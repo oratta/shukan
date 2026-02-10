@@ -1,0 +1,80 @@
+{
+  "app": {
+    "name": "Shukan",
+    "tagline": "Build better habits, one day at a time"
+  },
+  "nav": {
+    "today": "Today",
+    "stats": "Stats",
+    "settings": "Settings"
+  },
+  "habits": {
+    "title": "Today's Habits",
+    "empty": "No habits yet. Tap + to create your first habit!",
+    "add": "Add Habit",
+    "edit": "Edit Habit",
+    "delete": "Delete Habit",
+    "deleteConfirm": "Are you sure you want to delete this habit?",
+    "name": "Habit Name",
+    "namePlaceholder": "e.g., Morning meditation",
+    "description": "Description",
+    "descriptionPlaceholder": "Optional description...",
+    "icon": "Icon",
+    "color": "Color",
+    "frequency": "Frequency",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "custom": "Custom",
+    "save": "Save",
+    "cancel": "Cancel",
+    "completed": "Completed",
+    "streak": "day streak",
+    "streakPlural": "day streak"
+  },
+  "stats": {
+    "title": "Statistics",
+    "currentStreak": "Current Streak",
+    "longestStreak": "Longest Streak",
+    "completionRate": "Completion Rate",
+    "thisWeek": "This Week",
+    "thisMonth": "This Month",
+    "days": "days",
+    "noData": "Complete some habits to see your stats!"
+  },
+  "settings": {
+    "title": "Settings",
+    "appearance": "Appearance",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "language": "Language",
+    "english": "English",
+    "japanese": "Japanese",
+    "data": "Data",
+    "export": "Export Data",
+    "import": "Import Data",
+    "reset": "Reset All Data",
+    "resetConfirm": "This will delete all your habits and data. This cannot be undone.",
+    "about": "About",
+    "version": "Version"
+  },
+  "days": {
+    "sun": "Sun",
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit"
+  }
+}
