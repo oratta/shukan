@@ -1,13 +1,16 @@
 'use client';
 
 import { useTheme } from 'next-themes';
-import { Sun, Moon, CheckSquare } from 'lucide-react';
+import { Sun, Moon, CheckSquare, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LocaleSwitcher } from '@/components/locale-switcher';
+import { useAuth } from '@/components/auth-provider';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 export function Header() {
   const { theme, setTheme } = useTheme();
+  const { user } = useAuth();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -18,6 +21,8 @@ export function Header() {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
+  const avatarUrl = user?.user_metadata?.avatar_url;
+
   return (
     <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4">
@@ -26,6 +31,21 @@ export function Header() {
           <h1 className="text-lg font-bold tracking-tight">Shukan</h1>
         </div>
         <div className="flex items-center gap-1">
+          {user && (
+            <Link href="/settings" className="flex items-center">
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt=""
+                  className="size-7 rounded-full"
+                />
+              ) : (
+                <div className="flex size-7 items-center justify-center rounded-full bg-muted">
+                  <User className="size-3.5 text-muted-foreground" />
+                </div>
+              )}
+            </Link>
+          )}
           <LocaleSwitcher />
           {mounted && (
             <Button

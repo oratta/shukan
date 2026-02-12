@@ -4,19 +4,22 @@ import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { Sun, Moon, Monitor, Trash2, Download, Upload } from 'lucide-react';
+import { Sun, Moon, Monitor, Trash2, Download, Upload, LogOut, User } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { HABITS_KEY, COMPLETIONS_KEY, getItem } from '@/lib/storage';
+import { useAuth } from '@/components/auth-provider';
+import { createClient } from '@/lib/supabase/client';
 
 export default function SettingsPage() {
   const t = useTranslations();
   const { theme, setTheme } = useTheme();
   const locale = useLocale();
   const router = useRouter();
+  const { user } = useAuth();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -87,11 +90,65 @@ export default function SettingsPage() {
     { value: 'ja', label: '日本語' },
   ];
 
+  const handleSignOut = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    window.location.href = '/login';
+  };
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold tracking-tight">
         {t('settings.title')}
       </h2>
+
+      {user && (
+        <Card className="p-4">
+          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            {t('settings.account')}
+          </h3>
+
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              {user.user_metadata?.avatar_url ? (
+                <img
+                  src={user.user_metadata.avatar_url}
+                  alt=""
+                  className="size-10 rounded-full"
+                />
+              ) : (
+                <div className="flex size-10 items-center justify-center rounded-full bg-muted">
+                  <User className="size-5 text-muted-foreground" />
+                </div>
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">
+                  {user.user_metadata?.full_name || user.email}
+                </p>
+                <p className="truncate text-xs text-muted-foreground">
+                  {user.email}
+                </p>
+              </div>
+            </div>
+
+            <p className="text-xs text-muted-foreground">
+              {t('settings.syncEnabled')}
+            </p>
+
+            <Separator />
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSignOut}
+              className="w-full justify-start"
+            >
+              <LogOut className="mr-2 size-4" />
+              {t('settings.signOut')}
+            </Button>
+          </div>
+        </Card>
+      )}
 
       <Card className="p-4">
         <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">

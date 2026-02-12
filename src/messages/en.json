@@ -56,6 +56,13 @@
     "import": "Import Data",
     "reset": "Reset All Data",
     "resetConfirm": "This will delete all your habits and data. This cannot be undone.",
+    "account": "Account",
+    "signInWithGoogle": "Sign in with Google",
+    "signInDescription": "Sign in to sync your habits across devices.",
+    "signOut": "Sign Out",
+    "syncEnabled": "Your data is synced to the cloud.",
+    "loginTitle": "Welcome to Shukan",
+    "loginSubtitle": "Track your habits, build your life.",
     "about": "About",
     "version": "Version"
   },
@@ -67,6 +74,13 @@
     "thu": "Thu",
     "fri": "Fri",
     "sat": "Sat"
+  },
+  "auth": {
+    "loginTagline": "Track your habits, build your future",
+    "loginWith": "Sign in with {provider}",
+    "signingIn": "Signing in...",
+    "error": "Authentication failed. Please try again.",
+    "signOut": "Sign Out"
   },
   "common": {
     "loading": "Loading...",

@@ -2,99 +2,98 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import type { Habit, HabitCompletion, HabitWithStats } from '@/types/habit';
+import { useAuth } from '@/components/auth-provider';
+import { getTodayString, getHabitsWithStats } from '@/lib/habits';
 import {
-  getItem,
-  setItem,
-  HABITS_KEY,
-  COMPLETIONS_KEY,
-} from '@/lib/storage';
-import {
-  generateId,
-  getTodayString,
-  getHabitsWithStats,
-} from '@/lib/habits';
+  fetchHabits,
+  fetchCompletions,
+  insertHabit,
+  updateHabitById,
+  deleteHabitById,
+  insertCompletion,
+  deleteCompletion,
+} from '@/lib/supabase/habits';
 
 export function useHabits() {
+  const { user } = useAuth();
   const [habits, setHabits] = useState<Habit[]>([]);
   const [completions, setCompletions] = useState<HabitCompletion[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedHabits = getItem<Habit[]>(HABITS_KEY) ?? [];
-    const storedCompletions =
-      getItem<HabitCompletion[]>(COMPLETIONS_KEY) ?? [];
-    setHabits(storedHabits);
-    setCompletions(storedCompletions);
-    setLoading(false);
-  }, []);
+    if (!user) {
+      setHabits([]);
+      setCompletions([]);
+      setLoading(false);
+      return;
+    }
 
-  const persistHabits = useCallback((updated: Habit[]) => {
-    setHabits(updated);
-    setItem(HABITS_KEY, updated);
-  }, []);
+    let cancelled = false;
 
-  const persistCompletions = useCallback((updated: HabitCompletion[]) => {
-    setCompletions(updated);
-    setItem(COMPLETIONS_KEY, updated);
-  }, []);
+    async function load() {
+      try {
+        const [h, c] = await Promise.all([fetchHabits(), fetchCompletions()]);
+        if (!cancelled) {
+          setHabits(h);
+          setCompletions(c);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    load();
+    return () => { cancelled = true; };
+  }, [user]);
 
   const addHabit = useCallback(
-    (habit: Omit<Habit, 'id' | 'createdAt' | 'archived'>) => {
-      const newHabit: Habit = {
-        ...habit,
-        id: generateId(),
-        createdAt: new Date().toISOString(),
-        archived: false,
-      };
-      persistHabits([...habits, newHabit]);
+    async (habit: Omit<Habit, 'id' | 'createdAt' | 'archived'>) => {
+      if (!user) return;
+      const newHabit = await insertHabit(user.id, habit);
+      setHabits((prev) => [...prev, newHabit]);
       return newHabit;
     },
-    [habits, persistHabits]
+    [user]
   );
 
   const updateHabit = useCallback(
-    (id: string, updates: Partial<Omit<Habit, 'id' | 'createdAt'>>) => {
-      const updated = habits.map((h) =>
-        h.id === id ? { ...h, ...updates } : h
+    async (id: string, updates: Partial<Omit<Habit, 'id' | 'createdAt'>>) => {
+      await updateHabitById(id, updates);
+      setHabits((prev) =>
+        prev.map((h) => (h.id === id ? { ...h, ...updates } : h))
       );
-      persistHabits(updated);
     },
-    [habits, persistHabits]
+    []
   );
 
   const deleteHabit = useCallback(
-    (id: string) => {
-      persistHabits(habits.filter((h) => h.id !== id));
-      persistCompletions(completions.filter((c) => c.habitId !== id));
+    async (id: string) => {
+      await deleteHabitById(id);
+      setHabits((prev) => prev.filter((h) => h.id !== id));
+      setCompletions((prev) => prev.filter((c) => c.habitId !== id));
     },
-    [habits, completions, persistHabits, persistCompletions]
+    []
   );
 
   const toggleCompletion = useCallback(
-    (habitId: string) => {
+    async (habitId: string) => {
+      if (!user) return;
       const today = getTodayString();
       const existing = completions.find(
         (c) => c.habitId === habitId && c.date === today
       );
 
       if (existing) {
-        persistCompletions(
-          completions.filter(
-            (c) => !(c.habitId === habitId && c.date === today)
-          )
+        await deleteCompletion(habitId, today);
+        setCompletions((prev) =>
+          prev.filter((c) => !(c.habitId === habitId && c.date === today))
         );
       } else {
-        persistCompletions([
-          ...completions,
-          {
-            habitId,
-            date: today,
-            completedAt: new Date().toISOString(),
-          },
-        ]);
+        const newCompletion = await insertCompletion(user.id, habitId, today);
+        setCompletions((prev) => [...prev, newCompletion]);
       }
     },
-    [completions, persistCompletions]
+    [user, completions]
   );
 
   const getStats = useCallback((): HabitWithStats[] => {

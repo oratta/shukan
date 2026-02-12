@@ -56,6 +56,13 @@
     "import": "データをインポート",
     "reset": "すべてのデータをリセット",
     "resetConfirm": "すべての習慣とデータが削除されます。この操作は取り消せません。",
+    "account": "アカウント",
+    "signInWithGoogle": "Googleでサインイン",
+    "signInDescription": "サインインして習慣をデバイス間で同期しましょう。",
+    "signOut": "サインアウト",
+    "syncEnabled": "データはクラウドに同期されています。",
+    "loginTitle": "Shukanへようこそ",
+    "loginSubtitle": "習慣を記録して、人生を築こう。",
     "about": "このアプリについて",
     "version": "バージョン"
   },
@@ -67,6 +74,13 @@
     "thu": "木",
     "fri": "金",
     "sat": "土"
+  },
+  "auth": {
+    "loginTagline": "習慣を記録して、未来を作ろう",
+    "loginWith": "{provider}でログイン",
+    "signingIn": "ログイン中...",
+    "error": "認証に失敗しました。もう一度お試しください。",
+    "signOut": "ログアウト"
   },
   "common": {
     "loading": "読み込み中...",
