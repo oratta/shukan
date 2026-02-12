@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { Plus, X } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -44,16 +46,24 @@ const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 interface HabitFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: Omit<Habit, 'id' | 'createdAt' | 'archived'>) => void;
+  onSubmit: (
+    data: Omit<Habit, 'id' | 'createdAt' | 'archived'>,
+    copingSteps?: { title: string; sortOrder: number }[]
+  ) => void;
+  onDelete?: () => void;
   initialData?: Partial<Habit>;
+  initialCopingSteps?: { title: string; sortOrder: number }[];
 }
 
 export function HabitForm({
   open,
   onOpenChange,
   onSubmit,
+  onDelete,
   initialData,
+  initialCopingSteps,
 }: HabitFormProps) {
+  const t = useTranslations('habits');
   const [name, setName] = useState(initialData?.name ?? '');
   const [description, setDescription] = useState(
     initialData?.description ?? ''
@@ -68,19 +78,38 @@ export function HabitForm({
   const [customDays, setCustomDays] = useState<number[]>(
     initialData?.customDays ?? [1, 2, 3, 4, 5]
   );
+  const [type, setType] = useState<'positive' | 'quit'>(
+    initialData?.type ?? 'positive'
+  );
+  const [dailyTarget, setDailyTarget] = useState(
+    initialData?.dailyTarget ?? 3
+  );
+  const [copingSteps, setCopingSteps] = useState<
+    { title: string; sortOrder: number }[]
+  >(initialCopingSteps ?? [{ title: '', sortOrder: 0 }]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
+    if (type === 'quit' && copingSteps.every((s) => !s.title.trim())) return;
 
-    onSubmit({
-      name: name.trim(),
-      description: description.trim() || undefined,
-      icon,
-      color,
-      frequency,
-      customDays: frequency === 'custom' ? customDays : undefined,
-    });
+    const validSteps = copingSteps
+      .filter((s) => s.title.trim())
+      .map((s, i) => ({ title: s.title.trim(), sortOrder: i }));
+
+    onSubmit(
+      {
+        name: name.trim(),
+        description: description.trim() || undefined,
+        icon,
+        color,
+        frequency,
+        customDays: frequency === 'custom' ? customDays : undefined,
+        type,
+        dailyTarget: type === 'quit' ? dailyTarget : 1,
+      },
+      type === 'quit' ? validSteps : undefined
+    );
 
     if (!initialData) {
       setName('');
@@ -89,6 +118,9 @@ export function HabitForm({
       setColor('oklch(0.6 0.2 260)');
       setFrequency('daily');
       setCustomDays([1, 2, 3, 4, 5]);
+      setType('positive');
+      setDailyTarget(3);
+      setCopingSteps([{ title: '', sortOrder: 0 }]);
     }
 
     onOpenChange(false);
@@ -100,40 +132,159 @@ export function HabitForm({
     );
   };
 
+  const addStep = () => {
+    setCopingSteps((prev) => [
+      ...prev,
+      { title: '', sortOrder: prev.length },
+    ]);
+  };
+
+  const removeStep = (index: number) => {
+    setCopingSteps((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const updateStep = (index: number, title: string) => {
+    setCopingSteps((prev) =>
+      prev.map((s, i) => (i === index ? { ...s, title } : s))
+    );
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {initialData ? 'Edit Habit' : 'New Habit'}
+            {t(initialData ? 'edit' : 'add')}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="habit-name">Name</Label>
+            <Label htmlFor="habit-name">{t('name')}</Label>
             <Input
               id="habit-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Morning exercise"
+              placeholder={t('namePlaceholder')}
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="habit-description">Description</Label>
+            <Label htmlFor="habit-description">{t('description')}</Label>
             <Textarea
               id="habit-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Optional details..."
+              placeholder={t('descriptionPlaceholder')}
               rows={2}
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Icon</Label>
+            <Label>{t('type')}</Label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setType('positive')}
+                className={cn(
+                  'flex flex-col items-center gap-1.5 rounded-lg border p-3 text-center transition-all',
+                  type === 'positive'
+                    ? 'ring-2 ring-primary border-primary'
+                    : 'hover:bg-accent'
+                )}
+              >
+                <span className="text-2xl">💪</span>
+                <span className="text-sm font-medium">{t('typePositive')}</span>
+                <span className="text-xs text-muted-foreground">
+                  {t('typePositiveDesc')}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setType('quit')}
+                className={cn(
+                  'flex flex-col items-center gap-1.5 rounded-lg border p-3 text-center transition-all',
+                  type === 'quit'
+                    ? 'ring-2 ring-primary border-primary'
+                    : 'hover:bg-accent'
+                )}
+              >
+                <span className="text-2xl">🛡️</span>
+                <span className="text-sm font-medium">{t('typeQuit')}</span>
+                <span className="text-xs text-muted-foreground">
+                  {t('typeQuitDesc')}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {type === 'quit' && (
+            <>
+              <div className="space-y-2">
+                <Label>{t('copingSteps')}</Label>
+                <p className="text-xs text-muted-foreground">
+                  {t('copingStepsDesc')}
+                </p>
+                <div className="space-y-2">
+                  {copingSteps.map((step, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Input
+                        value={step.title}
+                        onChange={(e) => updateStep(index, e.target.value)}
+                        placeholder={t('stepPlaceholder')}
+                        className="flex-1"
+                      />
+                      {copingSteps.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="shrink-0 size-9"
+                          onClick={() => removeStep(index)}
+                        >
+                          <X className="size-4" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addStep}
+                  className="w-full"
+                >
+                  <Plus className="size-4" />
+                  {t('addStep')}
+                </Button>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="daily-target">{t('dailyTarget')}</Label>
+                <p className="text-xs text-muted-foreground">
+                  {t('dailyTargetDesc')}
+                </p>
+                <Input
+                  id="daily-target"
+                  type="number"
+                  min={1}
+                  max={20}
+                  value={dailyTarget}
+                  onChange={(e) =>
+                    setDailyTarget(
+                      Math.max(1, Math.min(20, parseInt(e.target.value) || 1))
+                    )
+                  }
+                  className="w-24"
+                />
+              </div>
+            </>
+          )}
+
+          <div className="space-y-2">
+            <Label>{t('icon')}</Label>
             <div className="grid grid-cols-8 gap-1.5">
               {EMOJI_OPTIONS.map((emoji) => (
                 <button
@@ -153,7 +304,7 @@ export function HabitForm({
           </div>
 
           <div className="space-y-2">
-            <Label>Color</Label>
+            <Label>{t('color')}</Label>
             <div className="flex flex-wrap gap-2">
               {COLOR_OPTIONS.map((opt) => (
                 <button
@@ -162,7 +313,8 @@ export function HabitForm({
                   onClick={() => setColor(opt.value)}
                   className={cn(
                     'size-8 rounded-full transition-all hover:scale-110',
-                    color === opt.value && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
+                    color === opt.value &&
+                      'ring-2 ring-primary ring-offset-2 ring-offset-background'
                   )}
                   style={{ backgroundColor: opt.value }}
                   title={opt.label}
@@ -172,7 +324,7 @@ export function HabitForm({
           </div>
 
           <div className="space-y-2">
-            <Label>Frequency</Label>
+            <Label>{t('frequency')}</Label>
             <Select
               value={frequency}
               onValueChange={(v) =>
@@ -183,9 +335,9 @@ export function HabitForm({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="daily">Daily</SelectItem>
-                <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="custom">Custom</SelectItem>
+                <SelectItem value="daily">{t('daily')}</SelectItem>
+                <SelectItem value="weekly">{t('weekly')}</SelectItem>
+                <SelectItem value="custom">{t('custom')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -213,16 +365,26 @@ export function HabitForm({
             </div>
           )}
 
-          <DialogFooter>
+          <DialogFooter className="flex-row">
+            {initialData && onDelete && (
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={onDelete}
+                className="mr-auto"
+              >
+                {t('delete')}
+              </Button>
+            )}
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              {t('cancel')}
             </Button>
             <Button type="submit" disabled={!name.trim()}>
-              {initialData ? 'Save' : 'Create'}
+              {t('save')}
             </Button>
           </DialogFooter>
         </form>

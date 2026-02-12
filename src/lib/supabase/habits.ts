@@ -1,4 +1,4 @@
-import type { Habit, HabitCompletion } from '@/types/habit';
+import type { Habit, HabitCompletion, CopingStep, UrgeLog } from '@/types/habit';
 import { createClient } from './client';
 
 interface HabitRow {
@@ -10,8 +10,28 @@ interface HabitRow {
   color: string;
   frequency: 'daily' | 'weekly' | 'custom';
   custom_days: number[] | null;
+  type: string;
+  daily_target: number;
   created_at: string;
   archived: boolean;
+}
+
+interface CopingStepRow {
+  id: string;
+  habit_id: string;
+  title: string;
+  sort_order: number;
+  created_at: string;
+}
+
+interface UrgeLogRow {
+  id: string;
+  user_id: string;
+  habit_id: string;
+  date: string;
+  completed_steps: string[];
+  all_completed: boolean;
+  created_at: string;
 }
 
 interface CompletionRow {
@@ -31,8 +51,30 @@ function toHabit(row: HabitRow): Habit {
     color: row.color,
     frequency: row.frequency,
     customDays: row.custom_days ?? undefined,
+    type: (row.type as 'positive' | 'quit') || 'positive',
+    dailyTarget: row.daily_target ?? 1,
     createdAt: row.created_at,
     archived: row.archived,
+  };
+}
+
+function toCopingStep(row: CopingStepRow): CopingStep {
+  return {
+    id: row.id,
+    habitId: row.habit_id,
+    title: row.title,
+    sortOrder: row.sort_order,
+  };
+}
+
+function toUrgeLog(row: UrgeLogRow): UrgeLog {
+  return {
+    id: row.id,
+    habitId: row.habit_id,
+    date: row.date,
+    completedSteps: row.completed_steps ?? [],
+    allCompleted: row.all_completed,
+    createdAt: row.created_at,
   };
 }
 
@@ -81,6 +123,8 @@ export async function insertHabit(
       color: habit.color,
       frequency: habit.frequency,
       custom_days: habit.customDays || null,
+      type: habit.type || 'positive',
+      daily_target: habit.dailyTarget ?? 1,
     })
     .select()
     .single();
@@ -101,6 +145,8 @@ export async function updateHabitById(
   if (updates.color !== undefined) row.color = updates.color;
   if (updates.frequency !== undefined) row.frequency = updates.frequency;
   if (updates.customDays !== undefined) row.custom_days = updates.customDays || null;
+  if (updates.type !== undefined) row.type = updates.type;
+  if (updates.dailyTarget !== undefined) row.daily_target = updates.dailyTarget;
   if (updates.archived !== undefined) row.archived = updates.archived;
 
   const { error } = await supabase.from('habits').update(row).eq('id', id);
@@ -144,5 +190,109 @@ export async function deleteCompletion(
     .eq('habit_id', habitId)
     .eq('date', date);
 
+  if (error) throw error;
+}
+
+// --- Coping Steps ---
+
+export async function fetchCopingSteps(habitId: string): Promise<CopingStep[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('coping_steps')
+    .select('*')
+    .eq('habit_id', habitId)
+    .order('sort_order', { ascending: true });
+
+  if (error) throw error;
+  return (data as CopingStepRow[]).map(toCopingStep);
+}
+
+export async function upsertCopingSteps(
+  habitId: string,
+  steps: { title: string; sortOrder: number }[]
+): Promise<CopingStep[]> {
+  const supabase = createClient();
+
+  // Delete existing steps
+  const { error: deleteError } = await supabase
+    .from('coping_steps')
+    .delete()
+    .eq('habit_id', habitId);
+  if (deleteError) throw deleteError;
+
+  if (steps.length === 0) return [];
+
+  // Insert new steps
+  const rows = steps.map((s) => ({
+    habit_id: habitId,
+    title: s.title,
+    sort_order: s.sortOrder,
+  }));
+
+  const { data, error } = await supabase
+    .from('coping_steps')
+    .insert(rows)
+    .select();
+
+  if (error) throw error;
+  return (data as CopingStepRow[]).map(toCopingStep);
+}
+
+// --- Urge Logs ---
+
+export async function fetchUrgeLogsForDate(date: string): Promise<UrgeLog[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('urge_logs')
+    .select('*')
+    .eq('date', date)
+    .order('created_at', { ascending: true });
+
+  if (error) throw error;
+  return (data as UrgeLogRow[]).map(toUrgeLog);
+}
+
+export async function insertUrgeLog(
+  userId: string,
+  habitId: string,
+  date: string
+): Promise<UrgeLog> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('urge_logs')
+    .insert({
+      user_id: userId,
+      habit_id: habitId,
+      date,
+      completed_steps: [],
+      all_completed: false,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return toUrgeLog(data as UrgeLogRow);
+}
+
+export async function updateUrgeLog(
+  id: string,
+  completedSteps: string[],
+  allCompleted: boolean
+): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from('urge_logs')
+    .update({
+      completed_steps: completedSteps,
+      all_completed: allCompleted,
+    })
+    .eq('id', id);
+
+  if (error) throw error;
+}
+
+export async function deleteUrgeLog(id: string): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase.from('urge_logs').delete().eq('id', id);
   if (error) throw error;
 }

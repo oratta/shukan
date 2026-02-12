@@ -1,4 +1,4 @@
-import type { Habit, HabitCompletion, HabitWithStats } from '@/types/habit';
+import type { Habit, HabitCompletion, HabitWithStats, UrgeLog, CopingStep } from '@/types/habit';
 
 export function generateId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -133,18 +133,49 @@ export function shouldShowToday(habit: Habit): boolean {
   }
 }
 
+export function isQuitHabitCompletedToday(
+  habitId: string,
+  urgeLogs: UrgeLog[],
+  dailyTarget: number
+): boolean {
+  const today = getTodayString();
+  const todayLogs = urgeLogs.filter(
+    (log) => log.habitId === habitId && log.date === today && log.allCompleted
+  );
+  return todayLogs.length >= dailyTarget;
+}
+
+export function getTodayUrgeCount(
+  habitId: string,
+  urgeLogs: UrgeLog[]
+): number {
+  const today = getTodayString();
+  return urgeLogs.filter(
+    (log) => log.habitId === habitId && log.date === today && log.allCompleted
+  ).length;
+}
+
 export function getHabitsWithStats(
   habits: Habit[],
-  completions: HabitCompletion[]
+  completions: HabitCompletion[],
+  urgeLogs?: UrgeLog[],
+  copingStepsMap?: Map<string, CopingStep[]>
 ): HabitWithStats[] {
   return habits.map((habit) => {
     const { current, longest } = calculateStreak(habit.id, completions);
+    const isQuit = habit.type === 'quit';
+    const completedToday = isQuit && urgeLogs
+      ? isQuitHabitCompletedToday(habit.id, urgeLogs, habit.dailyTarget)
+      : isCompletedToday(habit.id, completions);
+
     return {
       ...habit,
       currentStreak: current,
       longestStreak: longest,
-      completedToday: isCompletedToday(habit.id, completions),
+      completedToday,
       completionRate: getCompletionRate(habit.id, completions, 30),
+      ...(isQuit && urgeLogs ? { todayUrgeCount: getTodayUrgeCount(habit.id, urgeLogs) } : {}),
+      ...(isQuit && copingStepsMap ? { copingSteps: copingStepsMap.get(habit.id) } : {}),
     };
   });
 }

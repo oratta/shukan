@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { Plus } from 'lucide-react';
 import { HabitCard } from '@/components/habits/habit-card';
 import { Button } from '@/components/ui/button';
@@ -11,9 +12,13 @@ interface HabitListProps {
   onToggle: (id: string) => void;
   onEdit: (id: string) => void;
   onAdd: () => void;
+  onActions: (id: string) => void;
+  onUrge: (id: string) => void;
 }
 
-export function HabitList({ habits, onToggle, onEdit, onAdd }: HabitListProps) {
+export function HabitList({ habits, onToggle, onEdit, onAdd, onActions, onUrge }: HabitListProps) {
+  const t = useTranslations('habits');
+
   const sortedHabits = useMemo(() => {
     return [...habits].sort((a, b) => {
       if (a.completedToday !== b.completedToday) {
@@ -28,13 +33,10 @@ export function HabitList({ habits, onToggle, onEdit, onAdd }: HabitListProps) {
       {sortedHabits.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <div className="mb-4 text-5xl">🌱</div>
-          <h3 className="mb-1 text-lg font-semibold">No habits yet</h3>
-          <p className="mb-6 text-sm text-muted-foreground">
-            Start building better habits today
-          </p>
-          <Button onClick={onAdd} size="sm">
+          <h3 className="mb-1 text-lg font-semibold">{t('empty')}</h3>
+          <Button onClick={onAdd} size="sm" className="mt-4">
             <Plus className="size-4" />
-            Add your first habit
+            {t('add')}
           </Button>
         </div>
       ) : (
@@ -45,6 +47,8 @@ export function HabitList({ habits, onToggle, onEdit, onAdd }: HabitListProps) {
               habit={habit}
               onToggle={onToggle}
               onEdit={onEdit}
+              onActions={onActions}
+              onUrge={onUrge}
             />
           ))}
         </div>

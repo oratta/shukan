@@ -4,23 +4,49 @@ import { useState, useMemo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { HabitList } from '@/components/habits/habit-list';
 import { HabitForm } from '@/components/habits/habit-form';
+import { HabitActions } from '@/components/habits/habit-actions';
+import { UrgeFlow } from '@/components/habits/urge-flow';
 import { useHabits } from '@/hooks/useHabits';
 import { shouldShowToday, getHabitsWithStats } from '@/lib/habits';
 import type { Habit } from '@/types/habit';
 
 export default function DashboardPage() {
   const t = useTranslations();
-  const { habits, completions, loading, addHabit, updateHabit, toggleCompletion } = useHabits();
+  const {
+    habits,
+    completions,
+    loading,
+    addHabit,
+    updateHabit,
+    deleteHabit,
+    toggleCompletion,
+    copingStepsMap,
+    urgeLogs,
+    startUrgeFlow,
+    completeUrgeStep,
+  } = useHabits();
   const [formOpen, setFormOpen] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
+  const [actionsHabitId, setActionsHabitId] = useState<string | null>(null);
+  const [urgeHabitId, setUrgeHabitId] = useState<string | null>(null);
 
   const todayHabits = useMemo(() => {
     const filtered = habits.filter(shouldShowToday);
-    return getHabitsWithStats(filtered, completions);
-  }, [habits, completions]);
+    return getHabitsWithStats(filtered, completions, urgeLogs, copingStepsMap);
+  }, [habits, completions, urgeLogs, copingStepsMap]);
 
   const completedCount = todayHabits.filter((h) => h.completedToday).length;
   const totalCount = todayHabits.length;
+
+  const actionsHabit = useMemo(
+    () => todayHabits.find((h) => h.id === actionsHabitId),
+    [todayHabits, actionsHabitId]
+  );
+
+  const urgeHabit = useMemo(
+    () => todayHabits.find((h) => h.id === urgeHabitId),
+    [todayHabits, urgeHabitId]
+  );
 
   const handleAdd = useCallback(() => {
     setEditingHabit(null);
@@ -39,16 +65,49 @@ export default function DashboardPage() {
   );
 
   const handleSubmit = useCallback(
-    (data: Omit<Habit, 'id' | 'createdAt' | 'archived'>) => {
+    (
+      data: Omit<Habit, 'id' | 'createdAt' | 'archived'>,
+      copingSteps?: { title: string; sortOrder: number }[]
+    ) => {
       if (editingHabit) {
-        updateHabit(editingHabit.id, data);
+        updateHabit(editingHabit.id, data, copingSteps);
       } else {
-        addHabit(data);
+        addHabit(data, copingSteps);
       }
       setEditingHabit(null);
     },
     [editingHabit, addHabit, updateHabit]
   );
+
+  const handleActions = useCallback((id: string) => {
+    setActionsHabitId(id);
+  }, []);
+
+  const handleUrge = useCallback((id: string) => {
+    setUrgeHabitId(id);
+  }, []);
+
+  const handleDelete = useCallback(() => {
+    if (actionsHabitId) {
+      deleteHabit(actionsHabitId);
+      setActionsHabitId(null);
+    }
+  }, [actionsHabitId, deleteHabit]);
+
+  const handleArchive = useCallback(() => {
+    if (actionsHabitId) {
+      updateHabit(actionsHabitId, { archived: true });
+      setActionsHabitId(null);
+    }
+  }, [actionsHabitId, updateHabit]);
+
+  const handleFormDelete = useCallback(() => {
+    if (editingHabit) {
+      deleteHabit(editingHabit.id);
+      setEditingHabit(null);
+      setFormOpen(false);
+    }
+  }, [editingHabit, deleteHabit]);
 
   if (loading) {
     return (
@@ -87,14 +146,48 @@ export default function DashboardPage() {
         onToggle={toggleCompletion}
         onEdit={handleEdit}
         onAdd={handleAdd}
+        onActions={handleActions}
+        onUrge={handleUrge}
       />
 
       <HabitForm
         open={formOpen}
         onOpenChange={setFormOpen}
         onSubmit={handleSubmit}
+        onDelete={editingHabit ? handleFormDelete : undefined}
         initialData={editingHabit ?? undefined}
+        initialCopingSteps={
+          editingHabit
+            ? copingStepsMap
+                ?.get(editingHabit.id)
+                ?.map((s) => ({ title: s.title, sortOrder: s.sortOrder }))
+            : undefined
+        }
       />
+
+      <HabitActions
+        open={!!actionsHabitId}
+        onOpenChange={(open) => !open && setActionsHabitId(null)}
+        habitName={actionsHabit?.name ?? ''}
+        onEdit={() => {
+          if (actionsHabitId) {
+            handleEdit(actionsHabitId);
+            setActionsHabitId(null);
+          }
+        }}
+        onArchive={handleArchive}
+        onDelete={handleDelete}
+      />
+
+      {urgeHabit && (
+        <UrgeFlow
+          open={!!urgeHabitId}
+          onOpenChange={(open) => !open && setUrgeHabitId(null)}
+          habit={urgeHabit}
+          onStartFlow={() => startUrgeFlow(urgeHabitId!)}
+          onCompleteStep={completeUrgeStep}
+        />
+      )}
     </div>
   );
 }
