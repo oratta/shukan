@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { CheckCircle2, Flame } from 'lucide-react';
 import {
   Sheet,
@@ -42,22 +42,21 @@ export function UrgeFlow({
 
   const steps = habit.copingSteps ?? [];
   const todayCount = habit.todayUrgeCount ?? 0;
-
-  const initFlow = useCallback(async () => {
-    setCheckedSteps(new Set());
-    setAllDone(false);
-    setDailyDone(false);
-    const log = await onStartFlow();
-    setCurrentLog(log);
-  }, [onStartFlow]);
+  const initializedRef = useRef(false);
 
   useEffect(() => {
-    if (open) {
-      initFlow();
-    } else {
+    if (open && !initializedRef.current) {
+      initializedRef.current = true;
+      setCheckedSteps(new Set());
+      setAllDone(false);
+      setDailyDone(false);
+      onStartFlow().then((log) => setCurrentLog(log));
+    }
+    if (!open) {
+      initializedRef.current = false;
       setCurrentLog(null);
     }
-  }, [open, initFlow]);
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleCheck = async (stepId: string) => {
     if (!currentLog || checkedSteps.has(stepId)) return;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Plus, X } from 'lucide-react';
 import {
@@ -87,6 +87,19 @@ export function HabitForm({
   const [copingSteps, setCopingSteps] = useState<
     { title: string; sortOrder: number }[]
   >(initialCopingSteps ?? [{ title: '', sortOrder: 0 }]);
+
+  // Sync state when initialData/initialCopingSteps change (e.g., editing a different habit)
+  useEffect(() => {
+    setName(initialData?.name ?? '');
+    setDescription(initialData?.description ?? '');
+    setIcon(initialData?.icon ?? '💪');
+    setColor(initialData?.color ?? 'oklch(0.6 0.2 260)');
+    setFrequency(initialData?.frequency ?? 'daily');
+    setCustomDays(initialData?.customDays ?? [1, 2, 3, 4, 5]);
+    setType(initialData?.type ?? 'positive');
+    setDailyTarget(initialData?.dailyTarget ?? 3);
+    setCopingSteps(initialCopingSteps ?? [{ title: '', sortOrder: 0 }]);
+  }, [initialData, initialCopingSteps]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

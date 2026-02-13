@@ -50,7 +50,10 @@
     "urgeDailyDone": "今日の目標達成！",
     "sets": "セット",
     "actions": "アクション",
-    "moreActions": "その他のアクション"
+    "moreActions": "その他のアクション",
+    "quitUrgeDesc": "コーピングフローで対処する",
+    "quitDailyOk": "今日は大丈夫だった",
+    "quitDailyOkDesc": "衝動なく1日を過ごせた"
   },
   "stats": {
     "title": "統計",

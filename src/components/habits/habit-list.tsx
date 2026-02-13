@@ -9,14 +9,14 @@ import type { HabitWithStats } from '@/types/habit';
 
 interface HabitListProps {
   habits: HabitWithStats[];
-  onToggle: (id: string) => void;
+  onDayStatusChange: (habitId: string, date: string, status: 'completed' | 'failed' | 'none') => void;
   onEdit: (id: string) => void;
   onAdd: () => void;
   onActions: (id: string) => void;
-  onUrge: (id: string) => void;
+  onQuitToday: (id: string) => void;
 }
 
-export function HabitList({ habits, onToggle, onEdit, onAdd, onActions, onUrge }: HabitListProps) {
+export function HabitList({ habits, onDayStatusChange, onEdit, onAdd, onActions, onQuitToday }: HabitListProps) {
   const t = useTranslations('habits');
 
   const sortedHabits = useMemo(() => {
@@ -45,10 +45,10 @@ export function HabitList({ habits, onToggle, onEdit, onAdd, onActions, onUrge }
             <HabitCard
               key={habit.id}
               habit={habit}
-              onToggle={onToggle}
+              onDayStatusChange={onDayStatusChange}
               onEdit={onEdit}
               onActions={onActions}
-              onUrge={onUrge}
+              onQuitToday={onQuitToday}
             />
           ))}
         </div>

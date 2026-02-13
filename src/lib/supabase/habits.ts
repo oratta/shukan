@@ -40,6 +40,7 @@ interface CompletionRow {
   habit_id: string;
   date: string;
   completed_at: string;
+  status: string;
 }
 
 function toHabit(row: HabitRow): Habit {
@@ -83,6 +84,7 @@ function toCompletion(row: CompletionRow): HabitCompletion {
     habitId: row.habit_id,
     date: row.date,
     completedAt: row.completed_at,
+    status: (row.status as 'completed' | 'failed') || 'completed',
   };
 }
 
@@ -162,7 +164,8 @@ export async function deleteHabitById(id: string): Promise<void> {
 export async function insertCompletion(
   userId: string,
   habitId: string,
-  date: string
+  date: string,
+  status: 'completed' | 'failed' = 'completed'
 ): Promise<HabitCompletion> {
   const supabase = createClient();
   const { data, error } = await supabase
@@ -171,12 +174,41 @@ export async function insertCompletion(
       user_id: userId,
       habit_id: habitId,
       date,
+      status,
     })
     .select()
     .single();
 
   if (error) throw error;
   return toCompletion(data as CompletionRow);
+}
+
+export async function upsertCompletion(
+  userId: string,
+  habitId: string,
+  date: string,
+  status: 'completed' | 'failed'
+): Promise<HabitCompletion> {
+  const supabase = createClient();
+  const { data: existing } = await supabase
+    .from('habit_completions')
+    .select('*')
+    .eq('habit_id', habitId)
+    .eq('date', date)
+    .maybeSingle();
+
+  if (existing) {
+    const { data, error } = await supabase
+      .from('habit_completions')
+      .update({ status })
+      .eq('id', existing.id)
+      .select()
+      .single();
+    if (error) throw error;
+    return toCompletion(data as CompletionRow);
+  } else {
+    return insertCompletion(userId, habitId, date, status);
+  }
 }
 
 export async function deleteCompletion(

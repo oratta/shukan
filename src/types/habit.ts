@@ -32,6 +32,12 @@ export interface HabitCompletion {
   habitId: string;
   date: string;
   completedAt: string;
+  status: 'completed' | 'failed';
+}
+
+export interface DayStatus {
+  date: string;
+  status: 'completed' | 'failed' | 'none';
 }
 
 export interface HabitWithStats extends Habit {
@@ -39,6 +45,7 @@ export interface HabitWithStats extends Habit {
   longestStreak: number;
   completedToday: boolean;
   completionRate: number;
+  recentDays: DayStatus[];
   copingSteps?: CopingStep[];
   todayUrgeCount?: number;
 }

@@ -1,56 +1,95 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Check, MoreVertical, Shield } from 'lucide-react';
+import { Check, MoreVertical, Shield, X } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { ProgressRing } from '@/components/habits/progress-ring';
 import { StreakBadge } from '@/components/habits/streak-badge';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import type { HabitWithStats } from '@/types/habit';
+import { getTodayString } from '@/lib/habits';
+import type { DayStatus, HabitWithStats } from '@/types/habit';
 
 interface HabitCardProps {
   habit: HabitWithStats;
-  onToggle: (id: string) => void;
+  onDayStatusChange: (habitId: string, date: string, status: 'completed' | 'failed' | 'none') => void;
   onEdit: (id: string) => void;
   onActions: (id: string) => void;
-  onUrge?: (id: string) => void;
+  onQuitToday?: (id: string) => void;
 }
 
-export function HabitCard({ habit, onToggle, onEdit, onActions, onUrge }: HabitCardProps) {
+function DayStatusDot({
+  day,
+  isToday,
+  habitColor,
+  onTap,
+}: {
+  day: DayStatus;
+  isToday: boolean;
+  habitColor: string;
+  onTap: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onTap}
+      className={cn(
+        'flex items-center justify-center rounded-full size-7 transition-all',
+        day.status === 'completed' && 'bg-green-500 text-white',
+        day.status === 'failed' && 'bg-red-400 text-white',
+        day.status === 'none' && 'bg-muted',
+        isToday && 'ring-2 ring-offset-1 ring-offset-background ring-primary/50',
+      )}
+    >
+      {day.status === 'completed' && <Check className="size-3.5" />}
+      {day.status === 'failed' && <X className="size-3.5" />}
+    </button>
+  );
+}
+
+const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
+
+function nextStatus(current: 'completed' | 'failed' | 'none'): 'completed' | 'failed' | 'none' {
+  if (current === 'none') return 'completed';
+  if (current === 'completed') return 'failed';
+  return 'none';
+}
+
+export function HabitCard({ habit, onDayStatusChange, onEdit, onActions, onQuitToday }: HabitCardProps) {
   const t = useTranslations('habits');
+  const tDays = useTranslations('days');
   const isQuit = habit.type === 'quit';
 
-  const handleClick = () => {
-    if (isQuit) {
-      onUrge?.(habit.id);
+  const today = getTodayString();
+
+  const handleDotTap = (day: DayStatus) => {
+    if (isQuit && day.date === today) {
+      onQuitToday?.(habit.id);
     } else {
-      onToggle(habit.id);
+      onDayStatusChange(habit.id, day.date, nextStatus(day.status));
     }
   };
 
   return (
     <Card
       className={cn(
-        'group relative cursor-pointer gap-0 py-0 transition-all duration-200 hover:shadow-md active:scale-[0.98]',
+        'group relative gap-0 py-0 transition-all duration-200',
         habit.completedToday &&
           'border-green-200 bg-green-50/50 dark:border-green-900/50 dark:bg-green-950/20'
       )}
-      onClick={handleClick}
     >
       <div className="flex items-center gap-3 p-4">
         <div
           className={cn(
-            'flex size-12 shrink-0 items-center justify-center rounded-xl text-2xl transition-all duration-200',
+            'flex size-10 shrink-0 items-center justify-center rounded-xl text-xl transition-all duration-200',
             habit.completedToday
               ? 'bg-green-100 dark:bg-green-900/40'
               : 'bg-muted'
           )}
         >
           {habit.completedToday ? (
-            <Check className="size-6 text-green-600 dark:text-green-400" />
+            <Check className="size-5 text-green-600 dark:text-green-400" />
           ) : isQuit ? (
-            <Shield className="size-6 text-orange-500" />
+            <Shield className="size-5 text-orange-500" />
           ) : (
             <span>{habit.icon}</span>
           )}
@@ -87,31 +126,34 @@ export function HabitCard({ habit, onToggle, onEdit, onActions, onUrge }: HabitC
           )}
         </div>
 
-        <div className="shrink-0">
-          {!isQuit && (
-            <ProgressRing
-              progress={habit.completionRate}
-              size={44}
-              strokeWidth={3}
-              color={
-                habit.completedToday
-                  ? 'oklch(0.6 0.18 145)'
-                  : habit.color || 'oklch(0.6 0.2 260)'
-              }
-            />
-          )}
+        <div className="flex flex-col items-end gap-1 shrink-0">
+          <div className="flex items-center gap-1">
+            {(habit.recentDays ?? []).map((day) => {
+              const [y, m, d] = day.date.split('-').map(Number);
+              const dayKey = DAY_KEYS[new Date(y, m - 1, d).getDay()];
+              return (
+                <div key={day.date} className="flex flex-col items-center gap-0.5">
+                  <DayStatusDot
+                    day={day}
+                    isToday={day.date === today}
+                    habitColor={habit.color}
+                    onTap={() => handleDotTap(day)}
+                  />
+                  <span className="text-[10px] text-muted-foreground leading-none">
+                    {tDays(dayKey).charAt(0)}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+          <button
+            type="button"
+            onClick={() => onActions(habit.id)}
+            className="shrink-0 rounded-full p-1 hover:bg-accent"
+          >
+            <MoreVertical className="size-4 text-muted-foreground" />
+          </button>
         </div>
-
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onActions(habit.id);
-          }}
-          className="shrink-0 rounded-full p-1.5 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-accent focus:opacity-100"
-        >
-          <MoreVertical className="size-5 text-muted-foreground" />
-        </button>
       </div>
     </Card>
   );

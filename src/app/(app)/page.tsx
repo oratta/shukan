@@ -6,6 +6,7 @@ import { HabitList } from '@/components/habits/habit-list';
 import { HabitForm } from '@/components/habits/habit-form';
 import { HabitActions } from '@/components/habits/habit-actions';
 import { UrgeFlow } from '@/components/habits/urge-flow';
+import { QuitTodaySheet } from '@/components/habits/quit-today-sheet';
 import { useHabits } from '@/hooks/useHabits';
 import { shouldShowToday, getHabitsWithStats } from '@/lib/habits';
 import type { Habit } from '@/types/habit';
@@ -19,7 +20,8 @@ export default function DashboardPage() {
     addHabit,
     updateHabit,
     deleteHabit,
-    toggleCompletion,
+    setDayStatus,
+    markQuitDailyDone,
     copingStepsMap,
     urgeLogs,
     startUrgeFlow,
@@ -29,6 +31,7 @@ export default function DashboardPage() {
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [actionsHabitId, setActionsHabitId] = useState<string | null>(null);
   const [urgeHabitId, setUrgeHabitId] = useState<string | null>(null);
+  const [quitTodayHabitId, setQuitTodayHabitId] = useState<string | null>(null);
 
   const todayHabits = useMemo(() => {
     const filtered = habits.filter(shouldShowToday);
@@ -46,6 +49,11 @@ export default function DashboardPage() {
   const urgeHabit = useMemo(
     () => todayHabits.find((h) => h.id === urgeHabitId),
     [todayHabits, urgeHabitId]
+  );
+
+  const quitTodayHabit = useMemo(
+    () => todayHabits.find((h) => h.id === quitTodayHabitId),
+    [todayHabits, quitTodayHabitId]
   );
 
   const handleAdd = useCallback(() => {
@@ -83,8 +91,8 @@ export default function DashboardPage() {
     setActionsHabitId(id);
   }, []);
 
-  const handleUrge = useCallback((id: string) => {
-    setUrgeHabitId(id);
+  const handleQuitToday = useCallback((id: string) => {
+    setQuitTodayHabitId(id);
   }, []);
 
   const handleDelete = useCallback(() => {
@@ -143,11 +151,11 @@ export default function DashboardPage() {
 
       <HabitList
         habits={todayHabits}
-        onToggle={toggleCompletion}
+        onDayStatusChange={setDayStatus}
         onEdit={handleEdit}
         onAdd={handleAdd}
         onActions={handleActions}
-        onUrge={handleUrge}
+        onQuitToday={handleQuitToday}
       />
 
       <HabitForm
@@ -177,6 +185,24 @@ export default function DashboardPage() {
         }}
         onArchive={handleArchive}
         onDelete={handleDelete}
+      />
+
+      <QuitTodaySheet
+        open={!!quitTodayHabitId}
+        onOpenChange={(open) => !open && setQuitTodayHabitId(null)}
+        habitName={quitTodayHabit?.name ?? ''}
+        onUrge={() => {
+          if (quitTodayHabitId) {
+            setUrgeHabitId(quitTodayHabitId);
+            setQuitTodayHabitId(null);
+          }
+        }}
+        onDailyDone={() => {
+          if (quitTodayHabitId) {
+            markQuitDailyDone(quitTodayHabitId);
+            setQuitTodayHabitId(null);
+          }
+        }}
       />
 
       {urgeHabit && (

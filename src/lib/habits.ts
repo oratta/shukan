@@ -1,4 +1,4 @@
-import type { Habit, HabitCompletion, HabitWithStats, UrgeLog, CopingStep } from '@/types/habit';
+import type { Habit, HabitCompletion, HabitWithStats, UrgeLog, CopingStep, DayStatus } from '@/types/habit';
 
 export function generateId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -24,7 +24,7 @@ export function isCompletedToday(
   completions: HabitCompletion[]
 ): boolean {
   const today = getTodayString();
-  return completions.some((c) => c.habitId === habitId && c.date === today);
+  return completions.some((c) => c.habitId === habitId && c.date === today && c.status === 'completed');
 }
 
 export function calculateStreak(
@@ -32,7 +32,7 @@ export function calculateStreak(
   completions: HabitCompletion[]
 ): { current: number; longest: number } {
   const habitCompletions = completions
-    .filter((c) => c.habitId === habitId)
+    .filter((c) => c.habitId === habitId && c.status === 'completed')
     .map((c) => c.date)
     .sort()
     .reverse();
@@ -109,7 +109,7 @@ export function getCompletionRate(
 
   const completedDays = new Set(
     completions
-      .filter((c) => c.habitId === habitId && c.date >= startStr)
+      .filter((c) => c.habitId === habitId && c.date >= startStr && c.status === 'completed')
       .map((c) => c.date)
   );
 
@@ -155,6 +155,28 @@ export function getTodayUrgeCount(
   ).length;
 }
 
+export function getRecentDays(
+  habitId: string,
+  completions: HabitCompletion[],
+  days: number = 5
+): DayStatus[] {
+  const today = new Date();
+  const result: DayStatus[] = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const dateStr = getDateString(d);
+    const completion = completions.find(
+      (c) => c.habitId === habitId && c.date === dateStr
+    );
+    result.push({
+      date: dateStr,
+      status: completion ? completion.status : 'none',
+    });
+  }
+  return result;
+}
+
 export function getHabitsWithStats(
   habits: Habit[],
   completions: HabitCompletion[],
@@ -174,6 +196,7 @@ export function getHabitsWithStats(
       longestStreak: longest,
       completedToday,
       completionRate: getCompletionRate(habit.id, completions, 30),
+      recentDays: getRecentDays(habit.id, completions),
       ...(isQuit && urgeLogs ? { todayUrgeCount: getTodayUrgeCount(habit.id, urgeLogs) } : {}),
       ...(isQuit && copingStepsMap ? { copingSteps: copingStepsMap.get(habit.id) } : {}),
     };

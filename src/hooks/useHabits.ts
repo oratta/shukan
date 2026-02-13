@@ -10,8 +10,8 @@ import {
   insertHabit,
   updateHabitById,
   deleteHabitById,
-  insertCompletion,
   deleteCompletion,
+  upsertCompletion,
   fetchCopingSteps,
   upsertCopingSteps,
   fetchUrgeLogsForDate,
@@ -119,25 +119,36 @@ export function useHabits() {
     []
   );
 
-  const toggleCompletion = useCallback(
+  const setDayStatus = useCallback(
+    async (habitId: string, date: string, status: 'completed' | 'failed' | 'none') => {
+      if (!user) return;
+      if (status === 'none') {
+        await deleteCompletion(habitId, date);
+        setCompletions((prev) =>
+          prev.filter((c) => !(c.habitId === habitId && c.date === date))
+        );
+      } else {
+        const updated = await upsertCompletion(user.id, habitId, date, status);
+        setCompletions((prev) => {
+          const filtered = prev.filter((c) => !(c.habitId === habitId && c.date === date));
+          return [...filtered, updated];
+        });
+      }
+    },
+    [user]
+  );
+
+  const markQuitDailyDone = useCallback(
     async (habitId: string) => {
       if (!user) return;
       const today = getTodayString();
-      const existing = completions.find(
-        (c) => c.habitId === habitId && c.date === today
-      );
-
-      if (existing) {
-        await deleteCompletion(habitId, today);
-        setCompletions((prev) =>
-          prev.filter((c) => !(c.habitId === habitId && c.date === today))
-        );
-      } else {
-        const newCompletion = await insertCompletion(user.id, habitId, today);
-        setCompletions((prev) => [...prev, newCompletion]);
-      }
+      const updated = await upsertCompletion(user.id, habitId, today, 'completed');
+      setCompletions((prev) => {
+        const filtered = prev.filter((c) => !(c.habitId === habitId && c.date === today));
+        return [...filtered, updated];
+      });
     },
-    [user, completions]
+    [user]
   );
 
   const startUrgeFlow = useCallback(async (habitId: string): Promise<UrgeLog> => {
@@ -169,7 +180,8 @@ export function useHabits() {
     addHabit,
     updateHabit,
     deleteHabit,
-    toggleCompletion,
+    setDayStatus,
+    markQuitDailyDone,
     getStats,
     copingStepsMap,
     urgeLogs,

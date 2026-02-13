@@ -50,7 +50,10 @@
     "urgeDailyDone": "Daily goal achieved!",
     "sets": "sets",
     "actions": "Actions",
-    "moreActions": "More Actions"
+    "moreActions": "More Actions",
+    "quitUrgeDesc": "Start coping flow",
+    "quitDailyOk": "I was fine today",
+    "quitDailyOkDesc": "Got through the day without urges"
   },
   "stats": {
     "title": "Statistics",
