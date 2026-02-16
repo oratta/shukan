@@ -12,7 +12,9 @@ export async function GET(request: Request) {
     if (!error) {
       const forwardedHost = request.headers.get('x-forwarded-host');
       if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}`);
+        const isLocalhost = forwardedHost.includes('localhost') || forwardedHost.includes('127.0.0.1');
+        const protocol = isLocalhost ? 'http' : 'https';
+        return NextResponse.redirect(`${protocol}://${forwardedHost}`);
       }
       return NextResponse.redirect(`${origin}/`);
     }
