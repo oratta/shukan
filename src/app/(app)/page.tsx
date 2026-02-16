@@ -5,8 +5,8 @@ import { useTranslations } from 'next-intl';
 import { HabitList } from '@/components/habits/habit-list';
 import { HabitForm } from '@/components/habits/habit-form';
 import { HabitActions } from '@/components/habits/habit-actions';
-import { UrgeFlow } from '@/components/habits/urge-flow';
-import { QuitTodaySheet } from '@/components/habits/quit-today-sheet';
+import { HabitDetailModal } from '@/components/habits/habit-detail-modal';
+import { VsTemptationModal } from '@/components/habits/vs-temptation-modal';
 import { useHabits } from '@/hooks/useHabits';
 import { shouldShowToday, getHabitsWithStats } from '@/lib/habits';
 import type { Habit } from '@/types/habit';
@@ -21,17 +21,17 @@ export default function DashboardPage() {
     updateHabit,
     deleteHabit,
     setDayStatus,
-    markQuitDailyDone,
     copingStepsMap,
     urgeLogs,
     startUrgeFlow,
     completeUrgeStep,
+    useRocket,
   } = useHabits();
   const [formOpen, setFormOpen] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [actionsHabitId, setActionsHabitId] = useState<string | null>(null);
-  const [urgeHabitId, setUrgeHabitId] = useState<string | null>(null);
-  const [quitTodayHabitId, setQuitTodayHabitId] = useState<string | null>(null);
+  const [detailHabitId, setDetailHabitId] = useState<string | null>(null);
+  const [vsHabitId, setVsHabitId] = useState<string | null>(null);
 
   const todayHabits = useMemo(() => {
     const filtered = habits.filter(shouldShowToday);
@@ -46,14 +46,14 @@ export default function DashboardPage() {
     [todayHabits, actionsHabitId]
   );
 
-  const urgeHabit = useMemo(
-    () => todayHabits.find((h) => h.id === urgeHabitId),
-    [todayHabits, urgeHabitId]
+  const detailHabit = useMemo(
+    () => todayHabits.find((h) => h.id === detailHabitId) ?? null,
+    [todayHabits, detailHabitId]
   );
 
-  const quitTodayHabit = useMemo(
-    () => todayHabits.find((h) => h.id === quitTodayHabitId),
-    [todayHabits, quitTodayHabitId]
+  const vsHabit = useMemo(
+    () => todayHabits.find((h) => h.id === vsHabitId) ?? null,
+    [todayHabits, vsHabitId]
   );
 
   const handleAdd = useCallback(() => {
@@ -91,8 +91,12 @@ export default function DashboardPage() {
     setActionsHabitId(id);
   }, []);
 
-  const handleQuitToday = useCallback((id: string) => {
-    setQuitTodayHabitId(id);
+  const handleOpenDetail = useCallback((id: string) => {
+    setDetailHabitId(id);
+  }, []);
+
+  const handleOpenVsTemptation = useCallback((id: string) => {
+    setVsHabitId(id);
   }, []);
 
   const handleDelete = useCallback(() => {
@@ -152,10 +156,10 @@ export default function DashboardPage() {
       <HabitList
         habits={todayHabits}
         onDayStatusChange={setDayStatus}
-        onEdit={handleEdit}
         onAdd={handleAdd}
         onActions={handleActions}
-        onQuitToday={handleQuitToday}
+        onOpenDetail={handleOpenDetail}
+        onOpenVsTemptation={handleOpenVsTemptation}
       />
 
       <HabitForm
@@ -187,33 +191,20 @@ export default function DashboardPage() {
         onDelete={handleDelete}
       />
 
-      <QuitTodaySheet
-        open={!!quitTodayHabitId}
-        onOpenChange={(open) => !open && setQuitTodayHabitId(null)}
-        habitName={quitTodayHabit?.name ?? ''}
-        onUrge={() => {
-          if (quitTodayHabitId) {
-            setUrgeHabitId(quitTodayHabitId);
-            setQuitTodayHabitId(null);
-          }
-        }}
-        onDailyDone={() => {
-          if (quitTodayHabitId) {
-            markQuitDailyDone(quitTodayHabitId);
-            setQuitTodayHabitId(null);
-          }
-        }}
+      <HabitDetailModal
+        open={!!detailHabitId}
+        onOpenChange={(open) => !open && setDetailHabitId(null)}
+        habit={detailHabit}
+        onUseRocket={useRocket}
       />
 
-      {urgeHabit && (
-        <UrgeFlow
-          open={!!urgeHabitId}
-          onOpenChange={(open) => !open && setUrgeHabitId(null)}
-          habit={urgeHabit}
-          onStartFlow={() => startUrgeFlow(urgeHabitId!)}
-          onCompleteStep={completeUrgeStep}
-        />
-      )}
+      <VsTemptationModal
+        open={!!vsHabitId}
+        onOpenChange={(open) => !open && setVsHabitId(null)}
+        habit={vsHabit}
+        onStartFlow={() => startUrgeFlow(vsHabitId!)}
+        onCompleteStep={completeUrgeStep}
+      />
     </div>
   );
 }

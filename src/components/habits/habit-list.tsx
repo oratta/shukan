@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Plus } from 'lucide-react';
 import { HabitCard } from '@/components/habits/habit-card';
@@ -10,14 +10,26 @@ import type { HabitWithStats } from '@/types/habit';
 interface HabitListProps {
   habits: HabitWithStats[];
   onDayStatusChange: (habitId: string, date: string, status: 'completed' | 'failed' | 'none') => void;
-  onEdit: (id: string) => void;
   onAdd: () => void;
   onActions: (id: string) => void;
-  onQuitToday: (id: string) => void;
+  onOpenDetail: (id: string) => void;
+  onOpenVsTemptation: (id: string) => void;
 }
 
-export function HabitList({ habits, onDayStatusChange, onEdit, onAdd, onActions, onQuitToday }: HabitListProps) {
+export function HabitList({
+  habits,
+  onDayStatusChange,
+  onAdd,
+  onActions,
+  onOpenDetail,
+  onOpenVsTemptation,
+}: HabitListProps) {
   const t = useTranslations('habits');
+  const [expandedHabitId, setExpandedHabitId] = useState<string | null>(null);
+
+  const handleToggleExpand = useCallback((id: string) => {
+    setExpandedHabitId((prev) => (prev === id ? null : id));
+  }, []);
 
   const sortedHabits = useMemo(() => {
     return [...habits].sort((a, b) => {
@@ -45,10 +57,12 @@ export function HabitList({ habits, onDayStatusChange, onEdit, onAdd, onActions,
             <HabitCard
               key={habit.id}
               habit={habit}
+              isExpanded={expandedHabitId === habit.id}
+              onToggleExpand={handleToggleExpand}
               onDayStatusChange={onDayStatusChange}
-              onEdit={onEdit}
+              onOpenDetail={onOpenDetail}
+              onOpenVsTemptation={onOpenVsTemptation}
               onActions={onActions}
-              onQuitToday={onQuitToday}
             />
           ))}
         </div>

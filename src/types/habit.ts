@@ -2,6 +2,7 @@ export interface Habit {
   id: string;
   name: string;
   description?: string;
+  lifeSignificance?: string;
   icon: string;
   color: string;
   frequency: 'daily' | 'weekly' | 'custom';
@@ -32,7 +33,7 @@ export interface HabitCompletion {
   habitId: string;
   date: string;
   completedAt: string;
-  status: 'completed' | 'failed';
+  status: 'completed' | 'failed' | 'rocket_used';
 }
 
 export interface DayStatus {
@@ -46,6 +47,9 @@ export interface HabitWithStats extends Habit {
   completedToday: boolean;
   completionRate: number;
   recentDays: DayStatus[];
+  allDays: DayStatus[];
+  rockets: number;
+  rocketNextIn: number;
   copingSteps?: CopingStep[];
   todayUrgeCount?: number;
 }

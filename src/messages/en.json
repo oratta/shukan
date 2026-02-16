@@ -53,7 +53,20 @@
     "moreActions": "More Actions",
     "quitUrgeDesc": "Start coping flow",
     "quitDailyOk": "I was fine today",
-    "quitDailyOkDesc": "Got through the day without urges"
+    "quitDailyOkDesc": "Got through the day without urges",
+    "lifeSignificance": "Life Significance",
+    "lifeSignificancePlaceholder": "How does this habit impact your life?",
+    "detail": "Detail",
+    "rockets": "Rockets",
+    "rocketNextIn": "Next in {days} days",
+    "streakGoal": "{percent}% to 30-day goal",
+    "currentStreakDays": "{count} days",
+    "bestRecord": "Best Record",
+    "history": "History",
+    "vsTemptation": "VS Temptation",
+    "iResisted": "I Resisted!",
+    "vsHint": "Complete all items or tap the button when you've overcome the urge",
+    "todayResisted": "Today: {current}/{target} resisted"
   },
   "stats": {
     "title": "Statistics",

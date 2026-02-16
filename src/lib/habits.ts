@@ -24,7 +24,7 @@ export function isCompletedToday(
   completions: HabitCompletion[]
 ): boolean {
   const today = getTodayString();
-  return completions.some((c) => c.habitId === habitId && c.date === today && c.status === 'completed');
+  return completions.some((c) => c.habitId === habitId && c.date === today && (c.status === 'completed' || c.status === 'rocket_used'));
 }
 
 export function calculateStreak(
@@ -32,7 +32,7 @@ export function calculateStreak(
   completions: HabitCompletion[]
 ): { current: number; longest: number } {
   const habitCompletions = completions
-    .filter((c) => c.habitId === habitId && c.status === 'completed')
+    .filter((c) => c.habitId === habitId && (c.status === 'completed' || c.status === 'rocket_used'))
     .map((c) => c.date)
     .sort()
     .reverse();
@@ -109,7 +109,7 @@ export function getCompletionRate(
 
   const completedDays = new Set(
     completions
-      .filter((c) => c.habitId === habitId && c.date >= startStr && c.status === 'completed')
+      .filter((c) => c.habitId === habitId && c.date >= startStr && (c.status === 'completed' || c.status === 'rocket_used'))
       .map((c) => c.date)
   );
 
@@ -169,11 +169,102 @@ export function getRecentDays(
     const completion = completions.find(
       (c) => c.habitId === habitId && c.date === dateStr
     );
+    const dayStatus = completion
+      ? (completion.status === 'rocket_used' ? 'completed' : completion.status) as DayStatus['status']
+      : 'none';
     result.push({
       date: dateStr,
-      status: completion ? completion.status : 'none',
+      status: dayStatus,
     });
   }
+  return result;
+}
+
+export function calculateRockets(
+  habitId: string,
+  completions: HabitCompletion[]
+): { rockets: number; nextIn: number } {
+  const habitCompletions = completions
+    .filter((c) => c.habitId === habitId && (c.status === 'completed' || c.status === 'rocket_used'))
+    .map((c) => c.date)
+    .sort();
+
+  const uniqueDates = [...new Set(habitCompletions)];
+
+  if (uniqueDates.length === 0) {
+    return { rockets: 0, nextIn: 10 };
+  }
+
+  // Count consecutive streaks of 10+ to determine total rockets earned
+  let totalRocketsEarned = 0;
+  let currentConsecutive = 1;
+
+  for (let i = 1; i < uniqueDates.length; i++) {
+    const prev = new Date(uniqueDates[i - 1]);
+    const curr = new Date(uniqueDates[i]);
+    const diffDays = Math.round(
+      (curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    if (diffDays === 1) {
+      currentConsecutive++;
+      if (currentConsecutive % 10 === 0) {
+        totalRocketsEarned++;
+      }
+    } else {
+      currentConsecutive = 1;
+    }
+  }
+
+  // Count rockets used (completions with status 'completed' that were originally failed
+  // are tracked via a special mechanism - for now rockets earned = total)
+  const rocketsUsed = completions.filter(
+    (c) => c.habitId === habitId && c.status === 'rocket_used'
+  ).length;
+
+  const rockets = totalRocketsEarned - rocketsUsed;
+  const nextIn = 10 - (currentConsecutive % 10);
+
+  return { rockets: Math.max(0, rockets), nextIn: nextIn === 10 ? 10 : nextIn };
+}
+
+export function getAllDayStatuses(
+  habitId: string,
+  completions: HabitCompletion[],
+  createdAt: string
+): DayStatus[] {
+  const today = new Date();
+  const startDate = new Date(createdAt);
+  startDate.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+
+  const result: DayStatus[] = [];
+  const d = new Date(startDate);
+
+  while (d <= today) {
+    const dateStr = getDateString(d);
+    const completion = completions.find(
+      (c) => c.habitId === habitId && c.date === dateStr
+    );
+
+    if (completion) {
+      result.push({
+        date: dateStr,
+        status: (completion.status === 'completed' || completion.status === 'rocket_used') ? 'completed' : 'failed',
+      });
+    } else {
+      // Check if it's been more than 5 days ago (auto-fail)
+      const daysDiff = Math.round(
+        (today.getTime() - d.getTime()) / (1000 * 60 * 60 * 24)
+      );
+      result.push({
+        date: dateStr,
+        status: daysDiff >= 5 ? 'failed' : 'none',
+      });
+    }
+    d.setDate(d.getDate() + 1);
+  }
+
   return result;
 }
 
@@ -190,6 +281,8 @@ export function getHabitsWithStats(
       ? isQuitHabitCompletedToday(habit.id, urgeLogs, habit.dailyTarget)
       : isCompletedToday(habit.id, completions);
 
+    const { rockets, nextIn } = calculateRockets(habit.id, completions);
+
     return {
       ...habit,
       currentStreak: current,
@@ -197,6 +290,9 @@ export function getHabitsWithStats(
       completedToday,
       completionRate: getCompletionRate(habit.id, completions, 30),
       recentDays: getRecentDays(habit.id, completions),
+      allDays: getAllDayStatuses(habit.id, completions, habit.createdAt),
+      rockets,
+      rocketNextIn: nextIn,
       ...(isQuit && urgeLogs ? { todayUrgeCount: getTodayUrgeCount(habit.id, urgeLogs) } : {}),
       ...(isQuit && copingStepsMap ? { copingSteps: copingStepsMap.get(habit.id) } : {}),
     };

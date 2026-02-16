@@ -6,6 +6,7 @@ interface HabitRow {
   user_id: string;
   name: string;
   description: string | null;
+  life_significance: string | null;
   icon: string;
   color: string;
   frequency: 'daily' | 'weekly' | 'custom';
@@ -48,6 +49,7 @@ function toHabit(row: HabitRow): Habit {
     id: row.id,
     name: row.name,
     description: row.description ?? undefined,
+    lifeSignificance: row.life_significance ?? undefined,
     icon: row.icon,
     color: row.color,
     frequency: row.frequency,
@@ -121,6 +123,7 @@ export async function insertHabit(
       user_id: userId,
       name: habit.name,
       description: habit.description || null,
+      life_significance: habit.lifeSignificance || null,
       icon: habit.icon,
       color: habit.color,
       frequency: habit.frequency,
@@ -143,6 +146,7 @@ export async function updateHabitById(
   const row: Record<string, unknown> = {};
   if (updates.name !== undefined) row.name = updates.name;
   if (updates.description !== undefined) row.description = updates.description || null;
+  if (updates.lifeSignificance !== undefined) row.life_significance = updates.lifeSignificance || null;
   if (updates.icon !== undefined) row.icon = updates.icon;
   if (updates.color !== undefined) row.color = updates.color;
   if (updates.frequency !== undefined) row.frequency = updates.frequency;
@@ -327,4 +331,45 @@ export async function deleteUrgeLog(id: string): Promise<void> {
   const supabase = createClient();
   const { error } = await supabase.from('urge_logs').delete().eq('id', id);
   if (error) throw error;
+}
+
+// --- Rocket ---
+
+export async function useRocketOnDate(
+  userId: string,
+  habitId: string,
+  date: string
+): Promise<HabitCompletion> {
+  const supabase = createClient();
+  // Upsert the completion as rocket_used (marks it as completed via rocket)
+  const { data: existing } = await supabase
+    .from('habit_completions')
+    .select('*')
+    .eq('habit_id', habitId)
+    .eq('date', date)
+    .maybeSingle();
+
+  if (existing) {
+    const { data, error } = await supabase
+      .from('habit_completions')
+      .update({ status: 'rocket_used' })
+      .eq('id', existing.id)
+      .select()
+      .single();
+    if (error) throw error;
+    return toCompletion(data as CompletionRow);
+  } else {
+    const { data, error } = await supabase
+      .from('habit_completions')
+      .insert({
+        user_id: userId,
+        habit_id: habitId,
+        date,
+        status: 'rocket_used',
+      })
+      .select()
+      .single();
+    if (error) throw error;
+    return toCompletion(data as CompletionRow);
+  }
 }

@@ -17,6 +17,7 @@ import {
   fetchUrgeLogsForDate,
   insertUrgeLog,
   updateUrgeLog,
+  useRocketOnDate,
 } from '@/lib/supabase/habits';
 
 export function useHabits() {
@@ -169,6 +170,18 @@ export function useHabits() {
     );
   }, [urgeLogs]);
 
+  const useRocket = useCallback(
+    async (habitId: string, date: string) => {
+      if (!user) return;
+      const updated = await useRocketOnDate(user.id, habitId, date);
+      setCompletions((prev) => {
+        const filtered = prev.filter((c) => !(c.habitId === habitId && c.date === date));
+        return [...filtered, updated];
+      });
+    },
+    [user]
+  );
+
   const getStats = useCallback((): HabitWithStats[] => {
     return getHabitsWithStats(habits, completions, urgeLogs, copingStepsMap);
   }, [habits, completions, urgeLogs, copingStepsMap]);
@@ -187,5 +200,6 @@ export function useHabits() {
     urgeLogs,
     startUrgeFlow,
     completeUrgeStep,
+    useRocket,
   };
 }

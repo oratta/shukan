@@ -68,6 +68,9 @@ export function HabitForm({
   const [description, setDescription] = useState(
     initialData?.description ?? ''
   );
+  const [lifeSignificance, setLifeSignificance] = useState(
+    initialData?.lifeSignificance ?? ''
+  );
   const [icon, setIcon] = useState(initialData?.icon ?? '💪');
   const [color, setColor] = useState(
     initialData?.color ?? 'oklch(0.6 0.2 260)'
@@ -92,6 +95,7 @@ export function HabitForm({
   useEffect(() => {
     setName(initialData?.name ?? '');
     setDescription(initialData?.description ?? '');
+    setLifeSignificance(initialData?.lifeSignificance ?? '');
     setIcon(initialData?.icon ?? '💪');
     setColor(initialData?.color ?? 'oklch(0.6 0.2 260)');
     setFrequency(initialData?.frequency ?? 'daily');
@@ -114,6 +118,7 @@ export function HabitForm({
       {
         name: name.trim(),
         description: description.trim() || undefined,
+        lifeSignificance: lifeSignificance.trim() || undefined,
         icon,
         color,
         frequency,
@@ -127,6 +132,7 @@ export function HabitForm({
     if (!initialData) {
       setName('');
       setDescription('');
+      setLifeSignificance('');
       setIcon('💪');
       setColor('oklch(0.6 0.2 260)');
       setFrequency('daily');
@@ -190,6 +196,17 @@ export function HabitForm({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder={t('descriptionPlaceholder')}
+              rows={2}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="habit-life-significance">{t('lifeSignificance')}</Label>
+            <Textarea
+              id="habit-life-significance"
+              value={lifeSignificance}
+              onChange={(e) => setLifeSignificance(e.target.value)}
+              placeholder={t('lifeSignificancePlaceholder')}
               rows={2}
             />
           </div>

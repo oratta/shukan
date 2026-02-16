@@ -53,7 +53,20 @@
     "moreActions": "その他のアクション",
     "quitUrgeDesc": "コーピングフローで対処する",
     "quitDailyOk": "今日は大丈夫だった",
-    "quitDailyOkDesc": "衝動なく1日を過ごせた"
+    "quitDailyOkDesc": "衝動なく1日を過ごせた",
+    "lifeSignificance": "人生への意義",
+    "lifeSignificancePlaceholder": "この習慣があなたの人生にどう影響しますか？",
+    "detail": "詳細",
+    "rockets": "ロケット",
+    "rocketNextIn": "あと{days}日で獲得",
+    "streakGoal": "30日目標の{percent}%",
+    "currentStreakDays": "{count}日",
+    "bestRecord": "最高記録",
+    "history": "履歴",
+    "vsTemptation": "VS 誘惑",
+    "iResisted": "打ち勝った！",
+    "vsHint": "全項目を達成するか、精神的に勝てたらボタンを押してください",
+    "todayResisted": "今日: {current}/{target} 回対抗"
   },
   "stats": {
     "title": "統計",
