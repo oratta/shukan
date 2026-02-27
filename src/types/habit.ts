@@ -1,3 +1,5 @@
+import type { ArticleId, LifeImpactSavings } from './impact';
+
 export interface Habit {
   id: string;
   name: string;
@@ -11,6 +13,7 @@ export interface Habit {
   dailyTarget: number;
   createdAt: string;
   archived: boolean;
+  impactArticleId?: ArticleId;
 }
 
 export interface CopingStep {
@@ -52,6 +55,7 @@ export interface HabitWithStats extends Habit {
   rocketNextIn: number;
   copingSteps?: CopingStep[];
   todayUrgeCount?: number;
+  impactSavings?: LifeImpactSavings;
 }
 
 export interface AppSettings {

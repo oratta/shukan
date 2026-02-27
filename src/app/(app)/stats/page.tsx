@@ -2,18 +2,18 @@
 
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { Flame, Trophy, TrendingUp } from 'lucide-react';
+import { Flame, Trophy, TrendingUp, Heart, PiggyBank, TrendingUp as IncomeIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { ProgressRing } from '@/components/habits/progress-ring';
 import { useHabits } from '@/hooks/useHabits';
-import { getHabitsWithStats } from '@/lib/habits';
+import { calculateTotalSavings, formatHealthMinutes, formatCurrency } from '@/lib/impact';
 
 export default function StatsPage() {
   const t = useTranslations();
-  const { habits, completions, loading } = useHabits();
+  const { getStats, loading } = useHabits();
 
   const stats = useMemo(() => {
-    const withStats = getHabitsWithStats(habits, completions);
+    const withStats = getStats();
     const activeHabits = withStats.filter((h) => !h.archived);
 
     const totalCurrentStreak = activeHabits.reduce(
@@ -36,14 +36,17 @@ export default function StatsPage() {
           activeHabits.length
         : 0;
 
+    const totalSavings = calculateTotalSavings(activeHabits);
+
     return {
       habits: activeHabits,
       avgCurrentStreak,
       longestStreak,
       avgCompletionRate,
       totalHabits: activeHabits.length,
+      totalSavings,
     };
-  }, [habits, completions]);
+  }, [getStats]);
 
   if (loading) {
     return (
@@ -108,9 +111,53 @@ export default function StatsPage() {
         </div>
       </Card>
 
+      {/* Total Life Impact Savings */}
+      {stats.totalSavings.completedDays > 0 && (
+        <Card className="space-y-3 p-4">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            {t('impact.totalSavings')}
+          </h3>
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <Heart className="size-5 text-rose-500" />
+              <div>
+                <div className="text-xl font-bold">
+                  +{formatHealthMinutes(stats.totalSavings.healthMinutes, { min: t('impact.minuteUnit'), hour: t('impact.hourUnit'), day: t('impact.dayUnit') })}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {t('impact.dailyHealth')}
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <PiggyBank className="size-5 text-emerald-500" />
+              <div>
+                <div className="text-xl font-bold">
+                  {formatCurrency(stats.totalSavings.costSaving)}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {t('impact.dailyCost')}
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <TrendingUp className="size-5 text-blue-500" />
+              <div>
+                <div className="text-xl font-bold">
+                  {formatCurrency(stats.totalSavings.incomeGain)}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {t('impact.dailyIncome')}
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
+
       <div>
         <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          Per Habit
+          {t('stats.perHabit')}
         </h3>
         <div className="space-y-2">
           {stats.habits.map((habit) => (

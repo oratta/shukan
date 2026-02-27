@@ -76,7 +76,8 @@
     "thisWeek": "今週",
     "thisMonth": "今月",
     "days": "日",
-    "noData": "習慣を達成して統計を確認しましょう！"
+    "noData": "習慣を達成して統計を確認しましょう！",
+    "perHabit": "習慣ごと"
   },
   "settings": {
     "title": "設定",
@@ -118,6 +119,30 @@
     "signingIn": "ログイン中...",
     "error": "認証に失敗しました。もう一度お試しください。",
     "signOut": "ログアウト"
+  },
+  "impact": {
+    "title": "人生インパクト",
+    "dailyHealth": "健康寿命",
+    "dailyCost": "コスト削減",
+    "dailyIncome": "収入増加",
+    "perDay": "/日",
+    "minuteUnit": "分",
+    "hourUnit": "時間",
+    "dayUnit": "日",
+    "savings": "累積貯金",
+    "daysUnit": "日",
+    "accumulated": "分の累積",
+    "totalSavings": "人生インパクト貯金",
+    "readArticle": "根拠を読む",
+    "selectArticle": "インパクト記事を選択",
+    "noArticle": "なし",
+    "sources": "出典",
+    "yourSavings": "あなたの貯金",
+    "confidence": {
+      "high": "信頼度: 高",
+      "medium": "信頼度: 中",
+      "low": "信頼度: 低（推定）"
+    }
   },
   "common": {
     "loading": "読み込み中...",

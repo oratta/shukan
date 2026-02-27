@@ -14,6 +14,7 @@ interface HabitListProps {
   onActions: (id: string) => void;
   onOpenDetail: (id: string) => void;
   onOpenVsTemptation: (id: string) => void;
+  onOpenArticle: (id: string) => void;
 }
 
 export function HabitList({
@@ -23,6 +24,7 @@ export function HabitList({
   onActions,
   onOpenDetail,
   onOpenVsTemptation,
+  onOpenArticle,
 }: HabitListProps) {
   const t = useTranslations('habits');
   const [expandedHabitId, setExpandedHabitId] = useState<string | null>(null);
@@ -63,6 +65,7 @@ export function HabitList({
               onOpenDetail={onOpenDetail}
               onOpenVsTemptation={onOpenVsTemptation}
               onActions={onActions}
+              onOpenArticle={onOpenArticle}
             />
           ))}
         </div>

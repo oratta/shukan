@@ -5,6 +5,9 @@ import { Check, ChevronDown, ChevronUp, Shield, Rocket, Maximize2 } from 'lucide
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { getTodayString } from '@/lib/habits';
+import { getArticle } from '@/data/impact-articles';
+import { ImpactBadge } from '@/components/habits/impact-badge';
+import { SavingsCard } from '@/components/habits/savings-card';
 import type { DayStatus, HabitWithStats } from '@/types/habit';
 
 interface HabitCardProps {
@@ -15,6 +18,7 @@ interface HabitCardProps {
   onOpenDetail: (id: string) => void;
   onOpenVsTemptation: (id: string) => void;
   onActions: (id: string) => void;
+  onOpenArticle: (id: string) => void;
 }
 
 function nextStatus(current: 'completed' | 'failed' | 'none'): 'completed' | 'failed' | 'none' {
@@ -32,7 +36,7 @@ function DayStatusDot({
   isToday: boolean;
   onTap: () => void;
 }) {
-  const status = day.status as string;
+  const { status } = day;
 
   return (
     <button
@@ -45,7 +49,6 @@ function DayStatusDot({
         'flex items-center justify-center rounded-full size-3 transition-all',
         status === 'completed' && 'bg-[#3D8A5A]',
         status === 'failed' && 'bg-[#D08068]',
-        status === 'rocket_used' && 'bg-[#C8F0D8]',
         status === 'none' && 'border border-gray-300 bg-transparent',
         isToday && 'ring-2 ring-offset-1 ring-offset-background ring-[#3D8A5A]/40',
       )}
@@ -110,11 +113,14 @@ export function HabitCard({
   onOpenDetail,
   onOpenVsTemptation,
   onActions,
+  onOpenArticle,
 }: HabitCardProps) {
   const t = useTranslations('habits');
   const tStats = useTranslations('stats');
+  const tImpact = useTranslations('impact');
   const isQuit = habit.type === 'quit';
   const today = getTodayString();
+  const article = habit.impactArticleId ? getArticle(habit.impactArticleId) : undefined;
 
   const handleDotTap = (day: DayStatus) => {
     onDayStatusChange(habit.id, day.date, nextStatus(day.status));
@@ -125,10 +131,12 @@ export function HabitCard({
   return (
     <Card className="gap-0 py-0 overflow-hidden transition-all duration-200">
       {/* Collapsed row - always visible */}
-      <button
-        type="button"
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => onToggleExpand(habit.id)}
-        className="flex items-center gap-3 p-3 w-full text-left"
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onToggleExpand(habit.id); }}
+        className="flex cursor-pointer items-center gap-3 p-3 w-full text-left"
       >
         {/* Left: Status indicator */}
         <StatusIndicator habit={habit} />
@@ -173,7 +181,7 @@ export function HabitCard({
             <ChevronDown className="size-5" />
           )}
         </div>
-      </button>
+      </div>
 
       {/* Expanded body - smooth height transition via grid trick */}
       <div
@@ -194,6 +202,14 @@ export function HabitCard({
                   {habit.lifeSignificance}
                 </p>
               </div>
+            )}
+
+            {/* Impact Badge */}
+            {article && (
+              <ImpactBadge
+                article={article}
+                onTap={() => onOpenArticle(habit.id)}
+              />
             )}
 
             {/* Streak card */}
@@ -218,6 +234,11 @@ export function HabitCard({
               </div>
             </div>
 
+            {/* Savings Card */}
+            {habit.impactSavings && (
+              <SavingsCard savings={habit.impactSavings} />
+            )}
+
             {/* Button row */}
             <div className="flex items-center gap-2">
               <button
@@ -236,6 +257,18 @@ export function HabitCard({
                 <Rocket className="size-4" />
                 {habit.rockets}
               </button>
+              {article && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpenArticle(habit.id);
+                  }}
+                  className="flex items-center gap-1.5 rounded-lg bg-[#B8860B]/10 px-3 py-2 text-sm font-medium text-[#B8860B] transition-colors hover:bg-[#B8860B]/20"
+                >
+                  {tImpact('readArticle')}
+                </button>
+              )}
               <button
                 type="button"
                 onClick={(e) => {

@@ -7,8 +7,10 @@ import { HabitForm } from '@/components/habits/habit-form';
 import { HabitActions } from '@/components/habits/habit-actions';
 import { HabitDetailModal } from '@/components/habits/habit-detail-modal';
 import { VsTemptationModal } from '@/components/habits/vs-temptation-modal';
+import { ImpactArticleSheet } from '@/components/habits/impact-article-sheet';
 import { useHabits } from '@/hooks/useHabits';
 import { shouldShowToday, getHabitsWithStats } from '@/lib/habits';
+import { getArticle } from '@/data/impact-articles';
 import type { Habit } from '@/types/habit';
 
 export default function DashboardPage() {
@@ -32,10 +34,11 @@ export default function DashboardPage() {
   const [actionsHabitId, setActionsHabitId] = useState<string | null>(null);
   const [detailHabitId, setDetailHabitId] = useState<string | null>(null);
   const [vsHabitId, setVsHabitId] = useState<string | null>(null);
+  const [articleHabitId, setArticleHabitId] = useState<string | null>(null);
 
   const todayHabits = useMemo(() => {
     const filtered = habits.filter(shouldShowToday);
-    return getHabitsWithStats(filtered, completions, urgeLogs, copingStepsMap);
+    return getHabitsWithStats(filtered, completions, urgeLogs, copingStepsMap, getArticle);
   }, [habits, completions, urgeLogs, copingStepsMap]);
 
   const completedCount = todayHabits.filter((h) => h.completedToday).length;
@@ -54,6 +57,11 @@ export default function DashboardPage() {
   const vsHabit = useMemo(
     () => todayHabits.find((h) => h.id === vsHabitId) ?? null,
     [todayHabits, vsHabitId]
+  );
+
+  const articleHabit = useMemo(
+    () => todayHabits.find((h) => h.id === articleHabitId) ?? null,
+    [todayHabits, articleHabitId]
   );
 
   const handleAdd = useCallback(() => {
@@ -97,6 +105,10 @@ export default function DashboardPage() {
 
   const handleOpenVsTemptation = useCallback((id: string) => {
     setVsHabitId(id);
+  }, []);
+
+  const handleOpenArticle = useCallback((id: string) => {
+    setArticleHabitId(id);
   }, []);
 
   const handleDelete = useCallback(() => {
@@ -160,6 +172,7 @@ export default function DashboardPage() {
         onActions={handleActions}
         onOpenDetail={handleOpenDetail}
         onOpenVsTemptation={handleOpenVsTemptation}
+        onOpenArticle={handleOpenArticle}
       />
 
       <HabitForm
@@ -204,6 +217,12 @@ export default function DashboardPage() {
         habit={vsHabit}
         onStartFlow={() => startUrgeFlow(vsHabitId!)}
         onCompleteStep={completeUrgeStep}
+      />
+
+      <ImpactArticleSheet
+        open={!!articleHabitId}
+        onOpenChange={(open) => !open && setArticleHabitId(null)}
+        habit={articleHabit}
       />
     </div>
   );

@@ -1,4 +1,6 @@
 import type { Habit, HabitCompletion, HabitWithStats, UrgeLog, CopingStep, DayStatus } from '@/types/habit';
+import type { ArticleId, LifeImpactArticle } from '@/types/impact';
+import { calculateImpactSavings } from '@/lib/impact';
 
 export function generateId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -272,7 +274,8 @@ export function getHabitsWithStats(
   habits: Habit[],
   completions: HabitCompletion[],
   urgeLogs?: UrgeLog[],
-  copingStepsMap?: Map<string, CopingStep[]>
+  copingStepsMap?: Map<string, CopingStep[]>,
+  getArticleFn?: (id: ArticleId) => LifeImpactArticle | undefined
 ): HabitWithStats[] {
   return habits.map((habit) => {
     const { current, longest } = calculateStreak(habit.id, completions);
@@ -282,6 +285,10 @@ export function getHabitsWithStats(
       : isCompletedToday(habit.id, completions);
 
     const { rockets, nextIn } = calculateRockets(habit.id, completions);
+
+    const article = habit.impactArticleId && getArticleFn
+      ? getArticleFn(habit.impactArticleId)
+      : undefined;
 
     return {
       ...habit,
@@ -295,6 +302,7 @@ export function getHabitsWithStats(
       rocketNextIn: nextIn,
       ...(isQuit && urgeLogs ? { todayUrgeCount: getTodayUrgeCount(habit.id, urgeLogs) } : {}),
       ...(isQuit && copingStepsMap ? { copingSteps: copingStepsMap.get(habit.id) } : {}),
+      ...(article ? { impactSavings: calculateImpactSavings(habit.id, completions, article) } : {}),
     };
   });
 }

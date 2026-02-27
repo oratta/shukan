@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { Habit, HabitCompletion, HabitWithStats, CopingStep, UrgeLog } from '@/types/habit';
 import { useAuth } from '@/components/auth-provider';
 import { getTodayString, getHabitsWithStats } from '@/lib/habits';
+import { getArticle } from '@/data/impact-articles';
 import {
   fetchHabits,
   fetchCompletions,
@@ -183,7 +184,7 @@ export function useHabits() {
   );
 
   const getStats = useCallback((): HabitWithStats[] => {
-    return getHabitsWithStats(habits, completions, urgeLogs, copingStepsMap);
+    return getHabitsWithStats(habits, completions, urgeLogs, copingStepsMap, getArticle);
   }, [habits, completions, urgeLogs, copingStepsMap]);
 
   return {

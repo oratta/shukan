@@ -1,4 +1,5 @@
 import type { Habit, HabitCompletion, CopingStep, UrgeLog } from '@/types/habit';
+import { isValidArticleId } from '@/types/impact';
 import { createClient } from './client';
 
 interface HabitRow {
@@ -15,6 +16,7 @@ interface HabitRow {
   daily_target: number;
   created_at: string;
   archived: boolean;
+  impact_article_id: string | null;
 }
 
 interface CopingStepRow {
@@ -58,6 +60,7 @@ function toHabit(row: HabitRow): Habit {
     dailyTarget: row.daily_target ?? 1,
     createdAt: row.created_at,
     archived: row.archived,
+    impactArticleId: isValidArticleId(row.impact_article_id) ? row.impact_article_id : undefined,
   };
 }
 
@@ -86,7 +89,7 @@ function toCompletion(row: CompletionRow): HabitCompletion {
     habitId: row.habit_id,
     date: row.date,
     completedAt: row.completed_at,
-    status: (row.status as 'completed' | 'failed') || 'completed',
+    status: (row.status as 'completed' | 'failed' | 'rocket_used') || 'completed',
   };
 }
 
@@ -130,6 +133,7 @@ export async function insertHabit(
       custom_days: habit.customDays || null,
       type: habit.type || 'positive',
       daily_target: habit.dailyTarget ?? 1,
+      impact_article_id: habit.impactArticleId ?? null,
     })
     .select()
     .single();
@@ -154,6 +158,7 @@ export async function updateHabitById(
   if (updates.type !== undefined) row.type = updates.type;
   if (updates.dailyTarget !== undefined) row.daily_target = updates.dailyTarget;
   if (updates.archived !== undefined) row.archived = updates.archived;
+  if (updates.impactArticleId !== undefined) row.impact_article_id = updates.impactArticleId ?? null;
 
   const { error } = await supabase.from('habits').update(row).eq('id', id);
   if (error) throw error;

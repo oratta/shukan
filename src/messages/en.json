@@ -76,7 +76,8 @@
     "thisWeek": "This Week",
     "thisMonth": "This Month",
     "days": "days",
-    "noData": "Complete some habits to see your stats!"
+    "noData": "Complete some habits to see your stats!",
+    "perHabit": "Per Habit"
   },
   "settings": {
     "title": "Settings",
@@ -118,6 +119,30 @@
     "signingIn": "Signing in...",
     "error": "Authentication failed. Please try again.",
     "signOut": "Sign Out"
+  },
+  "impact": {
+    "title": "Life Impact",
+    "dailyHealth": "Health Lifespan",
+    "dailyCost": "Cost Savings",
+    "dailyIncome": "Income Gain",
+    "perDay": "/day",
+    "minuteUnit": "min",
+    "hourUnit": "h",
+    "dayUnit": "d",
+    "savings": "Savings",
+    "daysUnit": " days",
+    "accumulated": " accumulated",
+    "totalSavings": "Life Impact Savings",
+    "readArticle": "Read Evidence",
+    "selectArticle": "Select Impact Article",
+    "noArticle": "None",
+    "sources": "Sources",
+    "yourSavings": "Your Savings",
+    "confidence": {
+      "high": "Confidence: High",
+      "medium": "Confidence: Medium",
+      "low": "Confidence: Low (Estimated)"
+    }
   },
   "common": {
     "loading": "Loading...",

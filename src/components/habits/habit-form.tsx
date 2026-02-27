@@ -22,7 +22,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { getArticleList } from '@/data/impact-articles';
 import type { Habit } from '@/types/habit';
+import type { ArticleId } from '@/types/impact';
 
 const EMOJI_OPTIONS = [
   '💪', '📚', '🏃', '🧘', '💧', '🎯', '✍️', '🎨',
@@ -64,6 +66,7 @@ export function HabitForm({
   initialCopingSteps,
 }: HabitFormProps) {
   const t = useTranslations('habits');
+  const tImpact = useTranslations('impact');
   const [name, setName] = useState(initialData?.name ?? '');
   const [description, setDescription] = useState(
     initialData?.description ?? ''
@@ -90,6 +93,9 @@ export function HabitForm({
   const [copingSteps, setCopingSteps] = useState<
     { title: string; sortOrder: number }[]
   >(initialCopingSteps ?? [{ title: '', sortOrder: 0 }]);
+  const [impactArticleId, setImpactArticleId] = useState(
+    initialData?.impactArticleId ?? ''
+  );
 
   // Sync state when initialData/initialCopingSteps change (e.g., editing a different habit)
   useEffect(() => {
@@ -103,6 +109,7 @@ export function HabitForm({
     setType(initialData?.type ?? 'positive');
     setDailyTarget(initialData?.dailyTarget ?? 3);
     setCopingSteps(initialCopingSteps ?? [{ title: '', sortOrder: 0 }]);
+    setImpactArticleId(initialData?.impactArticleId ?? '');
   }, [initialData, initialCopingSteps]);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -125,6 +132,9 @@ export function HabitForm({
         customDays: frequency === 'custom' ? customDays : undefined,
         type,
         dailyTarget: type === 'quit' ? dailyTarget : 1,
+        impactArticleId: impactArticleId && impactArticleId !== 'none'
+          ? impactArticleId as ArticleId
+          : undefined,
       },
       type === 'quit' ? validSteps : undefined
     );
@@ -140,6 +150,7 @@ export function HabitForm({
       setType('positive');
       setDailyTarget(3);
       setCopingSteps([{ title: '', sortOrder: 0 }]);
+      setImpactArticleId('');
     }
 
     onOpenChange(false);
@@ -247,6 +258,27 @@ export function HabitForm({
                 </span>
               </button>
             </div>
+          </div>
+
+          {/* Impact Article Selection */}
+          <div className="space-y-2">
+            <Label>{tImpact('selectArticle')}</Label>
+            <Select
+              value={impactArticleId || 'none'}
+              onValueChange={(v) => setImpactArticleId(v === 'none' ? '' : v)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={tImpact('noArticle')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">{tImpact('noArticle')}</SelectItem>
+                {getArticleList().map((article) => (
+                  <SelectItem key={article.id} value={article.id}>
+                    {article.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {type === 'quit' && (
