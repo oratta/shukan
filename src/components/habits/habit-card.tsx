@@ -29,11 +29,9 @@ function nextStatus(current: 'completed' | 'failed' | 'none'): 'completed' | 'fa
 
 function DayStatusDot({
   day,
-  isToday,
   onTap,
 }: {
   day: DayStatus;
-  isToday: boolean;
   onTap: () => void;
 }) {
   const { status } = day;
@@ -46,33 +44,25 @@ function DayStatusDot({
         onTap();
       }}
       className={cn(
-        'flex items-center justify-center rounded-full transition-all',
-        isToday ? 'size-7' : 'size-2.5',
+        'flex items-center justify-center rounded-full size-3 transition-all',
         status === 'completed' && 'bg-[#3D8A5A]',
         status === 'failed' && 'bg-[#D08068]',
-        status === 'none' && (isToday
-          ? 'border-2 border-gray-300 bg-transparent'
-          : 'border border-gray-300 bg-transparent'),
+        status === 'none' && 'border border-gray-300 bg-transparent',
       )}
-    >
-      {isToday && status === 'completed' && (
-        <Check className="size-4 text-white" strokeWidth={3} />
-      )}
-    </button>
+    />
   );
 }
 
-function StatusIndicator({ habit }: { habit: HabitWithStats }) {
+function StatusIndicator({
+  habit,
+  onTapToday,
+}: {
+  habit: HabitWithStats;
+  onTapToday?: () => void;
+}) {
   const isQuit = habit.type === 'quit';
 
-  if (habit.completedToday && !isQuit) {
-    return (
-      <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#3D8A5A]">
-        <Check className="size-4 text-white" strokeWidth={3} />
-      </div>
-    );
-  }
-
+  // Quit habits: show urge progress ring (not tappable for status toggle)
   if (isQuit) {
     const current = habit.todayUrgeCount ?? 0;
     const target = habit.dailyTarget;
@@ -104,10 +94,27 @@ function StatusIndicator({ habit }: { habit: HabitWithStats }) {
     );
   }
 
+  // Positive habits: tappable circle that toggles today's status
+  const todayStatus = habit.recentDays?.[0]?.status ?? 'none';
+
   return (
-    <div className="flex size-8 shrink-0 items-center justify-center rounded-full border-2 border-gray-300">
-      <span className="sr-only">pending</span>
-    </div>
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        onTapToday?.();
+      }}
+      className={cn(
+        'flex size-8 shrink-0 items-center justify-center rounded-full transition-all',
+        todayStatus === 'completed' && 'bg-[#3D8A5A]',
+        todayStatus === 'failed' && 'bg-[#D08068]',
+        todayStatus === 'none' && 'border-2 border-gray-300',
+      )}
+    >
+      {todayStatus === 'completed' && (
+        <Check className="size-4 text-white" strokeWidth={3} />
+      )}
+    </button>
   );
 }
 
@@ -144,35 +151,29 @@ export function HabitCard({
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onToggleExpand(habit.id); }}
         className="flex cursor-pointer items-center gap-3 p-3 w-full text-left"
       >
-        {/* Left: Status indicator */}
-        <StatusIndicator habit={habit} />
+        {/* Left: Status indicator (tappable for today's toggle) */}
+        <StatusIndicator
+          habit={habit}
+          onTapToday={() => {
+            const todayDay = (habit.recentDays ?? [])[0];
+            if (todayDay) handleDotTap(todayDay);
+          }}
+        />
 
-        {/* Center: Name + dots */}
+        {/* Center: Name + past day dots */}
         <div className="flex-1 min-w-0 flex flex-col gap-1">
           <span className="text-[15px] font-medium truncate">
             {habit.name}
           </span>
-          <div className="flex items-center gap-2">
-            {/* Today's big dot (first element after reorder) */}
-            {(habit.recentDays ?? []).slice(0, 1).map((day) => (
+          <div className="flex items-center gap-1.5">
+            {/* Past days only (skip index 0 = today), left=yesterday, right=oldest */}
+            {(habit.recentDays ?? []).slice(1).map((day) => (
               <DayStatusDot
                 key={day.date}
                 day={day}
-                isToday={true}
                 onTap={() => handleDotTap(day)}
               />
             ))}
-            {/* Past 4 days - small dots */}
-            <div className="flex items-center gap-1">
-              {(habit.recentDays ?? []).slice(1).map((day) => (
-                <DayStatusDot
-                  key={day.date}
-                  day={day}
-                  isToday={false}
-                  onTap={() => handleDotTap(day)}
-                />
-              ))}
-            </div>
           </div>
         </div>
 
