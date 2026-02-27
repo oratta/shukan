@@ -112,8 +112,7 @@ export default function StatsPage() {
       </Card>
 
       {/* Total Life Impact Savings */}
-      {stats.totalSavings.completedDays > 0 && (
-        <Card className="space-y-3 p-4">
+      <Card className="space-y-3 p-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-bold">
               {t('impact.totalSavings')}
@@ -152,7 +151,6 @@ export default function StatsPage() {
             </div>
           </div>
         </Card>
-      )}
 
       {/* Per-habit savings breakdown */}
       {stats.habits.some((h) => h.impactSavings && h.impactSavings.completedDays > 0) && (

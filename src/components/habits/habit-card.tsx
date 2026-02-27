@@ -46,13 +46,19 @@ function DayStatusDot({
         onTap();
       }}
       className={cn(
-        'flex items-center justify-center rounded-full size-3 transition-all',
+        'flex items-center justify-center rounded-full transition-all',
+        isToday ? 'size-7' : 'size-2.5',
         status === 'completed' && 'bg-[#3D8A5A]',
         status === 'failed' && 'bg-[#D08068]',
-        status === 'none' && 'border border-gray-300 bg-transparent',
-        isToday && 'ring-2 ring-offset-1 ring-offset-background ring-[#3D8A5A]/40',
+        status === 'none' && (isToday
+          ? 'border-2 border-gray-300 bg-transparent'
+          : 'border border-gray-300 bg-transparent'),
       )}
-    />
+    >
+      {isToday && status === 'completed' && (
+        <Check className="size-4 text-white" strokeWidth={3} />
+      )}
+    </button>
   );
 }
 
@@ -141,20 +147,32 @@ export function HabitCard({
         {/* Left: Status indicator */}
         <StatusIndicator habit={habit} />
 
-        {/* Center: Name + dots (vertical stack) */}
+        {/* Center: Name + dots */}
         <div className="flex-1 min-w-0 flex flex-col gap-1">
           <span className="text-[15px] font-medium truncate">
             {habit.name}
           </span>
-          <div className="flex items-center gap-1.5">
-            {(habit.recentDays ?? []).map((day) => (
+          <div className="flex items-center gap-2">
+            {/* Today's big dot (first element after reorder) */}
+            {(habit.recentDays ?? []).slice(0, 1).map((day) => (
               <DayStatusDot
                 key={day.date}
                 day={day}
-                isToday={day.date === today}
+                isToday={true}
                 onTap={() => handleDotTap(day)}
               />
             ))}
+            {/* Past 4 days - small dots */}
+            <div className="flex items-center gap-1">
+              {(habit.recentDays ?? []).slice(1).map((day) => (
+                <DayStatusDot
+                  key={day.date}
+                  day={day}
+                  isToday={false}
+                  onTap={() => handleDotTap(day)}
+                />
+              ))}
+            </div>
           </div>
         </div>
 

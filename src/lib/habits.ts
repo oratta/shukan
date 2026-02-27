@@ -164,7 +164,8 @@ export function getRecentDays(
 ): DayStatus[] {
   const today = new Date();
   const result: DayStatus[] = [];
-  for (let i = days - 1; i >= 0; i--) {
+  // Today first (index 0), then yesterday, etc.
+  for (let i = 0; i < days; i++) {
     const d = new Date(today);
     d.setDate(d.getDate() - i);
     const dateStr = getDateString(d);
