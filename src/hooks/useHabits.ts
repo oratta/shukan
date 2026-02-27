@@ -124,17 +124,21 @@ export function useHabits() {
   const setDayStatus = useCallback(
     async (habitId: string, date: string, status: 'completed' | 'failed' | 'none') => {
       if (!user) return;
-      if (status === 'none') {
-        await deleteCompletion(habitId, date);
-        setCompletions((prev) =>
-          prev.filter((c) => !(c.habitId === habitId && c.date === date))
-        );
-      } else {
-        const updated = await upsertCompletion(user.id, habitId, date, status);
-        setCompletions((prev) => {
-          const filtered = prev.filter((c) => !(c.habitId === habitId && c.date === date));
-          return [...filtered, updated];
-        });
+      try {
+        if (status === 'none') {
+          await deleteCompletion(habitId, date);
+          setCompletions((prev) =>
+            prev.filter((c) => !(c.habitId === habitId && c.date === date))
+          );
+        } else {
+          const updated = await upsertCompletion(user.id, habitId, date, status);
+          setCompletions((prev) => {
+            const filtered = prev.filter((c) => !(c.habitId === habitId && c.date === date));
+            return [...filtered, updated];
+          });
+        }
+      } catch (err) {
+        console.error('setDayStatus failed:', err);
       }
     },
     [user]

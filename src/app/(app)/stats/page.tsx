@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { Flame, Trophy, TrendingUp, Heart, PiggyBank, TrendingUp as IncomeIcon } from 'lucide-react';
+import { Flame, Trophy, TrendingUp } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { ProgressRing } from '@/components/habits/progress-ring';
 import { useHabits } from '@/hooks/useHabits';
@@ -114,45 +114,70 @@ export default function StatsPage() {
       {/* Total Life Impact Savings */}
       {stats.totalSavings.completedDays > 0 && (
         <Card className="space-y-3 p-4">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-            {t('impact.totalSavings')}
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-bold">
+              {t('impact.totalSavings')}
+            </h3>
+            <span className="rounded-full bg-[#3D8A5A] px-2 py-0.5 text-[10px] font-semibold text-white">
+              {t('impact.cumulative')}
+            </span>
+          </div>
           <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <Heart className="size-5 text-rose-500" />
+            <div className="flex items-center justify-between rounded-lg bg-[#FFF8F0] px-3 py-2.5">
               <div>
-                <div className="text-xl font-bold">
-                  +{formatHealthMinutes(stats.totalSavings.healthMinutes, { min: t('impact.minuteUnit'), hour: t('impact.hourUnit'), day: t('impact.dayUnit') })}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {t('impact.dailyHealth')}
-                </div>
+                <div className="text-xs font-medium text-[#B8860B]">{t('impact.dailyHealth')}</div>
+                <div className="text-[10px] text-[#B8860B]/50">{t('impact.allHabitsTotal')}</div>
+              </div>
+              <div className="text-lg font-bold text-[#B8860B]">
+                +{formatHealthMinutes(stats.totalSavings.healthMinutes, { min: t('impact.minuteUnit'), hour: t('impact.hourUnit'), day: t('impact.dayUnit') })}
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <PiggyBank className="size-5 text-emerald-500" />
+            <div className="flex items-center justify-between rounded-lg bg-[#FFF8F0] px-3 py-2.5">
               <div>
-                <div className="text-xl font-bold">
-                  {formatCurrency(stats.totalSavings.costSaving)}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {t('impact.dailyCost')}
-                </div>
+                <div className="text-xs font-medium text-[#B8860B]">{t('impact.dailyCost')}</div>
+                <div className="text-[10px] text-[#B8860B]/50">{t('impact.allHabitsTotal')}</div>
+              </div>
+              <div className="text-lg font-bold text-[#B8860B]">
+                {formatCurrency(stats.totalSavings.costSaving)}
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <TrendingUp className="size-5 text-blue-500" />
+            <div className="flex items-center justify-between rounded-lg bg-[#FFF8F0] px-3 py-2.5">
               <div>
-                <div className="text-xl font-bold">
-                  {formatCurrency(stats.totalSavings.incomeGain)}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {t('impact.dailyIncome')}
-                </div>
+                <div className="text-xs font-medium text-[#B8860B]">{t('impact.dailyIncome')}</div>
+                <div className="text-[10px] text-[#B8860B]/50">{t('impact.allHabitsTotal')}</div>
+              </div>
+              <div className="text-lg font-bold text-[#B8860B]">
+                {formatCurrency(stats.totalSavings.incomeGain)}
               </div>
             </div>
           </div>
         </Card>
+      )}
+
+      {/* Per-habit savings breakdown */}
+      {stats.habits.some((h) => h.impactSavings && h.impactSavings.completedDays > 0) && (
+        <div>
+          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            {t('impact.perHabitBreakdown')}
+          </h3>
+          <div className="space-y-2">
+            {stats.habits
+              .filter((h) => h.impactSavings && h.impactSavings.completedDays > 0)
+              .map((habit) => (
+                <Card key={habit.id} className="flex items-center gap-3 p-3">
+                  <span className="text-xl">{habit.icon}</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">{habit.name}</p>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span>🏥 {formatHealthMinutes(habit.impactSavings!.healthMinutes, { min: t('impact.minuteUnit'), hour: t('impact.hourUnit'), day: t('impact.dayUnit') })}</span>
+                    <span>💰 {formatCurrency(habit.impactSavings!.costSaving)}</span>
+                    <span>📈 {formatCurrency(habit.impactSavings!.incomeGain)}</span>
+                  </div>
+                </Card>
+              ))}
+          </div>
+        </div>
       )}
 
       <div>

@@ -6,6 +6,7 @@ import { Rocket, X } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import type { HabitWithStats, DayStatus } from '@/types/habit';
@@ -111,6 +112,7 @@ export function HabitDetailModal({
         showCloseButton={false}
         className="max-h-[85vh] overflow-y-auto p-0 sm:max-w-md"
       >
+        <DialogTitle className="sr-only">{habit.name}</DialogTitle>
         {/* Header */}
         <div className="flex items-center justify-between px-5 pt-5">
           <h2 className="text-xl font-bold">{habit.name}</h2>

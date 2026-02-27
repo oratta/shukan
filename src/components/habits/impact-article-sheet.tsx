@@ -6,6 +6,7 @@ import { X } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import { getArticle } from '@/data/impact-articles';
 import { renderArticle, formatHealthMinutes, formatCurrency } from '@/lib/impact';
@@ -53,10 +54,11 @@ export function ImpactArticleSheet({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto p-0 sm:max-w-md [&>button]:hidden">
+        <DialogTitle className="sr-only">{t('title')}</DialogTitle>
         {/* Header */}
         <div className="sticky top-0 z-10 bg-white px-4 pb-3 pt-4 dark:bg-gray-900">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-lg font-bold">{article.habitName}</h2>
+          <div className="mb-1 flex items-center justify-between">
+            <p className="text-xs text-muted-foreground">{article.habitName}</p>
             <button
               type="button"
               onClick={() => onOpenChange(false)}
@@ -65,21 +67,22 @@ export function ImpactArticleSheet({
               <X className="size-5" />
             </button>
           </div>
+          <h2 className="mb-3 text-lg font-bold">{t('title')}</h2>
 
-          {/* Metric summary */}
-          <div className="flex items-center gap-3 rounded-lg bg-[#FFF8F0] p-2.5 text-sm">
-            <span className="flex items-center gap-1">
-              <span>🏥</span>
-              <span className="font-medium">+{dailyHealthMinutes}{t('minuteUnit')}</span>
-            </span>
-            <span className="flex items-center gap-1">
-              <span>💰</span>
-              <span className="font-medium">¥{dailyCostSaving.toLocaleString()}</span>
-            </span>
-            <span className="flex items-center gap-1">
-              <span>📈</span>
-              <span className="font-medium">¥{dailyIncomeGain.toLocaleString()}</span>
-            </span>
+          {/* Metric summary - with labels and /日 */}
+          <div className="flex items-start gap-4 rounded-lg bg-[#FFF8F0] p-3">
+            <div className="flex flex-col items-start">
+              <span className="text-[10px] text-[#B8860B]/60">🏥 {t('dailyHealth')}</span>
+              <span className="text-sm font-semibold text-[#B8860B]">+{dailyHealthMinutes}{t('minuteUnit')}{t('perDay')}</span>
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="text-[10px] text-[#B8860B]/60">💰 {t('dailyCost')}</span>
+              <span className="text-sm font-semibold text-[#B8860B]">¥{dailyCostSaving.toLocaleString()}{t('perDay')}</span>
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="text-[10px] text-[#B8860B]/60">📈 {t('dailyIncome')}</span>
+              <span className="text-sm font-semibold text-[#B8860B]">¥{dailyIncomeGain.toLocaleString()}{t('perDay')}</span>
+            </div>
           </div>
 
           {/* Confidence badge */}

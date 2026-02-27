@@ -6,6 +6,7 @@ import { Shield, Check, Trophy } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import type { HabitWithStats } from '@/types/habit';
@@ -91,6 +92,7 @@ export function VsTemptationModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false} className="max-w-sm gap-0 p-0 overflow-hidden">
+        <DialogTitle className="sr-only">{t('vsTemptation')}</DialogTitle>
         {showSuccess ? (
           <div className="flex flex-col items-center gap-3 py-12 animate-in zoom-in-75 duration-300">
             <div className="flex size-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-950/40">

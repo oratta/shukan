@@ -199,25 +199,22 @@ export async function upsertCompletion(
   status: 'completed' | 'failed'
 ): Promise<HabitCompletion> {
   const supabase = createClient();
-  const { data: existing } = await supabase
+  const { data, error } = await supabase
     .from('habit_completions')
-    .select('*')
-    .eq('habit_id', habitId)
-    .eq('date', date)
-    .maybeSingle();
+    .upsert(
+      {
+        user_id: userId,
+        habit_id: habitId,
+        date,
+        status,
+      },
+      { onConflict: 'habit_id,date' }
+    )
+    .select()
+    .single();
 
-  if (existing) {
-    const { data, error } = await supabase
-      .from('habit_completions')
-      .update({ status })
-      .eq('id', existing.id)
-      .select()
-      .single();
-    if (error) throw error;
-    return toCompletion(data as CompletionRow);
-  } else {
-    return insertCompletion(userId, habitId, date, status);
-  }
+  if (error) throw error;
+  return toCompletion(data as CompletionRow);
 }
 
 export async function deleteCompletion(

@@ -19,11 +19,11 @@ export function SavingsCard({ savings }: SavingsCardProps) {
       <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#3D8A5A]">
         {t('savings')} ({savings.completedDays}{t('daysUnit')})
       </p>
-      <div className="flex items-center gap-3 text-sm">
+      <div className="flex items-center gap-4 text-sm">
         <span className="flex items-center gap-1">
           <span>🏥</span>
           <span className="font-medium text-[#3D8A5A]">
-            +{formatHealthMinutes(savings.healthMinutes, timeUnits)}
+            {formatHealthMinutes(savings.healthMinutes, timeUnits)}
           </span>
         </span>
         <span className="flex items-center gap-1">
