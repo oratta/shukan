@@ -66,7 +66,11 @@
     "vsTemptation": "VS 誘惑",
     "iResisted": "打ち勝った！",
     "vsHint": "全項目を達成するか、精神的に勝てたらボタンを押してください",
-    "todayResisted": "今日: {current}/{target} 回対抗"
+    "todayResisted": "今日: {current}/{target} 回対抗",
+    "rocketConfirmTitle": "ロケットを使用",
+    "rocketConfirmDescription": "ロケットを1つ使って、この日をクリアしたことにします。よろしいですか？",
+    "rocketConfirmOk": "使用する",
+    "rocketConfirmCancel": "キャンセル"
   },
   "stats": {
     "title": "統計",

@@ -19,6 +19,7 @@ import {
   insertUrgeLog,
   updateUrgeLog,
   useRocketOnDate,
+  updateHabitSortOrders,
 } from '@/lib/supabase/habits';
 
 export function useHabits() {
@@ -79,7 +80,7 @@ export function useHabits() {
   }, [user]);
 
   const addHabit = useCallback(
-    async (habit: Omit<Habit, 'id' | 'createdAt' | 'archived'>, copingSteps?: { title: string; sortOrder: number }[]) => {
+    async (habit: Omit<Habit, 'id' | 'createdAt' | 'archived' | 'sortOrder'>, copingSteps?: { title: string; sortOrder: number }[]) => {
       if (!user) return;
       const newHabit = await insertHabit(user.id, habit);
       setHabits((prev) => [...prev, newHabit]);
@@ -187,6 +188,31 @@ export function useHabits() {
     [user]
   );
 
+  const reorderHabits = useCallback(
+    async (orderedIds: string[]) => {
+      const updates = orderedIds.map((id, index) => ({ id, sortOrder: index }));
+      // Optimistic update
+      setHabits((prev) => {
+        const map = new Map(prev.map((h) => [h.id, h]));
+        return orderedIds
+          .map((id, index) => {
+            const habit = map.get(id);
+            return habit ? { ...habit, sortOrder: index } : undefined;
+          })
+          .filter((h): h is Habit => h !== undefined);
+      });
+      try {
+        await updateHabitSortOrders(updates);
+      } catch (err) {
+        console.error('reorderHabits failed:', err);
+        // Reload on error
+        const h = await fetchHabits();
+        setHabits(h);
+      }
+    },
+    []
+  );
+
   const getStats = useCallback((): HabitWithStats[] => {
     return getHabitsWithStats(habits, completions, urgeLogs, copingStepsMap, getArticle);
   }, [habits, completions, urgeLogs, copingStepsMap]);
@@ -206,5 +232,6 @@ export function useHabits() {
     startUrgeFlow,
     completeUrgeStep,
     useRocket,
+    reorderHabits,
   };
 }

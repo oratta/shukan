@@ -17,6 +17,7 @@ interface HabitRow {
   created_at: string;
   archived: boolean;
   impact_article_id: string | null;
+  sort_order: number;
 }
 
 interface CopingStepRow {
@@ -61,6 +62,7 @@ function toHabit(row: HabitRow): Habit {
     createdAt: row.created_at,
     archived: row.archived,
     impactArticleId: isValidArticleId(row.impact_article_id) ? row.impact_article_id : undefined,
+    sortOrder: row.sort_order ?? 0,
   };
 }
 
@@ -98,7 +100,7 @@ export async function fetchHabits(): Promise<Habit[]> {
   const { data, error } = await supabase
     .from('habits')
     .select('*')
-    .order('created_at', { ascending: true });
+    .order('sort_order', { ascending: true });
 
   if (error) throw error;
   return (data as HabitRow[]).map(toHabit);
@@ -117,9 +119,20 @@ export async function fetchCompletions(): Promise<HabitCompletion[]> {
 
 export async function insertHabit(
   userId: string,
-  habit: Omit<Habit, 'id' | 'createdAt' | 'archived'>
+  habit: Omit<Habit, 'id' | 'createdAt' | 'archived' | 'sortOrder'>
 ): Promise<Habit> {
   const supabase = createClient();
+
+  // Get max sort_order for this user
+  const { data: maxData } = await supabase
+    .from('habits')
+    .select('sort_order')
+    .eq('user_id', userId)
+    .order('sort_order', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const nextSortOrder = (maxData?.sort_order ?? -1) + 1;
+
   const { data, error } = await supabase
     .from('habits')
     .insert({
@@ -134,6 +147,7 @@ export async function insertHabit(
       type: habit.type || 'positive',
       daily_target: habit.dailyTarget ?? 1,
       impact_article_id: habit.impactArticleId ?? null,
+      sort_order: nextSortOrder,
     })
     .select()
     .single();
@@ -373,5 +387,20 @@ export async function useRocketOnDate(
       .single();
     if (error) throw error;
     return toCompletion(data as CompletionRow);
+  }
+}
+
+// --- Sort Order ---
+
+export async function updateHabitSortOrders(
+  updates: { id: string; sortOrder: number }[]
+): Promise<void> {
+  const supabase = createClient();
+  for (const { id, sortOrder } of updates) {
+    const { error } = await supabase
+      .from('habits')
+      .update({ sort_order: sortOrder })
+      .eq('id', id);
+    if (error) throw error;
   }
 }

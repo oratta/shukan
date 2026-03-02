@@ -124,3 +124,14 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes celebration {
+  0% {
+    transform: translate(-50%, -50%) translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) translate(var(--tx), var(--ty)) scale(0.5);
+    opacity: 0;
+  }
+}

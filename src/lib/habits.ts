@@ -173,7 +173,7 @@ export function getRecentDays(
       (c) => c.habitId === habitId && c.date === dateStr
     );
     const dayStatus = completion
-      ? (completion.status === 'rocket_used' ? 'completed' : completion.status) as DayStatus['status']
+      ? completion.status as DayStatus['status']
       : 'none';
     result.push({
       date: dateStr,
@@ -253,7 +253,7 @@ export function getAllDayStatuses(
     if (completion) {
       result.push({
         date: dateStr,
-        status: (completion.status === 'completed' || completion.status === 'rocket_used') ? 'completed' : 'failed',
+        status: completion.status as DayStatus['status'],
       });
     } else {
       // Check if it's been more than 5 days ago (auto-fail)

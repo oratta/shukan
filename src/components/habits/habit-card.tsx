@@ -1,7 +1,10 @@
 'use client';
 
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import { Check, ChevronDown, ChevronUp, Shield, Rocket, Maximize2 } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp, Shield, Rocket, Maximize2, GripVertical } from 'lucide-react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { getTodayString } from '@/lib/habits';
@@ -21,9 +24,9 @@ interface HabitCardProps {
   onOpenArticle: (id: string) => void;
 }
 
-function nextStatus(current: 'completed' | 'failed' | 'none'): 'completed' | 'failed' | 'none' {
+function nextStatus(current: DayStatus['status']): 'completed' | 'failed' | 'none' {
   if (current === 'none') return 'completed';
-  if (current === 'completed') return 'failed';
+  if (current === 'completed' || current === 'rocket_used') return 'failed';
   return 'none';
 }
 
@@ -45,11 +48,38 @@ function DayStatusDot({
       }}
       className={cn(
         'flex items-center justify-center rounded-full size-3 transition-all',
-        status === 'completed' && 'bg-[#3D8A5A]',
+        (status === 'completed' || status === 'rocket_used') && 'bg-[#3D8A5A]',
         status === 'failed' && 'bg-[#D08068]',
         status === 'none' && 'border border-gray-300 bg-transparent',
       )}
     />
+  );
+}
+
+const CELEBRATION_PARTICLES = ['🎉', '✨', '🎊', '⭐', '💫', '🌟'];
+
+function CelebrationEffect() {
+  return (
+    <div className="pointer-events-none absolute inset-0 z-10">
+      {CELEBRATION_PARTICLES.map((emoji, i) => {
+        const angle = (i / CELEBRATION_PARTICLES.length) * 360;
+        const rad = (angle * Math.PI) / 180;
+        const tx = Math.cos(rad) * 28;
+        const ty = Math.sin(rad) * 28;
+        return (
+          <span
+            key={i}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-sm animate-[celebration_600ms_ease-out_forwards]"
+            style={{
+              '--tx': `${tx}px`,
+              '--ty': `${ty}px`,
+            } as React.CSSProperties}
+          >
+            {emoji}
+          </span>
+        );
+      })}
+    </div>
   );
 }
 
@@ -61,6 +91,24 @@ function StatusIndicator({
   onTapToday?: () => void;
 }) {
   const isQuit = habit.type === 'quit';
+  const [showCelebration, setShowCelebration] = useState(false);
+  const prevStatusRef = useRef<string | null>(null);
+
+  const todayStatus = habit.recentDays?.[0]?.status ?? 'none';
+
+  useEffect(() => {
+    if (
+      prevStatusRef.current !== null &&
+      prevStatusRef.current !== 'completed' &&
+      prevStatusRef.current !== 'rocket_used' &&
+      (todayStatus === 'completed' || todayStatus === 'rocket_used')
+    ) {
+      setShowCelebration(true);
+      const timer = setTimeout(() => setShowCelebration(false), 700);
+      return () => clearTimeout(timer);
+    }
+    prevStatusRef.current = todayStatus;
+  }, [todayStatus]);
 
   // Quit habits: show urge progress ring (not tappable for status toggle)
   if (isQuit) {
@@ -95,26 +143,27 @@ function StatusIndicator({
   }
 
   // Positive habits: tappable circle that toggles today's status
-  const todayStatus = habit.recentDays?.[0]?.status ?? 'none';
-
   return (
-    <button
-      type="button"
-      onClick={(e) => {
-        e.stopPropagation();
-        onTapToday?.();
-      }}
-      className={cn(
-        'flex size-8 shrink-0 items-center justify-center rounded-full transition-all',
-        todayStatus === 'completed' && 'bg-[#3D8A5A]',
-        todayStatus === 'failed' && 'bg-[#D08068]',
-        todayStatus === 'none' && 'border-2 border-gray-300',
-      )}
-    >
-      {todayStatus === 'completed' && (
-        <Check className="size-4 text-white" strokeWidth={3} />
-      )}
-    </button>
+    <div className="relative flex size-8 shrink-0 items-center justify-center">
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onTapToday?.();
+        }}
+        className={cn(
+          'flex size-8 shrink-0 items-center justify-center rounded-full transition-all',
+          (todayStatus === 'completed' || todayStatus === 'rocket_used') && 'bg-[#3D8A5A]',
+          todayStatus === 'failed' && 'bg-[#D08068]',
+          todayStatus === 'none' && 'border-2 border-gray-300',
+        )}
+      >
+        {(todayStatus === 'completed' || todayStatus === 'rocket_used') && (
+          <Check className="size-4 text-white" strokeWidth={3} />
+        )}
+      </button>
+      {showCelebration && <CelebrationEffect />}
+    </div>
   );
 }
 
@@ -135,6 +184,20 @@ export function HabitCard({
   const today = getTodayString();
   const article = habit.impactArticleId ? getArticle(habit.impactArticleId) : undefined;
 
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: habit.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
   const handleDotTap = (day: DayStatus) => {
     onDayStatusChange(habit.id, day.date, nextStatus(day.status));
   };
@@ -142,6 +205,7 @@ export function HabitCard({
   const streakPercent = Math.min(Math.round((habit.currentStreak / 30) * 100), 100);
 
   return (
+    <div ref={setNodeRef} style={style} className={cn(isDragging && 'z-50 opacity-80')}>
     <Card className="gap-0 py-0 overflow-hidden transition-all duration-200">
       {/* Collapsed row - always visible */}
       <div
@@ -151,6 +215,17 @@ export function HabitCard({
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onToggleExpand(habit.id); }}
         className="flex cursor-pointer items-center gap-3 p-3 w-full text-left"
       >
+        {/* Drag handle */}
+        <button
+          type="button"
+          className="touch-none shrink-0 text-gray-300 hover:text-gray-500 dark:text-gray-600 dark:hover:text-gray-400 cursor-grab active:cursor-grabbing"
+          {...attributes}
+          {...listeners}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <GripVertical className="size-4" />
+        </button>
+
         {/* Left: Status indicator (tappable for today's toggle) */}
         <StatusIndicator
           habit={habit}
@@ -304,5 +379,6 @@ export function HabitCard({
         </div>
       </div>
     </Card>
+    </div>
   );
 }

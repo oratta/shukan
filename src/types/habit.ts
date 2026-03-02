@@ -14,6 +14,7 @@ export interface Habit {
   createdAt: string;
   archived: boolean;
   impactArticleId?: ArticleId;
+  sortOrder: number;
 }
 
 export interface CopingStep {
@@ -41,7 +42,7 @@ export interface HabitCompletion {
 
 export interface DayStatus {
   date: string;
-  status: 'completed' | 'failed' | 'none';
+  status: 'completed' | 'failed' | 'none' | 'rocket_used';
 }
 
 export interface HabitWithStats extends Habit {

@@ -49,7 +49,7 @@ interface HabitFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (
-    data: Omit<Habit, 'id' | 'createdAt' | 'archived'>,
+    data: Omit<Habit, 'id' | 'createdAt' | 'archived' | 'sortOrder'>,
     copingSteps?: { title: string; sortOrder: number }[]
   ) => void;
   onDelete?: () => void;

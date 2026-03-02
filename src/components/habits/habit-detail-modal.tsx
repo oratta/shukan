@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Rocket, X } from 'lucide-react';
 import {
@@ -8,6 +8,16 @@ import {
   DialogContent,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import type { HabitWithStats, DayStatus } from '@/types/habit';
 
@@ -70,6 +80,7 @@ export function HabitDetailModal({
   const t = useTranslations('stats');
   const tHabits = useTranslations('habits');
   const tDays = useTranslations('days');
+  const [rocketConfirmDate, setRocketConfirmDate] = useState<string | null>(null);
 
   const dayLabelsLocalized = [
     tDays('mon'), tDays('tue'), tDays('wed'), tDays('thu'),
@@ -220,6 +231,7 @@ export function HabitDetailModal({
 
                   const isRocketEligible = day.date === rocketEligibleDate;
                   const isCompleted = day.status === 'completed';
+                  const isRocketUsed = day.status === 'rocket_used';
                   const isFailed = day.status === 'failed';
                   const isNone = day.status === 'none';
 
@@ -230,18 +242,22 @@ export function HabitDetailModal({
                       disabled={!isRocketEligible}
                       onClick={() => {
                         if (isRocketEligible) {
-                          onUseRocket(habit.id, day.date);
+                          setRocketConfirmDate(day.date);
                         }
                       }}
                       className={cn(
                         'relative flex aspect-square items-center justify-center rounded-full transition-all',
                         isCompleted && 'bg-green-500 dark:bg-green-600',
+                        isRocketUsed && 'bg-green-500 dark:bg-green-600',
                         isFailed && !isRocketEligible && 'bg-[#D89575] dark:bg-[#B87A5E]',
                         isNone && 'border border-border bg-transparent',
                         isRocketEligible && 'cursor-pointer ring-2 ring-[#D89575] ring-offset-1',
                         !isRocketEligible && 'cursor-default'
                       )}
                     >
+                      {isRocketUsed && (
+                        <Rocket className="size-3 text-white" />
+                      )}
                       {isRocketEligible && (
                         <Rocket className="size-3 animate-pulse text-[#D89575]" />
                       )}
@@ -253,6 +269,34 @@ export function HabitDetailModal({
           </div>
         </div>
       </DialogContent>
+
+      {/* Rocket confirmation dialog */}
+      <AlertDialog
+        open={rocketConfirmDate !== null}
+        onOpenChange={(open) => { if (!open) setRocketConfirmDate(null); }}
+      >
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{tHabits('rocketConfirmTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {tHabits('rocketConfirmDescription')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{tHabits('rocketConfirmCancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (rocketConfirmDate && habit) {
+                  onUseRocket(habit.id, rocketConfirmDate);
+                  setRocketConfirmDate(null);
+                }
+              }}
+            >
+              {tHabits('rocketConfirmOk')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 }

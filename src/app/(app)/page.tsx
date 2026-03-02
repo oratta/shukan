@@ -28,6 +28,7 @@ export default function DashboardPage() {
     startUrgeFlow,
     completeUrgeStep,
     useRocket,
+    reorderHabits,
   } = useHabits();
   const [formOpen, setFormOpen] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
@@ -82,7 +83,7 @@ export default function DashboardPage() {
 
   const handleSubmit = useCallback(
     (
-      data: Omit<Habit, 'id' | 'createdAt' | 'archived'>,
+      data: Omit<Habit, 'id' | 'createdAt' | 'archived' | 'sortOrder'>,
       copingSteps?: { title: string; sortOrder: number }[]
     ) => {
       if (editingHabit) {
@@ -173,6 +174,7 @@ export default function DashboardPage() {
         onOpenDetail={handleOpenDetail}
         onOpenVsTemptation={handleOpenVsTemptation}
         onOpenArticle={handleOpenArticle}
+        onReorder={reorderHabits}
       />
 
       <HabitForm

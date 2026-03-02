@@ -3,6 +3,19 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Plus } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 import { HabitCard } from '@/components/habits/habit-card';
 import { Button } from '@/components/ui/button';
 import type { HabitWithStats } from '@/types/habit';
@@ -15,6 +28,7 @@ interface HabitListProps {
   onOpenDetail: (id: string) => void;
   onOpenVsTemptation: (id: string) => void;
   onOpenArticle: (id: string) => void;
+  onReorder: (orderedIds: string[]) => void;
 }
 
 export function HabitList({
@@ -25,6 +39,7 @@ export function HabitList({
   onOpenDetail,
   onOpenVsTemptation,
   onOpenArticle,
+  onReorder,
 }: HabitListProps) {
   const t = useTranslations('habits');
   const [expandedHabitId, setExpandedHabitId] = useState<string | null>(null);
@@ -33,14 +48,37 @@ export function HabitList({
     setExpandedHabitId((prev) => (prev === id ? null : id));
   }, []);
 
+  // Sort by sortOrder (no more completedToday sorting)
   const sortedHabits = useMemo(() => {
-    return [...habits].sort((a, b) => {
-      if (a.completedToday !== b.completedToday) {
-        return a.completedToday ? 1 : -1;
-      }
-      return 0;
-    });
+    return [...habits].sort((a, b) => a.sortOrder - b.sortOrder);
   }, [habits]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 200, tolerance: 5 },
+    })
+  );
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
+
+      const oldIndex = sortedHabits.findIndex((h) => h.id === active.id);
+      const newIndex = sortedHabits.findIndex((h) => h.id === over.id);
+      if (oldIndex === -1 || newIndex === -1) return;
+
+      const newOrder = [...sortedHabits];
+      const [moved] = newOrder.splice(oldIndex, 1);
+      newOrder.splice(newIndex, 0, moved);
+
+      onReorder(newOrder.map((h) => h.id));
+    },
+    [sortedHabits, onReorder]
+  );
 
   return (
     <div className="relative">
@@ -54,21 +92,32 @@ export function HabitList({
           </Button>
         </div>
       ) : (
-        <div className="space-y-3">
-          {sortedHabits.map((habit) => (
-            <HabitCard
-              key={habit.id}
-              habit={habit}
-              isExpanded={expandedHabitId === habit.id}
-              onToggleExpand={handleToggleExpand}
-              onDayStatusChange={onDayStatusChange}
-              onOpenDetail={onOpenDetail}
-              onOpenVsTemptation={onOpenVsTemptation}
-              onActions={onActions}
-              onOpenArticle={onOpenArticle}
-            />
-          ))}
-        </div>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={sortedHabits.map((h) => h.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="space-y-3">
+              {sortedHabits.map((habit) => (
+                <HabitCard
+                  key={habit.id}
+                  habit={habit}
+                  isExpanded={expandedHabitId === habit.id}
+                  onToggleExpand={handleToggleExpand}
+                  onDayStatusChange={onDayStatusChange}
+                  onOpenDetail={onOpenDetail}
+                  onOpenVsTemptation={onOpenVsTemptation}
+                  onActions={onActions}
+                  onOpenArticle={onOpenArticle}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
       )}
 
       {sortedHabits.length > 0 && (
