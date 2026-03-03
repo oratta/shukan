@@ -4,7 +4,8 @@
     "tagline": "Build better habits, one day at a time"
   },
   "nav": {
-    "today": "Today",
+    "today": "Home",
+    "discover": "Discover",
     "stats": "Stats",
     "settings": "Settings"
   },
@@ -70,7 +71,14 @@
     "rocketConfirmTitle": "Use Rocket",
     "rocketConfirmDescription": "Use 1 rocket to mark this day as completed. Are you sure?",
     "rocketConfirmOk": "Use",
-    "rocketConfirmCancel": "Cancel"
+    "rocketConfirmCancel": "Cancel",
+    "historyTab": "HISTORY",
+    "milestones": "MILESTONES",
+    "historyHelpTitle": "How History Works",
+    "historyHelp1": "The calendar shows your completion status for this habit by month.",
+    "historyHelp2": "Green: completed, Orange: failed, Empty: no record yet.",
+    "historyHelp3": "The last 5 days are shown with a border and can be tapped to toggle status (completed → failed → none).",
+    "historyHelp4": "Complete 10 consecutive days to earn a rocket. Rockets can rescue a past failed day (only days older than 5 days)."
   },
   "stats": {
     "title": "Statistics",
@@ -126,7 +134,7 @@
   },
   "impact": {
     "title": "Life Impact",
-    "dailyHealth": "Health Lifespan",
+    "dailyHealth": "Health",
     "dailyCost": "Cost Savings",
     "dailyIncome": "Income Gain",
     "perDay": "/day",
@@ -137,7 +145,7 @@
     "daysUnit": " days",
     "accumulated": " accumulated",
     "totalSavings": "Life Impact Savings",
-    "cumulative": "Total",
+    "cumulative": "Cumulative Savings",
     "allHabitsTotal": "All habits combined",
     "perHabitBreakdown": "Per Habit Breakdown",
     "readArticle": "Read Evidence",
@@ -150,6 +158,34 @@
       "medium": "Confidence: Medium",
       "low": "Confidence: Low (Estimated)"
     }
+  },
+  "discover": {
+    "title": "Discover",
+    "quit": "Quit",
+    "build": "Build",
+    "addHabit": "Add this habit",
+    "perDay": "/day",
+    "confidence": {
+      "high": "Confidence: High",
+      "medium": "Confidence: Medium",
+      "low": "Confidence: Low"
+    }
+  },
+  "evidence": {
+    "title": "Evidence",
+    "selectTitle": "Select Evidence",
+    "all": "All",
+    "addEvidence": "Add Evidence",
+    "addCount": "Add {count} evidence(s)",
+    "noEvidence": "You can create a habit without evidence",
+    "weight": "Weight",
+    "weightAbout": "Changing the weight multiplies the evidence impact values. For example, setting 'Quit Smoking' to 50% matches a goal to cut tobacco by half.",
+    "totalImpact": "Total Impact",
+    "search": "Search by keyword...",
+    "noResults": "No matching articles found",
+    "addThisHabit": "Add this habit",
+    "manage": "Manage Evidence",
+    "removeConfirm": "Remove this evidence?"
   },
   "common": {
     "loading": "Loading...",

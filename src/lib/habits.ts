@@ -1,6 +1,6 @@
 import type { Habit, HabitCompletion, HabitWithStats, UrgeLog, CopingStep, DayStatus } from '@/types/habit';
 import type { ArticleId, LifeImpactArticle } from '@/types/impact';
-import { calculateImpactSavings } from '@/lib/impact';
+import { calculateImpactSavings, calculateMultiEvidenceImpact } from '@/lib/impact';
 
 export function generateId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -287,9 +287,18 @@ export function getHabitsWithStats(
 
     const { rockets, nextIn } = calculateRockets(habit.id, completions);
 
-    const article = habit.impactArticleId && getArticleFn
-      ? getArticleFn(habit.impactArticleId)
-      : undefined;
+    // Multi-evidence impact calculation (preferred) or legacy single-article
+    let impactSavings;
+    if (habit.evidences && habit.evidences.length > 0 && getArticleFn) {
+      impactSavings = calculateMultiEvidenceImpact(
+        habit.id, completions, habit.evidences, getArticleFn
+      );
+    } else if (habit.impactArticleId && getArticleFn) {
+      const article = getArticleFn(habit.impactArticleId);
+      if (article) {
+        impactSavings = calculateImpactSavings(habit.id, completions, article);
+      }
+    }
 
     return {
       ...habit,
@@ -303,7 +312,7 @@ export function getHabitsWithStats(
       rocketNextIn: nextIn,
       ...(isQuit && urgeLogs ? { todayUrgeCount: getTodayUrgeCount(habit.id, urgeLogs) } : {}),
       ...(isQuit && copingStepsMap ? { copingSteps: copingStepsMap.get(habit.id) } : {}),
-      ...(article ? { impactSavings: calculateImpactSavings(habit.id, completions, article) } : {}),
+      ...(impactSavings ? { impactSavings } : {}),
     };
   });
 }

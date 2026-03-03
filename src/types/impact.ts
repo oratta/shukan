@@ -1,7 +1,22 @@
 // 有効な記事IDの型安全な定義
-export type ArticleId = 'quit_smoking' | 'quit_porn';
+export type ArticleId =
+  | 'quit_smoking'
+  | 'quit_porn'
+  | 'quit_alcohol'
+  | 'daily_cardio'
+  | 'daily_strength'
+  | 'morning_planning'
+  | 'no_youtube';
 
-const VALID_ARTICLE_IDS: readonly string[] = ['quit_smoking', 'quit_porn'] as const;
+const VALID_ARTICLE_IDS: readonly string[] = [
+  'quit_smoking',
+  'quit_porn',
+  'quit_alcohol',
+  'daily_cardio',
+  'daily_strength',
+  'morning_planning',
+  'no_youtube',
+] as const;
 
 export function isValidArticleId(id: string | null | undefined): id is ArticleId {
   return typeof id === 'string' && VALID_ARTICLE_IDS.includes(id);
@@ -42,6 +57,10 @@ export interface LifeImpactArticle {
   };
 
   confidenceLevel: 'high' | 'medium' | 'low';
+
+  // Discover（マーケットプレイス）用メタデータ
+  defaultHabitType: 'positive' | 'quit';
+  defaultIcon: string;
 }
 
 // V2ハードコードプロフィール
@@ -57,6 +76,14 @@ export const V2_DEFAULT_PROFILE = {
   remainingLifeExpectancy: 40,
   userContext: '42歳の日本人男性（年収1,500万円）',
 };
+
+// 習慣とエビデンスの紐付け（多対多 + 重み）
+export interface HabitEvidence {
+  id: string;
+  habitId: string;
+  articleId: ArticleId;
+  weight: number; // 1-100 (パーセンテージ)
+}
 
 // 累積インパクト（算出値、保存なし）
 export interface LifeImpactSavings {

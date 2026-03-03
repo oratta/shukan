@@ -2,13 +2,12 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import { Check, ChevronDown, ChevronUp, Shield, Rocket, Maximize2, GripVertical } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp, Shield, Maximize2, GripVertical } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { getTodayString } from '@/lib/habits';
-import { getArticle } from '@/data/impact-articles';
 import { ImpactBadge } from '@/components/habits/impact-badge';
 import { SavingsCard } from '@/components/habits/savings-card';
 import type { DayStatus, HabitWithStats } from '@/types/habit';
@@ -20,8 +19,6 @@ interface HabitCardProps {
   onDayStatusChange: (habitId: string, date: string, status: 'completed' | 'failed' | 'none') => void;
   onOpenDetail: (id: string) => void;
   onOpenVsTemptation: (id: string) => void;
-  onActions: (id: string) => void;
-  onOpenArticle: (id: string) => void;
 }
 
 function nextStatus(current: DayStatus['status']): 'completed' | 'failed' | 'none' {
@@ -174,15 +171,11 @@ export function HabitCard({
   onDayStatusChange,
   onOpenDetail,
   onOpenVsTemptation,
-  onActions,
-  onOpenArticle,
 }: HabitCardProps) {
   const t = useTranslations('habits');
   const tStats = useTranslations('stats');
-  const tImpact = useTranslations('impact');
   const isQuit = habit.type === 'quit';
   const today = getTodayString();
-  const article = habit.impactArticleId ? getArticle(habit.impactArticleId) : undefined;
 
   const {
     attributes,
@@ -299,11 +292,8 @@ export function HabitCard({
             )}
 
             {/* Impact Badge */}
-            {article && (
-              <ImpactBadge
-                article={article}
-                onTap={() => onOpenArticle(habit.id)}
-              />
+            {habit.evidences.length > 0 && (
+              <ImpactBadge evidences={habit.evidences} />
             )}
 
             {/* Streak card */}
@@ -333,48 +323,18 @@ export function HabitCard({
               <SavingsCard savings={habit.impactSavings} />
             )}
 
-            {/* Button row */}
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onActions(habit.id);
-                }}
-                className={cn(
-                  'flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                  habit.rockets > 0
-                    ? 'bg-[#D08068] text-white'
-                    : 'bg-gray-100 text-gray-400 dark:bg-gray-800'
-                )}
-              >
-                <Rocket className="size-4" />
-                {habit.rockets}
-              </button>
-              {article && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onOpenArticle(habit.id);
-                  }}
-                  className="flex items-center gap-1.5 rounded-lg bg-[#B8860B]/10 px-3 py-2 text-sm font-medium text-[#B8860B] transition-colors hover:bg-[#B8860B]/20"
-                >
-                  {tImpact('readArticle')}
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onOpenDetail(habit.id);
-                }}
-                className="flex items-center gap-1.5 rounded-lg bg-[#3D8A5A] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#346F4B]"
-              >
-                <Maximize2 className="size-4" />
-                {t('detail')}
-              </button>
-            </div>
+            {/* Detail button */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenDetail(habit.id);
+              }}
+              className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#3D8A5A] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#346F4B]"
+            >
+              <Maximize2 className="size-4" />
+              {t('detail')}
+            </button>
           </div>
         </div>
       </div>

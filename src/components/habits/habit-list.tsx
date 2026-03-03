@@ -24,10 +24,8 @@ interface HabitListProps {
   habits: HabitWithStats[];
   onDayStatusChange: (habitId: string, date: string, status: 'completed' | 'failed' | 'none') => void;
   onAdd: () => void;
-  onActions: (id: string) => void;
   onOpenDetail: (id: string) => void;
   onOpenVsTemptation: (id: string) => void;
-  onOpenArticle: (id: string) => void;
   onReorder: (orderedIds: string[]) => void;
 }
 
@@ -35,10 +33,8 @@ export function HabitList({
   habits,
   onDayStatusChange,
   onAdd,
-  onActions,
   onOpenDetail,
   onOpenVsTemptation,
-  onOpenArticle,
   onReorder,
 }: HabitListProps) {
   const t = useTranslations('habits');
@@ -111,8 +107,6 @@ export function HabitList({
                   onDayStatusChange={onDayStatusChange}
                   onOpenDetail={onOpenDetail}
                   onOpenVsTemptation={onOpenVsTemptation}
-                  onActions={onActions}
-                  onOpenArticle={onOpenArticle}
                 />
               ))}
             </div>

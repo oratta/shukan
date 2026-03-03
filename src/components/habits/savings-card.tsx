@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { PiggyBank } from 'lucide-react';
 import { formatHealthMinutes, formatCurrency } from '@/lib/impact';
 import type { LifeImpactSavings } from '@/types/impact';
 
@@ -15,29 +16,17 @@ export function SavingsCard({ savings }: SavingsCardProps) {
   if (savings.completedDays === 0) return null;
 
   return (
-    <div className="rounded-lg bg-[#F0F7F2] p-3">
-      <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#3D8A5A]">
-        {t('savings')} ({savings.completedDays}{t('daysUnit')})
-      </p>
-      <div className="flex items-center gap-4 text-sm">
-        <span className="flex items-center gap-1">
-          <span>🏥</span>
-          <span className="font-medium text-[#3D8A5A]">
-            {formatHealthMinutes(savings.healthMinutes, timeUnits)}
-          </span>
+    <div className="flex items-center justify-between rounded-xl border border-[#D4E8DA] bg-[#F0F7F2] px-3.5 py-2.5">
+      <div className="flex items-center gap-1.5">
+        <PiggyBank className="size-4 text-[#3D8A5A]" />
+        <span className="text-[11px] font-semibold text-[#3D8A5A]">
+          {t('cumulative')}
         </span>
-        <span className="flex items-center gap-1">
-          <span>💰</span>
-          <span className="font-medium text-[#3D8A5A]">
-            {formatCurrency(savings.costSaving)}
-          </span>
-        </span>
-        <span className="flex items-center gap-1">
-          <span>📈</span>
-          <span className="font-medium text-[#3D8A5A]">
-            {formatCurrency(savings.incomeGain)}
-          </span>
-        </span>
+      </div>
+      <div className="flex items-center gap-2.5 text-[11px] font-medium text-[#6D6C6A]">
+        <span>🏥 {formatHealthMinutes(savings.healthMinutes, timeUnits)}</span>
+        <span>💰 {formatCurrency(savings.costSaving)}</span>
+        <span>📈 {formatCurrency(savings.incomeGain)}</span>
       </div>
     </div>
   );

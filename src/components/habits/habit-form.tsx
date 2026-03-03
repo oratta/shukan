@@ -22,7 +22,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { getArticleList } from '@/data/impact-articles';
+import { getArticle } from '@/data/impact-articles';
+import { EvidencePicker } from '@/components/habits/evidence-picker';
 import type { Habit } from '@/types/habit';
 import type { ArticleId } from '@/types/impact';
 
@@ -45,16 +46,23 @@ const COLOR_OPTIONS = [
 
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+interface EvidenceEntry {
+  articleId: string;
+  weight: number;
+}
+
 interface HabitFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (
     data: Omit<Habit, 'id' | 'createdAt' | 'archived' | 'sortOrder'>,
-    copingSteps?: { title: string; sortOrder: number }[]
+    copingSteps?: { title: string; sortOrder: number }[],
+    initialEvidences?: EvidenceEntry[]
   ) => void;
   onDelete?: () => void;
   initialData?: Partial<Habit>;
   initialCopingSteps?: { title: string; sortOrder: number }[];
+  prefilledEvidences?: EvidenceEntry[];
 }
 
 export function HabitForm({
@@ -64,9 +72,10 @@ export function HabitForm({
   onDelete,
   initialData,
   initialCopingSteps,
+  prefilledEvidences,
 }: HabitFormProps) {
   const t = useTranslations('habits');
-  const tImpact = useTranslations('impact');
+  const tEvidence = useTranslations('evidence');
   const [name, setName] = useState(initialData?.name ?? '');
   const [description, setDescription] = useState(
     initialData?.description ?? ''
@@ -93,9 +102,12 @@ export function HabitForm({
   const [copingSteps, setCopingSteps] = useState<
     { title: string; sortOrder: number }[]
   >(initialCopingSteps ?? [{ title: '', sortOrder: 0 }]);
-  const [impactArticleId, setImpactArticleId] = useState(
-    initialData?.impactArticleId ?? ''
+  const [evidences, setEvidences] = useState<EvidenceEntry[]>(
+    prefilledEvidences ??
+    initialData?.evidences?.map((ev) => ({ articleId: ev.articleId, weight: ev.weight })) ??
+    []
   );
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   // Sync state when initialData/initialCopingSteps change (e.g., editing a different habit)
   useEffect(() => {
@@ -109,8 +121,12 @@ export function HabitForm({
     setType(initialData?.type ?? 'positive');
     setDailyTarget(initialData?.dailyTarget ?? 3);
     setCopingSteps(initialCopingSteps ?? [{ title: '', sortOrder: 0 }]);
-    setImpactArticleId(initialData?.impactArticleId ?? '');
-  }, [initialData, initialCopingSteps]);
+    setEvidences(
+      prefilledEvidences ??
+      initialData?.evidences?.map((ev) => ({ articleId: ev.articleId, weight: ev.weight })) ??
+      []
+    );
+  }, [initialData, initialCopingSteps, prefilledEvidences]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -132,11 +148,11 @@ export function HabitForm({
         customDays: frequency === 'custom' ? customDays : undefined,
         type,
         dailyTarget: type === 'quit' ? dailyTarget : 1,
-        impactArticleId: impactArticleId && impactArticleId !== 'none'
-          ? impactArticleId as ArticleId
-          : undefined,
+        impactArticleId: undefined,
+        evidences: initialData?.evidences ?? [],
       },
-      type === 'quit' ? validSteps : undefined
+      type === 'quit' ? validSteps : undefined,
+      evidences.length > 0 ? evidences : undefined
     );
 
     if (!initialData) {
@@ -150,7 +166,7 @@ export function HabitForm({
       setType('positive');
       setDailyTarget(3);
       setCopingSteps([{ title: '', sortOrder: 0 }]);
-      setImpactArticleId('');
+      setEvidences([]);
     }
 
     onOpenChange(false);
@@ -179,278 +195,326 @@ export function HabitForm({
     );
   };
 
+  const handleEvidenceSelect = (articleIds: string[]) => {
+    setEvidences((prev) => {
+      const existing = new Set(prev.map((e) => e.articleId));
+      const newEntries = articleIds
+        .filter((id) => !existing.has(id))
+        .map((articleId) => ({ articleId, weight: 100 }));
+      return [...prev, ...newEntries];
+    });
+  };
+
+  const removeEvidence = (articleId: string) => {
+    setEvidences((prev) => prev.filter((e) => e.articleId !== articleId));
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>
-            {t(initialData ? 'edit' : 'add')}
-          </DialogTitle>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {t(initialData ? 'edit' : 'add')}
+            </DialogTitle>
+          </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="habit-name">{t('name')}</Label>
-            <Input
-              id="habit-name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder={t('namePlaceholder')}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="habit-description">{t('description')}</Label>
-            <Textarea
-              id="habit-description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder={t('descriptionPlaceholder')}
-              rows={2}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="habit-life-significance">{t('lifeSignificance')}</Label>
-            <Textarea
-              id="habit-life-significance"
-              value={lifeSignificance}
-              onChange={(e) => setLifeSignificance(e.target.value)}
-              placeholder={t('lifeSignificancePlaceholder')}
-              rows={2}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>{t('type')}</Label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setType('positive')}
-                className={cn(
-                  'flex flex-col items-center gap-1.5 rounded-lg border p-3 text-center transition-all',
-                  type === 'positive'
-                    ? 'ring-2 ring-primary border-primary'
-                    : 'hover:bg-accent'
-                )}
-              >
-                <span className="text-2xl">💪</span>
-                <span className="text-sm font-medium">{t('typePositive')}</span>
-                <span className="text-xs text-muted-foreground">
-                  {t('typePositiveDesc')}
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setType('quit')}
-                className={cn(
-                  'flex flex-col items-center gap-1.5 rounded-lg border p-3 text-center transition-all',
-                  type === 'quit'
-                    ? 'ring-2 ring-primary border-primary'
-                    : 'hover:bg-accent'
-                )}
-              >
-                <span className="text-2xl">🛡️</span>
-                <span className="text-sm font-medium">{t('typeQuit')}</span>
-                <span className="text-xs text-muted-foreground">
-                  {t('typeQuitDesc')}
-                </span>
-              </button>
-            </div>
-          </div>
-
-          {/* Impact Article Selection */}
-          <div className="space-y-2">
-            <Label>{tImpact('selectArticle')}</Label>
-            <Select
-              value={impactArticleId || 'none'}
-              onValueChange={(v) => setImpactArticleId(v === 'none' ? '' : v)}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder={tImpact('noArticle')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">{tImpact('noArticle')}</SelectItem>
-                {getArticleList().map((article) => (
-                  <SelectItem key={article.id} value={article.id}>
-                    {article.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {type === 'quit' && (
-            <>
-              <div className="space-y-2">
-                <Label>{t('copingSteps')}</Label>
-                <p className="text-xs text-muted-foreground">
-                  {t('copingStepsDesc')}
-                </p>
-                <div className="space-y-2">
-                  {copingSteps.map((step, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Input
-                        value={step.title}
-                        onChange={(e) => updateStep(index, e.target.value)}
-                        placeholder={t('stepPlaceholder')}
-                        className="flex-1"
-                      />
-                      {copingSteps.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="shrink-0 size-9"
-                          onClick={() => removeStep(index)}
-                        >
-                          <X className="size-4" />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={addStep}
-                  className="w-full"
-                >
-                  <Plus className="size-4" />
-                  {t('addStep')}
-                </Button>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="daily-target">{t('dailyTarget')}</Label>
-                <p className="text-xs text-muted-foreground">
-                  {t('dailyTargetDesc')}
-                </p>
-                <Input
-                  id="daily-target"
-                  type="number"
-                  min={1}
-                  max={20}
-                  value={dailyTarget}
-                  onChange={(e) =>
-                    setDailyTarget(
-                      Math.max(1, Math.min(20, parseInt(e.target.value) || 1))
-                    )
-                  }
-                  className="w-24"
-                />
-              </div>
-            </>
-          )}
-
-          <div className="space-y-2">
-            <Label>{t('icon')}</Label>
-            <div className="grid grid-cols-8 gap-1.5">
-              {EMOJI_OPTIONS.map((emoji) => (
-                <button
-                  key={emoji}
-                  type="button"
-                  onClick={() => setIcon(emoji)}
-                  className={cn(
-                    'flex size-9 items-center justify-center rounded-lg text-lg transition-all hover:bg-accent',
-                    icon === emoji &&
-                      'bg-primary/10 ring-2 ring-primary dark:bg-primary/20'
-                  )}
-                >
-                  {emoji}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>{t('color')}</Label>
-            <div className="flex flex-wrap gap-2">
-              {COLOR_OPTIONS.map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => setColor(opt.value)}
-                  className={cn(
-                    'size-8 rounded-full transition-all hover:scale-110',
-                    color === opt.value &&
-                      'ring-2 ring-primary ring-offset-2 ring-offset-background'
-                  )}
-                  style={{ backgroundColor: opt.value }}
-                  title={opt.label}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>{t('frequency')}</Label>
-            <Select
-              value={frequency}
-              onValueChange={(v) =>
-                setFrequency(v as 'daily' | 'weekly' | 'custom')
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="daily">{t('daily')}</SelectItem>
-                <SelectItem value="weekly">{t('weekly')}</SelectItem>
-                <SelectItem value="custom">{t('custom')}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {frequency === 'custom' && (
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label>Days</Label>
-              <div className="flex gap-1.5">
-                {DAY_LABELS.map((label, index) => (
-                  <button
-                    key={label}
+              <Label htmlFor="habit-name">{t('name')}</Label>
+              <Input
+                id="habit-name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={t('namePlaceholder')}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="habit-description">{t('description')}</Label>
+              <Textarea
+                id="habit-description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder={t('descriptionPlaceholder')}
+                rows={2}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="habit-life-significance">{t('lifeSignificance')}</Label>
+              <Textarea
+                id="habit-life-significance"
+                value={lifeSignificance}
+                onChange={(e) => setLifeSignificance(e.target.value)}
+                placeholder={t('lifeSignificancePlaceholder')}
+                rows={2}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('type')}</Label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setType('positive')}
+                  className={cn(
+                    'flex flex-col items-center gap-1.5 rounded-lg border p-3 text-center transition-all',
+                    type === 'positive'
+                      ? 'ring-2 ring-primary border-primary'
+                      : 'hover:bg-accent'
+                  )}
+                >
+                  <span className="text-2xl">💪</span>
+                  <span className="text-sm font-medium">{t('typePositive')}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {t('typePositiveDesc')}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setType('quit')}
+                  className={cn(
+                    'flex flex-col items-center gap-1.5 rounded-lg border p-3 text-center transition-all',
+                    type === 'quit'
+                      ? 'ring-2 ring-primary border-primary'
+                      : 'hover:bg-accent'
+                  )}
+                >
+                  <span className="text-2xl">🛡️</span>
+                  <span className="text-sm font-medium">{t('typeQuit')}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {t('typeQuitDesc')}
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* Evidence Selection */}
+            <div className="space-y-2">
+              <Label>{tEvidence('title')}</Label>
+              {evidences.length > 0 && (
+                <div className="space-y-1.5">
+                  {evidences.map((ev) => {
+                    const article = getArticle(ev.articleId as ArticleId);
+                    if (!article) return null;
+                    return (
+                      <div
+                        key={ev.articleId}
+                        className="flex items-center gap-2 rounded-lg border border-[#D4E8DA] bg-[#F8FBF9] px-3 py-2"
+                      >
+                        <span className="text-base">{article.defaultIcon}</span>
+                        <span className="flex-1 truncate text-sm font-medium">
+                          {article.habitName}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => removeEvidence(ev.articleId)}
+                          className="shrink-0 rounded-full p-1 text-muted-foreground hover:bg-muted"
+                        >
+                          <X className="size-3.5" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setPickerOpen(true)}
+                className="w-full"
+              >
+                <Plus className="size-4" />
+                {tEvidence('addEvidence')}
+              </Button>
+              {evidences.length === 0 && (
+                <p className="text-xs text-muted-foreground">
+                  {tEvidence('noEvidence')}
+                </p>
+              )}
+            </div>
+
+            {type === 'quit' && (
+              <>
+                <div className="space-y-2">
+                  <Label>{t('copingSteps')}</Label>
+                  <p className="text-xs text-muted-foreground">
+                    {t('copingStepsDesc')}
+                  </p>
+                  <div className="space-y-2">
+                    {copingSteps.map((step, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <Input
+                          value={step.title}
+                          onChange={(e) => updateStep(index, e.target.value)}
+                          placeholder={t('stepPlaceholder')}
+                          className="flex-1"
+                        />
+                        {copingSteps.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="shrink-0 size-9"
+                            onClick={() => removeStep(index)}
+                          >
+                            <X className="size-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <Button
                     type="button"
-                    onClick={() => toggleDay(index)}
+                    variant="outline"
+                    size="sm"
+                    onClick={addStep}
+                    className="w-full"
+                  >
+                    <Plus className="size-4" />
+                    {t('addStep')}
+                  </Button>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="daily-target">{t('dailyTarget')}</Label>
+                  <p className="text-xs text-muted-foreground">
+                    {t('dailyTargetDesc')}
+                  </p>
+                  <Input
+                    id="daily-target"
+                    type="number"
+                    min={1}
+                    max={20}
+                    value={dailyTarget}
+                    onChange={(e) =>
+                      setDailyTarget(
+                        Math.max(1, Math.min(20, parseInt(e.target.value) || 1))
+                      )
+                    }
+                    className="w-24"
+                  />
+                </div>
+              </>
+            )}
+
+            <div className="space-y-2">
+              <Label>{t('icon')}</Label>
+              <div className="grid grid-cols-8 gap-1.5">
+                {EMOJI_OPTIONS.map((emoji) => (
+                  <button
+                    key={emoji}
+                    type="button"
+                    onClick={() => setIcon(emoji)}
                     className={cn(
-                      'flex size-9 items-center justify-center rounded-full text-xs font-medium transition-all',
-                      customDays.includes(index)
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted text-muted-foreground hover:bg-accent'
+                      'flex size-9 items-center justify-center rounded-lg text-lg transition-all hover:bg-accent',
+                      icon === emoji &&
+                        'bg-primary/10 ring-2 ring-primary dark:bg-primary/20'
                     )}
                   >
-                    {label.charAt(0)}
+                    {emoji}
                   </button>
                 ))}
               </div>
             </div>
-          )}
 
-          <DialogFooter className="flex-row">
-            {initialData && onDelete && (
+            <div className="space-y-2">
+              <Label>{t('color')}</Label>
+              <div className="flex flex-wrap gap-2">
+                {COLOR_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setColor(opt.value)}
+                    className={cn(
+                      'size-8 rounded-full transition-all hover:scale-110',
+                      color === opt.value &&
+                        'ring-2 ring-primary ring-offset-2 ring-offset-background'
+                    )}
+                    style={{ backgroundColor: opt.value }}
+                    title={opt.label}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('frequency')}</Label>
+              <Select
+                value={frequency}
+                onValueChange={(v) =>
+                  setFrequency(v as 'daily' | 'weekly' | 'custom')
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="daily">{t('daily')}</SelectItem>
+                  <SelectItem value="weekly">{t('weekly')}</SelectItem>
+                  <SelectItem value="custom">{t('custom')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {frequency === 'custom' && (
+              <div className="space-y-2">
+                <Label>Days</Label>
+                <div className="flex gap-1.5">
+                  {DAY_LABELS.map((label, index) => (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => toggleDay(index)}
+                      className={cn(
+                        'flex size-9 items-center justify-center rounded-full text-xs font-medium transition-all',
+                        customDays.includes(index)
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted text-muted-foreground hover:bg-accent'
+                      )}
+                    >
+                      {label.charAt(0)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <DialogFooter className="flex-row">
+              {initialData && onDelete && (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={onDelete}
+                  className="mr-auto"
+                >
+                  {t('delete')}
+                </Button>
+              )}
               <Button
                 type="button"
-                variant="destructive"
-                onClick={onDelete}
-                className="mr-auto"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
               >
-                {t('delete')}
+                {t('cancel')}
               </Button>
-            )}
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              {t('cancel')}
-            </Button>
-            <Button type="submit" disabled={!name.trim()}>
-              {t('save')}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+              <Button type="submit" disabled={!name.trim()}>
+                {t('save')}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <EvidencePicker
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        onSelect={handleEvidenceSelect}
+        initialSelected={evidences.map((e) => e.articleId)}
+      />
+    </>
   );
 }

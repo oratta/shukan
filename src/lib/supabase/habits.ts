@@ -1,4 +1,5 @@
 import type { Habit, HabitCompletion, CopingStep, UrgeLog } from '@/types/habit';
+import type { HabitEvidence } from '@/types/impact';
 import { isValidArticleId } from '@/types/impact';
 import { createClient } from './client';
 
@@ -47,7 +48,24 @@ interface CompletionRow {
   status: string;
 }
 
-function toHabit(row: HabitRow): Habit {
+interface HabitEvidenceRow {
+  id: string;
+  habit_id: string;
+  article_id: string;
+  weight: number;
+  created_at: string;
+}
+
+function toHabitEvidence(row: HabitEvidenceRow): HabitEvidence {
+  return {
+    id: row.id,
+    habitId: row.habit_id,
+    articleId: isValidArticleId(row.article_id) ? row.article_id : (row.article_id as HabitEvidence['articleId']),
+    weight: row.weight,
+  };
+}
+
+function toHabit(row: HabitRow, evidenceRows?: HabitEvidenceRow[]): Habit {
   return {
     id: row.id,
     name: row.name,
@@ -62,6 +80,7 @@ function toHabit(row: HabitRow): Habit {
     createdAt: row.created_at,
     archived: row.archived,
     impactArticleId: isValidArticleId(row.impact_article_id) ? row.impact_article_id : undefined,
+    evidences: evidenceRows ? evidenceRows.map(toHabitEvidence) : [],
     sortOrder: row.sort_order ?? 0,
   };
 }
@@ -99,11 +118,13 @@ export async function fetchHabits(): Promise<Habit[]> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('habits')
-    .select('*')
+    .select('*, habit_evidences(*)')
     .order('sort_order', { ascending: true });
 
   if (error) throw error;
-  return (data as HabitRow[]).map(toHabit);
+  return (data as (HabitRow & { habit_evidences: HabitEvidenceRow[] })[]).map(
+    (row) => toHabit(row, row.habit_evidences ?? [])
+  );
 }
 
 export async function fetchCompletions(): Promise<HabitCompletion[]> {
@@ -388,6 +409,83 @@ export async function useRocketOnDate(
     if (error) throw error;
     return toCompletion(data as CompletionRow);
   }
+}
+
+// --- Habit Evidences ---
+
+export async function fetchHabitEvidences(habitId: string): Promise<HabitEvidence[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('habit_evidences')
+    .select('*')
+    .eq('habit_id', habitId);
+
+  if (error) throw error;
+  return (data as HabitEvidenceRow[]).map(toHabitEvidence);
+}
+
+export async function insertHabitEvidence(
+  habitId: string,
+  articleId: string,
+  weight: number = 100
+): Promise<HabitEvidence> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('habit_evidences')
+    .insert({ habit_id: habitId, article_id: articleId, weight })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return toHabitEvidence(data as HabitEvidenceRow);
+}
+
+export async function updateHabitEvidenceWeight(
+  id: string,
+  weight: number
+): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from('habit_evidences')
+    .update({ weight })
+    .eq('id', id);
+  if (error) throw error;
+}
+
+export async function deleteHabitEvidence(id: string): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from('habit_evidences')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
+}
+
+export async function replaceHabitEvidences(
+  habitId: string,
+  evidences: { articleId: string; weight: number }[]
+): Promise<HabitEvidence[]> {
+  const supabase = createClient();
+  // Delete existing
+  const { error: delError } = await supabase
+    .from('habit_evidences')
+    .delete()
+    .eq('habit_id', habitId);
+  if (delError) throw delError;
+
+  if (evidences.length === 0) return [];
+
+  const rows = evidences.map((e) => ({
+    habit_id: habitId,
+    article_id: e.articleId,
+    weight: e.weight,
+  }));
+  const { data, error } = await supabase
+    .from('habit_evidences')
+    .insert(rows)
+    .select();
+  if (error) throw error;
+  return (data as HabitEvidenceRow[]).map(toHabitEvidence);
 }
 
 // --- Sort Order ---

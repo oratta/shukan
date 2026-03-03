@@ -1,9 +1,38 @@
 import type { HabitCompletion, HabitWithStats } from '@/types/habit';
-import type { LifeImpactArticle, LifeImpactSavings } from '@/types/impact';
+import type { HabitEvidence, LifeImpactArticle, LifeImpactSavings } from '@/types/impact';
 
 /**
- * 1つの習慣のインパクト貯金を計算
- * completions数（達成日数）× 1日あたりの値
+ * 1日あたりのインパクト値（重み付き合計）
+ */
+export interface DailyImpact {
+  healthMinutes: number;
+  costSaving: number;
+  incomeGain: number;
+}
+
+/**
+ * 複数エビデンスの重み付き合計で日次インパクトを計算
+ */
+export function calculateDailyImpact(
+  evidences: HabitEvidence[],
+  getArticleFn: (id: HabitEvidence['articleId']) => LifeImpactArticle | undefined
+): DailyImpact {
+  let healthMinutes = 0;
+  let costSaving = 0;
+  let incomeGain = 0;
+  for (const ev of evidences) {
+    const article = getArticleFn(ev.articleId);
+    if (!article) continue;
+    const w = ev.weight / 100;
+    healthMinutes += article.calculationParams.dailyHealthMinutes * w;
+    costSaving += article.calculationParams.dailyCostSaving * w;
+    incomeGain += article.calculationParams.dailyIncomeGain * w;
+  }
+  return { healthMinutes, costSaving, incomeGain };
+}
+
+/**
+ * 1つの習慣のインパクト貯金を計算（multi-evidence対応）
  */
 export function calculateImpactSavings(
   habitId: string,
@@ -20,6 +49,29 @@ export function calculateImpactSavings(
     healthMinutes: completedDays * article.calculationParams.dailyHealthMinutes,
     costSaving: completedDays * article.calculationParams.dailyCostSaving,
     incomeGain: completedDays * article.calculationParams.dailyIncomeGain,
+  };
+}
+
+/**
+ * 複数エビデンスからインパクト貯金を計算
+ */
+export function calculateMultiEvidenceImpact(
+  habitId: string,
+  completions: HabitCompletion[],
+  evidences: HabitEvidence[],
+  getArticleFn: (id: HabitEvidence['articleId']) => LifeImpactArticle | undefined
+): LifeImpactSavings {
+  const completedDays = completions.filter(
+    (c) => c.habitId === habitId &&
+           (c.status === 'completed' || c.status === 'rocket_used')
+  ).length;
+
+  const daily = calculateDailyImpact(evidences, getArticleFn);
+  return {
+    completedDays,
+    healthMinutes: completedDays * daily.healthMinutes,
+    costSaving: completedDays * daily.costSaving,
+    incomeGain: completedDays * daily.incomeGain,
   };
 }
 

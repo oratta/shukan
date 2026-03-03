@@ -68,4 +68,7 @@ export const quitSmoking: LifeImpactArticle = {
   },
 
   confidenceLevel: 'high',
+
+  defaultHabitType: 'quit',
+  defaultIcon: '🚭',
 };

@@ -20,6 +20,10 @@ import {
   updateUrgeLog,
   useRocketOnDate,
   updateHabitSortOrders,
+  insertHabitEvidence,
+  deleteHabitEvidence,
+  updateHabitEvidenceWeight,
+  replaceHabitEvidences,
 } from '@/lib/supabase/habits';
 
 export function useHabits() {
@@ -80,14 +84,22 @@ export function useHabits() {
   }, [user]);
 
   const addHabit = useCallback(
-    async (habit: Omit<Habit, 'id' | 'createdAt' | 'archived' | 'sortOrder'>, copingSteps?: { title: string; sortOrder: number }[]) => {
+    async (
+      habit: Omit<Habit, 'id' | 'createdAt' | 'archived' | 'sortOrder'>,
+      copingSteps?: { title: string; sortOrder: number }[],
+      initialEvidences?: { articleId: string; weight: number }[]
+    ) => {
       if (!user) return;
       const newHabit = await insertHabit(user.id, habit);
-      setHabits((prev) => [...prev, newHabit]);
       if (copingSteps && copingSteps.length > 0 && newHabit.type === 'quit') {
         const steps = await upsertCopingSteps(newHabit.id, copingSteps);
         setCopingStepsMap((prev) => new Map(prev).set(newHabit.id, steps));
       }
+      if (initialEvidences && initialEvidences.length > 0) {
+        const evs = await replaceHabitEvidences(newHabit.id, initialEvidences);
+        newHabit.evidences = evs;
+      }
+      setHabits((prev) => [...prev, newHabit]);
       return newHabit;
     },
     [user]
@@ -96,8 +108,10 @@ export function useHabits() {
   const updateHabit = useCallback(
     async (id: string, updates: Partial<Omit<Habit, 'id' | 'createdAt'>>, copingSteps?: { title: string; sortOrder: number }[]) => {
       await updateHabitById(id, updates);
+      // Exclude evidences from optimistic update — evidences are managed via dedicated CRUD
+      const { evidences: _ignored, ...safeUpdates } = updates;
       setHabits((prev) =>
-        prev.map((h) => (h.id === id ? { ...h, ...updates } : h))
+        prev.map((h) => (h.id === id ? { ...h, ...safeUpdates } : h))
       );
       if (copingSteps) {
         const steps = await upsertCopingSteps(id, copingSteps);
@@ -188,6 +202,52 @@ export function useHabits() {
     [user]
   );
 
+  const addEvidence = useCallback(
+    async (habitId: string, articleId: string, weight: number = 100) => {
+      const ev = await insertHabitEvidence(habitId, articleId, weight);
+      setHabits((prev) =>
+        prev.map((h) =>
+          h.id === habitId ? { ...h, evidences: [...h.evidences, ev] } : h
+        )
+      );
+      return ev;
+    },
+    []
+  );
+
+  const removeEvidence = useCallback(
+    async (habitId: string, evidenceId: string) => {
+      await deleteHabitEvidence(evidenceId);
+      setHabits((prev) =>
+        prev.map((h) =>
+          h.id === habitId
+            ? { ...h, evidences: h.evidences.filter((e) => e.id !== evidenceId) }
+            : h
+        )
+      );
+    },
+    []
+  );
+
+  const setEvidenceWeight = useCallback(
+    async (habitId: string, evidenceId: string, weight: number) => {
+      await updateHabitEvidenceWeight(evidenceId, weight);
+      setHabits((prev) =>
+        prev.map((h) =>
+          h.id === habitId
+            ? {
+                ...h,
+                evidences: h.evidences.map((e) =>
+                  e.id === evidenceId ? { ...e, weight } : e
+                ),
+              }
+            : h
+        )
+      );
+    },
+    []
+  );
+
   const reorderHabits = useCallback(
     async (orderedIds: string[]) => {
       const updates = orderedIds.map((id, index) => ({ id, sortOrder: index }));
@@ -233,5 +293,8 @@ export function useHabits() {
     completeUrgeStep,
     useRocket,
     reorderHabits,
+    addEvidence,
+    removeEvidence,
+    setEvidenceWeight,
   };
 }

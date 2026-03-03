@@ -7,7 +7,7 @@ import { HabitForm } from '@/components/habits/habit-form';
 import { HabitActions } from '@/components/habits/habit-actions';
 import { HabitDetailModal } from '@/components/habits/habit-detail-modal';
 import { VsTemptationModal } from '@/components/habits/vs-temptation-modal';
-import { ImpactArticleSheet } from '@/components/habits/impact-article-sheet';
+import { EvidenceArticleSheet } from '@/components/habits/evidence-article-sheet';
 import { useHabits } from '@/hooks/useHabits';
 import { shouldShowToday, getHabitsWithStats } from '@/lib/habits';
 import { getArticle } from '@/data/impact-articles';
@@ -29,13 +29,16 @@ export default function DashboardPage() {
     completeUrgeStep,
     useRocket,
     reorderHabits,
+    addEvidence,
+    removeEvidence,
+    setEvidenceWeight,
   } = useHabits();
   const [formOpen, setFormOpen] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [actionsHabitId, setActionsHabitId] = useState<string | null>(null);
   const [detailHabitId, setDetailHabitId] = useState<string | null>(null);
   const [vsHabitId, setVsHabitId] = useState<string | null>(null);
-  const [articleHabitId, setArticleHabitId] = useState<string | null>(null);
+  const [openArticleId, setOpenArticleId] = useState<string | null>(null);
 
   const todayHabits = useMemo(() => {
     const filtered = habits.filter(shouldShowToday);
@@ -60,11 +63,6 @@ export default function DashboardPage() {
     [todayHabits, vsHabitId]
   );
 
-  const articleHabit = useMemo(
-    () => todayHabits.find((h) => h.id === articleHabitId) ?? null,
-    [todayHabits, articleHabitId]
-  );
-
   const handleAdd = useCallback(() => {
     setEditingHabit(null);
     setFormOpen(true);
@@ -84,21 +82,18 @@ export default function DashboardPage() {
   const handleSubmit = useCallback(
     (
       data: Omit<Habit, 'id' | 'createdAt' | 'archived' | 'sortOrder'>,
-      copingSteps?: { title: string; sortOrder: number }[]
+      copingSteps?: { title: string; sortOrder: number }[],
+      initialEvidences?: { articleId: string; weight: number }[]
     ) => {
       if (editingHabit) {
         updateHabit(editingHabit.id, data, copingSteps);
       } else {
-        addHabit(data, copingSteps);
+        addHabit(data, copingSteps, initialEvidences);
       }
       setEditingHabit(null);
     },
     [editingHabit, addHabit, updateHabit]
   );
-
-  const handleActions = useCallback((id: string) => {
-    setActionsHabitId(id);
-  }, []);
 
   const handleOpenDetail = useCallback((id: string) => {
     setDetailHabitId(id);
@@ -106,10 +101,6 @@ export default function DashboardPage() {
 
   const handleOpenVsTemptation = useCallback((id: string) => {
     setVsHabitId(id);
-  }, []);
-
-  const handleOpenArticle = useCallback((id: string) => {
-    setArticleHabitId(id);
   }, []);
 
   const handleDelete = useCallback(() => {
@@ -170,10 +161,8 @@ export default function DashboardPage() {
         habits={todayHabits}
         onDayStatusChange={setDayStatus}
         onAdd={handleAdd}
-        onActions={handleActions}
         onOpenDetail={handleOpenDetail}
         onOpenVsTemptation={handleOpenVsTemptation}
-        onOpenArticle={handleOpenArticle}
         onReorder={reorderHabits}
       />
 
@@ -211,6 +200,15 @@ export default function DashboardPage() {
         onOpenChange={(open) => !open && setDetailHabitId(null)}
         habit={detailHabit}
         onUseRocket={useRocket}
+        onDayStatusChange={setDayStatus}
+        onEdit={(id) => {
+          setDetailHabitId(null);
+          handleEdit(id);
+        }}
+        onOpenArticle={(articleId) => setOpenArticleId(articleId)}
+        onAddEvidence={addEvidence}
+        onRemoveEvidence={removeEvidence}
+        onSetWeight={setEvidenceWeight}
       />
 
       <VsTemptationModal
@@ -221,10 +219,10 @@ export default function DashboardPage() {
         onCompleteStep={completeUrgeStep}
       />
 
-      <ImpactArticleSheet
-        open={!!articleHabitId}
-        onOpenChange={(open) => !open && setArticleHabitId(null)}
-        habit={articleHabit}
+      <EvidenceArticleSheet
+        open={!!openArticleId}
+        onOpenChange={(open) => !open && setOpenArticleId(null)}
+        articleId={openArticleId}
       />
     </div>
   );

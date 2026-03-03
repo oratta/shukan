@@ -1,4 +1,4 @@
-import type { ArticleId, LifeImpactSavings } from './impact';
+import type { ArticleId, HabitEvidence, LifeImpactSavings } from './impact';
 
 export interface Habit {
   id: string;
@@ -13,7 +13,8 @@ export interface Habit {
   dailyTarget: number;
   createdAt: string;
   archived: boolean;
-  impactArticleId?: ArticleId;
+  impactArticleId?: ArticleId; // legacy single-evidence — kept for backward compat
+  evidences: HabitEvidence[];
   sortOrder: number;
 }
 

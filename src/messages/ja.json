@@ -4,7 +4,8 @@
     "tagline": "毎日の積み重ねで、いい習慣を身につけよう"
   },
   "nav": {
-    "today": "今日",
+    "today": "ホーム",
+    "discover": "発見",
     "stats": "統計",
     "settings": "設定"
   },
@@ -70,7 +71,14 @@
     "rocketConfirmTitle": "ロケットを使用",
     "rocketConfirmDescription": "ロケットを1つ使って、この日をクリアしたことにします。よろしいですか？",
     "rocketConfirmOk": "使用する",
-    "rocketConfirmCancel": "キャンセル"
+    "rocketConfirmCancel": "キャンセル",
+    "historyTab": "HISTORY",
+    "milestones": "MILESTONES",
+    "historyHelpTitle": "履歴の見方",
+    "historyHelp1": "カレンダーは、この習慣の達成状況を月ごとに表示します。",
+    "historyHelp2": "緑: 達成した日、オレンジ: 失敗した日、空: まだ記録なし。",
+    "historyHelp3": "直近5日間は枠付きで表示されており、タップしてステータスを切り替えられます（達成 → 失敗 → 未記録）。",
+    "historyHelp4": "10日連続達成するとロケットを獲得できます。ロケットは過去の失敗日を1つ救済できます（5日以上前の日のみ）。"
   },
   "stats": {
     "title": "統計",
@@ -137,7 +145,7 @@
     "daysUnit": "日",
     "accumulated": "分の累積",
     "totalSavings": "人生インパクト貯金",
-    "cumulative": "累計",
+    "cumulative": "累積貯金",
     "allHabitsTotal": "全記事合計",
     "perHabitBreakdown": "習慣ごとの内訳",
     "readArticle": "根拠を読む",
@@ -150,6 +158,34 @@
       "medium": "信頼度: 中",
       "low": "信頼度: 低（推定）"
     }
+  },
+  "discover": {
+    "title": "Discover",
+    "quit": "Quit",
+    "build": "Build",
+    "addHabit": "この習慣を追加",
+    "perDay": "/日",
+    "confidence": {
+      "high": "信頼度: 高",
+      "medium": "信頼度: 中",
+      "low": "信頼度: 低"
+    }
+  },
+  "evidence": {
+    "title": "エビデンス",
+    "selectTitle": "エビデンスを選択",
+    "all": "すべて",
+    "addEvidence": "エビデンスを追加",
+    "addCount": "{count}件のエビデンスを追加",
+    "noEvidence": "エビデンスなしでも習慣を作成できます",
+    "weight": "適用率",
+    "weightAbout": "エビデンスの適用率を変更すると、そのエビデンスのインパクト値に掛け算されます。例えば「禁煙」のエビデンスを50%に設定すると、タバコの量を半分にする目標に対応できます。",
+    "totalImpact": "合計インパクト",
+    "search": "キーワードで検索...",
+    "noResults": "該当する記事が見つかりません",
+    "addThisHabit": "この習慣を追加",
+    "manage": "エビデンス管理",
+    "removeConfirm": "このエビデンスを削除しますか？"
   },
   "common": {
     "loading": "読み込み中...",
