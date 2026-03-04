@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { getArticleList } from '@/data/impact-articles';
-import { formatCurrency, formatHealthMinutes } from '@/lib/impact';
+import { formatCurrency, formatHealthMinutes, calculateAnnualImpact } from '@/lib/impact';
 import { EvidenceArticleSheet } from '@/components/habits/evidence-article-sheet';
 import { HabitForm } from '@/components/habits/habit-form';
 import { useHabits } from '@/hooks/useHabits';
@@ -64,7 +64,7 @@ export default function DiscoverPage() {
       min: t('impact.minuteUnit'),
       hour: t('impact.hourUnit'),
       day: t('impact.dayUnit'),
-      perDay: t('discover.perDay'),
+      perYear: t('discover.perYear'),
     }),
     [t]
   );
@@ -182,7 +182,7 @@ interface ArticleCardProps {
   confidenceLevel: 'high' | 'medium' | 'low';
   heroImage?: string;
   gradient: string;
-  timeUnits: { min: string; hour: string; day: string; perDay: string };
+  timeUnits: { min: string; hour: string; day: string; perYear: string };
   confidenceLabel: string;
   onTap: (id: ArticleId) => void;
 }
@@ -235,21 +235,30 @@ function ArticleCard({
           </span>
         </div>
 
-        {/* Impact metrics */}
-        <div className="text-[11px] text-muted-foreground space-y-0.5 mb-2">
-          <div>
-            <span>🏥</span>{' '}
-            <span>+{formatHealthMinutes(healthMinutes, timeUnits)}</span>
-          </div>
-          <div>
-            <span>💰</span>{' '}
-            <span>{formatCurrency(costSaving, false)}</span>
-          </div>
-          <div>
-            <span>📈</span>{' '}
-            <span>{formatCurrency(incomeGain, false)}{timeUnits.perDay}</span>
-          </div>
-        </div>
+        {/* Impact metrics (annual) */}
+        {(() => {
+          const annual = calculateAnnualImpact({
+            healthMinutes,
+            costSaving,
+            incomeGain,
+          });
+          return (
+            <div className="text-[11px] text-muted-foreground space-y-0.5 mb-2">
+              <div>
+                <span>🏥</span>{' '}
+                <span>+{formatHealthMinutes(annual.healthMinutes, timeUnits)}{timeUnits.perYear}</span>
+              </div>
+              <div>
+                <span>💰</span>{' '}
+                <span>{formatCurrency(annual.costSaving)}{timeUnits.perYear}</span>
+              </div>
+              <div>
+                <span>📈</span>{' '}
+                <span>{formatCurrency(annual.incomeGain)}{timeUnits.perYear}</span>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Confidence badge */}
         <span

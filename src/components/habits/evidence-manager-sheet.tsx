@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
 import { getArticle } from '@/data/impact-articles';
+import { calculateAnnualImpact, formatHealthMinutes, formatCurrency } from '@/lib/impact';
 import { EvidencePicker } from '@/components/habits/evidence-picker';
 import { HelpButton } from '@/components/ui/help-button';
 import type { HabitEvidence, ArticleId } from '@/types/impact';
@@ -36,6 +37,7 @@ export function EvidenceManagerSheet({
   onSetWeight,
 }: EvidenceManagerSheetProps) {
   const t = useTranslations('evidence');
+  const tImpact = useTranslations('impact');
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const resolvedEvidences = useMemo(() => {
@@ -46,6 +48,24 @@ export function EvidenceManagerSheet({
       })
       .filter(Boolean) as { evidence: HabitEvidence; article: NonNullable<ReturnType<typeof getArticle>> }[];
   }, [evidences]);
+
+  const totalAnnualImpact = useMemo(() => {
+    let healthMinutes = 0;
+    let costSaving = 0;
+    let incomeGain = 0;
+    for (const { evidence, article } of resolvedEvidences) {
+      const w = evidence.weight / 100;
+      const annual = calculateAnnualImpact({
+        healthMinutes: article.calculationParams.dailyHealthMinutes * w,
+        costSaving: article.calculationParams.dailyCostSaving * w,
+        incomeGain: article.calculationParams.dailyIncomeGain * w,
+      });
+      healthMinutes += annual.healthMinutes;
+      costSaving += annual.costSaving;
+      incomeGain += annual.incomeGain;
+    }
+    return { healthMinutes, costSaving, incomeGain };
+  }, [resolvedEvidences]);
 
   const handlePickerSelect = useCallback(
     (articleIds: string[]) => {
@@ -86,6 +106,26 @@ export function EvidenceManagerSheet({
             </button>
           </div>
 
+          {/* Total annual impact summary */}
+          {resolvedEvidences.length > 0 && (
+            <div className="shrink-0 border-b bg-[#F8FBF9] px-5 py-3">
+              <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                {tImpact('title')}{tImpact('perYear')}
+              </p>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-bold text-[#3D8A5A]">
+                  🏥 +{formatHealthMinutes(totalAnnualImpact.healthMinutes)}
+                </span>
+                <span className="text-sm font-bold text-[#3D8A5A]">
+                  💰 {formatCurrency(totalAnnualImpact.costSaving)}
+                </span>
+                <span className="text-sm font-bold text-[#3D8A5A]">
+                  📈 {formatCurrency(totalAnnualImpact.incomeGain)}
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* Evidence list */}
           <div className="flex-1 overflow-y-auto px-5 py-4">
             {resolvedEvidences.length === 0 ? (
@@ -94,44 +134,60 @@ export function EvidenceManagerSheet({
               </p>
             ) : (
               <div className="space-y-4">
-                {resolvedEvidences.map(({ evidence, article }) => (
-                  <div
-                    key={evidence.id}
-                    className="rounded-xl border border-[#E5E4E1] bg-card p-4"
-                  >
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-xl">{article.defaultIcon}</span>
-                      <span className="flex-1 truncate text-sm font-semibold">
-                        {article.habitName}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => onRemoveEvidence(habitId, evidence.id)}
-                        className="shrink-0 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-500"
-                      >
-                        <Trash2 className="size-4" />
-                      </button>
-                    </div>
+                {resolvedEvidences.map(({ evidence, article }) => {
+                  const w = evidence.weight / 100;
+                  const annual = calculateAnnualImpact({
+                    healthMinutes: article.calculationParams.dailyHealthMinutes * w,
+                    costSaving: article.calculationParams.dailyCostSaving * w,
+                    incomeGain: article.calculationParams.dailyIncomeGain * w,
+                  });
 
-                    {/* Weight slider */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-muted-foreground">{t('weight')}</span>
-                        <span className="font-semibold text-[#3D8A5A]">
-                          {evidence.weight}%
+                  return (
+                    <div
+                      key={evidence.id}
+                      className="rounded-xl border border-[#E5E4E1] bg-card p-4"
+                    >
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-xl">{article.defaultIcon}</span>
+                        <span className="flex-1 truncate text-sm font-semibold">
+                          {article.habitName}
                         </span>
+                        <button
+                          type="button"
+                          onClick={() => onRemoveEvidence(habitId, evidence.id)}
+                          className="shrink-0 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-500"
+                        >
+                          <Trash2 className="size-4" />
+                        </button>
                       </div>
-                      <Slider
-                        value={[evidence.weight]}
-                        onValueChange={([val]) => onSetWeight(habitId, evidence.id, val)}
-                        min={1}
-                        max={100}
-                        step={5}
-                        className="w-full"
-                      />
+
+                      {/* Annual impact for this evidence */}
+                      <div className="mb-3 flex gap-3 text-[11px] text-muted-foreground">
+                        <span>🏥 +{formatHealthMinutes(annual.healthMinutes)}{tImpact('perYear')}</span>
+                        <span>💰 {formatCurrency(annual.costSaving)}{tImpact('perYear')}</span>
+                        <span>📈 {formatCurrency(annual.incomeGain)}{tImpact('perYear')}</span>
+                      </div>
+
+                      {/* Weight slider */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-muted-foreground">{t('weight')}</span>
+                          <span className="font-semibold text-[#3D8A5A]">
+                            {evidence.weight}%
+                          </span>
+                        </div>
+                        <Slider
+                          value={[evidence.weight]}
+                          onValueChange={([val]) => onSetWeight(habitId, evidence.id, val)}
+                          min={1}
+                          max={100}
+                          step={5}
+                          className="w-full"
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

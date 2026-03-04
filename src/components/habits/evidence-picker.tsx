@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { getArticleList } from '@/data/impact-articles';
+import { calculateAnnualImpact, formatHealthMinutes, formatCurrency } from '@/lib/impact';
 
 type TabFilter = 'all' | 'quit' | 'positive';
 
@@ -169,6 +170,11 @@ export function EvidencePicker({
                 const isSelected = selected.has(article.id);
                 const { dailyHealthMinutes, dailyCostSaving, dailyIncomeGain } =
                   article.calculationParams;
+                const annual = calculateAnnualImpact({
+                  healthMinutes: dailyHealthMinutes,
+                  costSaving: dailyCostSaving,
+                  incomeGain: dailyIncomeGain,
+                });
 
                 return (
                   <button
@@ -203,9 +209,9 @@ export function EvidencePicker({
                         </span>
                       </div>
                       <div className="mt-0.5 flex gap-3 text-[11px] text-muted-foreground">
-                        <span>+{dailyHealthMinutes}{tImpact('minuteUnit')}{tImpact('perDay')}</span>
-                        <span>{dailyCostSaving.toLocaleString()}{tImpact('perDay')}</span>
-                        <span>{dailyIncomeGain.toLocaleString()}{tImpact('perDay')}</span>
+                        <span>🏥 +{formatHealthMinutes(annual.healthMinutes)}{tImpact('perYear')}</span>
+                        <span>💰 {formatCurrency(annual.costSaving)}{tImpact('perYear')}</span>
+                        <span>📈 {formatCurrency(annual.incomeGain)}{tImpact('perYear')}</span>
                       </div>
                     </div>
 

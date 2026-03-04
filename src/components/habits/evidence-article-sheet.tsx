@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { getArticle } from '@/data/impact-articles';
-import { renderArticle } from '@/lib/impact';
+import { renderArticle, calculateAnnualImpact, formatHealthMinutes, formatCurrency } from '@/lib/impact';
 import type { ArticleId } from '@/types/impact';
 
 /** Convert **bold** markers in text to <strong> elements */
@@ -86,6 +86,11 @@ export function EvidenceArticleSheet({
 
   const { dailyHealthMinutes, dailyCostSaving, dailyIncomeGain } =
     article.calculationParams;
+  const annual = calculateAnnualImpact({
+    healthMinutes: dailyHealthMinutes,
+    costSaving: dailyCostSaving,
+    incomeGain: dailyIncomeGain,
+  });
 
   const confidenceLabel = t(`confidence.${article.confidenceLevel}`);
   const gradient = HERO_GRADIENTS[articleId] ?? DEFAULT_GRADIENT;
@@ -145,16 +150,16 @@ export function EvidenceArticleSheet({
           <div className="px-4 pt-4">
             <h2 className="text-xl font-bold">{article.habitName}</h2>
 
-            {/* Impact badges row */}
+            {/* Impact badges row (annual) */}
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF8F0] px-2.5 py-1 text-xs font-medium text-[#B8860B]">
-                🏥 +{dailyHealthMinutes}{t('minuteUnit')}{t('perDay')}
+                🏥 +{formatHealthMinutes(annual.healthMinutes)}{t('perYear')}
               </span>
               <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF8F0] px-2.5 py-1 text-xs font-medium text-[#B8860B]">
-                💰 ¥{dailyCostSaving.toLocaleString()}{t('perDay')}
+                💰 {formatCurrency(annual.costSaving)}{t('perYear')}
               </span>
               <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF8F0] px-2.5 py-1 text-xs font-medium text-[#B8860B]">
-                📈 ¥{dailyIncomeGain.toLocaleString()}{t('perDay')}
+                📈 {formatCurrency(annual.incomeGain)}{t('perYear')}
               </span>
             </div>
 

@@ -308,15 +308,6 @@ export function HabitDetailModal({
               <p className="text-sm font-semibold text-foreground">
                 {tEvidence('title')}
               </p>
-              {onAddEvidence && onRemoveEvidence && onSetWeight && (
-                <button
-                  type="button"
-                  onClick={() => setEvidenceManagerOpen(true)}
-                  className="flex size-6 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                >
-                  <Settings className="size-4" />
-                </button>
-              )}
             </div>
             <div className="space-y-1.5">
               {evidenceArticles.map(({ evidence, article }) => (
@@ -339,6 +330,17 @@ export function HabitDetailModal({
                 </button>
               ))}
             </div>
+            {/* Manage Evidence bar */}
+            {onAddEvidence && onRemoveEvidence && onSetWeight && (
+              <button
+                type="button"
+                onClick={() => setEvidenceManagerOpen(true)}
+                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[#D4E8DA] bg-[#F8FBF9] px-3.5 py-2.5 text-sm font-medium text-[#3D8A5A] transition-colors hover:bg-[#EDF5F0]"
+              >
+                <Settings className="size-4" />
+                {tEvidence('manage')}
+              </button>
+            )}
           </div>
         )}
 

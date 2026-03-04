@@ -138,6 +138,7 @@
     "dailyCost": "コスト削減",
     "dailyIncome": "収入増加",
     "perDay": "/日",
+    "perYear": "/年",
     "minuteUnit": "分",
     "hourUnit": "時間",
     "dayUnit": "日",
@@ -165,6 +166,7 @@
     "build": "Build",
     "addHabit": "この習慣を追加",
     "perDay": "/日",
+    "perYear": "/年",
     "confidence": {
       "high": "信頼度: 高",
       "medium": "信頼度: 中",

@@ -1,22 +1,25 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { calculateDailyImpact, type DailyImpact } from '@/lib/impact';
+import { calculateDailyImpact, calculateAnnualImpact, formatHealthMinutes, formatCurrency, type DailyImpact } from '@/lib/impact';
 import { getArticle } from '@/data/impact-articles';
 import type { HabitEvidence, LifeImpactArticle } from '@/types/impact';
 
 interface ImpactBadgeFromArticleProps {
   article: LifeImpactArticle;
+  mode?: 'daily' | 'annual';
   onTap?: () => void;
 }
 
 interface ImpactBadgeFromEvidencesProps {
   evidences: HabitEvidence[];
+  mode?: 'daily' | 'annual';
   onTap?: () => void;
 }
 
 interface ImpactBadgeFromValuesProps {
   daily: DailyImpact;
+  mode?: 'daily' | 'annual';
   onTap?: () => void;
 }
 
@@ -47,6 +50,10 @@ export function ImpactBadge(props: ImpactBadgeProps) {
   const daily = getDailyValues(props);
   if (!daily) return null;
 
+  const mode = props.mode ?? 'annual';
+  const values = mode === 'annual' ? calculateAnnualImpact(daily) : daily;
+  const periodLabel = mode === 'annual' ? t('perYear') : t('perDay');
+
   const Wrapper = props.onTap ? 'button' : 'div';
   const wrapperProps = props.onTap
     ? {
@@ -66,7 +73,7 @@ export function ImpactBadge(props: ImpactBadgeProps) {
       <div className="flex flex-col items-center gap-0.5">
         <span className="text-base">🏥</span>
         <span className="text-sm font-bold text-[#3D8A5A]">
-          +{Math.round(daily.healthMinutes)}{t('minuteUnit')}
+          +{formatHealthMinutes(values.healthMinutes)}
         </span>
         <span className="text-[9px] font-medium text-[#9C9B99]">
           {t('dailyHealth')}
@@ -75,7 +82,7 @@ export function ImpactBadge(props: ImpactBadgeProps) {
       <div className="flex flex-col items-center gap-0.5">
         <span className="text-base">💰</span>
         <span className="text-sm font-bold text-[#3D8A5A]">
-          ¥{Math.round(daily.costSaving).toLocaleString()}
+          {formatCurrency(values.costSaving)}
         </span>
         <span className="text-[9px] font-medium text-[#9C9B99]">
           {t('dailyCost')}
@@ -84,13 +91,13 @@ export function ImpactBadge(props: ImpactBadgeProps) {
       <div className="flex flex-col items-center gap-0.5">
         <span className="text-base">📈</span>
         <span className="text-sm font-bold text-[#3D8A5A]">
-          ¥{Math.round(daily.incomeGain).toLocaleString()}
+          {formatCurrency(values.incomeGain)}
         </span>
         <span className="text-[9px] font-medium text-[#9C9B99]">
           {t('dailyIncome')}
         </span>
       </div>
-      <span className="text-xs font-medium text-[#9C9B99]">{t('perDay')}</span>
+      <span className="text-xs font-medium text-[#9C9B99]">{periodLabel}</span>
     </Wrapper>
   );
 }

@@ -138,6 +138,7 @@
     "dailyCost": "Cost Savings",
     "dailyIncome": "Income Gain",
     "perDay": "/day",
+    "perYear": "/year",
     "minuteUnit": "min",
     "hourUnit": "h",
     "dayUnit": "d",
@@ -165,6 +166,7 @@
     "build": "Build",
     "addHabit": "Add this habit",
     "perDay": "/day",
+    "perYear": "/year",
     "confidence": {
       "high": "Confidence: High",
       "medium": "Confidence: Medium",

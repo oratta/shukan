@@ -11,6 +11,28 @@ export interface DailyImpact {
 }
 
 /**
+ * 年間インパクト値
+ */
+export interface AnnualImpact {
+  healthMinutes: number;
+  costSaving: number;
+  incomeGain: number;
+}
+
+const DAYS_PER_YEAR = 365;
+
+/**
+ * 日次インパクトを年間に変換
+ */
+export function calculateAnnualImpact(daily: DailyImpact): AnnualImpact {
+  return {
+    healthMinutes: daily.healthMinutes * DAYS_PER_YEAR,
+    costSaving: daily.costSaving * DAYS_PER_YEAR,
+    incomeGain: daily.incomeGain * DAYS_PER_YEAR,
+  };
+}
+
+/**
  * 複数エビデンスの重み付き合計で日次インパクトを計算
  */
 export function calculateDailyImpact(
