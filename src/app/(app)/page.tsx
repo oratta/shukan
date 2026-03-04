@@ -86,7 +86,7 @@ export default function DashboardPage() {
       initialEvidences?: { articleId: string; weight: number }[]
     ) => {
       if (editingHabit) {
-        updateHabit(editingHabit.id, data, copingSteps);
+        updateHabit(editingHabit.id, data, copingSteps, initialEvidences);
       } else {
         addHabit(data, copingSteps, initialEvidences);
       }

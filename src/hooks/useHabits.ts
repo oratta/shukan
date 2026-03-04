@@ -106,7 +106,12 @@ export function useHabits() {
   );
 
   const updateHabit = useCallback(
-    async (id: string, updates: Partial<Omit<Habit, 'id' | 'createdAt'>>, copingSteps?: { title: string; sortOrder: number }[]) => {
+    async (
+      id: string,
+      updates: Partial<Omit<Habit, 'id' | 'createdAt'>>,
+      copingSteps?: { title: string; sortOrder: number }[],
+      newEvidences?: { articleId: string; weight: number }[]
+    ) => {
       await updateHabitById(id, updates);
       // Exclude evidences from optimistic update — evidences are managed via dedicated CRUD
       const { evidences: _ignored, ...safeUpdates } = updates;
@@ -116,6 +121,12 @@ export function useHabits() {
       if (copingSteps) {
         const steps = await upsertCopingSteps(id, copingSteps);
         setCopingStepsMap((prev) => new Map(prev).set(id, steps));
+      }
+      if (newEvidences) {
+        const evs = await replaceHabitEvidences(id, newEvidences);
+        setHabits((prev) =>
+          prev.map((h) => (h.id === id ? { ...h, evidences: evs } : h))
+        );
       }
     },
     []
