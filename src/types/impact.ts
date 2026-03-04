@@ -3,19 +3,65 @@ export type ArticleId =
   | 'quit_smoking'
   | 'quit_porn'
   | 'quit_alcohol'
+  | 'quit_sugar'
+  | 'quit_junk_food'
+  | 'quit_social_media'
   | 'daily_cardio'
   | 'daily_strength'
+  | 'daily_walking'
+  | 'daily_stretching'
+  | 'daily_yoga'
+  | 'daily_meditation'
+  | 'daily_journaling'
+  | 'daily_reading'
+  | 'daily_saving'
   | 'morning_planning'
-  | 'no_youtube';
+  | 'no_youtube'
+  | 'no_screens_before_bed'
+  | 'no_impulse_buying'
+  | 'cold_shower'
+  | 'sleep_7hours'
+  | 'wake_early'
+  | 'gratitude_practice'
+  | 'drink_water'
+  | 'eat_vegetables'
+  | 'intermittent_fasting'
+  | 'home_cooking'
+  | 'deep_work'
+  | 'learn_language'
+  | 'time_in_nature';
 
 const VALID_ARTICLE_IDS: readonly string[] = [
   'quit_smoking',
   'quit_porn',
   'quit_alcohol',
+  'quit_sugar',
+  'quit_junk_food',
+  'quit_social_media',
   'daily_cardio',
   'daily_strength',
+  'daily_walking',
+  'daily_stretching',
+  'daily_yoga',
+  'daily_meditation',
+  'daily_journaling',
+  'daily_reading',
+  'daily_saving',
   'morning_planning',
   'no_youtube',
+  'no_screens_before_bed',
+  'no_impulse_buying',
+  'cold_shower',
+  'sleep_7hours',
+  'wake_early',
+  'gratitude_practice',
+  'drink_water',
+  'eat_vegetables',
+  'intermittent_fasting',
+  'home_cooking',
+  'deep_work',
+  'learn_language',
+  'time_in_nature',
 ] as const;
 
 export function isValidArticleId(id: string | null | undefined): id is ArticleId {
