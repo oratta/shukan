@@ -55,5 +55,5 @@ export const dailyWalking: LifeImpactArticle = {
 
   confidenceLevel: 'high',
   defaultHabitType: 'positive',
-  defaultIcon: '🚶',
+  defaultIcon: 'footprints',
 };

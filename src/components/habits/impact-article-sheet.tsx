@@ -2,7 +2,7 @@
 
 import { useMemo, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
-import { X } from 'lucide-react';
+import { X, HeartPulse, Wallet, TrendingUp } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -72,15 +72,15 @@ export function ImpactArticleSheet({
           {/* Metric summary - with labels and /日 */}
           <div className="flex items-start gap-4 rounded-lg bg-[#FFF8F0] p-3">
             <div className="flex flex-col items-start">
-              <span className="text-[10px] text-[#B8860B]/60">🏥 {t('dailyHealth')}</span>
+              <span className="flex items-center gap-0.5 text-[10px] text-[#B8860B]/60"><HeartPulse className="size-3" /> {t('dailyHealth')}</span>
               <span className="text-sm font-semibold text-[#B8860B]">+{dailyHealthMinutes}{t('minuteUnit')}{t('perDay')}</span>
             </div>
             <div className="flex flex-col items-start">
-              <span className="text-[10px] text-[#B8860B]/60">💰 {t('dailyCost')}</span>
+              <span className="flex items-center gap-0.5 text-[10px] text-[#B8860B]/60"><Wallet className="size-3" /> {t('dailyCost')}</span>
               <span className="text-sm font-semibold text-[#B8860B]">¥{dailyCostSaving.toLocaleString()}{t('perDay')}</span>
             </div>
             <div className="flex flex-col items-start">
-              <span className="text-[10px] text-[#B8860B]/60">📈 {t('dailyIncome')}</span>
+              <span className="flex items-center gap-0.5 text-[10px] text-[#B8860B]/60"><TrendingUp className="size-3" /> {t('dailyIncome')}</span>
               <span className="text-sm font-semibold text-[#B8860B]">¥{dailyIncomeGain.toLocaleString()}{t('perDay')}</span>
             </div>
           </div>
@@ -131,9 +131,9 @@ export function ImpactArticleSheet({
                 {t('yourSavings')}
               </h3>
               <div className="space-y-1 text-sm text-[#3D8A5A]">
-                <p>🏥 {t('dailyHealth')}: +{formatHealthMinutes(habit.impactSavings.healthMinutes, timeUnits)}</p>
-                <p>💰 {t('dailyCost')}: {formatCurrency(habit.impactSavings.costSaving)}</p>
-                <p>📈 {t('dailyIncome')}: {formatCurrency(habit.impactSavings.incomeGain)}</p>
+                <p className="flex items-center gap-1"><HeartPulse className="size-3.5" /> {t('dailyHealth')}: +{formatHealthMinutes(habit.impactSavings.healthMinutes, timeUnits)}</p>
+                <p className="flex items-center gap-1"><Wallet className="size-3.5" /> {t('dailyCost')}: {formatCurrency(habit.impactSavings.costSaving)}</p>
+                <p className="flex items-center gap-1"><TrendingUp className="size-3.5" /> {t('dailyIncome')}: {formatCurrency(habit.impactSavings.incomeGain)}</p>
                 <p className="text-xs text-[#3D8A5A]/70">
                   ({habit.impactSavings.completedDays}{t('daysUnit')}{t('accumulated')})
                 </p>

@@ -83,5 +83,5 @@ export const noYoutube: LifeImpactArticle = {
   confidenceLevel: 'medium',
 
   defaultHabitType: 'quit',
-  defaultIcon: '📺',
+  defaultIcon: 'tv-minimal',
 };

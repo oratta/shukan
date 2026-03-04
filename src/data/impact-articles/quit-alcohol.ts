@@ -93,5 +93,5 @@ export const quitAlcohol: LifeImpactArticle = {
   confidenceLevel: 'high',
 
   defaultHabitType: 'quit',
-  defaultIcon: '🍺',
+  defaultIcon: 'wine-off',
 };

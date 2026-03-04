@@ -60,5 +60,5 @@ export const drinkWater: LifeImpactArticle = {
 
   confidenceLevel: 'medium',
   defaultHabitType: 'positive',
-  defaultIcon: '💧',
+  defaultIcon: 'droplets',
 };

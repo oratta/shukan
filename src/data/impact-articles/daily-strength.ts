@@ -75,5 +75,5 @@ export const dailyStrength: LifeImpactArticle = {
   confidenceLevel: 'high',
 
   defaultHabitType: 'positive',
-  defaultIcon: '💪',
+  defaultIcon: 'dumbbell',
 };

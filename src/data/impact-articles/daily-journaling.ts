@@ -60,5 +60,5 @@ export const dailyJournaling: LifeImpactArticle = {
 
   confidenceLevel: 'medium',
   defaultHabitType: 'positive',
-  defaultIcon: '📝',
+  defaultIcon: 'notebook-pen',
 };

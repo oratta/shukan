@@ -90,5 +90,5 @@ export const dailyCardio: LifeImpactArticle = {
   confidenceLevel: 'high',
 
   defaultHabitType: 'positive',
-  defaultIcon: '🏃',
+  defaultIcon: 'person-standing',
 };

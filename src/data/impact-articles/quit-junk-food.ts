@@ -56,5 +56,5 @@ export const quitJunkFood: LifeImpactArticle = {
 
   confidenceLevel: 'medium',
   defaultHabitType: 'quit',
-  defaultIcon: '🍔',
+  defaultIcon: 'utensils-crossed',
 };

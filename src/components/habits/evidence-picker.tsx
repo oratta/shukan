@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { X, Search, Check } from 'lucide-react';
+import { X, Search, Check, HeartPulse, Wallet, TrendingUp } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { HabitIcon } from '@/components/ui/habit-icon';
 import { cn } from '@/lib/utils';
 import { getArticleList } from '@/data/impact-articles';
 import { calculateAnnualImpact, formatHealthMinutes, formatCurrency } from '@/lib/impact';
@@ -189,8 +190,8 @@ export function EvidencePicker({
                     )}
                   >
                     {/* Icon */}
-                    <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-white text-xl shadow-sm dark:bg-gray-800">
-                      {article.defaultIcon}
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-white shadow-sm dark:bg-gray-800">
+                      <HabitIcon name={article.defaultIcon} size={20} />
                     </span>
 
                     {/* Content */}
@@ -209,9 +210,9 @@ export function EvidencePicker({
                         </span>
                       </div>
                       <div className="mt-0.5 flex gap-3 text-[11px] text-muted-foreground">
-                        <span>🏥 +{formatHealthMinutes(annual.healthMinutes)}{tImpact('perYear')}</span>
-                        <span>💰 {formatCurrency(annual.costSaving)}{tImpact('perYear')}</span>
-                        <span>📈 {formatCurrency(annual.incomeGain)}{tImpact('perYear')}</span>
+                        <span className="flex items-center gap-0.5"><HeartPulse className="size-3" /> +{formatHealthMinutes(annual.healthMinutes)}{tImpact('perYear')}</span>
+                        <span className="flex items-center gap-0.5"><Wallet className="size-3" /> {formatCurrency(annual.costSaving)}{tImpact('perYear')}</span>
+                        <span className="flex items-center gap-0.5"><TrendingUp className="size-3" /> {formatCurrency(annual.incomeGain)}{tImpact('perYear')}</span>
                       </div>
                     </div>
 

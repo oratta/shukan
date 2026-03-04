@@ -56,5 +56,5 @@ export const dailyStretching: LifeImpactArticle = {
 
   confidenceLevel: 'medium',
   defaultHabitType: 'positive',
-  defaultIcon: '🤸',
+  defaultIcon: 'stretch-horizontal',
 };

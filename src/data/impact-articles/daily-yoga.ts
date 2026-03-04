@@ -55,5 +55,5 @@ export const dailyYoga: LifeImpactArticle = {
 
   confidenceLevel: 'medium',
   defaultHabitType: 'positive',
-  defaultIcon: '🧘‍♂️',
+  defaultIcon: 'flower-2',
 };

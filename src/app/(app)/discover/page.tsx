@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
+import { HeartPulse, Wallet, TrendingUp } from 'lucide-react';
 import { getArticleList } from '@/data/impact-articles';
 import { formatCurrency, formatHealthMinutes, calculateAnnualImpact } from '@/lib/impact';
 import { EvidenceArticleSheet } from '@/components/habits/evidence-article-sheet';
@@ -108,7 +109,7 @@ export default function DiscoverPage() {
               <ArticleCard
                 key={article.id}
                 articleId={article.id}
-                icon={article.defaultIcon}
+
                 name={article.name}
                 healthMinutes={article.calculationParams.dailyHealthMinutes}
                 costSaving={article.calculationParams.dailyCostSaving}
@@ -136,7 +137,7 @@ export default function DiscoverPage() {
               <ArticleCard
                 key={article.id}
                 articleId={article.id}
-                icon={article.defaultIcon}
+
                 name={article.name}
                 healthMinutes={article.calculationParams.dailyHealthMinutes}
                 costSaving={article.calculationParams.dailyCostSaving}
@@ -174,7 +175,6 @@ export default function DiscoverPage() {
 
 interface ArticleCardProps {
   articleId: ArticleId;
-  icon: string;
   name: string;
   healthMinutes: number;
   costSaving: number;
@@ -189,7 +189,6 @@ interface ArticleCardProps {
 
 function ArticleCard({
   articleId,
-  icon,
   name,
   healthMinutes,
   costSaving,
@@ -207,29 +206,24 @@ function ArticleCard({
       onClick={() => onTap(articleId)}
       className="bg-card rounded-xl shadow-sm overflow-hidden text-left transition-transform active:scale-[0.97] w-full"
     >
-      {/* Hero image with icon overlay */}
+      {/* Hero image */}
       <div
-        className={`relative h-28 ${heroImage ? '' : `bg-gradient-to-br ${gradient}`} flex items-center justify-center`}
+        className={`relative h-28 ${heroImage ? '' : `bg-gradient-to-br ${gradient}`}`}
       >
         {heroImage && (
-          <>
-            <img
-              src={heroImage}
-              alt=""
-              className="absolute inset-0 h-full w-full object-cover"
-              loading="lazy"
-            />
-            <div className="absolute inset-0 bg-black/30" />
-          </>
+          <img
+            src={heroImage}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
+            loading="lazy"
+          />
         )}
-        <span className="relative text-4xl drop-shadow-lg">{icon}</span>
       </div>
 
       {/* Content */}
       <div className="p-3">
         {/* Title */}
-        <div className="flex items-center gap-1.5 mb-2">
-          <span className="text-base">{icon}</span>
+        <div className="mb-2">
           <span className="text-sm font-semibold text-foreground leading-tight line-clamp-1">
             {name}
           </span>
@@ -244,16 +238,16 @@ function ArticleCard({
           });
           return (
             <div className="text-[11px] text-muted-foreground space-y-0.5 mb-2">
-              <div>
-                <span>🏥</span>{' '}
+              <div className="flex items-center gap-1">
+                <HeartPulse className="size-3" />
                 <span>+{formatHealthMinutes(annual.healthMinutes, timeUnits)}{timeUnits.perYear}</span>
               </div>
-              <div>
-                <span>💰</span>{' '}
+              <div className="flex items-center gap-1">
+                <Wallet className="size-3" />
                 <span>{formatCurrency(annual.costSaving)}{timeUnits.perYear}</span>
               </div>
-              <div>
-                <span>📈</span>{' '}
+              <div className="flex items-center gap-1">
+                <TrendingUp className="size-3" />
                 <span>{formatCurrency(annual.incomeGain)}{timeUnits.perYear}</span>
               </div>
             </div>

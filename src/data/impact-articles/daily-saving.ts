@@ -60,5 +60,5 @@ export const dailySaving: LifeImpactArticle = {
 
   confidenceLevel: 'medium',
   defaultHabitType: 'positive',
-  defaultIcon: '💰',
+  defaultIcon: 'piggy-bank',
 };

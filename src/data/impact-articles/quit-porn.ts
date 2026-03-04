@@ -78,5 +78,5 @@ export const quitPorn: LifeImpactArticle = {
   confidenceLevel: 'medium',
 
   defaultHabitType: 'quit',
-  defaultIcon: '🧠',
+  defaultIcon: 'brain',
 };

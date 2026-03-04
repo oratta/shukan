@@ -60,5 +60,5 @@ export const intermittentFasting: LifeImpactArticle = {
 
   confidenceLevel: 'medium',
   defaultHabitType: 'positive',
-  defaultIcon: '⏱️',
+  defaultIcon: 'timer',
 };

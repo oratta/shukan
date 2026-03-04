@@ -2,7 +2,8 @@
 
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { Flame, Trophy, TrendingUp } from 'lucide-react';
+import { Flame, Trophy, TrendingUp, HeartPulse, Wallet, BarChart3 } from 'lucide-react';
+import { HabitIcon } from '@/components/ui/habit-icon';
 import { Card } from '@/components/ui/card';
 import { ProgressRing } from '@/components/habits/progress-ring';
 import { useHabits } from '@/hooks/useHabits';
@@ -63,7 +64,7 @@ export default function StatsPage() {
           {t('stats.title')}
         </h2>
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="mb-4 text-5xl">📊</div>
+          <BarChart3 className="mb-4 size-12 text-muted-foreground" />
           <p className="text-sm text-muted-foreground">{t('stats.noData')}</p>
         </div>
       </div>
@@ -163,14 +164,14 @@ export default function StatsPage() {
               .filter((h) => h.impactSavings && h.impactSavings.completedDays > 0)
               .map((habit) => (
                 <Card key={habit.id} className="flex items-center gap-3 p-3">
-                  <span className="text-xl">{habit.icon}</span>
+                  <HabitIcon name={habit.icon} size={20} />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{habit.name}</p>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span>🏥 {formatHealthMinutes(habit.impactSavings!.healthMinutes, { min: t('impact.minuteUnit'), hour: t('impact.hourUnit'), day: t('impact.dayUnit') })}</span>
-                    <span>💰 {formatCurrency(habit.impactSavings!.costSaving)}</span>
-                    <span>📈 {formatCurrency(habit.impactSavings!.incomeGain)}</span>
+                    <span className="flex items-center gap-0.5"><HeartPulse className="size-3" /> {formatHealthMinutes(habit.impactSavings!.healthMinutes, { min: t('impact.minuteUnit'), hour: t('impact.hourUnit'), day: t('impact.dayUnit') })}</span>
+                    <span className="flex items-center gap-0.5"><Wallet className="size-3" /> {formatCurrency(habit.impactSavings!.costSaving)}</span>
+                    <span className="flex items-center gap-0.5"><TrendingUp className="size-3" /> {formatCurrency(habit.impactSavings!.incomeGain)}</span>
                   </div>
                 </Card>
               ))}
@@ -188,7 +189,7 @@ export default function StatsPage() {
               key={habit.id}
               className="flex items-center gap-3 p-3"
             >
-              <span className="text-xl">{habit.icon}</span>
+              <HabitIcon name={habit.icon} size={20} />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">{habit.name}</p>
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">

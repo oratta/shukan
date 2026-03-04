@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { Plus } from 'lucide-react';
+import { Plus, Sprout } from 'lucide-react';
 import {
   DndContext,
   closestCenter,
@@ -80,7 +80,7 @@ export function HabitList({
     <div className="relative">
       {sortedHabits.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="mb-4 text-5xl">🌱</div>
+          <Sprout className="mb-4 size-12 text-muted-foreground" />
           <h3 className="mb-1 text-lg font-semibold">{t('empty')}</h3>
           <Button onClick={onAdd} size="sm" className="mt-4">
             <Plus className="size-4" />

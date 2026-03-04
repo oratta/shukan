@@ -81,5 +81,5 @@ export const morningPlanning: LifeImpactArticle = {
 
   confidenceLevel: 'medium',
   defaultHabitType: 'positive',
-  defaultIcon: '📋',
+  defaultIcon: 'clipboard-list',
 };

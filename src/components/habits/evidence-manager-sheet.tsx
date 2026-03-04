@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { X, Trash2, Plus } from 'lucide-react';
+import { X, Trash2, Plus, HeartPulse, Wallet, TrendingUp } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -13,6 +13,7 @@ import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
 import { getArticle } from '@/data/impact-articles';
 import { calculateAnnualImpact, formatHealthMinutes, formatCurrency } from '@/lib/impact';
+import { HabitIcon } from '@/components/ui/habit-icon';
 import { EvidencePicker } from '@/components/habits/evidence-picker';
 import { HelpButton } from '@/components/ui/help-button';
 import type { HabitEvidence, ArticleId } from '@/types/impact';
@@ -113,14 +114,14 @@ export function EvidenceManagerSheet({
                 {tImpact('title')}{tImpact('perYear')}
               </p>
               <div className="flex items-center justify-between">
-                <span className="text-sm font-bold text-[#3D8A5A]">
-                  🏥 +{formatHealthMinutes(totalAnnualImpact.healthMinutes)}
+                <span className="flex items-center gap-1 text-sm font-bold text-[#3D8A5A]">
+                  <HeartPulse className="size-3.5" /> +{formatHealthMinutes(totalAnnualImpact.healthMinutes)}
                 </span>
-                <span className="text-sm font-bold text-[#3D8A5A]">
-                  💰 {formatCurrency(totalAnnualImpact.costSaving)}
+                <span className="flex items-center gap-1 text-sm font-bold text-[#3D8A5A]">
+                  <Wallet className="size-3.5" /> {formatCurrency(totalAnnualImpact.costSaving)}
                 </span>
-                <span className="text-sm font-bold text-[#3D8A5A]">
-                  📈 {formatCurrency(totalAnnualImpact.incomeGain)}
+                <span className="flex items-center gap-1 text-sm font-bold text-[#3D8A5A]">
+                  <TrendingUp className="size-3.5" /> {formatCurrency(totalAnnualImpact.incomeGain)}
                 </span>
               </div>
             </div>
@@ -148,7 +149,7 @@ export function EvidenceManagerSheet({
                       className="rounded-xl border border-[#E5E4E1] bg-card p-4"
                     >
                       <div className="flex items-center gap-3 mb-2">
-                        <span className="text-xl">{article.defaultIcon}</span>
+                        <HabitIcon name={article.defaultIcon} size={20} />
                         <span className="flex-1 truncate text-sm font-semibold">
                           {article.habitName}
                         </span>
@@ -163,9 +164,9 @@ export function EvidenceManagerSheet({
 
                       {/* Annual impact for this evidence */}
                       <div className="mb-3 flex gap-3 text-[11px] text-muted-foreground">
-                        <span>🏥 +{formatHealthMinutes(annual.healthMinutes)}{tImpact('perYear')}</span>
-                        <span>💰 {formatCurrency(annual.costSaving)}{tImpact('perYear')}</span>
-                        <span>📈 {formatCurrency(annual.incomeGain)}{tImpact('perYear')}</span>
+                        <span className="flex items-center gap-0.5"><HeartPulse className="size-3" /> +{formatHealthMinutes(annual.healthMinutes)}{tImpact('perYear')}</span>
+                        <span className="flex items-center gap-0.5"><Wallet className="size-3" /> {formatCurrency(annual.costSaving)}{tImpact('perYear')}</span>
+                        <span className="flex items-center gap-0.5"><TrendingUp className="size-3" /> {formatCurrency(annual.incomeGain)}{tImpact('perYear')}</span>
                       </div>
 
                       {/* Weight slider */}

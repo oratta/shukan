@@ -55,5 +55,5 @@ export const sleep7hours: LifeImpactArticle = {
 
   confidenceLevel: 'high',
   defaultHabitType: 'positive',
-  defaultIcon: '😴',
+  defaultIcon: 'moon',
 };

@@ -59,5 +59,5 @@ export const deepWork: LifeImpactArticle = {
 
   confidenceLevel: 'medium',
   defaultHabitType: 'positive',
-  defaultIcon: '🎯',
+  defaultIcon: 'target',
 };

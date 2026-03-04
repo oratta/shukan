@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { HeartPulse, Wallet, TrendingUp } from 'lucide-react';
 import { calculateDailyImpact, calculateAnnualImpact, formatHealthMinutes, formatCurrency, type DailyImpact } from '@/lib/impact';
 import { getArticle } from '@/data/impact-articles';
 import type { HabitEvidence, LifeImpactArticle } from '@/types/impact';
@@ -71,7 +72,7 @@ export function ImpactBadge(props: ImpactBadgeProps) {
       className="flex w-full items-center justify-between rounded-xl border border-[#D4E8DA] bg-[#F8FBF9] px-3.5 py-3 text-left"
     >
       <div className="flex flex-col items-center gap-0.5">
-        <span className="text-base">🏥</span>
+        <HeartPulse className="size-4 text-[#3D8A5A]" />
         <span className="text-sm font-bold text-[#3D8A5A]">
           +{formatHealthMinutes(values.healthMinutes)}
         </span>
@@ -80,7 +81,7 @@ export function ImpactBadge(props: ImpactBadgeProps) {
         </span>
       </div>
       <div className="flex flex-col items-center gap-0.5">
-        <span className="text-base">💰</span>
+        <Wallet className="size-4 text-[#3D8A5A]" />
         <span className="text-sm font-bold text-[#3D8A5A]">
           {formatCurrency(values.costSaving)}
         </span>
@@ -89,7 +90,7 @@ export function ImpactBadge(props: ImpactBadgeProps) {
         </span>
       </div>
       <div className="flex flex-col items-center gap-0.5">
-        <span className="text-base">📈</span>
+        <TrendingUp className="size-4 text-[#3D8A5A]" />
         <span className="text-sm font-bold text-[#3D8A5A]">
           {formatCurrency(values.incomeGain)}
         </span>

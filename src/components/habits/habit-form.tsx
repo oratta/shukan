@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Dumbbell, Shield } from 'lucide-react';
+import { HabitIcon } from '@/components/ui/habit-icon';
 import {
   Dialog,
   DialogContent,
@@ -27,11 +28,7 @@ import { EvidencePicker } from '@/components/habits/evidence-picker';
 import type { Habit } from '@/types/habit';
 import type { ArticleId } from '@/types/impact';
 
-const EMOJI_OPTIONS = [
-  '💪', '📚', '🏃', '🧘', '💧', '🎯', '✍️', '🎨',
-  '🎵', '🌱', '💤', '🍎', '🧹', '💊', '🐕', '📝',
-  '☕', '🚶', '🏋️', '🧠', '❤️', '🌅', '📖', '🎸',
-];
+import { ICON_OPTIONS } from '@/lib/icon-registry';
 
 const COLOR_OPTIONS = [
   { value: 'oklch(0.6 0.2 260)', label: 'Blue' },
@@ -83,7 +80,7 @@ export function HabitForm({
   const [lifeSignificance, setLifeSignificance] = useState(
     initialData?.lifeSignificance ?? ''
   );
-  const [icon, setIcon] = useState(initialData?.icon ?? '💪');
+  const [icon, setIcon] = useState(initialData?.icon ?? 'dumbbell');
   const [color, setColor] = useState(
     initialData?.color ?? 'oklch(0.6 0.2 260)'
   );
@@ -114,7 +111,7 @@ export function HabitForm({
     setName(initialData?.name ?? '');
     setDescription(initialData?.description ?? '');
     setLifeSignificance(initialData?.lifeSignificance ?? '');
-    setIcon(initialData?.icon ?? '💪');
+    setIcon(initialData?.icon ?? 'dumbbell');
     setColor(initialData?.color ?? 'oklch(0.6 0.2 260)');
     setFrequency(initialData?.frequency ?? 'daily');
     setCustomDays(initialData?.customDays ?? [1, 2, 3, 4, 5]);
@@ -159,7 +156,7 @@ export function HabitForm({
       setName('');
       setDescription('');
       setLifeSignificance('');
-      setIcon('💪');
+      setIcon('dumbbell');
       setColor('oklch(0.6 0.2 260)');
       setFrequency('daily');
       setCustomDays([1, 2, 3, 4, 5]);
@@ -266,7 +263,7 @@ export function HabitForm({
                       : 'hover:bg-accent'
                   )}
                 >
-                  <span className="text-2xl">💪</span>
+                  <Dumbbell className="size-6" />
                   <span className="text-sm font-medium">{t('typePositive')}</span>
                   <span className="text-xs text-muted-foreground">
                     {t('typePositiveDesc')}
@@ -282,7 +279,7 @@ export function HabitForm({
                       : 'hover:bg-accent'
                   )}
                 >
-                  <span className="text-2xl">🛡️</span>
+                  <Shield className="size-6" />
                   <span className="text-sm font-medium">{t('typeQuit')}</span>
                   <span className="text-xs text-muted-foreground">
                     {t('typeQuitDesc')}
@@ -304,7 +301,7 @@ export function HabitForm({
                         key={ev.articleId}
                         className="flex items-center gap-2 rounded-lg border border-[#D4E8DA] bg-[#F8FBF9] px-3 py-2"
                       >
-                        <span className="text-base">{article.defaultIcon}</span>
+                        <HabitIcon name={article.defaultIcon} size={16} />
                         <span className="flex-1 truncate text-sm font-medium">
                           {article.habitName}
                         </span>
@@ -404,18 +401,18 @@ export function HabitForm({
             <div className="space-y-2">
               <Label>{t('icon')}</Label>
               <div className="grid grid-cols-8 gap-1.5">
-                {EMOJI_OPTIONS.map((emoji) => (
+                {ICON_OPTIONS.map((iconName) => (
                   <button
-                    key={emoji}
+                    key={iconName}
                     type="button"
-                    onClick={() => setIcon(emoji)}
+                    onClick={() => setIcon(iconName)}
                     className={cn(
-                      'flex size-9 items-center justify-center rounded-lg text-lg transition-all hover:bg-accent',
-                      icon === emoji &&
+                      'flex size-9 items-center justify-center rounded-lg transition-all hover:bg-accent',
+                      icon === iconName &&
                         'bg-primary/10 ring-2 ring-primary dark:bg-primary/20'
                     )}
                   >
-                    {emoji}
+                    <HabitIcon name={iconName} size={18} />
                   </button>
                 ))}
               </div>

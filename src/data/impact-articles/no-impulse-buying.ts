@@ -60,5 +60,5 @@ export const noImpulseBuying: LifeImpactArticle = {
 
   confidenceLevel: 'medium',
   defaultHabitType: 'quit',
-  defaultIcon: '🛒',
+  defaultIcon: 'shopping-cart',
 };

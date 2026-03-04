@@ -55,5 +55,5 @@ export const noScreensBeforeBed: LifeImpactArticle = {
 
   confidenceLevel: 'medium',
   defaultHabitType: 'quit',
-  defaultIcon: '📱',
+  defaultIcon: 'phone-off',
 };

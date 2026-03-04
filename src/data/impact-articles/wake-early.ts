@@ -54,5 +54,5 @@ export const wakeEarly: LifeImpactArticle = {
 
   confidenceLevel: 'medium',
   defaultHabitType: 'positive',
-  defaultIcon: '🌅',
+  defaultIcon: 'sunrise',
 };

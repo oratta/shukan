@@ -2,7 +2,7 @@
 
 import { useMemo, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, HeartPulse, Wallet, TrendingUp } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -117,23 +117,20 @@ export function EvidenceArticleSheet({
 
         {/* Scrollable area */}
         <div className={cn('flex-1 overflow-y-auto', showAddButton && 'pb-20')}>
-          {/* Hero gradient area with icon */}
+          {/* Hero image area */}
           <div
             className={cn(
-              'relative flex h-48 items-center justify-center',
+              'relative h-48',
               !HERO_IMAGES[articleId] && `bg-gradient-to-br ${gradient}`
             )}
           >
             {HERO_IMAGES[articleId] && (
-              <>
-                <img
-                  src={HERO_IMAGES[articleId]}
-                  alt=""
-                  className="absolute inset-0 h-full w-full object-cover"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-black/30" />
-              </>
+              <img
+                src={HERO_IMAGES[articleId]}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover"
+                loading="lazy"
+              />
             )}
             {/* Back button */}
             <button
@@ -143,7 +140,6 @@ export function EvidenceArticleSheet({
             >
               <ArrowLeft className="size-5" />
             </button>
-            <span className="text-6xl drop-shadow-lg">{article.defaultIcon}</span>
           </div>
 
           {/* Article title + meta */}
@@ -153,13 +149,13 @@ export function EvidenceArticleSheet({
             {/* Impact badges row (annual) */}
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF8F0] px-2.5 py-1 text-xs font-medium text-[#B8860B]">
-                🏥 +{formatHealthMinutes(annual.healthMinutes)}{t('perYear')}
+                <HeartPulse className="size-3.5" /> +{formatHealthMinutes(annual.healthMinutes)}{t('perYear')}
               </span>
               <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF8F0] px-2.5 py-1 text-xs font-medium text-[#B8860B]">
-                💰 {formatCurrency(annual.costSaving)}{t('perYear')}
+                <Wallet className="size-3.5" /> {formatCurrency(annual.costSaving)}{t('perYear')}
               </span>
               <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF8F0] px-2.5 py-1 text-xs font-medium text-[#B8860B]">
-                📈 {formatCurrency(annual.incomeGain)}{t('perYear')}
+                <TrendingUp className="size-3.5" /> {formatCurrency(annual.incomeGain)}{t('perYear')}
               </span>
             </div>
 

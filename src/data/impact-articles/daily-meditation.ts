@@ -60,5 +60,5 @@ export const dailyMeditation: LifeImpactArticle = {
 
   confidenceLevel: 'medium',
   defaultHabitType: 'positive',
-  defaultIcon: '🧠',
+  defaultIcon: 'brain',
 };

@@ -61,5 +61,5 @@ export const timeInNature: LifeImpactArticle = {
 
   confidenceLevel: 'medium',
   defaultHabitType: 'positive',
-  defaultIcon: '🌳',
+  defaultIcon: 'tree-pine',
 };

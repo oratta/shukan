@@ -60,5 +60,5 @@ export const learnLanguage: LifeImpactArticle = {
 
   confidenceLevel: 'medium',
   defaultHabitType: 'positive',
-  defaultIcon: '🌍',
+  defaultIcon: 'globe',
 };

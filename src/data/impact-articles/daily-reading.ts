@@ -60,5 +60,5 @@ export const dailyReading: LifeImpactArticle = {
 
   confidenceLevel: 'medium',
   defaultHabitType: 'positive',
-  defaultIcon: '📚',
+  defaultIcon: 'book-open',
 };

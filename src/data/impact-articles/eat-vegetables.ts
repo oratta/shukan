@@ -60,5 +60,5 @@ export const eatVegetables: LifeImpactArticle = {
 
   confidenceLevel: 'high',
   defaultHabitType: 'positive',
-  defaultIcon: '🥬',
+  defaultIcon: 'leaf',
 };

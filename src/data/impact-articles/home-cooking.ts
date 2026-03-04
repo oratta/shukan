@@ -60,5 +60,5 @@ export const homeCooking: LifeImpactArticle = {
 
   confidenceLevel: 'high',
   defaultHabitType: 'positive',
-  defaultIcon: '🍳',
+  defaultIcon: 'chef-hat',
 };

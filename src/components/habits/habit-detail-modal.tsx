@@ -3,6 +3,7 @@
 import { useMemo, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Rocket, X, Pencil, ChevronRight, ChevronLeft, Settings } from 'lucide-react';
+import { HabitIcon } from '@/components/ui/habit-icon';
 import {
   Dialog,
   DialogContent,
@@ -317,7 +318,7 @@ export function HabitDetailModal({
                   onClick={() => onOpenArticle?.(evidence.articleId)}
                   className="flex w-full items-center gap-3 rounded-xl border border-[#E5E4E1] bg-card px-3.5 py-3 text-left transition-colors hover:bg-accent/50"
                 >
-                  <span className="text-lg">{article.defaultIcon}</span>
+                  <HabitIcon name={article.defaultIcon} size={18} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{article.habitName}</p>
                     {evidence.weight < 100 && (

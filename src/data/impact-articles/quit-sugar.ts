@@ -55,5 +55,5 @@ export const quitSugar: LifeImpactArticle = {
 
   confidenceLevel: 'medium',
   defaultHabitType: 'quit',
-  defaultIcon: '🍬',
+  defaultIcon: 'candy-off',
 };

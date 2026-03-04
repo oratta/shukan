@@ -60,5 +60,5 @@ export const gratitudePractice: LifeImpactArticle = {
 
   confidenceLevel: 'medium',
   defaultHabitType: 'positive',
-  defaultIcon: '🙏',
+  defaultIcon: 'hand-heart',
 };

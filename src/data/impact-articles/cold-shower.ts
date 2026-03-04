@@ -55,5 +55,5 @@ export const coldShower: LifeImpactArticle = {
 
   confidenceLevel: 'medium',
   defaultHabitType: 'positive',
-  defaultIcon: '🚿',
+  defaultIcon: 'shower-head',
 };

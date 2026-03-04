@@ -54,5 +54,5 @@ export const quitSocialMedia: LifeImpactArticle = {
 
   confidenceLevel: 'medium',
   defaultHabitType: 'quit',
-  defaultIcon: '📵',
+  defaultIcon: 'message-circle-off',
 };
