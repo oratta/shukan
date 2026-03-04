@@ -22,7 +22,18 @@ function parseBold(text: string): ReactNode[] {
   );
 }
 
-/** Gradient color palette keyed on article type */
+/** Unsplash hero images per article */
+const HERO_IMAGES: Record<string, string> = {
+  quit_smoking: 'https://images.unsplash.com/photo-1554548405-74d68637f897?w=800&h=400&fit=crop&q=80',
+  quit_alcohol: 'https://images.unsplash.com/photo-1535683577427-740aaac4ec25?w=800&h=400&fit=crop&q=80',
+  quit_porn: 'https://images.unsplash.com/photo-1573511860302-28c524319d2a?w=800&h=400&fit=crop&q=80',
+  no_youtube: 'https://plus.unsplash.com/premium_photo-1661313613228-88dab4e3d22e?w=800&h=400&fit=crop&q=80',
+  daily_cardio: 'https://plus.unsplash.com/premium_photo-1663127773019-2d977286d60a?w=800&h=400&fit=crop&q=80',
+  daily_strength: 'https://images.unsplash.com/photo-1544033527-b192daee1f5b?w=800&h=400&fit=crop&q=80',
+  morning_planning: 'https://plus.unsplash.com/premium_photo-1706028469800-7c719a733e10?w=800&h=400&fit=crop&q=80',
+};
+
+/** Fallback gradient color palette */
 const HERO_GRADIENTS: Record<string, string> = {
   quit_smoking: 'from-red-400 to-orange-300',
   quit_porn: 'from-purple-400 to-pink-300',
@@ -104,10 +115,21 @@ export function EvidenceArticleSheet({
           {/* Hero gradient area with icon */}
           <div
             className={cn(
-              'relative flex h-48 items-center justify-center bg-gradient-to-br',
-              gradient
+              'relative flex h-48 items-center justify-center',
+              !HERO_IMAGES[articleId] && `bg-gradient-to-br ${gradient}`
             )}
           >
+            {HERO_IMAGES[articleId] && (
+              <>
+                <img
+                  src={HERO_IMAGES[articleId]}
+                  alt=""
+                  className="absolute inset-0 h-full w-full object-cover"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-black/30" />
+              </>
+            )}
             {/* Back button */}
             <button
               type="button"

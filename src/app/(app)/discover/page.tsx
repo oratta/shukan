@@ -10,7 +10,18 @@ import { useHabits } from '@/hooks/useHabits';
 import type { Habit } from '@/types/habit';
 import type { ArticleId } from '@/types/impact';
 
-/** Gradient color map per article category */
+/** Unsplash hero image URLs per article category */
+const HERO_IMAGES: Record<string, string> = {
+  quit_smoking: 'https://images.unsplash.com/photo-1554548405-74d68637f897?w=400&h=200&fit=crop&q=80',
+  quit_alcohol: 'https://images.unsplash.com/photo-1535683577427-740aaac4ec25?w=400&h=200&fit=crop&q=80',
+  quit_porn: 'https://images.unsplash.com/photo-1573511860302-28c524319d2a?w=400&h=200&fit=crop&q=80',
+  no_youtube: 'https://plus.unsplash.com/premium_photo-1661313613228-88dab4e3d22e?w=400&h=200&fit=crop&q=80',
+  daily_cardio: 'https://plus.unsplash.com/premium_photo-1663127773019-2d977286d60a?w=400&h=200&fit=crop&q=80',
+  daily_strength: 'https://images.unsplash.com/photo-1544033527-b192daee1f5b?w=400&h=200&fit=crop&q=80',
+  morning_planning: 'https://plus.unsplash.com/premium_photo-1706028469800-7c719a733e10?w=400&h=200&fit=crop&q=80',
+};
+
+/** Fallback gradient color map */
 const GRADIENT_MAP: Record<string, string> = {
   quit_smoking: 'from-gray-400 to-gray-600',
   quit_alcohol: 'from-amber-400 to-amber-600',
@@ -103,6 +114,7 @@ export default function DiscoverPage() {
                 costSaving={article.calculationParams.dailyCostSaving}
                 incomeGain={article.calculationParams.dailyIncomeGain}
                 confidenceLevel={article.confidenceLevel}
+                heroImage={HERO_IMAGES[article.id]}
                 gradient={GRADIENT_MAP[article.id] ?? 'from-gray-400 to-gray-600'}
                 timeUnits={timeUnits}
                 confidenceLabel={t(`discover.confidence.${article.confidenceLevel}`)}
@@ -130,6 +142,7 @@ export default function DiscoverPage() {
                 costSaving={article.calculationParams.dailyCostSaving}
                 incomeGain={article.calculationParams.dailyIncomeGain}
                 confidenceLevel={article.confidenceLevel}
+                heroImage={HERO_IMAGES[article.id]}
                 gradient={GRADIENT_MAP[article.id] ?? 'from-gray-400 to-gray-600'}
                 timeUnits={timeUnits}
                 confidenceLabel={t(`discover.confidence.${article.confidenceLevel}`)}
@@ -167,6 +180,7 @@ interface ArticleCardProps {
   costSaving: number;
   incomeGain: number;
   confidenceLevel: 'high' | 'medium' | 'low';
+  heroImage?: string;
   gradient: string;
   timeUnits: { min: string; hour: string; day: string; perDay: string };
   confidenceLabel: string;
@@ -181,6 +195,7 @@ function ArticleCard({
   costSaving,
   incomeGain,
   confidenceLevel,
+  heroImage,
   gradient,
   timeUnits,
   confidenceLabel,
@@ -192,11 +207,22 @@ function ArticleCard({
       onClick={() => onTap(articleId)}
       className="bg-card rounded-xl shadow-sm overflow-hidden text-left transition-transform active:scale-[0.97] w-full"
     >
-      {/* Hero gradient with icon */}
+      {/* Hero image with icon overlay */}
       <div
-        className={`h-28 bg-gradient-to-br ${gradient} flex items-center justify-center`}
+        className={`relative h-28 ${heroImage ? '' : `bg-gradient-to-br ${gradient}`} flex items-center justify-center`}
       >
-        <span className="text-4xl">{icon}</span>
+        {heroImage && (
+          <>
+            <img
+              src={heroImage}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-black/30" />
+          </>
+        )}
+        <span className="relative text-4xl drop-shadow-lg">{icon}</span>
       </div>
 
       {/* Content */}
