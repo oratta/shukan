@@ -9,18 +9,21 @@ import type { HabitEvidence, LifeImpactArticle } from '@/types/impact';
 interface ImpactBadgeFromArticleProps {
   article: LifeImpactArticle;
   mode?: 'daily' | 'annual';
+  useMan?: boolean;
   onTap?: () => void;
 }
 
 interface ImpactBadgeFromEvidencesProps {
   evidences: HabitEvidence[];
   mode?: 'daily' | 'annual';
+  useMan?: boolean;
   onTap?: () => void;
 }
 
 interface ImpactBadgeFromValuesProps {
   daily: DailyImpact;
   mode?: 'daily' | 'annual';
+  useMan?: boolean;
   onTap?: () => void;
 }
 
@@ -54,6 +57,7 @@ export function ImpactBadge(props: ImpactBadgeProps) {
   const mode = props.mode ?? 'annual';
   const values = mode === 'annual' ? calculateAnnualImpact(daily) : daily;
   const periodLabel = mode === 'annual' ? t('perYear') : t('perDay');
+  const useMan = props.useMan ?? true;
 
   const Wrapper = props.onTap ? 'button' : 'div';
   const wrapperProps = props.onTap
@@ -83,7 +87,7 @@ export function ImpactBadge(props: ImpactBadgeProps) {
       <div className="flex flex-col items-center gap-0.5">
         <Wallet className="size-4 text-[#3D8A5A]" />
         <span className="text-sm font-bold text-[#3D8A5A]">
-          {formatCurrency(values.costSaving)}
+          {formatCurrency(values.costSaving, useMan)}
         </span>
         <span className="text-[9px] font-medium text-[#9C9B99]">
           {t('dailyCost')}
@@ -92,7 +96,7 @@ export function ImpactBadge(props: ImpactBadgeProps) {
       <div className="flex flex-col items-center gap-0.5">
         <TrendingUp className="size-4 text-[#3D8A5A]" />
         <span className="text-sm font-bold text-[#3D8A5A]">
-          {formatCurrency(values.incomeGain)}
+          {formatCurrency(values.incomeGain, useMan)}
         </span>
         <span className="text-[9px] font-medium text-[#9C9B99]">
           {t('dailyIncome')}

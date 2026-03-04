@@ -293,7 +293,7 @@ export function HabitCard({
 
             {/* Impact Badge */}
             {habit.evidences.length > 0 && (
-              <ImpactBadge evidences={habit.evidences} />
+              <ImpactBadge evidences={habit.evidences} mode="daily" />
             )}
 
             {/* Streak card */}

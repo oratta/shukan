@@ -125,6 +125,12 @@
   }
 }
 
+@keyframes perfectPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
 @keyframes celebration {
   0% {
     transform: translate(-50%, -50%) translate(0, 0) scale(1);

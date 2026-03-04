@@ -8,6 +8,7 @@ import { HabitActions } from '@/components/habits/habit-actions';
 import { HabitDetailModal } from '@/components/habits/habit-detail-modal';
 import { VsTemptationModal } from '@/components/habits/vs-temptation-modal';
 import { EvidenceArticleSheet } from '@/components/habits/evidence-article-sheet';
+import { DailyImpactSummary } from '@/components/habits/daily-impact-summary';
 import { useHabits } from '@/hooks/useHabits';
 import { shouldShowToday, getHabitsWithStats } from '@/lib/habits';
 import { getArticle } from '@/data/impact-articles';
@@ -156,6 +157,8 @@ export default function DashboardPage() {
           />
         </div>
       )}
+
+      <DailyImpactSummary habits={todayHabits} />
 
       <HabitList
         habits={todayHabits}

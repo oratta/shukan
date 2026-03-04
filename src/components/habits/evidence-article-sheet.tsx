@@ -274,10 +274,10 @@ export function EvidenceArticleSheet({
                 <HeartPulse className="size-3.5" /> +{formatHealthMinutes(annual.healthMinutes)}{t('perYear')}
               </span>
               <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF8F0] px-2.5 py-1 text-xs font-medium text-[#B8860B]">
-                <Wallet className="size-3.5" /> {formatCurrency(annual.costSaving)}{t('perYear')}
+                <Wallet className="size-3.5" /> {formatCurrency(annual.costSaving, false)}{t('perYear')}
               </span>
               <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF8F0] px-2.5 py-1 text-xs font-medium text-[#B8860B]">
-                <TrendingUp className="size-3.5" /> {formatCurrency(annual.incomeGain)}{t('perYear')}
+                <TrendingUp className="size-3.5" /> {formatCurrency(annual.incomeGain, false)}{t('perYear')}
               </span>
             </div>
 

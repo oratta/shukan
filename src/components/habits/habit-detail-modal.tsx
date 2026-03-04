@@ -253,7 +253,7 @@ export function HabitDetailModal({
         {/* Impact Badge */}
         {habit.evidences.length > 0 && (
           <div className="px-5">
-            <ImpactBadge evidences={habit.evidences} />
+            <ImpactBadge evidences={habit.evidences} mode="daily" />
           </div>
         )}
 

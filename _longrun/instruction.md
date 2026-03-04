@@ -1,229 +1,137 @@
-# 計算ロジック表示 + フィードバック機能 + 全記事の計算検証・修正
+# ホーム画面デイリーインパクト表示 + 年間ビュー具体的数字
 
 ## 概要
 
-エビデンス記事の数値（dailyHealthMinutes, dailyCostSaving, dailyIncomeGain）の算出根拠を構造化データとして各記事に追加し、記事シートのSources下に展開可能セクションとして表示する。加えて、ユーザーが数値根拠に疑問を感じた際のバッドマーク＋自由コメント機能を実装する。最後に全30記事の計算ロジックを作成し、矛盾を検出・修正する。
+2つの変更を行う:
+1. **ホーム画面を「今日」に集中させる**: 完了インジケーター下に「今日獲得したライフインパクト」セクションを追加し、HabitCard展開時のImpactBadgeもデイリー表示に変更
+2. **年間ビューの金額を具体的数字で表示**: ¥54万 → ¥547,500 のように四捨五入せずフル表示
 
 ## 実行フロー
 
-**Phase 1: データモデル拡張** → **Phase 2: UI実装** → **Phase 3: 全30記事の計算ロジック作成 + 矛盾チェック・修正** → **Phase 4: ビルド検証 + コミット**
+**Phase 1: ホーム画面デイリーインパクトセクション** → **Phase 2: ImpactBadgeデイリー切替 + 年間ビュー具体的数字** → **Phase 3: ビルド検証 + コミット**
 
 ---
 
-## Phase 1: データモデル拡張
+## Phase 1: ホーム画面デイリーインパクトセクション
 
-### 1.1 LifeImpactArticle 型に calculationLogic フィールド追加
+### 1.1 DailyImpactSummary コンポーネント作成
 
-`src/types/impact.ts` の `LifeImpactArticle` に以下を追加:
+`src/components/habits/daily-impact-summary.tsx` を新規作成。
 
-```typescript
-calculationLogic: {
-  health: CalcStep[];
-  cost: CalcStep[];
-  income: CalcStep[];
-};
+**入力**: 今日の全習慣リスト（completedToday + evidences 情報）
+
+**計算ロジック**:
+- 各習慣について、紐づくevidences（重み付き）から1日のデイリーインパクト（healthMinutes, costSaving, incomeGain）を計算
+  - 既存の `calculateDailyImpact` 関数（`src/lib/impact.ts`）を利用
+- 分母（total）: 全習慣のデイリーインパクト合計
+- 分子（earned）: `completedToday === true` の習慣のデイリーインパクト合計
+- evidenceが紐づいていない習慣はインパクト計算対象外
+
+**表示レイアウト**（3指標並列表示）:
+
+```
+┌─────────────────────────────────────────┐
+│  今日のライフインパクト                   │
+│                                         │
+│  ❤️ 19分/33分    💰 ¥1,780/¥2,580       │
+│  健康寿命         コスト削減              │
+│                                         │
+│  📈 ¥7,190/¥12,380                      │
+│  収入増加                                │
+└─────────────────────────────────────────┘
 ```
 
+- 分子/分母のフォーマット: 金額は `formatCurrency(amount, false)` で具体的数字表示
+- 健康寿命は `formatHealthMinutes` でフォーマット
+- 分子 < 分母: 通常表示（muted-foreground の分母）
+- 分子 === 分母（全達成）: 🎉 パーフェクト表示
+
+### 1.2 パーフェクト表示
+
+全習慣を達成した場合:
+- テキスト: 「🎉 パーフェクト！」（i18nキー）
+- 背景色やボーダーの変化（例: `bg-green-50 border-green-200 dark:bg-green-950/30`）
+- subtle なアニメーション（CSS animation で pulse 1回程度）
+- 3指標の分子/分母は同値になるので、分母表示を省略して数値のみ表示
+
+### 1.3 page.tsx への組み込み
+
+`src/app/(app)/page.tsx` の完了インジケーター（プログレスバー）の直下に `DailyImpactSummary` を配置:
+
+```
+今日の習慣         2/3 完了
+████████████████░░░░░░░░
+
+[DailyImpactSummary コンポーネント]
+
+[HabitList]
+```
+
+- evidenceを持つ習慣が1つもない場合はセクション自体を非表示
+- habit データを props で渡す（既に page.tsx で `todayHabits` を計算済み）
+
+### 1.4 i18n キー追加
+
+`src/messages/ja.json` / `src/messages/en.json`:
+- `impact.todayImpact`: 「今日のライフインパクト」/ "Today's Life Impact"
+- `impact.perfect`: 「パーフェクト！」/ "Perfect!"
+
+---
+
+## Phase 2: ImpactBadge デイリー切替 + 年間ビュー具体的数字
+
+### 2.1 HabitCard の ImpactBadge をデイリーに変更
+
+`src/components/habits/habit-card.tsx`:
+- `ImpactBadge` の呼び出しに `mode="daily"` を追加
+
+`src/components/habits/habit-detail-modal.tsx`:
+- 同様に `mode="daily"` を追加（ホーム画面全体を「今日」に統一）
+
+### 2.2 formatCurrency の年間ビュー対応
+
+`src/lib/impact.ts` の `formatCurrency` 関数:
+
+**現状**:
 ```typescript
-export interface CalcStep {
-  label: string;      // ステップの説明（例: "研究結果"）
-  value?: string;     // 値（例: "10年延命"）
-  formula?: string;   // 計算式（例: "8年 × 525,600分 ÷ 40年 ÷ 365日"）
-  result?: string;    // 結果（例: "288分/日"）
+export function formatCurrency(amount: number, useMan = true): string {
+  if (useMan && amount >= 100_000) return `¥${Math.floor(amount / 10000)}万`;
+  if (useMan && amount >= 10_000) return `¥${(amount / 10000).toFixed(1)}万`;
+  return `¥${Math.round(amount).toLocaleString()}`;
 }
 ```
 
-### 1.2 article_feedbacks テーブル（Supabase マイグレーション）
+**変更方針**: 年間ビュー（evidence-article-sheet 等）で `formatCurrency(amount, false)` を呼んで具体的数字を表示。
 
-```sql
-CREATE TABLE article_feedbacks (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  article_id text NOT NULL,
-  type text NOT NULL CHECK (type IN ('bad', 'comment')),
-  content text,  -- type='comment' の場合の自由入力テキスト
-  created_at timestamptz NOT NULL DEFAULT now()
-);
+変更対象ファイル:
+- `src/components/habits/evidence-article-sheet.tsx` — ImpactBadge 呼び出し箇所で年間表示する場合に `useMan={false}` を指定
+  - ※ evidence-article-sheet の ImpactBadge は年間モードのままでよい（記事レベルの年間インパクト表示）
+  - ただし金額は具体的数字にする
 
--- RLS
-ALTER TABLE article_feedbacks ENABLE ROW LEVEL SECURITY;
+### 2.3 ImpactBadge への useMan prop 追加
 
--- ユーザーは自分のフィードバックを操作可能
-CREATE POLICY "Users can insert own feedback"
-  ON article_feedbacks FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can read own feedback"
-  ON article_feedbacks FOR SELECT
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can delete own feedback"
-  ON article_feedbacks FOR DELETE
-  USING (auth.uid() = user_id);
-
--- 集計View（全ユーザーの統計、将来LLM調査用）
-CREATE VIEW article_feedback_stats AS
-SELECT
-  article_id,
-  COUNT(*) FILTER (WHERE type = 'bad') AS bad_count,
-  COUNT(*) FILTER (WHERE type = 'comment') AS comment_count,
-  MAX(created_at) AS last_feedback_at
-FROM article_feedbacks
-GROUP BY article_id;
-```
-
-### 1.3 Supabase データ層
-
-`src/lib/supabase/feedbacks.ts` を新規作成:
-- `submitBadMark(articleId: string): Promise<void>` — バッドマーク投稿（同一ユーザー・同一記事で1回まで）
-- `removeBadMark(articleId: string): Promise<void>` — バッドマーク取消
-- `submitComment(articleId: string, content: string): Promise<void>` — コメント投稿
-- `getUserFeedback(articleId: string): Promise<{ hasBadMark: boolean }>` — 自分のフィードバック取得
-- snake_case ↔ camelCase マッピング
+`src/components/habits/impact-badge.tsx`:
+- `useMan?: boolean` prop を追加（デフォルト: mode === 'daily'）
+- 内部の `formatCurrency` 呼び出しに `useMan` を透過
 
 ---
 
-## Phase 2: UI実装
-
-### 2.1 展開可能な計算ロジックセクション
-
-`src/components/habits/evidence-article-sheet.tsx` の Sources セクションの下に追加:
-
-- 折りたたみ可能（デフォルト閉じ）
-- ヘッダー: 「計算ロジック」+ ChevronDown/ChevronUp アイコン
-- 中身: 3指標（健康寿命 / コスト削減 / 収入増加）ごとにステップを表示
-- 各ステップ: label → value/formula → result の流れで表示
-- コンパクトなデザイン（text-xs, muted-foreground）
-
-### 2.2 フィードバックセクション
-
-計算ロジックセクションの下に配置:
-
-- 「この数値に疑問がありますか？」というテキスト
-- バッドマーク（ThumbsDown アイコン）ボタン — トグル式（押すと色が変わる）
-- バッドマーク済みの場合: コメント入力欄が表示される（textarea + 送信ボタン）
-- コメント送信後: 「フィードバックありがとうございます」トースト表示
-
-### 2.3 i18n キー追加
-
-`src/messages/ja.json` と `src/messages/en.json` に以下を追加:
-- `evidence.calculationLogic` — 「計算ロジック」/ "Calculation Logic"
-- `evidence.healthLabel` / `evidence.costLabel` / `evidence.incomeLabel` — 指標ラベル
-- `evidence.feedbackQuestion` — 「この数値に疑問がありますか？」/ "Do you question these numbers?"
-- `evidence.feedbackThanks` — 「フィードバックありがとうございます」/ "Thanks for your feedback"
-- `evidence.commentPlaceholder` — 「具体的にどこがおかしいか教えてください」/ "Tell us what seems off"
-- `evidence.submit` — 「送信」/ "Submit"
-
----
-
-## Phase 3: 全30記事の計算ロジック作成 + 矛盾チェック・修正
-
-### 3.1 計算方針の統一ルール
-
-全記事で統一する計算方法:
-
-**健康寿命（dailyHealthMinutes）**:
-- 研究の延命効果をユーザープロフィール（42歳日本人男性）で調整
-- 残存寿命で日割り: `効果年数 × 525,600分 ÷ 残存寿命年数 ÷ 365日`
-- 「統計的期待値」であることを calculationLogic のステップで明記
-
-**コスト削減（dailyCostSaving）**:
-- 直接コスト（購入費など）+ 間接コスト（医療費など）の積み上げ
-- 日本の価格データを使用
-
-**収入増加（dailyIncomeGain）**:
-- 研究の効果量（%）× ユーザー年収（¥15,000,000）÷ 365日
-- 複数の経路（生産性向上、欠勤減少等）は個別に計算して合算
-
-### 3.2 作業手順（各記事ごと）
-
-1. 既存の `calculationParams` の値を確認
-2. コードコメントの Research basis を読む
-3. inferences テキストの数値を確認
-4. cumulative テキストの数値を確認
-5. 以下の整合性チェックを実行:
-   - **健康寿命**: 研究の効果量 → ユーザープロフィール調整 → dailyHealthMinutes への変換が数学的に正しいか
-   - **コスト**: 個別コスト項目の積み上げ → dailyCostSaving と一致するか
-   - **収入**: 収入プレミアム計算 → dailyIncomeGain と一致するか
-   - **累積**: dailyX × 30日/365日/3650日 が cumulative テキストの数値と一致するか
-6. 矛盾があれば:
-   - calculationParams の数値を修正
-   - inferences テキストの数値を修正
-   - cumulative テキストの数値を修正
-7. `calculationLogic` フィールドを構造化データで追加
-
-### 3.3 禁煙（quit_smoking）の既知の問題
-
-先に発見済みの計算ミス:
-- 研究: 30歳で禁煙 → 10年延命、42歳調整 → 約8年
-- 現在の計算: `dailyHealthMinutes: 12` → 40年で約4ヶ月（8年に遠く及ばない）
-- 正しい計算: `8年 × 525,600分 ÷ 40年 ÷ 365日 = 288分/日`
-- この修正を起点に、全記事の健康寿命計算を統一ルールで再計算する
-
-### 3.4 全30記事のリスト
-
-以下の順序で処理する:
-
-**Quit系（9記事）**:
-1. quit_smoking ← 既知のバグあり
-2. quit_porn
-3. quit_alcohol
-4. quit_sugar
-5. quit_junk_food
-6. quit_social_media
-7. no_youtube
-8. no_screens_before_bed
-9. no_impulse_buying
-
-**Exercise系（5記事）**:
-10. daily_cardio
-11. daily_strength
-12. daily_walking
-13. daily_stretching
-14. daily_yoga
-
-**その他（16記事）**:
-15. cold_shower
-16. daily_meditation
-17. daily_journaling
-18. gratitude_practice
-19. sleep_7hours
-20. wake_early
-21. drink_water
-22. eat_vegetables
-23. intermittent_fasting
-24. home_cooking
-25. morning_planning
-26. daily_reading
-27. deep_work
-28. learn_language
-29. daily_saving
-30. time_in_nature
-
----
-
-## Phase 4: ビルド検証 + コミット
+## Phase 3: ビルド検証 + コミット
 
 - TypeScript 型チェック（`npx tsc --noEmit`）
+- テスト実行（`npx vitest run`）
 - Next.js ビルド（`npx next build`）
-- Supabase マイグレーション適用（`supabase db push`）
-- 適切な単位でコミット:
-  1. `feat(types): add calculationLogic to LifeImpactArticle and CalcStep type`
-  2. `feat(db): add article_feedbacks table and stats view`
-  3. `feat(ui): add calculation logic section and feedback UI`
-  4. `fix(articles): verify and fix calculation logic for all 30 articles`（または記事グループごとに分割）
-- life-impact-article スキル（SKILL.md）も calculationLogic の追加手順を反映して更新
+- コミット
 
 ---
 
 ## 制約・注意事項
 
 - i18n: ja/en 両方を更新すること
-- CalcStep の label/value/formula/result は日本語で記載（V2はハードコードプロフィール）
-- バッドマークは同一ユーザー・同一記事で1回まで（トグル式）
-- コメントは複数投稿可
-- article_feedback_stats View は将来のLLM調査用であり、今回のUIでは使わない
-- Phase 3 で矛盾修正した場合、inferences テキストと cumulative テキストも連動して修正すること
+- DailyImpactSummary は習慣数が0件の場合やevidence未紐付けの場合に適切にフォールバック
+- パーフェクト表示はCSSのみで実装（ライブラリ追加なし）
+- formatCurrency の変更は後方互換性を保つ（useMan のデフォルト値は true のまま）
+- HabitCard / HabitDetailModal の SavingsCard（累積貯金）は変更しない
 
 ---
 
@@ -235,14 +143,12 @@ GROUP BY article_id;
 - [ ] ビルドエラーなし（型チェック + ビルド）
 
 **機能固有の条件:**
-- [ ] CalcStep 型と calculationLogic フィールドが LifeImpactArticle に追加されている
-- [ ] article_feedbacks テーブルと RLS ポリシーが作成されている
-- [ ] article_feedback_stats View が作成されている
-- [ ] Supabase データ層（feedbacks.ts）が実装されている
-- [ ] 計算ロジック展開セクションが evidence-article-sheet に表示される
-- [ ] バッドマーク + コメント機能が動作する
+- [ ] DailyImpactSummary コンポーネントが作成されている
+- [ ] ホーム画面の完了インジケーター下にデイリーインパクトが3指標で表示される
+- [ ] 分母 = 全習慣の合計デイリーインパクト、分子 = 達成済み習慣の合計
+- [ ] 全達成時にパーフェクト表示が出る
+- [ ] evidence未紐付け習慣はインパクト計算から除外される
+- [ ] HabitCard展開時の ImpactBadge が /日 表示になっている
+- [ ] HabitDetailModal の ImpactBadge が /日 表示になっている
+- [ ] 年間ビュー（evidence-article-sheet等）の金額が ¥XXX,XXX 形式で表示される
 - [ ] i18n 対応（ja/en）
-- [ ] 全30記事に calculationLogic が追加されている
-- [ ] 全30記事の calculationParams が整合性チェック済みで矛盾なし
-- [ ] inferences / cumulative テキストが修正済みの calculationParams と一致
-- [ ] life-impact-article スキルが更新されている

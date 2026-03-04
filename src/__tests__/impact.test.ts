@@ -295,4 +295,43 @@ describe('formatCurrency', () => {
   it('useMan=falseでは万表記しない', () => {
     expect(formatCurrency(100000, false)).toBe('¥100,000');
   });
+
+  it('useMan=falseで大きな金額も具体的数字', () => {
+    expect(formatCurrency(547500, false)).toBe('¥547,500');
+    expect(formatCurrency(1712000, false)).toBe('¥1,712,000');
+  });
+
+  it('useMan=falseで1万未満は同じ結果', () => {
+    expect(formatCurrency(5000, false)).toBe('¥5,000');
+    expect(formatCurrency(550, false)).toBe('¥550');
+  });
+});
+
+describe('Daily impact aggregation for DailyImpactSummary', () => {
+  it('複数習慣のデイリーインパクト合計を正しく算出', () => {
+    // Simulate: 3 habits, 2 with evidences, 1 without
+    const ev1 = [makeEvidence('quit_smoking', 100)]; // 30min, ¥550, ¥200
+    const ev2 = [makeEvidence('daily_cardio', 100)]; // 45min, ¥300, ¥500
+
+    const daily1 = calculateDailyImpact(ev1, mockGetArticle);
+    const daily2 = calculateDailyImpact(ev2, mockGetArticle);
+
+    // Total = sum of all habits with evidences
+    const totalHealth = daily1.healthMinutes + daily2.healthMinutes;
+    const totalCost = daily1.costSaving + daily2.costSaving;
+    const totalIncome = daily1.incomeGain + daily2.incomeGain;
+
+    expect(totalHealth).toBe(75);   // 30 + 45
+    expect(totalCost).toBe(850);    // 550 + 300
+    expect(totalIncome).toBe(700);  // 200 + 500
+
+    // Earned = only completed habits (simulate habit1 completed, habit2 not)
+    const earnedHealth = daily1.healthMinutes;
+    const earnedCost = daily1.costSaving;
+    const earnedIncome = daily1.incomeGain;
+
+    expect(earnedHealth).toBe(30);
+    expect(earnedCost).toBe(550);
+    expect(earnedIncome).toBe(200);
+  });
 });
