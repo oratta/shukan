@@ -59,6 +59,25 @@ export const homeCooking: LifeImpactArticle = {
   },
 
   confidenceLevel: 'high',
+
+  calculationLogic: {
+    health: [
+      { label: '研究結果', value: '週6回以上の自炊でHealthy Eating Index 10%以上向上（Wolfson & Bleich, 2015）' },
+      { label: '日本人の現状', value: 'コンビニ・外食文化により塩分・脂質の過剰摂取リスクが高い' },
+      { label: '日割り計算', value: '心血管疾患・糖尿病・がんリスク低減を控えめに算出', result: '6分/日' },
+    ],
+    cost: [
+      { label: '外食との差額', value: '外食1食約900円、自炊約350円', formula: '900 - 350', result: '550円/日' },
+      { label: '長期医療費削減', value: '食事改善による生活習慣病予防の医療費効果', result: '250円/日' },
+      { label: '合計', formula: '550 + 250', result: '800円/日' },
+    ],
+    income: [
+      { label: '基準日給', value: '年収1,500万円', formula: '15000000 ÷ 240日', result: '62500円/日' },
+      { label: '体調安定・集中力向上', value: '食事改善による生産性向上を控えめに1%', formula: '62500 × 1%', result: '625円/日' },
+      { label: '保守的調整', value: 'ストレス解消・創造性向上の付加価値を含め下方調整', result: '500円/日' },
+    ],
+  },
+
   defaultHabitType: 'positive',
   defaultIcon: 'chef-hat',
 };

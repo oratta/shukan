@@ -74,6 +74,23 @@ export const dailyStrength: LifeImpactArticle = {
 
   confidenceLevel: 'high',
 
+  calculationLogic: {
+    health: [
+      { label: '研究結果', value: '筋トレで全死亡リスク15%低下（Shailendra, 2022）' },
+      { label: '42歳男性に適用', value: '残存40年に対し保守的に按分', result: '8分/日' },
+    ],
+    cost: [
+      { label: '糖尿病予防', value: '発症リスク34%低下（Harvard 18年追跡）' },
+      { label: '医療費削減', formula: '年間73000 ÷ 365', result: '200円/日' },
+    ],
+    income: [
+      { label: '実行機能改善', value: '注意力・意思決定向上（Liu-Ambrose, 2010）' },
+      { label: '生産性1.5%', formula: '62500 × 1.5%', result: '625円/日' },
+      { label: '病欠減少', value: '年間約2日分の回復', formula: '62500 × 2 ÷ 365', result: '335円/日' },
+      { label: '合計', formula: '625 + 335', result: '960円/日' },
+    ],
+  },
+
   defaultHabitType: 'positive',
   defaultIcon: 'dumbbell',
 };

@@ -54,6 +54,25 @@ export const sleep7hours: LifeImpactArticle = {
   },
 
   confidenceLevel: 'high',
+
+  calculationLogic: {
+    health: [
+      { label: '研究結果', value: '6時間未満の睡眠で全死亡リスク13%上昇（Cappuccio, 2010）' },
+      { label: 'OHSU 2025', value: '睡眠は食事・運動より寿命への影響が大きい' },
+      { label: '日本人平均6h22m→7hへの改善', value: '13%リスク低減を保守的に按分', result: '14分/日' },
+    ],
+    cost: [
+      { label: '衝動消費の抑制', value: '睡眠不足→判断力低下→衝動消費' },
+      { label: '医療費・覚醒維持費', formula: 'メンタル通院50000 + エナジードリンク等 ÷ 365', result: '400円/日' },
+    ],
+    income: [
+      { label: 'RAND研究', value: '睡眠不足による日本の経済損失 GDP 2.92%' },
+      { label: '生産性2.4%回復', formula: '62500 × 2.4%', result: '1500円/日' },
+      { label: '判断力・創造性向上', value: '追加の認知効果', result: '1000円/日' },
+      { label: '合計', formula: '1500 + 1000', result: '2500円/日' },
+    ],
+  },
+
   defaultHabitType: 'positive',
   defaultIcon: 'moon',
 };

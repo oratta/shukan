@@ -59,6 +59,25 @@ export const dailyMeditation: LifeImpactArticle = {
   },
 
   confidenceLevel: 'medium',
+
+  calculationLogic: {
+    health: [
+      { label: '研究結果', value: '瞑想が不安・うつ・痛みに中程度の効果（Goyal et al., 2014）' },
+      { label: '脳・細胞への効果', value: '大脳皮質の萎縮遅延（Lazar, 2005）+ テロメラーゼ活性上昇（Epel, 2009）' },
+      { label: '日割り計算', formula: '脳萎縮遅延 + テロメア維持 + ストレス低減を残存寿命40年で換算', result: '8分/日' },
+    ],
+    cost: [
+      { label: 'ストレス関連消費の削減', value: '衝動買い・アルコール・外食の減少' },
+      { label: 'メンタルヘルス通院費削減', value: 'カウンセリング・通院費の削減', result: '250円/日' },
+      { label: '合計', result: '250円/日' },
+    ],
+    income: [
+      { label: '認知機能向上', value: '111のRCTで認知機能全般の向上を確認', formula: '15000000 × 2.5% ÷ 365', result: '1027円/日' },
+      { label: '企業導入事例', value: 'Aetna社で従業員の生産性62分/週向上の報告', result: '173円/日' },
+      { label: '合計', formula: '1027 + 173', result: '1200円/日' },
+    ],
+  },
+
   defaultHabitType: 'positive',
   defaultIcon: 'brain',
 };

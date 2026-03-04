@@ -82,6 +82,23 @@ export const noYoutube: LifeImpactArticle = {
 
   confidenceLevel: 'medium',
 
+  calculationLogic: {
+    health: [
+      { label: '座位スクリーン時間', value: '1時間あたりCVDリスク5%増（AHA, 2016）' },
+      { label: '42分削減効果', value: '睡眠改善+心血管リスク低減を保守的に', result: '5分/日' },
+    ],
+    cost: [
+      { label: 'Premium解約', formula: '1280 ÷ 30', result: '43円/日' },
+      { label: '広告衝動買い抑制', value: '保守的に1日100円', result: '100円/日' },
+      { label: '合計', formula: '43 + 100 ≈', result: '150円/日' },
+    ],
+    income: [
+      { label: '注意残余の回復', value: '中断1回あたり23分のロス（Mark, 2008）' },
+      { label: '実効1時間の回復', value: '42分 + Deep Work能力向上' },
+      { label: '時給60%割引', formula: '7813 × 60%', result: '4690円/日' },
+    ],
+  },
+
   defaultHabitType: 'quit',
   defaultIcon: 'tv-minimal',
 };

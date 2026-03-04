@@ -187,7 +187,17 @@
     "noResults": "該当する記事が見つかりません",
     "addThisHabit": "この習慣を追加",
     "manage": "エビデンス管理",
-    "removeConfirm": "このエビデンスを削除しますか？"
+    "removeConfirm": "このエビデンスを削除しますか？",
+    "calculationLogic": "算出根拠",
+    "calculationLabel": "ステップ",
+    "feedbackQuestion": "この数値に疑問がありますか？",
+    "feedbackBadMark": "疑問あり",
+    "feedbackCommentPlaceholder": "具体的な疑問点を教えてください...",
+    "feedbackSubmit": "送信",
+    "feedbackThanks": "フィードバックありがとうございます",
+    "feedbackHealth": "健康寿命の算出根拠",
+    "feedbackCost": "コスト削減の算出根拠",
+    "feedbackIncome": "収入増加の算出根拠"
   },
   "common": {
     "loading": "読み込み中...",

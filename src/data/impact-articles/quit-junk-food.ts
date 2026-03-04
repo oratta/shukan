@@ -55,6 +55,26 @@ export const quitJunkFood: LifeImpactArticle = {
   },
 
   confidenceLevel: 'medium',
+
+  calculationLogic: {
+    health: [
+      { label: 'CVDリスク', value: 'BMJ Srour 2019: 超加工食品10%増でCVDリスク12%上昇' },
+      { label: '全死亡リスク', value: 'BMJ Rico-Campà 2019: 高摂取群は全死亡リスク62%増' },
+      { label: '日割り計算', value: '慢性炎症・酸化ストレス低減を残存寿命40年で保守的に算出', result: '8分/日' },
+    ],
+    cost: [
+      { label: '食費差額', value: 'コンビニ¥700 → 自炊¥350 × 週3回', formula: '(700 - 350) × 3 ÷ 7', result: '150円/日' },
+      { label: '肥満・糖尿病医療費リスク低減', value: '生活習慣病関連の医療費削減', result: '350円/日' },
+      { label: '合計', formula: '150 + 350', result: '500円/日' },
+    ],
+    income: [
+      { label: '集中力・体調向上', value: '食事改善による炎症抑制・脳機能改善' },
+      { label: '控えめに1.5%適用', formula: '15000000 × 1.5% ÷ 365', result: '616円/日' },
+      { label: '病欠日数減少', value: '体調改善による欠勤減少', result: '184円/日' },
+      { label: '合計', formula: '616 + 184', result: '800円/日' },
+    ],
+  },
+
   defaultHabitType: 'quit',
   defaultIcon: 'utensils-crossed',
 };

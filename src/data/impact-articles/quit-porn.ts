@@ -77,6 +77,27 @@ export const quitPorn: LifeImpactArticle = {
 
   confidenceLevel: 'medium',
 
+  calculationLogic: {
+    health: [
+      { label: '睡眠改善', value: '就寝前スクリーン排除 → 30〜45分の睡眠増加' },
+      { label: 'メンタルヘルス', value: 'うつスコア17%低下（6ヶ月後）、不安改善（2〜3週間）' },
+      { label: 'ドーパミン回復', value: 'DAT 14ヶ月で正常値に回復（Volkow, 2001）' },
+      { label: '総合評価', value: '睡眠・精神健康・神経回復を総合し保守的に見積もり', result: '7分/日' },
+    ],
+    cost: [
+      { label: 'サブスク・課金', value: '推定月¥3,000〜5,000', formula: '4000 ÷ 30', result: '133円/日' },
+      { label: '視聴時間の機会費用（一部算入）', value: '1日40分の視聴時間 × 時給¥7,813の一部', result: '100円/日' },
+      { label: '離婚リスク低減', value: 'Perry & Schleifer: 離婚率2倍 → 法的・経済的コスト回避', result: '177円/日' },
+      { label: '合計', formula: '133 + 100 + 177', result: '410円/日' },
+    ],
+    income: [
+      { label: '生産性向上', value: '集中力・実行機能改善（ドーパミン回復効果）' },
+      { label: '控えめに3%適用', formula: '15000000 × 3% ÷ 365', result: '1233円/日' },
+      { label: '欠勤減少・倫理行動改善', value: 'Mecham 2021: サボり163%増加の逆転 + 睡眠改善', result: '1507円/日' },
+      { label: '合計', formula: '1233 + 1507', result: '2740円/日' },
+    ],
+  },
+
   defaultHabitType: 'quit',
   defaultIcon: 'brain',
 };

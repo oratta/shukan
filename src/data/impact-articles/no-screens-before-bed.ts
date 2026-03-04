@@ -54,6 +54,23 @@ export const noScreensBeforeBed: LifeImpactArticle = {
   },
 
   confidenceLevel: 'medium',
+
+  calculationLogic: {
+    health: [
+      { label: '研究結果', value: 'ブルーライトがメラトニンを抑制（Chang et al., 2015）' },
+      { label: '睡眠改善効果', value: '深い睡眠増加+心血管リスク低減+免疫向上', result: '6分/日' },
+    ],
+    cost: [
+      { label: '深夜衝動消費の抑制', value: '深夜EC購入は日中の1.3倍' },
+      { label: '医療費削減含む', formula: '衝動消費抑制 + 睡眠関連医療費', result: '200円/日' },
+    ],
+    income: [
+      { label: '翌日の生産性改善', value: '覚醒度向上・判断ミス減少' },
+      { label: '生産性1.5%', formula: '62500 × 1.5%', result: '938円/日' },
+      { label: '保守的に調整', result: '850円/日' },
+    ],
+  },
+
   defaultHabitType: 'quit',
   defaultIcon: 'phone-off',
 };

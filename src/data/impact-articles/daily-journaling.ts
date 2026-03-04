@@ -59,6 +59,24 @@ export const dailyJournaling: LifeImpactArticle = {
   },
 
   confidenceLevel: 'medium',
+
+  calculationLogic: {
+    health: [
+      { label: '研究結果', value: 'コルチゾール最大23%低減（Smyth et al., 2018）' },
+      { label: 'ストレス関連疾患リスク低減', value: '心血管・免疫機能改善を保守的に按分', result: '5分/日' },
+    ],
+    cost: [
+      { label: '道具代', value: 'ノート+ペン 月約100円', result: '-3円/日' },
+      { label: 'ストレス関連消費の抑制', value: '衝動消費・体調不良出費の減少', result: '103円/日' },
+      { label: '合計', formula: '-3 + 103', result: '100円/日' },
+    ],
+    income: [
+      { label: '思考整理効果', value: 'ワーキングメモリ解放による意思決定改善' },
+      { label: '生産性1.5%', formula: '62500 × 1.5%', result: '938円/日' },
+      { label: '保守的に調整', value: '欠勤減少を含め控えめに', result: '800円/日' },
+    ],
+  },
+
   defaultHabitType: 'positive',
   defaultIcon: 'notebook-pen',
 };

@@ -59,6 +59,25 @@ export const dailyReading: LifeImpactArticle = {
   },
 
   confidenceLevel: 'medium',
+
+  calculationLogic: {
+    health: [
+      { label: '研究結果', value: '週3.5時間以上の読書で全死亡リスク23%低下（Bavishi et al., 2016）' },
+      { label: '認知症予防', value: '認知活動が認知機能低下を遅延（Wilson et al., 2013）' },
+      { label: '日割り計算', value: '23%リスク低減を残存寿命40年で日割り算出', result: '8分/日' },
+    ],
+    cost: [
+      { label: '書籍費用', value: '月2冊約3,000円（図書館なら無料）', formula: '3000 ÷ 30', result: '-100円/日' },
+      { label: 'ストレス消費抑制', value: '読書でストレス68%低減→衝動消費の減少', result: '+200円/日' },
+      { label: '合計', formula: '-100 + 200', result: '100円/日' },
+    ],
+    income: [
+      { label: '基準日給', value: '年収1,500万円', formula: '15000000 ÷ 240日', result: '62500円/日' },
+      { label: '知識・語彙・分析力', value: '富裕層の88%が毎日30分以上読書（Corley, 2016）' },
+      { label: '生産性向上', value: '知識蓄積による生産性向上を控えめに3%', formula: '62500 × 3% ÷ 1.25', result: '1500円/日' },
+    ],
+  },
+
   defaultHabitType: 'positive',
   defaultIcon: 'book-open',
 };

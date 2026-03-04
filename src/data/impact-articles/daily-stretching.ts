@@ -55,6 +55,24 @@ export const dailyStretching: LifeImpactArticle = {
   },
 
   confidenceLevel: 'medium',
+
+  calculationLogic: {
+    health: [
+      { label: '研究結果', value: '4週間のストレッチで動脈硬化度が有意に改善（Yamamoto et al., 2009）' },
+      { label: '効果範囲', value: '心血管リスク低減 + 転倒・腰痛予防（40代は動脈硬化加速期）' },
+      { label: '日割り計算', formula: '血管柔軟性改善・転倒予防を残存寿命40年で換算', result: '5分/日' },
+    ],
+    cost: [
+      { label: '整体通院費削減', value: '腰痛・肩こりの整体通院費（月平均4,000-8,000円）の削減', formula: '6000 ÷ 30', result: '200円/日' },
+      { label: '合計', result: '200円/日' },
+    ],
+    income: [
+      { label: '生産性向上', value: 'ストレス低減と集中力向上を控えめに1%と見積もり', formula: '15000000 × 1% ÷ 365', result: '411円/日' },
+      { label: '体調不良による生産性低下の解消', value: 'デスクワーク中の肩こり・腰痛解消', result: '189円/日' },
+      { label: '合計', formula: '411 + 189', result: '600円/日' },
+    ],
+  },
+
   defaultHabitType: 'positive',
   defaultIcon: 'stretch-horizontal',
 };

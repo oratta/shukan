@@ -92,6 +92,24 @@ export const quitAlcohol: LifeImpactArticle = {
 
   confidenceLevel: 'high',
 
+  calculationLogic: {
+    health: [
+      { label: '研究結果', value: 'Lancet 2018: 中程度飲酒者は40歳時点で余命1〜2年短縮' },
+      { label: '保守的見積もり', value: '中程度飲酒者として1年の延命効果を採用' },
+      { label: '日割り計算', formula: '1年 × 525600分 ÷ 40年 ÷ 365日', result: '8分/日' },
+    ],
+    cost: [
+      { label: '自宅飲酒', value: 'ビール・チューハイ2〜3本/日', result: '600円/日' },
+      { label: '外食・飲み会按分', value: '月2〜3回 × ¥5,000', formula: '12500 ÷ 30 ÷ 2', result: '200円/日' },
+      { label: '合計', formula: '600 + 200', result: '800円/日' },
+    ],
+    income: [
+      { label: '生産性向上', value: 'BMJ Open 2019: 飲酒と業務パフォーマンス低下に77%正の相関' },
+      { label: '控えめに4%適用', formula: '15000000 × 4% ÷ 365', result: '1644円/日' },
+      { label: '端数調整', value: '二日酔い解消・集中力向上を含め保守的に丸め', result: '1640円/日' },
+    ],
+  },
+
   defaultHabitType: 'quit',
   defaultIcon: 'wine-off',
 };

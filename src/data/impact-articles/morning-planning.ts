@@ -80,6 +80,24 @@ export const morningPlanning: LifeImpactArticle = {
   },
 
   confidenceLevel: 'medium',
+
+  calculationLogic: {
+    health: [
+      { label: '研究結果', value: 'タイムマネジメントがストレス軽減（r=-.225）・人生満足度向上（r=.426）と相関（Aeon et al., 2021）' },
+      { label: 'メカニズム', value: '意思決定回数減少によるコルチゾール慢性上昇の抑制' },
+      { label: '日割り計算', value: 'ストレス軽減→心血管リスク低減・精神的健康改善を控えめに見積もり', result: '5分/日' },
+    ],
+    cost: [
+      { label: '衝動買い抑制', value: '事前計画による衝動的支出の削減' },
+      { label: '時間の無駄削減', value: '計画セッションで約25%の生産性向上（無駄な時間コスト削減）' },
+      { label: '合計', value: '衝動買い・不要課金・間接コスト削減を非常に控えめに見積もり', result: '300円/日' },
+    ],
+    income: [
+      { label: '基準日給', value: '年収1,500万円', formula: '15000000 ÷ 240日', result: '62500円/日' },
+      { label: '生産性向上効果', value: 'パフォーマンス相関（r=.259）+目標達成率42%向上を踏まえ約2.75%', formula: '62500 × 2.75%', result: '1720円/日' },
+    ],
+  },
+
   defaultHabitType: 'positive',
   defaultIcon: 'clipboard-list',
 };

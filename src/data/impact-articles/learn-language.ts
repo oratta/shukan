@@ -59,6 +59,25 @@ export const learnLanguage: LifeImpactArticle = {
   },
 
   confidenceLevel: 'medium',
+
+  calculationLogic: {
+    health: [
+      { label: '研究結果', value: 'バイリンガルは認知症発症が4.5年遅延（Alladi et al., 2013）' },
+      { label: '補強データ', value: '二言語話者のアルツハイマー発症5年遅延（Craik et al., 2010）' },
+      { label: '日割り計算', value: '認知症予防・認知機能維持効果を控えめに算出', result: '6分/日' },
+    ],
+    cost: [
+      { label: 'アプリ費用', value: '無料プラン利用可、有料でも月1,000-2,000円', result: '-50円/日' },
+      { label: '情報アクセス拡大', value: '海外旅行でのぼったくり回避・情報範囲拡大による節約', result: '+250円/日' },
+      { label: '合計', formula: '-50 + 250', result: '200円/日' },
+    ],
+    income: [
+      { label: '基準日給', value: '年収1,500万円', formula: '15000000 ÷ 240日', result: '62500円/日' },
+      { label: '語学プレミアム', value: '英語力ある人材は年収10-15%高い（リクルート調査）' },
+      { label: '追加プレミアム', value: '既存英語力への上乗せ・第二外国語を控えめに3%', formula: '62500 × 3% ÷ 1.04', result: '1800円/日' },
+    ],
+  },
+
   defaultHabitType: 'positive',
   defaultIcon: 'globe',
 };

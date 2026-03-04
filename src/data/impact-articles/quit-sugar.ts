@@ -54,6 +54,26 @@ export const quitSugar: LifeImpactArticle = {
   },
 
   confidenceLevel: 'medium',
+
+  calculationLogic: {
+    health: [
+      { label: '心血管リスク', value: 'JAMA 2014: 添加糖25%以上でCVD死亡リスク2.75倍' },
+      { label: '糖尿病リスク', value: '日本人はインスリン分泌量が少なく発症しやすい' },
+      { label: '日割り計算', value: '残存寿命40年ベースで心血管リスク低減を保守的に算出', result: '7分/日' },
+    ],
+    cost: [
+      { label: '菓子・嗜好飲料', value: '月約¥8,000（総務省家計調査2023）', formula: '8000 ÷ 30', result: '267円/日' },
+      { label: '糖尿病医療費リスク低減', value: '平均年間27万円 × 発症リスク低減分', formula: '270000 × 18% ÷ 365', result: '133円/日' },
+      { label: '合計', formula: '267 + 133', result: '400円/日' },
+    ],
+    income: [
+      { label: '午後の生産性向上', value: '血糖値安定による眠気解消' },
+      { label: '控えめに2%適用', formula: '15000000 × 2% ÷ 365', result: '822円/日' },
+      { label: 'うつリスク低減', value: 'Knüppel 2017: 男性のうつリスク23%低下 → 欠勤減少', result: '78円/日' },
+      { label: '合計', formula: '822 + 78', result: '900円/日' },
+    ],
+  },
+
   defaultHabitType: 'quit',
   defaultIcon: 'candy-off',
 };

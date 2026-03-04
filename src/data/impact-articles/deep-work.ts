@@ -58,6 +58,23 @@ export const deepWork: LifeImpactArticle = {
   },
 
   confidenceLevel: 'medium',
+
+  calculationLogic: {
+    health: [
+      { label: '研究結果', value: 'フロー状態がコルチゾール低下・幸福感上昇と関連（Csikszentmihalyi）' },
+      { label: 'ストレス回避', value: 'マルチタスクのストレス・中断コスト（23分15秒/回）の回避（Mark et al., 2008）' },
+      { label: '日割り計算', value: 'フロー体験の健康効果とストレス軽減を控えめに算出', result: '4分/日' },
+    ],
+    cost: [
+      { label: '実施コスト', value: 'ディープワーク自体は無料' },
+      { label: '間接的節約', value: '衝動的オンライン消費の減少+残業削減による節約', result: '200円/日' },
+    ],
+    income: [
+      { label: '基準日給', value: '年収1,500万円', formula: '15000000 ÷ 240日', result: '62500円/日' },
+      { label: '生産性向上', value: 'トップパフォーマーは2-3倍のアウトプット（Newport）、控えめに5%', formula: '62500 × 5% ÷ 1.25', result: '2500円/日' },
+    ],
+  },
+
   defaultHabitType: 'positive',
   defaultIcon: 'target',
 };

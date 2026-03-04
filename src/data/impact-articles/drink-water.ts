@@ -59,6 +59,22 @@ export const drinkWater: LifeImpactArticle = {
   },
 
   confidenceLevel: 'medium',
+
+  calculationLogic: {
+    health: [
+      { label: '研究結果', value: '適切な水分補給で認知機能維持・腎臓機能保護' },
+      { label: '脱水リスク予防', value: '尿路結石・代謝促進を総合して保守的に', result: '6分/日' },
+    ],
+    cost: [
+      { label: '飲料費置き換え', value: '清涼飲料水・コーヒーの一部を水に' },
+      { label: '月間節約', formula: '月4500 ÷ 30', result: '150円/日' },
+    ],
+    income: [
+      { label: '認知パフォーマンス維持', value: '軽度脱水で認知機能14%低下の防止' },
+      { label: '生産性1%向上', formula: '62500 × 1% ≈ 625 → 保守的に', result: '500円/日' },
+    ],
+  },
+
   defaultHabitType: 'positive',
   defaultIcon: 'droplets',
 };

@@ -53,6 +53,26 @@ export const quitSocialMedia: LifeImpactArticle = {
   },
 
   confidenceLevel: 'medium',
+
+  calculationLogic: {
+    health: [
+      { label: 'うつ・不安改善', value: 'JAMA 2025: 1週間のSNSデトックスでうつ24.8%改善、不安16.1%改善' },
+      { label: '睡眠改善', value: '不眠症状14.5%改善（JAMA 2025）' },
+      { label: '日割り計算', value: 'メンタルヘルス改善と睡眠向上を残存寿命40年で保守的に算出', result: '5分/日' },
+    ],
+    cost: [
+      { label: '衝動購入抑制', value: 'SNS経由の衝動買い年間約¥90,000', formula: '90000 ÷ 365', result: '247円/日' },
+      { label: 'サブスク・広告誘発支出', value: 'SNS関連の追加支出', result: '103円/日' },
+      { label: '合計', formula: '247 + 103', result: '350円/日' },
+    ],
+    income: [
+      { label: '集中力回復', value: 'Mark 2008: 中断後の再集中に平均23分' },
+      { label: '控えめに3%適用', formula: '15000000 × 3% ÷ 365', result: '1233円/日' },
+      { label: '注意残余の解消', value: '1日数回のSNSチェック排除による追加効果', result: '167円/日' },
+      { label: '合計', formula: '1233 + 167', result: '1400円/日' },
+    ],
+  },
+
   defaultHabitType: 'quit',
   defaultIcon: 'message-circle-off',
 };

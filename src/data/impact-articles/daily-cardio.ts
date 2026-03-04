@@ -89,6 +89,23 @@ export const dailyCardio: LifeImpactArticle = {
 
   confidenceLevel: 'high',
 
+  calculationLogic: {
+    health: [
+      { label: '研究結果', value: '30分/日の運動 → 約3.7年の延命（Wen et al., 2011）' },
+      { label: '保守的按分', formula: '3.7年 × 525600分 ÷ 40年 ÷ 365日 ≈ 133分だが保守的に', result: '10分/日' },
+    ],
+    cost: [
+      { label: '医療費削減', value: '運動者は9-26%医療費低い（Ding et al., 2016）' },
+      { label: '生活習慣病予防', formula: '年間128000 ÷ 365', result: '350円/日' },
+    ],
+    income: [
+      { label: '認知機能向上', value: '注意力・実行機能の改善（Smith et al., 2010）' },
+      { label: '生産性2%向上', formula: '62500 × 2%', result: '1250円/日' },
+      { label: '欠勤21%減少', value: '年間約1.7日分', result: '250円/日' },
+      { label: '合計', formula: '1250 + 250', result: '1500円/日' },
+    ],
+  },
+
   defaultHabitType: 'positive',
   defaultIcon: 'person-standing',
 };

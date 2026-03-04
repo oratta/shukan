@@ -59,6 +59,22 @@ export const gratitudePractice: LifeImpactArticle = {
   },
 
   confidenceLevel: 'medium',
+
+  calculationLogic: {
+    health: [
+      { label: '研究結果', value: '感謝の上位1/3は全死亡リスク9%低い（JAMA Psychiatry, 2024）' },
+      { label: '男性に控えめ適用', value: 'コルチゾール低下・血圧低下効果を按分', result: '5分/日' },
+    ],
+    cost: [
+      { label: '満足感向上', value: '物質的消費の減少傾向' },
+      { label: '衝動購入の抑制', formula: '年間約55000 ÷ 365', result: '150円/日' },
+    ],
+    income: [
+      { label: '幸福度と生産性', value: '幸福度高い人は生産性12%高い（Lyubomirsky, 2005）' },
+      { label: '感謝分を1.5%に控えめ適用', formula: '62500 × 1.5% ≈ 938 → 保守的に', result: '700円/日' },
+    ],
+  },
+
   defaultHabitType: 'positive',
   defaultIcon: 'hand-heart',
 };

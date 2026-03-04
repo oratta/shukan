@@ -54,6 +54,25 @@ export const dailyYoga: LifeImpactArticle = {
   },
 
   confidenceLevel: 'medium',
+
+  calculationLogic: {
+    health: [
+      { label: '研究結果', value: '12週間のヨガでテロメラーゼ活性上昇・細胞老化遅延（Tolahunase et al., 2017）' },
+      { label: '血圧改善', value: '収縮期5mmHg・拡張期3.9mmHg低下（Cramer et al., 2017）' },
+      { label: '日割り計算', formula: '細胞老化遅延 + 血圧改善 + 柔軟性向上を残存寿命40年で換算', result: '9分/日' },
+    ],
+    cost: [
+      { label: 'ジム・スタジオ代の節約', value: '自宅実践でヨガクラス費（月8,000-15,000円）不要', formula: '平均6000 ÷ 30', result: '200円/日' },
+      { label: '血圧関連医療費リスク低減', value: '通院・投薬費の将来リスク低減', result: '100円/日' },
+      { label: '合計', formula: '200 + 100', result: '300円/日' },
+    ],
+    income: [
+      { label: '生産性向上', value: 'ストレス低減による集中力・判断力向上を控えめに2%', formula: '15000000 × 2% ÷ 365', result: '822円/日' },
+      { label: '病欠減少', value: 'ヨガ実践者は病欠が少ないとの報告', result: '178円/日' },
+      { label: '合計', formula: '822 + 178', result: '1000円/日' },
+    ],
+  },
+
   defaultHabitType: 'positive',
   defaultIcon: 'flower-2',
 };

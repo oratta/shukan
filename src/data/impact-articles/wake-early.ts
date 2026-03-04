@@ -53,6 +53,23 @@ export const wakeEarly: LifeImpactArticle = {
   },
 
   confidenceLevel: 'medium',
+
+  calculationLogic: {
+    health: [
+      { label: '研究結果', value: '朝型はうつ病リスク23%低い（Vetter, 2018）' },
+      { label: '概日リズム安定化', value: '睡眠の質改善を含め保守的に', result: '5分/日' },
+    ],
+    cost: [
+      { label: '自炊朝食で節約', formula: '月5000 ÷ 30', result: '167円/日' },
+      { label: 'ストレス関連消費減', value: '通勤ラッシュ回避等', result: '33円/日' },
+      { label: '合計', formula: '167 + 33', result: '200円/日' },
+    ],
+    income: [
+      { label: '朝のDeep Work', value: '認知ピーク8-14時をフル活用' },
+      { label: '生産性2%向上', formula: '62500 × 2% ≈ 1250 → 保守的に', result: '1000円/日' },
+    ],
+  },
+
   defaultHabitType: 'positive',
   defaultIcon: 'sunrise',
 };

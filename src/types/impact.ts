@@ -68,6 +68,14 @@ export function isValidArticleId(id: string | null | undefined): id is ArticleId
   return typeof id === 'string' && VALID_ARTICLE_IDS.includes(id);
 }
 
+// 計算ロジックのステップ（1つの計算過程を表す）
+export interface CalcStep {
+  label: string;      // ステップの説明（例: "研究結果"）
+  value?: string;     // 値（例: "10年延命"）
+  formula?: string;   // 計算式（例: "8年 × 525,600分 ÷ 40年 ÷ 365日"）
+  result?: string;    // 結果（例: "288分/日"）
+}
+
 // 記事データ（静的、ビルド時バンドル）
 export interface LifeImpactArticle {
   habitCategory: ArticleId;
@@ -103,6 +111,13 @@ export interface LifeImpactArticle {
   };
 
   confidenceLevel: 'high' | 'medium' | 'low';
+
+  // 計算ロジック（算出根拠の構造化データ、optional）
+  calculationLogic?: {
+    health: CalcStep[];
+    cost: CalcStep[];
+    income: CalcStep[];
+  };
 
   // Discover（マーケットプレイス）用メタデータ
   defaultHabitType: 'positive' | 'quit';

@@ -59,6 +59,25 @@ export const intermittentFasting: LifeImpactArticle = {
   },
 
   confidenceLevel: 'medium',
+
+  calculationLogic: {
+    health: [
+      { label: '研究結果', value: '16:8断食がインスリン感受性改善・脂肪燃焼促進（de Cabo & Mattson, 2019）' },
+      { label: '代謝改善効果', value: '日本人はインスリン分泌量が少なく恩恵が大きい' },
+      { label: '日割り計算', value: '代謝改善・心血管リスク低減を保守的に見積もり', result: '7分/日' },
+    ],
+    cost: [
+      { label: '朝食カット', value: '1食分のコスト（約300-500円）を節約', result: '300円/日' },
+      { label: 'インスリン関連医療費削減', value: '糖尿病予防・血糖値安定による医療費リスク低減', result: '50円/日' },
+      { label: '合計', formula: '300 + 50', result: '350円/日' },
+    ],
+    income: [
+      { label: '基準日給', value: '年収1,500万円', formula: '15000000 ÷ 240日', result: '62500円/日' },
+      { label: '集中力・認知機能向上', value: '血糖値安定+BDNF増加を控えめに1.5%', formula: '62500 × 1.5%', result: '938円/日' },
+      { label: '保守的調整', value: '長期効果の不確実性を考慮し下方調整', result: '800円/日' },
+    ],
+  },
+
   defaultHabitType: 'positive',
   defaultIcon: 'timer',
 };

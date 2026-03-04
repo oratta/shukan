@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo, type ReactNode } from 'react';
+import { useMemo, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
-import { ArrowLeft, HeartPulse, Wallet, TrendingUp } from 'lucide-react';
+import { ArrowLeft, HeartPulse, Wallet, TrendingUp, ChevronDown, ThumbsDown, Send } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -12,7 +12,8 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { getArticle } from '@/data/impact-articles';
 import { renderArticle, calculateAnnualImpact, formatHealthMinutes, formatCurrency } from '@/lib/impact';
-import type { ArticleId } from '@/types/impact';
+import type { ArticleId, CalcStep } from '@/types/impact';
+import { submitBadMark, removeBadMark, submitComment, getUserFeedback } from '@/lib/supabase/feedbacks';
 
 /** Convert **bold** markers in text to <strong> elements */
 function parseBold(text: string): ReactNode[] {
@@ -100,6 +101,26 @@ interface EvidenceArticleSheetProps {
   onAddHabit?: (articleId: string) => void;
 }
 
+/** Renders a single CalcStep row */
+function CalcStepRow({ step, index }: { step: CalcStep; index: number }) {
+  return (
+    <div className="rounded-lg border bg-muted/30 px-3 py-2">
+      <div className="text-xs font-medium text-foreground/70">
+        {index + 1}. {step.label}
+      </div>
+      {step.value && (
+        <div className="mt-0.5 text-xs text-muted-foreground">{step.value}</div>
+      )}
+      {step.formula && (
+        <div className="mt-0.5 font-mono text-xs text-muted-foreground">{step.formula}</div>
+      )}
+      {step.result && (
+        <div className="mt-0.5 text-xs font-semibold text-foreground">= {step.result}</div>
+      )}
+    </div>
+  );
+}
+
 export function EvidenceArticleSheet({
   open,
   onOpenChange,
@@ -119,6 +140,61 @@ export function EvidenceArticleSheet({
     () => (article ? renderArticle(article) : ''),
     [article]
   );
+
+  // Calculation logic collapsible state
+  const [calcExpanded, setCalcExpanded] = useState(false);
+
+  // Feedback state
+  const [hasBadMark, setHasBadMark] = useState(false);
+  const [badMarkLoading, setBadMarkLoading] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const [commentSending, setCommentSending] = useState(false);
+  const [showThanks, setShowThanks] = useState(false);
+
+  // Load feedback state when sheet opens (SCENARIO-AF-09)
+  useEffect(() => {
+    if (!open || !articleId) return;
+    setCalcExpanded(false);
+    setCommentText('');
+    setShowThanks(false);
+    getUserFeedback(articleId).then(({ hasBadMark: has }) => setHasBadMark(has));
+  }, [open, articleId]);
+
+  // Bad mark toggle (SCENARIO-AF-01, AF-02, AF-08)
+  const handleBadMarkToggle = useCallback(async () => {
+    if (!articleId || badMarkLoading) return;
+    const prev = hasBadMark;
+    setHasBadMark(!prev); // optimistic
+    setBadMarkLoading(true);
+    try {
+      if (prev) {
+        await removeBadMark(articleId);
+      } else {
+        await submitBadMark(articleId);
+      }
+    } catch (err) {
+      console.error('Bad mark toggle failed:', err);
+      setHasBadMark(prev); // rollback
+    } finally {
+      setBadMarkLoading(false);
+    }
+  }, [articleId, hasBadMark, badMarkLoading]);
+
+  // Comment submit (SCENARIO-AF-04)
+  const handleCommentSubmit = useCallback(async () => {
+    if (!articleId || !commentText.trim() || commentSending) return;
+    setCommentSending(true);
+    try {
+      await submitComment(articleId, commentText.trim());
+      setCommentText('');
+      setShowThanks(true);
+      setTimeout(() => setShowThanks(false), 3000);
+    } catch (err) {
+      console.error('Comment submit failed:', err);
+    } finally {
+      setCommentSending(false);
+    }
+  }, [articleId, commentText, commentSending]);
 
   if (!article || !articleId) {
     return (
@@ -247,6 +323,117 @@ export function EvidenceArticleSheet({
                   </li>
                 ))}
               </ol>
+            </div>
+
+            {/* Calculation Logic (collapsible) — REQ-CL-04 */}
+            {article.calculationLogic && (
+              <div className="mt-4 border-t pt-4">
+                <button
+                  type="button"
+                  onClick={() => setCalcExpanded(!calcExpanded)}
+                  className="flex w-full items-center justify-between text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                >
+                  {tEvidence('calculationLogic')}
+                  <ChevronDown
+                    className={cn(
+                      'size-4 transition-transform',
+                      calcExpanded && 'rotate-180'
+                    )}
+                  />
+                </button>
+
+                {calcExpanded && (
+                  <div className="mt-3 space-y-4">
+                    {/* Health */}
+                    <div>
+                      <h4 className="mb-1.5 text-xs font-medium text-foreground/70">
+                        <HeartPulse className="mr-1 inline size-3.5" />
+                        {tEvidence('feedbackHealth')}
+                      </h4>
+                      <div className="space-y-1.5">
+                        {article.calculationLogic.health.map((step, i) => (
+                          <CalcStepRow key={i} step={step} index={i} />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Cost */}
+                    <div>
+                      <h4 className="mb-1.5 text-xs font-medium text-foreground/70">
+                        <Wallet className="mr-1 inline size-3.5" />
+                        {tEvidence('feedbackCost')}
+                      </h4>
+                      <div className="space-y-1.5">
+                        {article.calculationLogic.cost.map((step, i) => (
+                          <CalcStepRow key={i} step={step} index={i} />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Income */}
+                    <div>
+                      <h4 className="mb-1.5 text-xs font-medium text-foreground/70">
+                        <TrendingUp className="mr-1 inline size-3.5" />
+                        {tEvidence('feedbackIncome')}
+                      </h4>
+                      <div className="space-y-1.5">
+                        {article.calculationLogic.income.map((step, i) => (
+                          <CalcStepRow key={i} step={step} index={i} />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Feedback section — REQ-AF-04, AF-06 */}
+            <div className="mt-4 border-t pt-4 pb-4">
+              <p className="text-xs text-muted-foreground">
+                {tEvidence('feedbackQuestion')}
+              </p>
+              <button
+                type="button"
+                onClick={handleBadMarkToggle}
+                disabled={badMarkLoading}
+                className={cn(
+                  'mt-2 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
+                  hasBadMark
+                    ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                )}
+              >
+                <ThumbsDown className="size-3.5" />
+                {tEvidence('feedbackBadMark')}
+              </button>
+
+              {/* Comment input (SCENARIO-AF-03: visible when bad mark is active) */}
+              {hasBadMark && (
+                <div className="mt-3 flex gap-2">
+                  <input
+                    type="text"
+                    value={commentText}
+                    onChange={(e) => setCommentText(e.target.value)}
+                    placeholder={tEvidence('feedbackCommentPlaceholder')}
+                    className="flex-1 rounded-lg border bg-background px-3 py-2 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCommentSubmit}
+                    disabled={!commentText.trim() || commentSending}
+                    className="inline-flex items-center justify-center rounded-lg bg-primary px-3 py-2 text-xs text-primary-foreground transition-opacity disabled:opacity-50"
+                  >
+                    <Send className="size-3.5" />
+                  </button>
+                </div>
+              )}
+
+              {/* Thank you toast */}
+              {showThanks && (
+                <p className="mt-2 text-xs font-medium text-green-600 dark:text-green-400">
+                  {tEvidence('feedbackThanks')}
+                </p>
+              )}
             </div>
           </div>
         </div>

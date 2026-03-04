@@ -60,6 +60,24 @@ export const timeInNature: LifeImpactArticle = {
   },
 
   confidenceLevel: 'medium',
+
+  calculationLogic: {
+    health: [
+      { label: '研究結果', value: '週120分以上の自然で健康・幸福度が有意に向上（White et al., 2019）' },
+      { label: '免疫強化', value: '森林浴でNK細胞活性50%以上増加、7日間持続（Li Q, 2010）' },
+      { label: '日割り計算', value: '免疫強化・ストレス低減・メンタルヘルス改善を合算', result: '7分/日' },
+    ],
+    cost: [
+      { label: '実施コスト', value: '公園・自然の中を歩くこと自体は無料' },
+      { label: 'ストレス関連消費の抑制', value: 'メンタルヘルス維持→カウンセリング・薬代の節約', result: '200円/日' },
+    ],
+    income: [
+      { label: '基準日給', value: '年収1,500万円', formula: '15000000 ÷ 240日', result: '62500円/日' },
+      { label: '注意回復効果', value: '集中力回復・創造性向上を控えめに1.5%', formula: '62500 × 1.5%', result: '938円/日' },
+      { label: '保守的調整', value: 'うつ・不安予防による欠勤減少を含め下方調整', result: '800円/日' },
+    ],
+  },
+
   defaultHabitType: 'positive',
   defaultIcon: 'tree-pine',
 };

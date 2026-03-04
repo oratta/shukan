@@ -187,7 +187,17 @@
     "noResults": "No matching articles found",
     "addThisHabit": "Add this habit",
     "manage": "Manage Evidence",
-    "removeConfirm": "Remove this evidence?"
+    "removeConfirm": "Remove this evidence?",
+    "calculationLogic": "Calculation Logic",
+    "calculationLabel": "Step",
+    "feedbackQuestion": "Do you question these numbers?",
+    "feedbackBadMark": "Questionable",
+    "feedbackCommentPlaceholder": "Tell us what seems off...",
+    "feedbackSubmit": "Submit",
+    "feedbackThanks": "Thank you for your feedback",
+    "feedbackHealth": "Health Lifespan Calculation",
+    "feedbackCost": "Cost Savings Calculation",
+    "feedbackIncome": "Income Gain Calculation"
   },
   "common": {
     "loading": "Loading...",

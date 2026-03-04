@@ -59,6 +59,22 @@ export const noImpulseBuying: LifeImpactArticle = {
   },
 
   confidenceLevel: 'medium',
+
+  calculationLogic: {
+    health: [
+      { label: 'ストレス軽減', value: '購入後の後悔・経済的不安によるコルチゾール上昇の防止' },
+      { label: '間接的健康効果', value: 'ジャンクフード・アルコール衝動買い減少', result: '2分/日' },
+    ],
+    cost: [
+      { label: '衝動買い平均', value: '日本人推定 月2-3万円の50%抑制' },
+      { label: '月間節約', formula: '月15000 + 利息削減6000 = 21000 ÷ 30', result: '700円/日' },
+    ],
+    income: [
+      { label: '自己制御力向上', value: '職場の意思決定の質改善（Baumeister, 2011）' },
+      { label: '生産性1%', formula: '62500 × 1% ≈ 625 → 保守的に', result: '500円/日' },
+    ],
+  },
+
   defaultHabitType: 'quit',
   defaultIcon: 'shopping-cart',
 };
