@@ -29,7 +29,12 @@ export type ArticleId =
   | 'home_cooking'
   | 'deep_work'
   | 'learn_language'
-  | 'time_in_nature';
+  | 'time_in_nature'
+  | 'morning_tidying'
+  | 'daily_habit_review'
+  | 'schedule_adherence'
+  | 'pomodoro_technique'
+  | 'movement_breaks';
 
 const VALID_ARTICLE_IDS: readonly string[] = [
   'quit_smoking',
@@ -62,6 +67,11 @@ const VALID_ARTICLE_IDS: readonly string[] = [
   'deep_work',
   'learn_language',
   'time_in_nature',
+  'morning_tidying',
+  'daily_habit_review',
+  'schedule_adherence',
+  'pomodoro_technique',
+  'movement_breaks',
 ] as const;
 
 export function isValidArticleId(id: string | null | undefined): id is ArticleId {

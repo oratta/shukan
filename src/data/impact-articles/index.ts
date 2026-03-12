@@ -28,6 +28,11 @@ import { homeCooking } from './home-cooking';
 import { deepWork } from './deep-work';
 import { learnLanguage } from './learn-language';
 import { timeInNature } from './time-in-nature';
+import { morningTidying } from './morning-tidying';
+import { dailyHabitReview } from './daily-habit-review';
+import { scheduleAdherence } from './schedule-adherence';
+import { pomodoroTechnique } from './pomodoro-technique';
+import { movementBreaks } from './movement-breaks';
 import type { LifeImpactArticle, ArticleId } from '@/types/impact';
 
 const impactArticles: Map<ArticleId, LifeImpactArticle> = new Map([
@@ -68,6 +73,13 @@ const impactArticles: Map<ArticleId, LifeImpactArticle> = new Map([
   // Positive habits - Financial & Other
   ['daily_saving', dailySaving],
   ['time_in_nature', timeInNature],
+  // Positive habits - Home & Environment
+  ['morning_tidying', morningTidying],
+  ['daily_habit_review', dailyHabitReview],
+  // Positive habits - Self-discipline & Productivity
+  ['schedule_adherence', scheduleAdherence],
+  ['pomodoro_technique', pomodoroTechnique],
+  ['movement_breaks', movementBreaks],
 ]);
 
 export function getArticle(id: ArticleId): LifeImpactArticle | undefined {

@@ -43,6 +43,11 @@ const HERO_IMAGES: Record<string, string> = {
   learn_language: 'https://images.unsplash.com/photo-1673515336416-a859f5b02afa?w=400&h=200&fit=crop&q=80',
   daily_saving: 'https://images.unsplash.com/photo-1561837581-abd854e0ee22?w=400&h=200&fit=crop&q=80',
   time_in_nature: 'https://images.unsplash.com/photo-1620802470382-5799c79143ab?w=400&h=200&fit=crop&q=80',
+  morning_tidying: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=400&h=200&fit=crop&q=80',
+  daily_habit_review: 'https://images.unsplash.com/photo-1643706755543-2d1f7adff211?w=400&h=200&fit=crop&q=80',
+  schedule_adherence: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=400&h=200&fit=crop&q=80',
+  pomodoro_technique: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=400&h=200&fit=crop&q=80',
+  movement_breaks: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=200&fit=crop&q=80',
 };
 
 /** Fallback gradient color map */
@@ -77,6 +82,11 @@ const GRADIENT_MAP: Record<string, string> = {
   learn_language: 'from-teal-400 to-cyan-600',
   daily_saving: 'from-emerald-400 to-green-600',
   time_in_nature: 'from-green-400 to-teal-600',
+  morning_tidying: 'from-sky-400 to-cyan-600',
+  daily_habit_review: 'from-violet-400 to-indigo-600',
+  schedule_adherence: 'from-blue-400 to-slate-600',
+  pomodoro_technique: 'from-red-400 to-orange-600',
+  movement_breaks: 'from-green-400 to-teal-600',
 };
 
 /** Confidence badge colors */

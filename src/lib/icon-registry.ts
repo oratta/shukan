@@ -47,6 +47,8 @@ import {
   Timer,
   PhoneOff,
   MessageCircleOff,
+  Sparkles,
+  ListChecks,
 } from 'lucide-react';
 
 /** Lucide kebab-case name → Component mapping */
@@ -98,6 +100,8 @@ export const ICON_REGISTRY: Record<string, LucideIcon> = {
   timer: Timer,
   'phone-off': PhoneOff,
   'message-circle-off': MessageCircleOff,
+  sparkles: Sparkles,
+  'list-checks': ListChecks,
 };
 
 /** Icons available in the Habit Icon Picker */
