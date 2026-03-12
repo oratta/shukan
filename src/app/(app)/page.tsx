@@ -231,6 +231,11 @@ export default function DashboardPage() {
         habit={vsHabit}
         onStartFlow={() => startUrgeFlow(vsHabitId!)}
         onCompleteStep={completeUrgeStep}
+        onFailed={() => {
+          if (vsHabitId) {
+            setDayStatus(vsHabitId, getTodayString(), 'failed');
+          }
+        }}
       />
 
       <EvidenceArticleSheet

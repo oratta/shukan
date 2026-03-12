@@ -17,6 +17,7 @@ interface VsTemptationModalProps {
   habit: HabitWithStats | null;
   onStartFlow: () => Promise<{ id: string }>;
   onCompleteStep: (logId: string, stepId: string, allDone: boolean) => void;
+  onFailed?: () => void;
 }
 
 export function VsTemptationModal({
@@ -25,6 +26,7 @@ export function VsTemptationModal({
   habit,
   onStartFlow,
   onCompleteStep,
+  onFailed,
 }: VsTemptationModalProps) {
   const t = useTranslations('habits');
   const [logId, setLogId] = useState<string | null>(null);
@@ -189,6 +191,20 @@ export function VsTemptationModal({
               >
                 <Shield className="size-5" />
                 {t('iResisted')}
+              </button>
+            </div>
+
+            {/* "I gave in..." button */}
+            <div className="px-5 pb-1">
+              <button
+                type="button"
+                onClick={() => {
+                  onFailed?.();
+                  onOpenChange(false);
+                }}
+                className="w-full py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {t('iGaveIn')}
               </button>
             </div>
 

@@ -81,7 +81,8 @@
     "historyHelp4": "10日連続達成するとロケットを獲得できます。ロケットは過去の失敗日を1つ救済できます（5日以上前の日のみ）。",
     "skip": "スキップ",
     "unskip": "解除",
-    "skippedSection": "スキップ中"
+    "skippedSection": "スキップ中",
+    "iGaveIn": "負けた…"
   },
   "stats": {
     "title": "統計",

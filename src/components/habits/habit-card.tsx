@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import { Check, ChevronDown, ChevronUp, Shield, Maximize2, GripVertical, SkipForward, Undo2 } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp, Maximize2, GripVertical, SkipForward, Undo2 } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Card } from '@/components/ui/card';
@@ -85,9 +85,11 @@ function CelebrationEffect() {
 function StatusIndicator({
   habit,
   onTapToday,
+  onTapVs,
 }: {
   habit: HabitWithStats;
   onTapToday?: () => void;
+  onTapVs?: () => void;
 }) {
   const isQuit = habit.type === 'quit';
   const [showCelebration, setShowCelebration] = useState(false);
@@ -109,7 +111,7 @@ function StatusIndicator({
     prevStatusRef.current = todayStatus;
   }, [todayStatus]);
 
-  // Quit habits: show urge progress ring (not tappable for status toggle)
+  // Quit habits: show urge progress ring (tappable to open VS modal)
   if (isQuit) {
     const current = habit.todayUrgeCount ?? 0;
     const target = habit.dailyTarget;
@@ -117,27 +119,52 @@ function StatusIndicator({
     const radius = 13;
     const circumference = 2 * Math.PI * radius;
     const strokeDashoffset = circumference * (1 - Math.min(progress, 1));
+    const isFailed = todayStatus === 'failed';
+    const isCompleted = todayStatus === 'completed' || todayStatus === 'rocket_used';
+    const isDone = progress >= 1;
 
     return (
-      <div className="relative flex size-8 shrink-0 items-center justify-center">
-        <svg width="32" height="32" viewBox="0 0 32 32" className="-rotate-90">
-          <circle
-            cx="16" cy="16" r={radius}
-            fill="none" stroke="#E5E7EB" strokeWidth="2.5"
-          />
-          <circle
-            cx="16" cy="16" r={radius}
-            fill="none" stroke="#D08068" strokeWidth="2.5"
-            strokeDasharray={circumference}
-            strokeDashoffset={strokeDashoffset}
-            strokeLinecap="round"
-            className="transition-all duration-300"
-          />
-        </svg>
-        <span className="absolute text-[9px] font-bold text-[#D08068]">
-          {current}/{target}
-        </span>
-      </div>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onTapVs?.();
+        }}
+        className="relative flex size-8 shrink-0 items-center justify-center cursor-pointer active:scale-90 transition-transform"
+      >
+        {isFailed ? (
+          /* Failed: solid red circle, no progress arc */
+          <div className="flex size-8 items-center justify-center rounded-full bg-[#D08068]" />
+        ) : (isCompleted || isDone) ? (
+          /* Completed: solid green circle */
+          <div className="flex size-8 items-center justify-center rounded-full bg-[#3D8A5A]">
+            <span className="text-[9px] font-bold text-white">
+              {current}/{target}
+            </span>
+          </div>
+        ) : (
+          /* In progress: gray bg ring + green progress arc */
+          <>
+            <svg width="32" height="32" viewBox="0 0 32 32" className="-rotate-90">
+              <circle
+                cx="16" cy="16" r={radius}
+                fill="none" stroke="#E5E7EB" strokeWidth="2.5"
+              />
+              <circle
+                cx="16" cy="16" r={radius}
+                fill="none" stroke="#3D8A5A" strokeWidth="2.5"
+                strokeDasharray={circumference}
+                strokeDashoffset={strokeDashoffset}
+                strokeLinecap="round"
+                className="transition-all duration-300"
+              />
+            </svg>
+            <span className="absolute text-[9px] font-bold text-[#3D8A5A]">
+              {current}/{target}
+            </span>
+          </>
+        )}
+      </button>
     );
   }
 
@@ -230,6 +257,7 @@ export function HabitCard({
             const todayDay = (habit.recentDays ?? [])[0];
             if (todayDay) handleDotTap(todayDay);
           }}
+          onTapVs={() => onOpenVsTemptation(habit.id)}
         />
 
         {/* Center: Name + past day dots */}
@@ -248,21 +276,6 @@ export function HabitCard({
             ))}
           </div>
         </div>
-
-        {/* VS button for quit habits */}
-        {isQuit && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onOpenVsTemptation(habit.id);
-            }}
-            className="flex items-center gap-1 rounded-full bg-[#D08068] px-2.5 py-1 text-white text-xs font-semibold shrink-0"
-          >
-            <Shield className="size-3" />
-            VS
-          </button>
-        )}
 
         {/* Right: Chevron */}
         <div className="shrink-0 text-gray-400">

@@ -81,7 +81,8 @@
     "historyHelp4": "Complete 10 consecutive days to earn a rocket. Rockets can rescue a past failed day (only days older than 5 days).",
     "skip": "Skip",
     "unskip": "Unskip",
-    "skippedSection": "Skipped"
+    "skippedSection": "Skipped",
+    "iGaveIn": "I gave in..."
   },
   "stats": {
     "title": "Statistics",
