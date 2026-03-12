@@ -168,6 +168,32 @@ function StatusIndicator({
     );
   }
 
+  // Weekly positive habits: status based on weekly target achievement
+  if (!isQuit && habit.frequency === 'weekly') {
+    const weeklyDone = (habit.weeklyCompletedCount ?? 0) >= (habit.weeklyTarget ?? 1);
+
+    return (
+      <div className="relative flex size-8 shrink-0 items-center justify-center">
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onTapToday?.();
+          }}
+          className={cn(
+            'flex size-8 shrink-0 items-center justify-center rounded-full transition-all',
+            weeklyDone ? 'bg-[#3D8A5A]' : 'border-2 border-gray-300',
+          )}
+        >
+          {weeklyDone && (
+            <Check className="size-4 text-white" strokeWidth={3} />
+          )}
+        </button>
+        {showCelebration && <CelebrationEffect />}
+      </div>
+    );
+  }
+
   // Positive habits: tappable circle that toggles today's status
   return (
     <div className="relative flex size-8 shrink-0 items-center justify-center">
@@ -203,10 +229,13 @@ export function HabitCard({
   onSkipToday,
 }: HabitCardProps) {
   const t = useTranslations('habits');
+  const tDays = useTranslations('days');
   const tStats = useTranslations('stats');
   const isQuit = habit.type === 'quit';
   const isSkipped = habit.skippedToday;
   const today = getTodayString();
+  const dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
+  const dayLabels = dayKeys.map((k) => tDays(k));
 
   const {
     attributes,
@@ -260,11 +289,28 @@ export function HabitCard({
           onTapVs={() => onOpenVsTemptation(habit.id)}
         />
 
-        {/* Center: Name + past day dots */}
+        {/* Center: Name + frequency label + past day dots */}
         <div className="flex-1 min-w-0 flex flex-col gap-1">
-          <span className={cn('text-[15px] font-medium truncate', isSkipped && 'text-muted-foreground')}>
-            {habit.name}
-          </span>
+          <div className="flex items-baseline gap-2 min-w-0">
+            <span className={cn('text-[15px] font-medium truncate', isSkipped && 'text-muted-foreground')}>
+              {habit.name}
+            </span>
+            {habit.frequency === 'weekly' && (
+              <span className="shrink-0 text-[11px] text-muted-foreground">
+                {t('weeklyProgress', { current: habit.weeklyCompletedCount ?? 0, target: habit.weeklyTarget ?? 1 })}
+              </span>
+            )}
+            {habit.frequency === 'weekday' && (
+              <span className="shrink-0 text-[11px] text-muted-foreground">
+                {t('weekday')}
+              </span>
+            )}
+            {habit.frequency === 'custom' && habit.customDays && habit.customDays.length > 0 && (
+              <span className="shrink-0 text-[11px] text-muted-foreground">
+                {[...habit.customDays].sort((a, b) => a - b).map((d) => dayLabels[d]).join('・')}
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-1.5">
             {/* Past days only (skip index 0 = today), left=yesterday, right=oldest */}
             {(habit.recentDays ?? []).slice(1).map((day) => (

@@ -496,6 +496,44 @@ export function getHabitsWithStats(
       skippedToday = !isTargetDay(habit, new Date());
     }
 
+    // Frequency-aware recentDays
+    let recentDays: DayStatus[];
+    if (habit.frequency === 'weekly') {
+      recentDays = getRecentDays(habit.id, completions, 7);
+    } else if (habit.frequency === 'weekday' || habit.frequency === 'custom') {
+      // Fetch 21 calendar days, filter past days to target-day-only, keep 4
+      const allRecent = getRecentDays(habit.id, completions, 21);
+      const todayDay = allRecent[0]; // always keep today at index 0
+      const pastTargetDays = allRecent.slice(1).filter((day) => {
+        const d = new Date(day.date + 'T00:00:00');
+        return isTargetDay(habit, d);
+      }).slice(0, 4);
+      recentDays = [todayDay, ...pastTargetDays];
+    } else {
+      recentDays = getRecentDays(habit.id, completions);
+    }
+
+    // Weekly: compute this week's completion count
+    let weeklyCompletedCount: number | undefined;
+    if (habit.frequency === 'weekly') {
+      const monday = getMondayOfWeek(new Date(), 0);
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      const mondayStr = getDateString(monday);
+      const sundayStr = getDateString(sunday);
+      weeklyCompletedCount = new Set(
+        completions
+          .filter(
+            (c) =>
+              c.habitId === habit.id &&
+              c.date >= mondayStr &&
+              c.date <= sundayStr &&
+              (c.status === 'completed' || c.status === 'rocket_used')
+          )
+          .map((c) => c.date)
+      ).size;
+    }
+
     return {
       ...habit,
       currentStreak: current,
@@ -507,10 +545,11 @@ export function getHabitsWithStats(
         habit.frequency === 'weekly' ? 12 : 30,
         habit
       ),
-      recentDays: getRecentDays(habit.id, completions),
+      recentDays,
       allDays: getAllDayStatuses(habit.id, completions, habit.createdAt),
       rockets,
       rocketNextIn: nextIn,
+      ...(weeklyCompletedCount !== undefined ? { weeklyCompletedCount } : {}),
       ...(isQuit && urgeLogs ? { todayUrgeCount: getTodayUrgeCount(habit.id, urgeLogs) } : {}),
       ...(isQuit && copingStepsMap ? { copingSteps: copingStepsMap.get(habit.id) } : {}),
       ...(impactSavings ? { impactSavings } : {}),

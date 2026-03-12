@@ -44,10 +44,10 @@
 
 **実装エージェントは `frontend-design` スキルを使用すること。**
 
-- [ ] 4.1: `src/components/habits/habit-card.tsx` — Weekly 習慣の今週進捗（今週 N/M 回）を習慣名下に表示
-- [ ] 4.2: `src/components/habits/habit-card.tsx` — Weekly 習慣の StatusIndicator: 未達成=未完了円、達成=緑+Check
-- [ ] 4.3: `src/components/habits/habit-card.tsx` — weekday/custom 習慣の頻度ラベルを習慣名下に表示
-- [ ] 4.4: `src/components/habits/habit-card.tsx` — recentDays ドットの frequency 対応
+- [x] 4.1: `src/components/habits/habit-card.tsx` — Weekly 習慣の今週進捗（今週 N/M 回）を習慣名下に表示
+- [x] 4.2: `src/components/habits/habit-card.tsx` — Weekly 習慣の StatusIndicator: 未達成=未完了円、達成=緑+Check
+- [x] 4.3: `src/components/habits/habit-card.tsx` — weekday/custom 習慣の頻度ラベルを習慣名下に表示
+- [x] 4.4: `src/components/habits/habit-card.tsx` — recentDays ドットの frequency 対応
   - weekday: 平日のみのドット
   - custom: 対象曜日のみのドット
   - weekly: 直近7日のドット（毎日）

@@ -57,6 +57,7 @@ export interface HabitWithStats extends Habit {
   allDays: DayStatus[];
   rockets: number;
   rocketNextIn: number;
+  weeklyCompletedCount?: number;
   copingSteps?: CopingStep[];
   todayUrgeCount?: number;
   impactSavings?: LifeImpactSavings;
