@@ -148,7 +148,7 @@ export function useHabits() {
   );
 
   const setDayStatus = useCallback(
-    async (habitId: string, date: string, status: 'completed' | 'failed' | 'none') => {
+    async (habitId: string, date: string, status: 'completed' | 'failed' | 'none' | 'skipped') => {
       if (!user) return;
       try {
         if (status === 'none') {

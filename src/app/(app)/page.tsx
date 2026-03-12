@@ -10,7 +10,7 @@ import { VsTemptationModal } from '@/components/habits/vs-temptation-modal';
 import { EvidenceArticleSheet } from '@/components/habits/evidence-article-sheet';
 import { DailyImpactSummary } from '@/components/habits/daily-impact-summary';
 import { useHabits } from '@/hooks/useHabits';
-import { shouldShowToday, getHabitsWithStats } from '@/lib/habits';
+import { shouldShowToday, getHabitsWithStats, getTodayString } from '@/lib/habits';
 import { getArticle } from '@/data/impact-articles';
 import type { Habit } from '@/types/habit';
 
@@ -46,8 +46,9 @@ export default function DashboardPage() {
     return getHabitsWithStats(filtered, completions, urgeLogs, copingStepsMap, getArticle);
   }, [habits, completions, urgeLogs, copingStepsMap]);
 
-  const completedCount = todayHabits.filter((h) => h.completedToday).length;
-  const totalCount = todayHabits.length;
+  const activeHabits = todayHabits.filter((h) => !h.skippedToday);
+  const completedCount = activeHabits.filter((h) => h.completedToday).length;
+  const totalCount = activeHabits.length;
 
   const actionsHabit = useMemo(
     () => todayHabits.find((h) => h.id === actionsHabitId),
@@ -118,6 +119,15 @@ export default function DashboardPage() {
     }
   }, [actionsHabitId, updateHabit]);
 
+  const handleSkipToday = useCallback(
+    (id: string) => {
+      const today = getTodayString();
+      const habit = todayHabits.find((h) => h.id === id);
+      setDayStatus(id, today, habit?.skippedToday ? 'none' : 'skipped');
+    },
+    [todayHabits, setDayStatus]
+  );
+
   const handleFormDelete = useCallback(() => {
     if (editingHabit) {
       deleteHabit(editingHabit.id);
@@ -167,6 +177,7 @@ export default function DashboardPage() {
         onOpenDetail={handleOpenDetail}
         onOpenVsTemptation={handleOpenVsTemptation}
         onReorder={reorderHabits}
+        onSkipToday={handleSkipToday}
       />
 
       <HabitForm

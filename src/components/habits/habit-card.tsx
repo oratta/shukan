@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import { Check, ChevronDown, ChevronUp, Shield, Maximize2, GripVertical } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp, Shield, Maximize2, GripVertical, SkipForward, Undo2 } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Card } from '@/components/ui/card';
@@ -16,9 +16,10 @@ interface HabitCardProps {
   habit: HabitWithStats;
   isExpanded: boolean;
   onToggleExpand: (id: string) => void;
-  onDayStatusChange: (habitId: string, date: string, status: 'completed' | 'failed' | 'none') => void;
+  onDayStatusChange: (habitId: string, date: string, status: 'completed' | 'failed' | 'none' | 'skipped') => void;
   onOpenDetail: (id: string) => void;
   onOpenVsTemptation: (id: string) => void;
+  onSkipToday: (id: string) => void;
 }
 
 function nextStatus(current: DayStatus['status']): 'completed' | 'failed' | 'none' {
@@ -48,6 +49,7 @@ function DayStatusDot({
         (status === 'completed' || status === 'rocket_used') && 'bg-[#3D8A5A]',
         status === 'failed' && 'bg-[#D08068]',
         status === 'none' && 'border border-gray-300 bg-transparent',
+        status === 'skipped' && 'bg-gray-300',
       )}
     />
   );
@@ -171,10 +173,12 @@ export function HabitCard({
   onDayStatusChange,
   onOpenDetail,
   onOpenVsTemptation,
+  onSkipToday,
 }: HabitCardProps) {
   const t = useTranslations('habits');
   const tStats = useTranslations('stats');
   const isQuit = habit.type === 'quit';
+  const isSkipped = habit.skippedToday;
   const today = getTodayString();
 
   const {
@@ -230,7 +234,7 @@ export function HabitCard({
 
         {/* Center: Name + past day dots */}
         <div className="flex-1 min-w-0 flex flex-col gap-1">
-          <span className="text-[15px] font-medium truncate">
+          <span className={cn('text-[15px] font-medium truncate', isSkipped && 'text-muted-foreground')}>
             {habit.name}
           </span>
           <div className="flex items-center gap-1.5">
@@ -323,18 +327,45 @@ export function HabitCard({
               <SavingsCard savings={habit.impactSavings} />
             )}
 
-            {/* Detail button */}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpenDetail(habit.id);
-              }}
-              className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#3D8A5A] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#346F4B]"
-            >
-              <Maximize2 className="size-4" />
-              {t('detail')}
-            </button>
+            {/* Detail + Skip/Unskip buttons */}
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenDetail(habit.id);
+                }}
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#3D8A5A] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#346F4B]"
+              >
+                <Maximize2 className="size-4" />
+                {t('detail')}
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSkipToday(habit.id);
+                }}
+                className={cn(
+                  'flex shrink-0 items-center justify-center gap-1 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                  isSkipped
+                    ? 'bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-900/50'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                )}
+              >
+                {isSkipped ? (
+                  <>
+                    <Undo2 className="size-4" />
+                    {t('unskip')}
+                  </>
+                ) : (
+                  <>
+                    <SkipForward className="size-4" />
+                    {t('skip')}
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>

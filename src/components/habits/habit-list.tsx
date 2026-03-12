@@ -22,11 +22,12 @@ import type { HabitWithStats } from '@/types/habit';
 
 interface HabitListProps {
   habits: HabitWithStats[];
-  onDayStatusChange: (habitId: string, date: string, status: 'completed' | 'failed' | 'none') => void;
+  onDayStatusChange: (habitId: string, date: string, status: 'completed' | 'failed' | 'none' | 'skipped') => void;
   onAdd: () => void;
   onOpenDetail: (id: string) => void;
   onOpenVsTemptation: (id: string) => void;
   onReorder: (orderedIds: string[]) => void;
+  onSkipToday: (id: string) => void;
 }
 
 export function HabitList({
@@ -36,6 +37,7 @@ export function HabitList({
   onOpenDetail,
   onOpenVsTemptation,
   onReorder,
+  onSkipToday,
 }: HabitListProps) {
   const t = useTranslations('habits');
   const [expandedHabitId, setExpandedHabitId] = useState<string | null>(null);
@@ -44,9 +46,13 @@ export function HabitList({
     setExpandedHabitId((prev) => (prev === id ? null : id));
   }, []);
 
-  // Sort by sortOrder (no more completedToday sorting)
-  const sortedHabits = useMemo(() => {
-    return [...habits].sort((a, b) => a.sortOrder - b.sortOrder);
+  // Split into active and skipped, sorted by sortOrder
+  const { activeHabits, skippedHabits } = useMemo(() => {
+    const sorted = [...habits].sort((a, b) => a.sortOrder - b.sortOrder);
+    return {
+      activeHabits: sorted.filter((h) => !h.skippedToday),
+      skippedHabits: sorted.filter((h) => h.skippedToday),
+    };
   }, [habits]);
 
   const sensors = useSensors(
@@ -63,22 +69,25 @@ export function HabitList({
       const { active, over } = event;
       if (!over || active.id === over.id) return;
 
-      const oldIndex = sortedHabits.findIndex((h) => h.id === active.id);
-      const newIndex = sortedHabits.findIndex((h) => h.id === over.id);
+      const oldIndex = activeHabits.findIndex((h) => h.id === active.id);
+      const newIndex = activeHabits.findIndex((h) => h.id === over.id);
       if (oldIndex === -1 || newIndex === -1) return;
 
-      const newOrder = [...sortedHabits];
+      const newOrder = [...activeHabits];
       const [moved] = newOrder.splice(oldIndex, 1);
       newOrder.splice(newIndex, 0, moved);
 
-      onReorder(newOrder.map((h) => h.id));
+      // Include skipped habits in the full order
+      onReorder([...newOrder.map((h) => h.id), ...skippedHabits.map((h) => h.id)]);
     },
-    [sortedHabits, onReorder]
+    [activeHabits, skippedHabits, onReorder]
   );
+
+  const allHabits = [...activeHabits, ...skippedHabits];
 
   return (
     <div className="relative">
-      {sortedHabits.length === 0 ? (
+      {allHabits.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <Sprout className="mb-4 size-12 text-muted-foreground" />
           <h3 className="mb-1 text-lg font-semibold">{t('empty')}</h3>
@@ -88,33 +97,66 @@ export function HabitList({
           </Button>
         </div>
       ) : (
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={sortedHabits.map((h) => h.id)}
-            strategy={verticalListSortingStrategy}
+        <>
+          {/* Active habits section (drag-and-drop enabled) */}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
           >
-            <div className="space-y-3">
-              {sortedHabits.map((habit) => (
-                <HabitCard
-                  key={habit.id}
-                  habit={habit}
-                  isExpanded={expandedHabitId === habit.id}
-                  onToggleExpand={handleToggleExpand}
-                  onDayStatusChange={onDayStatusChange}
-                  onOpenDetail={onOpenDetail}
-                  onOpenVsTemptation={onOpenVsTemptation}
-                />
-              ))}
+            <SortableContext
+              items={activeHabits.map((h) => h.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-3">
+                {activeHabits.map((habit) => (
+                  <div key={habit.id} className="animate-[fadeSlideIn_300ms_ease-out]">
+                    <HabitCard
+                      habit={habit}
+                      isExpanded={expandedHabitId === habit.id}
+                      onToggleExpand={handleToggleExpand}
+                      onDayStatusChange={onDayStatusChange}
+                      onOpenDetail={onOpenDetail}
+                      onOpenVsTemptation={onOpenVsTemptation}
+                      onSkipToday={onSkipToday}
+                    />
+                  </div>
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+
+          {/* Skipped habits section */}
+          {skippedHabits.length > 0 && (
+            <div className="mt-4">
+              <div className="flex items-center gap-2 py-2">
+                <div className="flex-1 border-t border-border" />
+                <span className="text-xs font-medium text-muted-foreground">
+                  {t('skippedSection')}
+                </span>
+                <div className="flex-1 border-t border-border" />
+              </div>
+              <div className="space-y-3">
+                {skippedHabits.map((habit) => (
+                  <div key={habit.id} className="animate-[fadeSlideIn_300ms_ease-out]">
+                    <HabitCard
+                      habit={habit}
+                      isExpanded={expandedHabitId === habit.id}
+                      onToggleExpand={handleToggleExpand}
+                      onDayStatusChange={onDayStatusChange}
+                      onOpenDetail={onOpenDetail}
+                      onOpenVsTemptation={onOpenVsTemptation}
+                      onSkipToday={onSkipToday}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
-          </SortableContext>
-        </DndContext>
+          )}
+        </>
       )}
 
-      {sortedHabits.length > 0 && (
+      {allHabits.length > 0 && (
         <Button
           onClick={onAdd}
           size="icon"

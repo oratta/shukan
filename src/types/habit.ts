@@ -38,18 +38,19 @@ export interface HabitCompletion {
   habitId: string;
   date: string;
   completedAt: string;
-  status: 'completed' | 'failed' | 'rocket_used';
+  status: 'completed' | 'failed' | 'rocket_used' | 'skipped';
 }
 
 export interface DayStatus {
   date: string;
-  status: 'completed' | 'failed' | 'none' | 'rocket_used';
+  status: 'completed' | 'failed' | 'none' | 'rocket_used' | 'skipped';
 }
 
 export interface HabitWithStats extends Habit {
   currentStreak: number;
   longestStreak: number;
   completedToday: boolean;
+  skippedToday: boolean;
   completionRate: number;
   recentDays: DayStatus[];
   allDays: DayStatus[];

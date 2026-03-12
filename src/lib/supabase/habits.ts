@@ -110,7 +110,7 @@ function toCompletion(row: CompletionRow): HabitCompletion {
     habitId: row.habit_id,
     date: row.date,
     completedAt: row.completed_at,
-    status: (row.status as 'completed' | 'failed' | 'rocket_used') || 'completed',
+    status: (row.status as 'completed' | 'failed' | 'rocket_used' | 'skipped') || 'completed',
   };
 }
 
@@ -209,7 +209,7 @@ export async function insertCompletion(
   userId: string,
   habitId: string,
   date: string,
-  status: 'completed' | 'failed' = 'completed'
+  status: 'completed' | 'failed' | 'skipped' = 'completed'
 ): Promise<HabitCompletion> {
   const supabase = createClient();
   const { data, error } = await supabase
@@ -231,7 +231,7 @@ export async function upsertCompletion(
   userId: string,
   habitId: string,
   date: string,
-  status: 'completed' | 'failed'
+  status: 'completed' | 'failed' | 'skipped'
 ): Promise<HabitCompletion> {
   const supabase = createClient();
   const { data, error } = await supabase

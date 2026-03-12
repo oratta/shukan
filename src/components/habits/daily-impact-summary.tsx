@@ -24,6 +24,7 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
     let earnedIncome = 0;
 
     for (const habit of habits) {
+      if (habit.skippedToday) continue;
       if (habit.evidences.length === 0) continue;
       const daily = calculateDailyImpact(habit.evidences, getArticle);
       totalHealth += daily.healthMinutes;

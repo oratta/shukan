@@ -6,6 +6,7 @@ import {
   getAllDayStatuses,
   getHabitsWithStats,
   isCompletedToday,
+  isSkippedToday,
   getRecentDays,
 } from '@/lib/habits';
 import type { HabitCompletion, Habit } from '@/types/habit';
@@ -19,6 +20,33 @@ function makeCompletion(habitId: string, date: string, status: string = 'complet
     habitId,
     date,
     status: status as HabitCompletion['status'],
+  };
+}
+
+// 型エラーのない正確な HabitCompletion 生成ヘルパー（スキップ機能テスト用）
+function makeCompletionTyped(habitId: string, date: string, status: HabitCompletion['status'] = 'completed'): HabitCompletion {
+  return {
+    habitId,
+    date,
+    completedAt: `${date}T00:00:00.000Z`,
+    status,
+  };
+}
+
+// 型エラーのない正確な Habit 生成ヘルパー（スキップ機能テスト用）
+function makeHabit(overrides: Partial<Habit> & { id: string }): Habit {
+  return {
+    name: 'Test Habit',
+    icon: '✓',
+    color: '#000000',
+    frequency: 'daily',
+    type: 'positive',
+    dailyTarget: 1,
+    createdAt: '2026-01-01',
+    archived: false,
+    evidences: [],
+    sortOrder: 0,
+    ...overrides,
   };
 }
 
@@ -346,5 +374,352 @@ describe('getHabitsWithStats - multi-evidence', () => {
 
     const result = getHabitsWithStats(habits, [], [], undefined, getArticle);
     expect(result[0].impactSavings).toBeUndefined();
+  });
+});
+
+// ============================================================
+// スキップ機能テスト
+// ============================================================
+
+describe('isSkippedToday', () => {
+  it('should return true when today completion status is skipped', () => {
+    const today = getDateString(new Date());
+    const completions = [makeCompletionTyped('h1', today, 'skipped')];
+    expect(isSkippedToday('h1', completions)).toBe(true);
+  });
+
+  it('should return false when there is no completion for today', () => {
+    const completions = [makeCompletionTyped('h1', '2026-01-01', 'skipped')];
+    expect(isSkippedToday('h1', completions)).toBe(false);
+  });
+
+  it('should return false when today completion status is completed', () => {
+    const today = getDateString(new Date());
+    const completions = [makeCompletionTyped('h1', today, 'completed')];
+    expect(isSkippedToday('h1', completions)).toBe(false);
+  });
+
+  it('should return false when today completion status is rocket_used', () => {
+    const today = getDateString(new Date());
+    const completions = [makeCompletionTyped('h1', today, 'rocket_used')];
+    expect(isSkippedToday('h1', completions)).toBe(false);
+  });
+
+  it('should return false when completions array is empty', () => {
+    expect(isSkippedToday('h1', [])).toBe(false);
+  });
+
+  it('should return false when only a different habit is skipped today', () => {
+    const today = getDateString(new Date());
+    const completions = [makeCompletionTyped('h2', today, 'skipped')];
+    expect(isSkippedToday('h1', completions)).toBe(false);
+  });
+});
+
+describe('calculateStreak - skip support', () => {
+  it('should not break streak when today is skipped', () => {
+    const today = new Date();
+    const todayStr = getDateString(today);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = getDateString(yesterday);
+
+    const completions = [
+      makeCompletionTyped('h1', yesterdayStr, 'completed'),
+      makeCompletionTyped('h1', todayStr, 'skipped'),
+    ];
+    const result = calculateStreak('h1', completions);
+    // 昨日が完了、今日がスキップ → ストリーク継続で current=1（スキップはカウントしない）
+    expect(result.current).toBe(1);
+  });
+
+  it('should count skipped day as transparent: completed -> skipped -> completed = 2 day streak', () => {
+    const today = new Date();
+    const todayStr = getDateString(today);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = getDateString(yesterday);
+    const twoDaysAgo = new Date(today);
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+    const twoDaysAgoStr = getDateString(twoDaysAgo);
+
+    const completions = [
+      makeCompletionTyped('h1', twoDaysAgoStr, 'completed'),
+      makeCompletionTyped('h1', yesterdayStr, 'skipped'),
+      makeCompletionTyped('h1', todayStr, 'completed'),
+    ];
+    const result = calculateStreak('h1', completions);
+    // 完了→スキップ→完了 = スキップは透明、2日連続扱い
+    expect(result.current).toBe(2);
+  });
+
+  it('should handle multiple skipped days: 5 completed -> 2 skipped -> 3 completed = 8 day streak', () => {
+    const today = new Date();
+    const completions: HabitCompletion[] = [];
+
+    // 今日から0〜2日前: 3日完了
+    for (let i = 0; i <= 2; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      completions.push(makeCompletionTyped('h1', getDateString(d), 'completed'));
+    }
+    // 3〜4日前: 2日スキップ
+    for (let i = 3; i <= 4; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      completions.push(makeCompletionTyped('h1', getDateString(d), 'skipped'));
+    }
+    // 5〜9日前: 5日完了
+    for (let i = 5; i <= 9; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      completions.push(makeCompletionTyped('h1', getDateString(d), 'completed'));
+    }
+
+    const result = calculateStreak('h1', completions);
+    // スキップ2日は透明 → 完了8日がつながる
+    expect(result.current).toBe(8);
+  });
+
+  it('should not count skipped days in streak count', () => {
+    const today = new Date();
+    const todayStr = getDateString(today);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = getDateString(yesterday);
+
+    const completions = [
+      makeCompletionTyped('h1', yesterdayStr, 'skipped'),
+      makeCompletionTyped('h1', todayStr, 'completed'),
+    ];
+    const result = calculateStreak('h1', completions);
+    // スキップはカウントしないので completed=1のみ
+    expect(result.current).toBe(1);
+  });
+
+  it('should break streak when non-skipped gap exists between completed days', () => {
+    const today = new Date();
+    const todayStr = getDateString(today);
+    const twoDaysAgo = new Date(today);
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+    const twoDaysAgoStr = getDateString(twoDaysAgo);
+    // 昨日は未記録（スキップでもない）
+
+    const completions = [
+      makeCompletionTyped('h1', twoDaysAgoStr, 'completed'),
+      makeCompletionTyped('h1', todayStr, 'completed'),
+    ];
+    const result = calculateStreak('h1', completions);
+    // 昨日が空白（スキップなし）なので今日のみ
+    expect(result.current).toBe(1);
+  });
+
+  it('should reflect longest streak correctly when skipped days fill the gap', () => {
+    const today = new Date();
+    const completions: HabitCompletion[] = [];
+
+    // 今日だけ完了
+    completions.push(makeCompletionTyped('h1', getDateString(today), 'completed'));
+
+    // 10〜15日前: 6日完了、間に8〜9日前スキップ
+    for (let i = 15; i >= 10; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      completions.push(makeCompletionTyped('h1', getDateString(d), 'completed'));
+    }
+    // スキップで埋める（8〜9日前）
+    for (let i = 9; i >= 8; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      completions.push(makeCompletionTyped('h1', getDateString(d), 'skipped'));
+    }
+    // 6〜7日前: 2日完了
+    for (let i = 7; i >= 6; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      completions.push(makeCompletionTyped('h1', getDateString(d), 'completed'));
+    }
+
+    const result = calculateStreak('h1', completions);
+    // 過去の最長: 6+スキップ2+2=8日連続（スキップ透明）
+    expect(result.longest).toBeGreaterThanOrEqual(8);
+    // 今日のみ current=1
+    expect(result.current).toBe(1);
+  });
+});
+
+describe('getCompletionRate - skip support', () => {
+  it('should exclude skipped days from denominator', () => {
+    const today = new Date();
+    const completions: HabitCompletion[] = [];
+    const days = 30;
+
+    // 10日完了
+    for (let i = 0; i < 10; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      completions.push(makeCompletionTyped('h1', getDateString(d), 'completed'));
+    }
+    // 5日スキップ（11〜15日前）
+    for (let i = 11; i <= 15; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      completions.push(makeCompletionTyped('h1', getDateString(d), 'skipped'));
+    }
+
+    const rate = getCompletionRate('h1', completions, days);
+    // 10 / (30 - 5) = 0.4
+    expect(rate).toBeCloseTo(0.4);
+  });
+
+  it('should return 0 when all days in period are skipped', () => {
+    const today = new Date();
+    const completions: HabitCompletion[] = [];
+
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      completions.push(makeCompletionTyped('h1', getDateString(d), 'skipped'));
+    }
+
+    const rate = getCompletionRate('h1', completions, 7);
+    // effectiveDays = 0 → 0を返す
+    expect(rate).toBe(0);
+  });
+
+  it('should return 1.0 when all non-skipped days are completed', () => {
+    const today = new Date();
+    const completions: HabitCompletion[] = [];
+
+    // 5日完了
+    for (let i = 0; i < 5; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      completions.push(makeCompletionTyped('h1', getDateString(d), 'completed'));
+    }
+    // 5日スキップ（6〜10日前）
+    for (let i = 5; i < 10; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      completions.push(makeCompletionTyped('h1', getDateString(d), 'skipped'));
+    }
+
+    const rate = getCompletionRate('h1', completions, 10);
+    // 5 / (10 - 5) = 1.0
+    expect(rate).toBe(1.0);
+  });
+
+  it('should count skipped days in period range boundary correctly', () => {
+    const today = new Date();
+    const completions: HabitCompletion[] = [];
+    const days = 7;
+
+    // 期間外（8日前）のスキップは無視される
+    const eightDaysAgo = new Date(today);
+    eightDaysAgo.setDate(eightDaysAgo.getDate() - 8);
+    completions.push(makeCompletionTyped('h1', getDateString(eightDaysAgo), 'skipped'));
+
+    // 今日だけ完了
+    completions.push(makeCompletionTyped('h1', getDateString(today), 'completed'));
+
+    const rate = getCompletionRate('h1', completions, days);
+    // 有効日数7日、完了1日 → 1/7
+    expect(rate).toBeCloseTo(1 / 7);
+  });
+});
+
+describe('getRecentDays - skip support', () => {
+  it('should return skipped status for skipped days', () => {
+    const today = new Date();
+    const todayStr = getDateString(today);
+    const completions = [makeCompletionTyped('h1', todayStr, 'skipped')];
+
+    const result = getRecentDays('h1', completions, 5);
+    expect(result[0].date).toBe(todayStr);
+    expect(result[0].status).toBe('skipped');
+  });
+
+  it('should return none when day has no completion record', () => {
+    const today = new Date();
+    const result = getRecentDays('h1', [], 3);
+    expect(result).toHaveLength(3);
+    result.forEach(day => {
+      expect(day.status).toBe('none');
+    });
+  });
+
+  it('should correctly mix completed and skipped statuses', () => {
+    const today = new Date();
+    const todayStr = getDateString(today);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = getDateString(yesterday);
+    const twoDaysAgo = new Date(today);
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+    const twoDaysAgoStr = getDateString(twoDaysAgo);
+
+    const completions = [
+      makeCompletionTyped('h1', todayStr, 'completed'),
+      makeCompletionTyped('h1', yesterdayStr, 'skipped'),
+      makeCompletionTyped('h1', twoDaysAgoStr, 'completed'),
+    ];
+
+    const result = getRecentDays('h1', completions, 3);
+    expect(result[0].status).toBe('completed');  // 今日
+    expect(result[1].status).toBe('skipped');    // 昨日
+    expect(result[2].status).toBe('completed');  // 2日前
+  });
+
+  it('should return days in order from today to past', () => {
+    const today = new Date();
+    const result = getRecentDays('h1', [], 5);
+    expect(result).toHaveLength(5);
+    // 最初が今日、以降は過去に向かう
+    for (let i = 1; i < result.length; i++) {
+      expect(result[i].date < result[i - 1].date).toBe(true);
+    }
+  });
+});
+
+describe('getHabitsWithStats - skippedToday', () => {
+  it('should set skippedToday to true when habit is skipped today', () => {
+    const today = getDateString(new Date());
+    const habit = makeHabit({ id: 'h1', createdAt: today });
+    const completions = [makeCompletionTyped('h1', today, 'skipped')];
+
+    const result = getHabitsWithStats([habit], completions);
+    expect(result[0].skippedToday).toBe(true);
+  });
+
+  it('should set skippedToday to false when habit is not skipped today', () => {
+    const today = getDateString(new Date());
+    const habit = makeHabit({ id: 'h1', createdAt: today });
+    const completions = [makeCompletionTyped('h1', today, 'completed')];
+
+    const result = getHabitsWithStats([habit], completions);
+    expect(result[0].skippedToday).toBe(false);
+  });
+
+  it('should set skippedToday to false when there is no completion for today', () => {
+    const today = getDateString(new Date());
+    const habit = makeHabit({ id: 'h1', createdAt: today });
+
+    const result = getHabitsWithStats([habit], []);
+    expect(result[0].skippedToday).toBe(false);
+  });
+
+  it('should set skippedToday independently for each habit', () => {
+    const today = getDateString(new Date());
+    const habit1 = makeHabit({ id: 'h1', createdAt: today });
+    const habit2 = makeHabit({ id: 'h2', createdAt: today });
+
+    const completions = [
+      makeCompletionTyped('h1', today, 'skipped'),
+      makeCompletionTyped('h2', today, 'completed'),
+    ];
+
+    const result = getHabitsWithStats([habit1, habit2], completions);
+    expect(result[0].skippedToday).toBe(true);
+    expect(result[1].skippedToday).toBe(false);
   });
 });

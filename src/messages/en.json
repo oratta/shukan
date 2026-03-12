@@ -78,7 +78,10 @@
     "historyHelp1": "The calendar shows your completion status for this habit by month.",
     "historyHelp2": "Green: completed, Orange: failed, Empty: no record yet.",
     "historyHelp3": "The last 5 days are shown with a border and can be tapped to toggle status (completed → failed → none).",
-    "historyHelp4": "Complete 10 consecutive days to earn a rocket. Rockets can rescue a past failed day (only days older than 5 days)."
+    "historyHelp4": "Complete 10 consecutive days to earn a rocket. Rockets can rescue a past failed day (only days older than 5 days).",
+    "skip": "Skip",
+    "unskip": "Unskip",
+    "skippedSection": "Skipped"
   },
   "stats": {
     "title": "Statistics",

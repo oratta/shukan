@@ -39,27 +39,40 @@ export function calculateStreak(
     .sort()
     .reverse();
 
+  // Skipped dates: transparent days (don't break streak, don't count)
+  const skippedDates = new Set(
+    completions
+      .filter((c) => c.habitId === habitId && c.status === 'skipped')
+      .map((c) => c.date)
+  );
+
   const uniqueDates = [...new Set(habitCompletions)];
 
   if (uniqueDates.length === 0) {
     return { current: 0, longest: 0 };
   }
 
-  // Calculate current streak
+  // Calculate current streak (skipped days are transparent)
   let current = 0;
   const today = new Date();
   const checkDate = new Date(today);
 
-  // Check if today or yesterday is in completions to start the streak
   const todayStr = getDateString(today);
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
   const yesterdayStr = getDateString(yesterday);
 
-  if (!uniqueDates.includes(todayStr) && !uniqueDates.includes(yesterdayStr)) {
+  // Skip over today if it's skipped
+  const todaySkipped = skippedDates.has(todayStr);
+  const todayCompleted = uniqueDates.includes(todayStr);
+  const yesterdayCompleted = uniqueDates.includes(yesterdayStr);
+  const yesterdaySkipped = skippedDates.has(yesterdayStr);
+
+  if (!todayCompleted && !todaySkipped && !yesterdayCompleted && !yesterdaySkipped) {
     current = 0;
   } else {
-    if (!uniqueDates.includes(todayStr)) {
+    // Find the starting point: walk back from today, skipping skipped days
+    if (!todayCompleted && !todaySkipped) {
       checkDate.setDate(checkDate.getDate() - 1);
     }
     while (true) {
@@ -67,13 +80,16 @@ export function calculateStreak(
       if (uniqueDates.includes(dateStr)) {
         current++;
         checkDate.setDate(checkDate.getDate() - 1);
+      } else if (skippedDates.has(dateStr)) {
+        // Skipped day: skip over it without counting or breaking
+        checkDate.setDate(checkDate.getDate() - 1);
       } else {
         break;
       }
     }
   }
 
-  // Calculate longest streak
+  // Calculate longest streak (skipped days are transparent)
   let longest = 0;
   let streak = 1;
   const sortedDates = [...uniqueDates].sort();
@@ -88,8 +104,22 @@ export function calculateStreak(
     if (diffDays === 1) {
       streak++;
     } else {
-      longest = Math.max(longest, streak);
-      streak = 1;
+      // Check if all gap days are skipped
+      let allSkipped = true;
+      const gapDate = new Date(prev);
+      for (let d = 1; d < diffDays; d++) {
+        gapDate.setDate(gapDate.getDate() + 1);
+        if (!skippedDates.has(getDateString(gapDate))) {
+          allSkipped = false;
+          break;
+        }
+      }
+      if (allSkipped) {
+        streak++;
+      } else {
+        longest = Math.max(longest, streak);
+        streak = 1;
+      }
     }
   }
   longest = Math.max(longest, streak, current);
@@ -109,13 +139,27 @@ export function getCompletionRate(
   startDate.setDate(startDate.getDate() - days + 1);
   const startStr = getDateString(startDate);
 
+  const periodCompletions = completions.filter(
+    (c) => c.habitId === habitId && c.date >= startStr
+  );
+
   const completedDays = new Set(
-    completions
-      .filter((c) => c.habitId === habitId && c.date >= startStr && (c.status === 'completed' || c.status === 'rocket_used'))
+    periodCompletions
+      .filter((c) => c.status === 'completed' || c.status === 'rocket_used')
       .map((c) => c.date)
   );
 
-  return completedDays.size / days;
+  // Exclude skipped days from denominator
+  const skippedDays = new Set(
+    periodCompletions
+      .filter((c) => c.status === 'skipped')
+      .map((c) => c.date)
+  );
+
+  const effectiveDays = days - skippedDays.size;
+  if (effectiveDays <= 0) return 0;
+
+  return completedDays.size / effectiveDays;
 }
 
 export function shouldShowToday(habit: Habit): boolean {
@@ -133,6 +177,14 @@ export function shouldShowToday(habit: Habit): boolean {
     default:
       return true;
   }
+}
+
+export function isSkippedToday(
+  habitId: string,
+  completions: HabitCompletion[]
+): boolean {
+  const today = getTodayString();
+  return completions.some((c) => c.habitId === habitId && c.date === today && c.status === 'skipped');
 }
 
 export function isQuitHabitCompletedToday(
@@ -300,11 +352,14 @@ export function getHabitsWithStats(
       }
     }
 
+    const skippedToday = isSkippedToday(habit.id, completions);
+
     return {
       ...habit,
       currentStreak: current,
       longestStreak: longest,
       completedToday,
+      skippedToday,
       completionRate: getCompletionRate(habit.id, completions, 30),
       recentDays: getRecentDays(habit.id, completions),
       allDays: getAllDayStatuses(habit.id, completions, habit.createdAt),
