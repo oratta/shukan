@@ -162,21 +162,25 @@ export function getCompletionRate(
   return completedDays.size / effectiveDays;
 }
 
-export function shouldShowToday(habit: Habit): boolean {
-  if (habit.archived) return false;
-
-  const today = new Date().getDay();
+export function isTargetDay(habit: Habit, date: Date): boolean {
+  const dayOfWeek = date.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
 
   switch (habit.frequency) {
-    case 'daily':
+    case 'everyday':
       return true;
-    case 'weekly':
-      return today === 1; // Monday
+    case 'weekday':
+      return dayOfWeek >= 1 && dayOfWeek <= 5; // Mon-Fri
     case 'custom':
-      return habit.customDays?.includes(today) ?? false;
+      return (habit.customDays ?? []).includes(dayOfWeek);
+    case 'weekly':
+      return true; // Weekly: any day counts toward the weekly target
     default:
       return true;
   }
+}
+
+export function shouldShowToday(habit: Habit): boolean {
+  return !habit.archived;
 }
 
 export function isSkippedToday(

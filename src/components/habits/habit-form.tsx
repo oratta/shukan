@@ -94,8 +94,8 @@ export function HabitForm({
   const [color, setColor] = useState(
     initialData?.color ?? 'oklch(0.6 0.2 260)'
   );
-  const [frequency, setFrequency] = useState<'daily' | 'weekly' | 'custom'>(
-    initialData?.frequency ?? 'daily'
+  const [frequency, setFrequency] = useState<'everyday' | 'weekday' | 'custom' | 'weekly'>(
+    initialData?.frequency ?? 'everyday'
   );
   const [customDays, setCustomDays] = useState<number[]>(
     initialData?.customDays ?? [1, 2, 3, 4, 5]
@@ -124,7 +124,7 @@ export function HabitForm({
     setLifeSignificance(initialData?.lifeSignificance ?? '');
     setIcon(initialData?.icon ?? 'dumbbell');
     setColor(initialData?.color ?? 'oklch(0.6 0.2 260)');
-    setFrequency(initialData?.frequency ?? 'daily');
+    setFrequency(initialData?.frequency ?? 'everyday');
     setCustomDays(initialData?.customDays ?? [1, 2, 3, 4, 5]);
     setType(initialData?.type ?? 'positive');
     setDailyTarget(initialData?.dailyTarget ?? 3);
@@ -169,7 +169,7 @@ export function HabitForm({
       setLifeSignificance('');
       setIcon('dumbbell');
       setColor('oklch(0.6 0.2 260)');
-      setFrequency('daily');
+      setFrequency('everyday');
       setCustomDays([1, 2, 3, 4, 5]);
       setType('positive');
       setDailyTarget(3);
@@ -454,14 +454,15 @@ export function HabitForm({
               <Select
                 value={frequency}
                 onValueChange={(v) =>
-                  setFrequency(v as 'daily' | 'weekly' | 'custom')
+                  setFrequency(v as 'everyday' | 'weekday' | 'custom' | 'weekly')
                 }
               >
                 <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="daily">{t('daily')}</SelectItem>
+                  <SelectItem value="everyday">{t('everyday')}</SelectItem>
+                  <SelectItem value="weekday">{t('weekday')}</SelectItem>
                   <SelectItem value="weekly">{t('weekly')}</SelectItem>
                   <SelectItem value="custom">{t('custom')}</SelectItem>
                 </SelectContent>

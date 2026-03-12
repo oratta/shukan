@@ -11,10 +11,11 @@ interface HabitRow {
   life_significance: string | null;
   icon: string;
   color: string;
-  frequency: 'daily' | 'weekly' | 'custom';
+  frequency: 'everyday' | 'weekday' | 'custom' | 'weekly';
   custom_days: number[] | null;
   type: string;
   daily_target: number;
+  weekly_target: number | null;
   created_at: string;
   archived: boolean;
   impact_article_id: string | null;
@@ -77,6 +78,7 @@ function toHabit(row: HabitRow, evidenceRows?: HabitEvidenceRow[]): Habit {
     customDays: row.custom_days ?? undefined,
     type: (row.type as 'positive' | 'quit') || 'positive',
     dailyTarget: row.daily_target ?? 1,
+    weeklyTarget: row.weekly_target ?? 1,
     createdAt: row.created_at,
     archived: row.archived,
     impactArticleId: isValidArticleId(row.impact_article_id) ? row.impact_article_id : undefined,
@@ -167,6 +169,7 @@ export async function insertHabit(
       custom_days: habit.customDays || null,
       type: habit.type || 'positive',
       daily_target: habit.dailyTarget ?? 1,
+      weekly_target: habit.weeklyTarget ?? 1,
       impact_article_id: habit.impactArticleId ?? null,
       sort_order: nextSortOrder,
     })
@@ -192,6 +195,7 @@ export async function updateHabitById(
   if (updates.customDays !== undefined) row.custom_days = updates.customDays || null;
   if (updates.type !== undefined) row.type = updates.type;
   if (updates.dailyTarget !== undefined) row.daily_target = updates.dailyTarget;
+  if (updates.weeklyTarget !== undefined) row.weekly_target = updates.weeklyTarget ?? 1;
   if (updates.archived !== undefined) row.archived = updates.archived;
   if (updates.impactArticleId !== undefined) row.impact_article_id = updates.impactArticleId ?? null;
 

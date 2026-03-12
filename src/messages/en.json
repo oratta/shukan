@@ -24,6 +24,8 @@
     "color": "Color",
     "frequency": "Frequency",
     "daily": "Daily",
+    "everyday": "Every Day",
+    "weekday": "Weekdays",
     "weekly": "Weekly",
     "custom": "Custom",
     "save": "Save",

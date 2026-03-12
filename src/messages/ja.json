@@ -24,6 +24,8 @@
     "color": "カラー",
     "frequency": "頻度",
     "daily": "毎日",
+    "everyday": "毎日",
+    "weekday": "平日",
     "weekly": "毎週",
     "custom": "カスタム",
     "save": "保存",

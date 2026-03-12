@@ -7,10 +7,11 @@ export interface Habit {
   lifeSignificance?: string;
   icon: string;
   color: string;
-  frequency: 'daily' | 'weekly' | 'custom';
+  frequency: 'everyday' | 'weekday' | 'custom' | 'weekly';
   customDays?: number[];
   type: 'positive' | 'quit';
   dailyTarget: number;
+  weeklyTarget?: number;
   createdAt: string;
   archived: boolean;
   impactArticleId?: ArticleId; // legacy single-evidence — kept for backward compat
