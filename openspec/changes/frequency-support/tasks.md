@@ -33,12 +33,12 @@
 
 **実装エージェントは `frontend-design` スキルを使用すること。**
 
-- [ ] 3.1: `src/components/habits/habit-form.tsx` — Daily / Weekly カテゴリタブ表示（非表示解除）
-- [ ] 3.2: `src/components/habits/habit-form.tsx` — Daily サブタイプ選択（everyday / weekday / custom のラジオ/チップ）
-- [ ] 3.3: `src/components/habits/habit-form.tsx` — Custom 選択時の7曜日チップ表示（複数選択・最低1日バリデーション）
-- [ ] 3.4: `src/components/habits/habit-form.tsx` — Weekly 選択時の回数セレクター（1〜7、デフォルト1）
-- [ ] 3.5: `src/messages/ja.json` — i18n キー追加（frequencyDaily / frequencyWeekly / everyday / weekday / frequencyCustom / selectDays / timesPerWeek / weeklyProgress）
-- [ ] 3.6: `src/messages/en.json` — i18n キー追加（同上）
+- [x] 3.1: `src/components/habits/habit-form.tsx` — Daily / Weekly カテゴリタブ表示（非表示解除）
+- [x] 3.2: `src/components/habits/habit-form.tsx` — Daily サブタイプ選択（everyday / weekday / custom のラジオ/チップ）
+- [x] 3.3: `src/components/habits/habit-form.tsx` — Custom 選択時の7曜日チップ表示（複数選択・最低1日バリデーション）
+- [x] 3.4: `src/components/habits/habit-form.tsx` — Weekly 選択時の回数セレクター（1〜7、デフォルト1）
+- [x] 3.5: `src/messages/ja.json` — i18n キー追加（frequencyDaily / frequencyWeekly / everyday / weekday / frequencyCustom / selectDays / timesPerWeek / weeklyProgress）
+- [x] 3.6: `src/messages/en.json` — i18n キー追加（同上）
 
 ## Phase 4: ホーム画面表示
 

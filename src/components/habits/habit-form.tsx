@@ -103,6 +103,9 @@ export function HabitForm({
   const [type, setType] = useState<'positive' | 'quit'>(
     initialData?.type ?? 'positive'
   );
+  const [weeklyTarget, setWeeklyTarget] = useState(
+    initialData?.weeklyTarget ?? 1
+  );
   const [dailyTarget, setDailyTarget] = useState(
     initialData?.dailyTarget ?? 3
   );
@@ -127,6 +130,7 @@ export function HabitForm({
     setFrequency(initialData?.frequency ?? 'everyday');
     setCustomDays(initialData?.customDays ?? [1, 2, 3, 4, 5]);
     setType(initialData?.type ?? 'positive');
+    setWeeklyTarget(initialData?.weeklyTarget ?? 1);
     setDailyTarget(initialData?.dailyTarget ?? 3);
     setCopingSteps(initialCopingSteps ?? [{ title: '', sortOrder: 0 }]);
     setEvidences(
@@ -140,6 +144,7 @@ export function HabitForm({
     e.preventDefault();
     if (!name.trim()) return;
     if (type === 'quit' && copingSteps.every((s) => !s.title.trim())) return;
+    if (frequency === 'custom' && customDays.length === 0) return;
 
     const validSteps = copingSteps
       .filter((s) => s.title.trim())
@@ -154,6 +159,7 @@ export function HabitForm({
         color,
         frequency,
         customDays: frequency === 'custom' ? customDays : undefined,
+        weeklyTarget: frequency === 'weekly' ? weeklyTarget : undefined,
         type,
         dailyTarget: type === 'quit' ? dailyTarget : 1,
         impactArticleId: undefined,
@@ -171,6 +177,7 @@ export function HabitForm({
       setColor('oklch(0.6 0.2 260)');
       setFrequency('everyday');
       setCustomDays([1, 2, 3, 4, 5]);
+      setWeeklyTarget(1);
       setType('positive');
       setDailyTarget(3);
       setCopingSteps([{ title: '', sortOrder: 0 }]);
@@ -449,48 +456,107 @@ export function HabitForm({
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label>{t('frequency')}</Label>
-              <Select
-                value={frequency}
-                onValueChange={(v) =>
-                  setFrequency(v as 'everyday' | 'weekday' | 'custom' | 'weekly')
-                }
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="everyday">{t('everyday')}</SelectItem>
-                  <SelectItem value="weekday">{t('weekday')}</SelectItem>
-                  <SelectItem value="weekly">{t('weekly')}</SelectItem>
-                  <SelectItem value="custom">{t('custom')}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
 
-            {frequency === 'custom' && (
-              <div className="space-y-2">
-                <Label>Days</Label>
-                <div className="flex gap-1.5">
-                  {DAY_LABELS.map((label, index) => (
+              {/* Daily / Weekly category segment */}
+              <div className="flex rounded-lg border p-1">
+                <button
+                  type="button"
+                  onClick={() => { if (frequency === 'weekly') setFrequency('everyday'); }}
+                  className={cn(
+                    'flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-all',
+                    frequency !== 'weekly'
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  {t('frequencyDaily')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFrequency('weekly')}
+                  className={cn(
+                    'flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-all',
+                    frequency === 'weekly'
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  {t('frequencyWeekly')}
+                </button>
+              </div>
+
+              {/* Daily sub-type chips */}
+              {frequency !== 'weekly' && (
+                <div className="flex gap-2">
+                  {(['everyday', 'weekday', 'custom'] as const).map((subType) => (
                     <button
-                      key={label}
+                      key={subType}
                       type="button"
-                      onClick={() => toggleDay(index)}
+                      onClick={() => setFrequency(subType)}
                       className={cn(
-                        'flex size-9 items-center justify-center rounded-full text-xs font-medium transition-all',
-                        customDays.includes(index)
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-muted text-muted-foreground hover:bg-accent'
+                        'rounded-full border px-3 py-1 text-xs font-medium transition-all',
+                        frequency === subType
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-muted-foreground/30 text-muted-foreground hover:border-primary/50'
                       )}
                     >
-                      {label.charAt(0)}
+                      {subType === 'everyday'
+                        ? t('everyday')
+                        : subType === 'weekday'
+                          ? t('weekday')
+                          : t('frequencyCustom')}
                     </button>
                   ))}
                 </div>
-              </div>
-            )}
+              )}
+
+              {/* Custom day chips */}
+              {frequency === 'custom' && (
+                <div className="space-y-1.5">
+                  <span className="text-xs text-muted-foreground">{t('selectDays')}</span>
+                  <div className="flex gap-1.5">
+                    {DAY_LABELS.map((label, index) => (
+                      <button
+                        key={label}
+                        type="button"
+                        onClick={() => toggleDay(index)}
+                        className={cn(
+                          'flex size-9 items-center justify-center rounded-full text-xs font-medium transition-all',
+                          customDays.includes(index)
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted text-muted-foreground hover:bg-accent'
+                        )}
+                      >
+                        {label.charAt(0)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Weekly target selector */}
+              {frequency === 'weekly' && (
+                <Select
+                  value={weeklyTarget.toString()}
+                  onValueChange={(v) => setWeeklyTarget(parseInt(v))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue>
+                      {t('timesPerWeek', { count: weeklyTarget })}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[1, 2, 3, 4, 5, 6, 7].map((n) => (
+                      <SelectItem key={n} value={n.toString()}>
+                        {t('timesPerWeek', { count: n })}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
 
             <DialogFooter className="flex-row">
               {initialData && onDelete && (

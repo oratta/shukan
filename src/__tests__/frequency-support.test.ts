@@ -496,7 +496,6 @@ describe('calculateStreak - weekly habit (consecutive achieved weeks)', () => {
       makeCompletionTyped('h1', lastWeekDay2, 'completed'),
     ];
 
-    // @ts-expect-error: calculateStreak signature not yet updated to accept Habit
     const result = calculateStreak('h1', completions, habit);
     expect(result.current).toBe(1); // last week only
 
@@ -557,7 +556,6 @@ describe('getCompletionRate - weekly habit (achieved-weeks / 12)', () => {
       completions.push(makeCompletionTyped('h1', getDateString(getDateForISOWeek(w, 1)), 'completed'));
     }
 
-    // @ts-expect-error: getCompletionRate signature not yet updated to accept Habit
     const rate = getCompletionRate('h1', completions, 12, habit);
     expect(rate).toBeCloseTo(1.0);
 
@@ -582,7 +580,6 @@ describe('getCompletionRate - weekly habit (achieved-weeks / 12)', () => {
       completions.push(makeCompletionTyped('h1', getDateString(getDateForISOWeek(w, 1)), 'completed'));
     }
 
-    // @ts-expect-error: getCompletionRate signature not yet updated to accept Habit
     const rate = getCompletionRate('h1', completions, 12, habit);
     expect(rate).toBeCloseTo(0.0);
 
