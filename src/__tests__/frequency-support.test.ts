@@ -43,7 +43,6 @@ function makeHabit(overrides: Partial<Habit> & { id: string }): Habit {
     name: 'Test Habit',
     icon: '✓',
     color: '#000000',
-    // @ts-expect-error: 'everyday' is not yet a valid frequency — expected Red phase type error
     frequency: 'everyday',
     type: 'positive',
     dailyTarget: 1,
@@ -218,7 +217,6 @@ describe('isTargetDay', () => {
       const habit = makeHabit({
         id: 'h1',
         frequency: 'weekly' as Habit['frequency'],
-        // @ts-expect-error: weeklyTarget not yet on Habit type
         weeklyTarget: 3,
       });
       expect(isTargetDay(habit, new Date('2026-03-14'))).toBe(true);
@@ -228,7 +226,6 @@ describe('isTargetDay', () => {
       const habit = makeHabit({
         id: 'h1',
         frequency: 'weekly' as Habit['frequency'],
-        // @ts-expect-error: weeklyTarget not yet on Habit type
         weeklyTarget: 1,
       });
       expect(isTargetDay(habit, new Date('2026-03-16'))).toBe(true);
@@ -268,7 +265,6 @@ describe('shouldShowToday', () => {
     const habit = makeHabit({
       id: 'h1',
       frequency: 'weekly' as Habit['frequency'],
-      // @ts-expect-error: weeklyTarget not yet on Habit type
       weeklyTarget: 2,
       archived: false,
     });
@@ -424,7 +420,6 @@ describe('calculateStreak - weekday habit skip transparency', () => {
     ];
 
     // calculateStreak with habit context so it can determine auto-skip days
-    // @ts-expect-error: calculateStreak signature not yet updated to accept Habit
     const result = calculateStreak('h1', completions, habit);
     // Fri→(Sat auto-skip)→(Sun auto-skip)→Mon: streak should be at least 2
     expect(result.current).toBeGreaterThanOrEqual(2);
@@ -447,7 +442,6 @@ describe('calculateStreak - weekly habit (consecutive achieved weeks)', () => {
     const habit = makeHabit({
       id: 'h1',
       frequency: 'weekly' as Habit['frequency'],
-      // @ts-expect-error: weeklyTarget not yet on Habit type
       weeklyTarget: 2,
       createdAt: '2026-01-01',
     });
@@ -472,7 +466,6 @@ describe('calculateStreak - weekly habit (consecutive achieved weeks)', () => {
     ];
 
     // calculateStreak with habit context for weekly logic
-    // @ts-expect-error: calculateStreak signature not yet updated to accept Habit
     const result = calculateStreak('h1', completions, habit);
     expect(result.current).toBe(3);
 
@@ -487,7 +480,6 @@ describe('calculateStreak - weekly habit (consecutive achieved weeks)', () => {
     const habit = makeHabit({
       id: 'h1',
       frequency: 'weekly' as Habit['frequency'],
-      // @ts-expect-error: weeklyTarget not yet on Habit type
       weeklyTarget: 2,
       createdAt: '2026-01-01',
     });
@@ -525,7 +517,6 @@ describe('getCompletionRate - weekly habit (achieved-weeks / 12)', () => {
     const habit = makeHabit({
       id: 'h1',
       frequency: 'weekly' as Habit['frequency'],
-      // @ts-expect-error: weeklyTarget not yet on Habit type
       weeklyTarget: 2,
       createdAt: '2025-01-01',
     });
@@ -543,7 +534,6 @@ describe('getCompletionRate - weekly habit (achieved-weeks / 12)', () => {
     }
 
     // getCompletionRate with habit context for weekly mode
-    // @ts-expect-error: getCompletionRate signature not yet updated to accept Habit
     const rate = getCompletionRate('h1', completions, 12, habit);
     expect(rate).toBeCloseTo(0.5);
 
@@ -558,7 +548,6 @@ describe('getCompletionRate - weekly habit (achieved-weeks / 12)', () => {
     const habit = makeHabit({
       id: 'h1',
       frequency: 'weekly' as Habit['frequency'],
-      // @ts-expect-error: weeklyTarget not yet on Habit type
       weeklyTarget: 1,
       createdAt: '2025-01-01',
     });
@@ -583,7 +572,6 @@ describe('getCompletionRate - weekly habit (achieved-weeks / 12)', () => {
     const habit = makeHabit({
       id: 'h1',
       frequency: 'weekly' as Habit['frequency'],
-      // @ts-expect-error: weeklyTarget not yet on Habit type
       weeklyTarget: 3,
       createdAt: '2025-01-01',
     });

@@ -21,6 +21,106 @@ function getDateString(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
+function getMondayOfWeek(referenceDate: Date, weeksAgo: number): Date {
+  const d = new Date(referenceDate);
+  const dayOfWeek = d.getDay();
+  const isoDay = dayOfWeek === 0 ? 7 : dayOfWeek;
+  d.setDate(d.getDate() - (isoDay - 1) - weeksAgo * 7);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function calculateWeeklyStreak(
+  habitId: string,
+  completions: HabitCompletion[],
+  weeklyTarget: number
+): { current: number; longest: number } {
+  const today = new Date();
+
+  const getWeekCompletionCount = (weeksAgo: number): number => {
+    const monday = getMondayOfWeek(today, weeksAgo);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    const mondayStr = getDateString(monday);
+    const sundayStr = getDateString(sunday);
+
+    return new Set(
+      completions
+        .filter(
+          (c) =>
+            c.habitId === habitId &&
+            c.date >= mondayStr &&
+            c.date <= sundayStr &&
+            (c.status === 'completed' || c.status === 'rocket_used')
+        )
+        .map((c) => c.date)
+    ).size;
+  };
+
+  const currentWeekAchieved = getWeekCompletionCount(0) >= weeklyTarget;
+  let current = 0;
+  const startWeek = currentWeekAchieved ? 0 : 1;
+
+  for (let w = startWeek; w < 100; w++) {
+    if (getWeekCompletionCount(w) >= weeklyTarget) {
+      current++;
+    } else {
+      break;
+    }
+  }
+
+  let longest = current;
+  let streak = 0;
+  for (let w = 0; w < 52; w++) {
+    if (getWeekCompletionCount(w) >= weeklyTarget) {
+      streak++;
+      longest = Math.max(longest, streak);
+    } else {
+      streak = 0;
+    }
+  }
+
+  return { current, longest };
+}
+
+function getWeeklyCompletionRate(
+  habitId: string,
+  completions: HabitCompletion[],
+  weeks: number,
+  weeklyTarget: number
+): number {
+  if (weeks <= 0) return 0;
+
+  const today = new Date();
+  let achievedWeeks = 0;
+
+  for (let w = 0; w < weeks; w++) {
+    const monday = getMondayOfWeek(today, w);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    const mondayStr = getDateString(monday);
+    const sundayStr = getDateString(sunday);
+
+    const uniqueDays = new Set(
+      completions
+        .filter(
+          (c) =>
+            c.habitId === habitId &&
+            c.date >= mondayStr &&
+            c.date <= sundayStr &&
+            (c.status === 'completed' || c.status === 'rocket_used')
+        )
+        .map((c) => c.date)
+    );
+
+    if (uniqueDays.size >= weeklyTarget) {
+      achievedWeeks++;
+    }
+  }
+
+  return achievedWeeks / weeks;
+}
+
 export function isCompletedToday(
   habitId: string,
   completions: HabitCompletion[]
@@ -31,8 +131,14 @@ export function isCompletedToday(
 
 export function calculateStreak(
   habitId: string,
-  completions: HabitCompletion[]
+  completions: HabitCompletion[],
+  habit?: Habit
 ): { current: number; longest: number } {
+  // Weekly habits use week-based streak
+  if (habit && habit.frequency === 'weekly') {
+    return calculateWeeklyStreak(habitId, completions, habit.weeklyTarget ?? 1);
+  }
+
   const habitCompletions = completions
     .filter((c) => c.habitId === habitId && (c.status === 'completed' || c.status === 'rocket_used'))
     .map((c) => c.date)
@@ -46,13 +152,29 @@ export function calculateStreak(
       .map((c) => c.date)
   );
 
+  // All recorded dates (to distinguish "no record" from "has record" for auto-skip)
+  const recordedDates = new Set(
+    completions.filter((c) => c.habitId === habitId).map((c) => c.date)
+  );
+
   const uniqueDates = [...new Set(habitCompletions)];
 
   if (uniqueDates.length === 0) {
     return { current: 0, longest: 0 };
   }
 
-  // Calculate current streak (skipped days are transparent)
+  // Helper: is a date transparent (manual skip or auto-skip)?
+  const isTransparent = (dateStr: string): boolean => {
+    if (skippedDates.has(dateStr)) return true;
+    // Auto-skip: no record AND not a target day for this habit
+    if (habit && !recordedDates.has(dateStr)) {
+      const d = new Date(dateStr + 'T00:00:00');
+      if (!isTargetDay(habit, d)) return true;
+    }
+    return false;
+  };
+
+  // Calculate current streak (transparent days are skipped over)
   let current = 0;
   const today = new Date();
   const checkDate = new Date(today);
@@ -62,17 +184,15 @@ export function calculateStreak(
   yesterday.setDate(yesterday.getDate() - 1);
   const yesterdayStr = getDateString(yesterday);
 
-  // Skip over today if it's skipped
-  const todaySkipped = skippedDates.has(todayStr);
   const todayCompleted = uniqueDates.includes(todayStr);
+  const todayTransparent = isTransparent(todayStr);
   const yesterdayCompleted = uniqueDates.includes(yesterdayStr);
-  const yesterdaySkipped = skippedDates.has(yesterdayStr);
+  const yesterdayTransparent = isTransparent(yesterdayStr);
 
-  if (!todayCompleted && !todaySkipped && !yesterdayCompleted && !yesterdaySkipped) {
+  if (!todayCompleted && !todayTransparent && !yesterdayCompleted && !yesterdayTransparent) {
     current = 0;
   } else {
-    // Find the starting point: walk back from today, skipping skipped days
-    if (!todayCompleted && !todaySkipped) {
+    if (!todayCompleted && !todayTransparent) {
       checkDate.setDate(checkDate.getDate() - 1);
     }
     while (true) {
@@ -80,8 +200,7 @@ export function calculateStreak(
       if (uniqueDates.includes(dateStr)) {
         current++;
         checkDate.setDate(checkDate.getDate() - 1);
-      } else if (skippedDates.has(dateStr)) {
-        // Skipped day: skip over it without counting or breaking
+      } else if (isTransparent(dateStr)) {
         checkDate.setDate(checkDate.getDate() - 1);
       } else {
         break;
@@ -89,7 +208,7 @@ export function calculateStreak(
     }
   }
 
-  // Calculate longest streak (skipped days are transparent)
+  // Calculate longest streak (transparent days are skipped over)
   let longest = 0;
   let streak = 1;
   const sortedDates = [...uniqueDates].sort();
@@ -104,17 +223,16 @@ export function calculateStreak(
     if (diffDays === 1) {
       streak++;
     } else {
-      // Check if all gap days are skipped
-      let allSkipped = true;
+      let allTransparent = true;
       const gapDate = new Date(prev);
       for (let d = 1; d < diffDays; d++) {
         gapDate.setDate(gapDate.getDate() + 1);
-        if (!skippedDates.has(getDateString(gapDate))) {
-          allSkipped = false;
+        if (!isTransparent(getDateString(gapDate))) {
+          allTransparent = false;
           break;
         }
       }
-      if (allSkipped) {
+      if (allTransparent) {
         streak++;
       } else {
         longest = Math.max(longest, streak);
@@ -130,8 +248,14 @@ export function calculateStreak(
 export function getCompletionRate(
   habitId: string,
   completions: HabitCompletion[],
-  days: number
+  days: number,
+  habit?: Habit
 ): number {
+  // Weekly habits: days parameter is reused as weeks count
+  if (habit && habit.frequency === 'weekly') {
+    return getWeeklyCompletionRate(habitId, completions, days, habit.weeklyTarget ?? 1);
+  }
+
   if (days <= 0) return 0;
 
   const today = new Date();
@@ -335,7 +459,7 @@ export function getHabitsWithStats(
   getArticleFn?: (id: ArticleId) => LifeImpactArticle | undefined
 ): HabitWithStats[] {
   return habits.map((habit) => {
-    const { current, longest } = calculateStreak(habit.id, completions);
+    const { current, longest } = calculateStreak(habit.id, completions, habit);
     const isQuit = habit.type === 'quit';
     const completedToday = isQuit && urgeLogs
       ? isQuitHabitCompletedToday(habit.id, urgeLogs, habit.dailyTarget)
@@ -356,7 +480,21 @@ export function getHabitsWithStats(
       }
     }
 
-    const skippedToday = isSkippedToday(habit.id, completions);
+    // Auto-skip logic (REQ-FS-06):
+    // 1. Manual skip record → skippedToday = true
+    // 2. Any other record (completed/failed/rocket_used/none) → skippedToday = false
+    // 3. No record + not target day → skippedToday = true (auto-skip)
+    // 4. No record + target day → skippedToday = false
+    const todayStr = getTodayString();
+    const todayCompletion = completions.find(
+      (c) => c.habitId === habit.id && c.date === todayStr
+    );
+    let skippedToday: boolean;
+    if (todayCompletion) {
+      skippedToday = todayCompletion.status === 'skipped';
+    } else {
+      skippedToday = !isTargetDay(habit, new Date());
+    }
 
     return {
       ...habit,
@@ -364,7 +502,11 @@ export function getHabitsWithStats(
       longestStreak: longest,
       completedToday,
       skippedToday,
-      completionRate: getCompletionRate(habit.id, completions, 30),
+      completionRate: getCompletionRate(
+        habit.id, completions,
+        habit.frequency === 'weekly' ? 12 : 30,
+        habit
+      ),
       recentDays: getRecentDays(habit.id, completions),
       allDays: getAllDayStatuses(habit.id, completions, habit.createdAt),
       rockets,

@@ -2,30 +2,30 @@
 
 ## Phase 1: DB + 型 + CRUD
 
-- [ ] 1.1: `supabase/migrations/YYYYMMDD000000_frequency_support.sql` を作成
+- [x] 1.1: `supabase/migrations/YYYYMMDD000000_frequency_support.sql` を作成
   - frequency CHECK 制約更新（everyday/weekday/custom/weekly）
   - `UPDATE habits SET frequency = 'everyday' WHERE frequency = 'daily'`
   - `weekly_target integer DEFAULT 1` カラム追加
-- [ ] 1.2: `supabase db push` でマイグレーション適用
-- [ ] 1.3: `src/types/habit.ts` — frequency 型を `'everyday' | 'weekday' | 'custom' | 'weekly'` に変更
-- [ ] 1.4: `src/types/habit.ts` — `weeklyTarget?: number` フィールド追加
-- [ ] 1.5: `src/lib/supabase/habits.ts` — `weekly_target` ↔ `weeklyTarget` の snake_case/camelCase マッピング追加
-- [ ] 1.6: `src/lib/supabase/habits.ts` — INSERT/UPDATE/SELECT で `weekly_target` を含める
+- [x] 1.2: `supabase db push` でマイグレーション適用
+- [x] 1.3: `src/types/habit.ts` — frequency 型を `'everyday' | 'weekday' | 'custom' | 'weekly'` に変更
+- [x] 1.4: `src/types/habit.ts` — `weeklyTarget?: number` フィールド追加
+- [x] 1.5: `src/lib/supabase/habits.ts` — `weekly_target` ↔ `weeklyTarget` の snake_case/camelCase マッピング追加
+- [x] 1.6: `src/lib/supabase/habits.ts` — INSERT/UPDATE/SELECT で `weekly_target` を含める
 
 ## Phase 2: 自動スキップ + ストリーク + completionRate
 
-- [ ] 2.1: `src/lib/habits.ts` — `shouldShowToday` を `!habit.archived` のみに簡素化
-- [ ] 2.2: `src/lib/habits.ts` — `isTargetDay(habit: Habit, date: Date): boolean` ヘルパー追加
+- [x] 2.1: `src/lib/habits.ts` — `shouldShowToday` を `!habit.archived` のみに簡素化
+- [x] 2.2: `src/lib/habits.ts` — `isTargetDay(habit: Habit, date: Date): boolean` ヘルパー追加
   - everyday: 常に true
   - weekday: getDay() 1〜5 のみ true
   - custom: customDays.includes(getDay()) のみ true
   - weekly: 常に true
-- [ ] 2.3: `src/lib/habits.ts` / `src/hooks/useHabits.ts` — `getHabitsWithStats` 内の `skippedToday` 判定に自動スキップロジックを統合
+- [x] 2.3: `src/lib/habits.ts` / `src/hooks/useHabits.ts` — `getHabitsWithStats` 内の `skippedToday` 判定に自動スキップロジックを統合
   - 判定優先順位: 手動スキップ > 手動操作 > 自動スキップ > 通常未実施
-- [ ] 2.4: `src/lib/habits.ts` — `calculateStreak` を Weekly に対応
+- [x] 2.4: `src/lib/habits.ts` — `calculateStreak` を Weekly に対応
   - frequency が 'everyday' / 'weekday' / 'custom': 従来の日単位ロジックを維持
   - frequency が 'weekly': 連続達成週数ロジックに切り替え（月曜始まり、weeklyTarget 閾値）
-- [ ] 2.5: `src/lib/habits.ts` — `getCompletionRate` を Weekly に対応
+- [x] 2.5: `src/lib/habits.ts` — `getCompletionRate` を Weekly に対応
   - frequency が 'everyday' / 'weekday' / 'custom': 従来の completedDays / (30 - skippedDays)
   - frequency が 'weekly': 過去12週の達成週数 / 12
 
