@@ -6613,6 +6613,2756 @@
           ]
         }
       ]
+    },
+    {
+      "type": "frame",
+      "id": "uKw5v",
+      "x": 0,
+      "y": 1112,
+      "name": "8. Discover - Evidence Marketplace",
+      "clip": true,
+      "width": 402,
+      "height": 870,
+      "fill": "#F5F4F1",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "uf64J",
+          "name": "Header",
+          "width": "fill_container",
+          "height": 64,
+          "padding": [
+            0,
+            24
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "6SlMP",
+              "name": "titleTxt8",
+              "fill": "#1A1918",
+              "content": "Discover",
+              "fontFamily": "Outfit",
+              "fontSize": 26,
+              "fontWeight": "700",
+              "letterSpacing": -0.5
+            },
+            {
+              "type": "frame",
+              "id": "8cc4w",
+              "name": "searchBtn",
+              "width": 44,
+              "height": 44,
+              "fill": "#FFFFFF",
+              "cornerRadius": 100,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#1A191808",
+                "offset": {
+                  "x": 0,
+                  "y": 2
+                },
+                "blur": 8
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "2O4fY",
+                  "x": 12,
+                  "y": 12,
+                  "name": "searchIc8",
+                  "width": 20,
+                  "height": 20,
+                  "iconFontName": "compass",
+                  "iconFontFamily": "lucide",
+                  "fill": "#6D6C6A"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "fYZGj",
+          "name": "Content",
+          "clip": true,
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            16,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "rJXsL",
+              "name": "QuitSectionHead",
+              "width": "fill_container",
+              "gap": 6,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "RyVcx",
+                  "name": "sec1hIc",
+                  "content": "🚫",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "w2GMD",
+                  "name": "sec1hTxt",
+                  "fill": "#1A1918",
+                  "content": "やめる習慣",
+                  "fontFamily": "Outfit",
+                  "fontSize": 15,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "qT4in",
+              "name": "QuitGrid",
+              "width": "fill_container",
+              "gap": 12,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "IuhIu",
+                  "name": "col1",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "goTN4",
+                      "name": "Card-QuitSmoking",
+                      "clip": true,
+                      "width": "fill_container",
+                      "fill": "#FFFFFF",
+                      "cornerRadius": 14,
+                      "effect": {
+                        "type": "shadow",
+                        "shadowType": "outer",
+                        "color": "#1A191810",
+                        "offset": {
+                          "x": 0,
+                          "y": 2
+                        },
+                        "blur": 10
+                      },
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "wBvGn",
+                          "name": "hero",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "tinkerman",
+                            "link": "https://unsplash.com/@tinkerman",
+                            "author": "Immo Wegmann"
+                          },
+                          "width": "fill_container",
+                          "height": 100,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1717423035783-7b1b49cca17d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzI0NDI3ODd8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "fill"
+                          }
+                        },
+                        {
+                          "type": "frame",
+                          "id": "tS8va",
+                          "name": "body",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 6,
+                          "padding": [
+                            10,
+                            12,
+                            12,
+                            12
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "Gx06j",
+                              "name": "card1title",
+                              "fill": "#1A1918",
+                              "content": "🚭 禁煙",
+                              "fontFamily": "Outfit",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "kk8Ug",
+                              "name": "metrics",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "SJGQn",
+                                  "name": "card1m1",
+                                  "fill": "#6D6C6A",
+                                  "content": "🏥 +12分  💰 ¥1,240",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 10,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "M9J6R",
+                                  "name": "card1m2",
+                                  "fill": "#6D6C6A",
+                                  "content": "📈 ¥5,690 /日",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 10,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "RLPgx",
+                              "name": "badge",
+                              "fill": "#E8F5E9",
+                              "cornerRadius": 6,
+                              "padding": [
+                                2,
+                                6
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "EhQEF",
+                                  "name": "card1bTxt",
+                                  "fill": "#3D8A5A",
+                                  "content": "信頼度: 高",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 9,
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "8ZyDG",
+                      "name": "Card-QuitPorn",
+                      "clip": true,
+                      "width": "fill_container",
+                      "fill": "#FFFFFF",
+                      "cornerRadius": 14,
+                      "effect": {
+                        "type": "shadow",
+                        "shadowType": "outer",
+                        "color": "#1A191810",
+                        "offset": {
+                          "x": 0,
+                          "y": 2
+                        },
+                        "blur": 10
+                      },
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "6hT1u",
+                          "name": "hero",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "theshubhamdhage",
+                            "link": "https://unsplash.com/@theshubhamdhage",
+                            "author": "Shubham Dhage"
+                          },
+                          "width": "fill_container",
+                          "height": 100,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1693743062236-b888d3c68d1a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzI0NDI5NDl8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "fill"
+                          }
+                        },
+                        {
+                          "type": "frame",
+                          "id": "i4PwF",
+                          "name": "body",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 6,
+                          "padding": [
+                            10,
+                            12,
+                            12,
+                            12
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "Md31w",
+                              "name": "title",
+                              "fill": "#1A1918",
+                              "content": "🧠 ポルノ禁止",
+                              "fontFamily": "Outfit",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "vd7wy",
+                              "name": "metrics",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "TPjt7",
+                                  "name": "m3a",
+                                  "fill": "#6D6C6A",
+                                  "content": "🏥 +7分  💰 ¥410",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 10,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "egvAF",
+                                  "name": "m3b",
+                                  "fill": "#6D6C6A",
+                                  "content": "📈 ¥2,740 /日",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 10,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "MOExs",
+                              "name": "badge",
+                              "fill": "#FFF3E0",
+                              "cornerRadius": 6,
+                              "padding": [
+                                2,
+                                6
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "gLcK0",
+                                  "name": "b3t",
+                                  "fill": "#E65100",
+                                  "content": "信頼度: 中",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 9,
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "UtaRy",
+                  "name": "col2",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "SPdN8",
+                      "name": "Card-QuitAlcohol",
+                      "clip": true,
+                      "width": "fill_container",
+                      "fill": "#FFFFFF",
+                      "cornerRadius": 14,
+                      "effect": {
+                        "type": "shadow",
+                        "shadowType": "outer",
+                        "color": "#1A191810",
+                        "offset": {
+                          "x": 0,
+                          "y": 2
+                        },
+                        "blur": 10
+                      },
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "5rmQN",
+                          "name": "hero",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "alexanderkez",
+                            "link": "https://unsplash.com/@alexanderkez",
+                            "author": "ALEKO KEZEVADZE"
+                          },
+                          "width": "fill_container",
+                          "height": 100,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1735925455404-e8010ff33e5f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzI0NDI5MzJ8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "fill"
+                          }
+                        },
+                        {
+                          "type": "frame",
+                          "id": "lUgbl",
+                          "name": "body",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 6,
+                          "padding": [
+                            10,
+                            12,
+                            12,
+                            12
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "PLDja",
+                              "name": "title",
+                              "fill": "#1A1918",
+                              "content": "🍺 禁酒",
+                              "fontFamily": "Outfit",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "ziOyx",
+                              "name": "metrics",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "a3Y85",
+                                  "name": "m2a",
+                                  "fill": "#6D6C6A",
+                                  "content": "🏥 +8分  💰 ¥800",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 10,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "QCUTT",
+                                  "name": "m2b",
+                                  "fill": "#6D6C6A",
+                                  "content": "📈 ¥1,640 /日",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 10,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "qiz08",
+                              "name": "badge",
+                              "fill": "#E8F5E9",
+                              "cornerRadius": 6,
+                              "padding": [
+                                2,
+                                6
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "HwDpF",
+                                  "name": "b2t",
+                                  "fill": "#3D8A5A",
+                                  "content": "信頼度: 高",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 9,
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "40rNi",
+                      "name": "Card-NoYoutube",
+                      "clip": true,
+                      "width": "fill_container",
+                      "fill": "#FFFFFF",
+                      "cornerRadius": 14,
+                      "effect": {
+                        "type": "shadow",
+                        "shadowType": "outer",
+                        "color": "#1A191810",
+                        "offset": {
+                          "x": 0,
+                          "y": 2
+                        },
+                        "blur": 10
+                      },
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "l7Udr",
+                          "name": "hero",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "max_duz",
+                            "link": "https://unsplash.com/@max_duz",
+                            "author": "Max Duzij"
+                          },
+                          "width": "fill_container",
+                          "height": 100,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1556578330-97675be0a2b2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzI0NDI5NTF8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "fill"
+                          }
+                        },
+                        {
+                          "type": "frame",
+                          "id": "HUFij",
+                          "name": "body",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 6,
+                          "padding": [
+                            10,
+                            12,
+                            12,
+                            12
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "atlMo",
+                              "name": "title",
+                              "fill": "#1A1918",
+                              "content": "📵 YouTube禁止",
+                              "fontFamily": "Outfit",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "LimFF",
+                              "name": "metrics",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "lpzZ4",
+                                  "name": "m4a",
+                                  "fill": "#6D6C6A",
+                                  "content": "🏥 +5分  💰 ¥150",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 10,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "1t0Wh",
+                                  "name": "m4b",
+                                  "fill": "#6D6C6A",
+                                  "content": "📈 ¥4,690 /日",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 10,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "jLPt3",
+                              "name": "badge",
+                              "fill": "#FFF3E0",
+                              "cornerRadius": 6,
+                              "padding": [
+                                2,
+                                6
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "c5ivN",
+                                  "name": "b4t",
+                                  "fill": "#E65100",
+                                  "content": "信頼度: 中",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 9,
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "NnA4e",
+              "name": "BuildSectionHead",
+              "width": "fill_container",
+              "gap": 6,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "4EfWK",
+                  "name": "sec2hIc",
+                  "content": "✅",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "vsoRX",
+                  "name": "sec2hTxt",
+                  "fill": "#1A1918",
+                  "content": "続ける習慣",
+                  "fontFamily": "Outfit",
+                  "fontSize": 15,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Mkltt",
+              "name": "BuildGrid",
+              "width": "fill_container",
+              "gap": 12,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ecHCy",
+                  "name": "col1",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "7Tjmr",
+                      "name": "Card-DailyCardio",
+                      "clip": true,
+                      "width": "fill_container",
+                      "fill": "#FFFFFF",
+                      "cornerRadius": 14,
+                      "effect": {
+                        "type": "shadow",
+                        "shadowType": "outer",
+                        "color": "#1A191810",
+                        "offset": {
+                          "x": 0,
+                          "y": 2
+                        },
+                        "blur": 10
+                      },
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "d7soD",
+                          "name": "hero",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "jontyson",
+                            "link": "https://unsplash.com/@jontyson",
+                            "author": "Jon Tyson"
+                          },
+                          "width": "fill_container",
+                          "height": 100,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1577103712414-6b2279ca05ab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzI0NDI5Njl8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "fill"
+                          }
+                        },
+                        {
+                          "type": "frame",
+                          "id": "eXwXq",
+                          "name": "body",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 6,
+                          "padding": [
+                            10,
+                            12,
+                            12,
+                            12
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "EICSz",
+                              "name": "title",
+                              "fill": "#1A1918",
+                              "content": "🏃 毎日有酸素運動",
+                              "fontFamily": "Outfit",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "zlfWh",
+                              "name": "metrics",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "SmFzv",
+                                  "name": "m5a",
+                                  "fill": "#6D6C6A",
+                                  "content": "🏥 +10分  💰 ¥350",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 10,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "1TUnG",
+                                  "name": "m5b",
+                                  "fill": "#6D6C6A",
+                                  "content": "📈 ¥1,500 /日",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 10,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "mUGHT",
+                              "name": "badge",
+                              "fill": "#E8F5E9",
+                              "cornerRadius": 6,
+                              "padding": [
+                                2,
+                                6
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "8Meea",
+                                  "name": "b5t",
+                                  "fill": "#3D8A5A",
+                                  "content": "信頼度: 高",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 9,
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "4xhCt",
+                      "name": "Card-MorningPlanning",
+                      "clip": true,
+                      "width": "fill_container",
+                      "fill": "#FFFFFF",
+                      "cornerRadius": 14,
+                      "effect": {
+                        "type": "shadow",
+                        "shadowType": "outer",
+                        "color": "#1A191810",
+                        "offset": {
+                          "x": 0,
+                          "y": 2
+                        },
+                        "blur": 10
+                      },
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "XWhLX",
+                          "name": "hero",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "venczakjanos",
+                            "link": "https://unsplash.com/@venczakjanos",
+                            "author": "János Venczák"
+                          },
+                          "width": "fill_container",
+                          "height": 100,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1670045948319-3105501e85ae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzI0NDI5ODl8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "fill"
+                          }
+                        },
+                        {
+                          "type": "frame",
+                          "id": "p642A",
+                          "name": "body",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 6,
+                          "padding": [
+                            10,
+                            12,
+                            12,
+                            12
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "onMdE",
+                              "name": "title",
+                              "fill": "#1A1918",
+                              "content": "📋 朝スケジュール",
+                              "fontFamily": "Outfit",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "QnntC",
+                              "name": "metrics",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "NuLQn",
+                                  "name": "m7a",
+                                  "fill": "#6D6C6A",
+                                  "content": "🏥 +5分  💰 ¥300",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 10,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "juu3r",
+                                  "name": "m7b",
+                                  "fill": "#6D6C6A",
+                                  "content": "📈 ¥1,720 /日",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 10,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "YYBmn",
+                              "name": "badge",
+                              "fill": "#FFF3E0",
+                              "cornerRadius": 6,
+                              "padding": [
+                                2,
+                                6
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "cajHj",
+                                  "name": "b7t",
+                                  "fill": "#E65100",
+                                  "content": "信頼度: 中",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 9,
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "MMzQS",
+                  "name": "col2",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "pqdXU",
+                      "name": "Card-DailyStrength",
+                      "clip": true,
+                      "width": "fill_container",
+                      "fill": "#FFFFFF",
+                      "cornerRadius": 14,
+                      "effect": {
+                        "type": "shadow",
+                        "shadowType": "outer",
+                        "color": "#1A191810",
+                        "offset": {
+                          "x": 0,
+                          "y": 2
+                        },
+                        "blur": 10
+                      },
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "Wnqb4",
+                          "name": "hero",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "vdphotography",
+                            "link": "https://unsplash.com/@vdphotography",
+                            "author": "VD Photography"
+                          },
+                          "width": "fill_container",
+                          "height": 100,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1638536534782-6c7cf0802d1b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzI0NDI5ODh8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "fill"
+                          }
+                        },
+                        {
+                          "type": "frame",
+                          "id": "QrX0p",
+                          "name": "body",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 6,
+                          "padding": [
+                            10,
+                            12,
+                            12,
+                            12
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "9EnTE",
+                              "name": "title",
+                              "fill": "#1A1918",
+                              "content": "💪 毎日筋トレ",
+                              "fontFamily": "Outfit",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "O4FGa",
+                              "name": "metrics",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "sxLz3",
+                                  "name": "m6a",
+                                  "fill": "#6D6C6A",
+                                  "content": "🏥 +8分  💰 ¥200",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 10,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "3Gc4x",
+                                  "name": "m6b",
+                                  "fill": "#6D6C6A",
+                                  "content": "📈 ¥960 /日",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 10,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "SUS8R",
+                              "name": "badge",
+                              "fill": "#E8F5E9",
+                              "cornerRadius": 6,
+                              "padding": [
+                                2,
+                                6
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "mOdfT",
+                                  "name": "b6t",
+                                  "fill": "#3D8A5A",
+                                  "content": "信頼度: 高",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 9,
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "AWUgn",
+          "name": "spacer",
+          "width": "fill_container",
+          "height": 0
+        },
+        {
+          "type": "frame",
+          "id": "wKTOQ",
+          "name": "Tab Bar",
+          "width": "fill_container",
+          "height": 84,
+          "fill": "#FFFFFF",
+          "effect": {
+            "type": "shadow",
+            "shadowType": "outer",
+            "color": "#1A191808",
+            "offset": {
+              "x": 0,
+              "y": -1
+            },
+            "blur": 8
+          },
+          "padding": [
+            12,
+            0,
+            34,
+            0
+          ],
+          "justifyContent": "space_around",
+          "children": [
+            {
+              "type": "frame",
+              "id": "juLgC",
+              "name": "tabHome",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 4,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "OuChK",
+                  "name": "tabIc8a",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "home",
+                  "iconFontFamily": "Material Symbols Rounded",
+                  "fill": "#A8A7A5"
+                },
+                {
+                  "type": "text",
+                  "id": "JvoXD",
+                  "name": "tabLbl8a",
+                  "fill": "#A8A7A5",
+                  "content": "Home",
+                  "fontFamily": "Outfit",
+                  "fontSize": 10,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "F2W1Q",
+              "name": "tabDiscover",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 4,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "l5Hfm",
+                  "name": "tabIc8b",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "compass",
+                  "iconFontFamily": "lucide",
+                  "fill": "#3D8A5A"
+                },
+                {
+                  "type": "text",
+                  "id": "SMRGV",
+                  "name": "tabLbl8b",
+                  "fill": "#3D8A5A",
+                  "content": "Discover",
+                  "fontFamily": "Outfit",
+                  "fontSize": 10,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "r2f9o",
+              "name": "tabStats",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 4,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "bJQ5a",
+                  "name": "tabIc8c",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "bar_chart",
+                  "iconFontFamily": "Material Symbols Rounded",
+                  "fill": "#A8A7A5"
+                },
+                {
+                  "type": "text",
+                  "id": "B60TO",
+                  "name": "tabLbl8c",
+                  "fill": "#A8A7A5",
+                  "content": "Stats",
+                  "fontFamily": "Outfit",
+                  "fontSize": 10,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "sxxmW",
+              "name": "tabSettings",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 4,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "MoVEZ",
+                  "name": "tabIc8d",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "settings",
+                  "iconFontFamily": "Material Symbols Rounded",
+                  "fill": "#A8A7A5"
+                },
+                {
+                  "type": "text",
+                  "id": "3H0oW",
+                  "name": "tabLbl8d",
+                  "fill": "#A8A7A5",
+                  "content": "Settings",
+                  "fontFamily": "Outfit",
+                  "fontSize": 10,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "7u141",
+      "x": 502,
+      "y": 1112,
+      "name": "9. Evidence Detail Sheet",
+      "clip": true,
+      "width": 402,
+      "height": 870,
+      "fill": "#FFFFFF",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "EN5rW",
+          "name": "Header",
+          "width": "fill_container",
+          "height": 56,
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "bottom": 1
+            },
+            "fill": "#E5E4E1"
+          },
+          "padding": [
+            0,
+            20
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "rVzwn",
+              "name": "header9title",
+              "fill": "#3D8A5A",
+              "content": "禁煙",
+              "fontFamily": "Outfit",
+              "fontSize": 16,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "jlXj5",
+              "name": "closeBtn",
+              "width": 32,
+              "height": 32,
+              "fill": "#F5F4F1",
+              "cornerRadius": 100,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "gIwD7",
+                  "x": 8,
+                  "y": 8,
+                  "name": "header9x",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "x",
+                  "iconFontFamily": "lucide",
+                  "fill": "#6D6C6A"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "rpWcd",
+          "name": "Content",
+          "clip": true,
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 20,
+          "padding": [
+            20,
+            24
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "SM0eA",
+              "name": "TitleSection",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "P6Zui",
+                  "name": "articleTitle9",
+                  "fill": "#1A1918",
+                  "content": "人生インパクト",
+                  "fontFamily": "Outfit",
+                  "fontSize": 22,
+                  "fontWeight": "700"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "JpGkQ",
+              "name": "MetricsBanner",
+              "width": "fill_container",
+              "fill": "#FFF8F0",
+              "cornerRadius": 12,
+              "padding": [
+                14,
+                16
+              ],
+              "justifyContent": "space_around",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "zV6Mo",
+                  "name": "health",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "AF49A",
+                      "name": "metric9aLabel",
+                      "fill": "#A8A7A5",
+                      "content": "🏥 健康寿命",
+                      "fontFamily": "Outfit",
+                      "fontSize": 10,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "5Q1Dw",
+                      "name": "metric9aValue",
+                      "fill": "#B8860B",
+                      "content": "+12分/日",
+                      "fontFamily": "Outfit",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "CU0Qz",
+                  "name": "cost",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "uyru4",
+                      "name": "metric9bLabel",
+                      "fill": "#A8A7A5",
+                      "content": "💰 コスト削減",
+                      "fontFamily": "Outfit",
+                      "fontSize": 10,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "dHOFo",
+                      "name": "metric9bValue",
+                      "fill": "#B8860B",
+                      "content": "¥1,240/日",
+                      "fontFamily": "Outfit",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "NYzjw",
+                  "name": "income",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "DbHz0",
+                      "name": "metric9cLabel",
+                      "fill": "#A8A7A5",
+                      "content": "📈 収入増加",
+                      "fontFamily": "Outfit",
+                      "fontSize": 10,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "U7p2o",
+                      "name": "metric9cValue",
+                      "fill": "#B8860B",
+                      "content": "¥5,690/日",
+                      "fontFamily": "Outfit",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Tl0MF",
+              "name": "ConfidenceBadge",
+              "gap": 6,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "UzVsZ",
+                  "name": "confIc9",
+                  "width": 14,
+                  "height": 14,
+                  "iconFontName": "shield-check",
+                  "iconFontFamily": "lucide",
+                  "fill": "#3D8A5A"
+                },
+                {
+                  "type": "text",
+                  "id": "QwZn0",
+                  "name": "confTxt9",
+                  "fill": "#3D8A5A",
+                  "content": "信頼度: 高",
+                  "fontFamily": "Outfit",
+                  "fontSize": 12,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "3tLVp",
+              "name": "ArticleBody",
+              "fill": "#4A4946",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "タバコを1日やめるだけで、あなたの人生に新しい時間が生まれる。\n\n英国医師5万人を50年追跡した大規模研究（Doll & Peto, 2004）によると、30歳で禁煙した人は非喫煙者とほぼ同等の寿命を取り戻し、約10年の延命効果がある。\n\nあなたは42歳の日本人男性です。この研究は...",
+              "lineHeight": 1.6,
+              "fontFamily": "Outfit",
+              "fontSize": 13
+            },
+            {
+              "type": "frame",
+              "id": "AibwT",
+              "name": "Sources",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "6Jkmp",
+                  "name": "sourcesTitle9",
+                  "fill": "#1A1918",
+                  "content": "出典",
+                  "fontFamily": "Outfit",
+                  "fontSize": 14,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "7Oj8A",
+                  "name": "source1",
+                  "fill": "#6D6C6A",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "1. Doll R, Peto R, et al. (2004). BMJ, 328(7455).",
+                  "lineHeight": 1.4,
+                  "fontFamily": "Outfit",
+                  "fontSize": 11
+                },
+                {
+                  "type": "text",
+                  "id": "O7Mi8",
+                  "name": "source2",
+                  "fill": "#6D6C6A",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "2. 厚生労働省 (2023). 国民医療費の概況.",
+                  "lineHeight": 1.4,
+                  "fontFamily": "Outfit",
+                  "fontSize": 11
+                },
+                {
+                  "type": "text",
+                  "id": "KlhHE",
+                  "name": "source3",
+                  "fill": "#6D6C6A",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "3. Halpern MT, et al. (2001). Tobacco Control, 10(3).",
+                  "lineHeight": 1.4,
+                  "fontFamily": "Outfit",
+                  "fontSize": 11
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "qApKK",
+          "name": "CTABar",
+          "width": "fill_container",
+          "fill": "#FFFFFF",
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "top": 1
+            },
+            "fill": "#E5E4E1"
+          },
+          "effect": {
+            "type": "shadow",
+            "shadowType": "outer",
+            "color": "#1A191808",
+            "offset": {
+              "x": 0,
+              "y": -2
+            },
+            "blur": 8
+          },
+          "layout": "vertical",
+          "padding": [
+            16,
+            24,
+            34,
+            24
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "XmkL6",
+              "name": "AddHabitBtn",
+              "width": "fill_container",
+              "height": 52,
+              "fill": "#3D8A5A",
+              "cornerRadius": 14,
+              "gap": 8,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "z6JDt",
+                  "name": "ctaIc9",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "add_circle",
+                  "iconFontFamily": "Material Symbols Rounded",
+                  "fill": "#FFFFFF"
+                },
+                {
+                  "type": "text",
+                  "id": "hkLZ1",
+                  "name": "ctaTxt9",
+                  "fill": "#FFFFFF",
+                  "content": "この習慣を追加",
+                  "fontFamily": "Outfit",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "nEJVr",
+      "x": 1004,
+      "y": 1112,
+      "name": "10. Create Habit from Evidence",
+      "clip": true,
+      "width": 402,
+      "height": 870,
+      "fill": "#F5F4F1",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "Mnfpf",
+          "name": "Header",
+          "width": "fill_container",
+          "height": 56,
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "bottom": 1
+            },
+            "fill": "#E5E4E1"
+          },
+          "padding": [
+            0,
+            20
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "u3r6A",
+              "name": "header10title",
+              "fill": "#1A1918",
+              "content": "新しい習慣",
+              "fontFamily": "Outfit",
+              "fontSize": 18,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "lHx1o",
+              "name": "closeBtn",
+              "width": 32,
+              "height": 32,
+              "fill": "#FFFFFF",
+              "cornerRadius": 100,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "VPvIf",
+                  "x": 8,
+                  "y": 8,
+                  "name": "header10x",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "x",
+                  "iconFontFamily": "lucide",
+                  "fill": "#6D6C6A"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "iXV2N",
+          "name": "FormContent",
+          "clip": true,
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 20,
+          "padding": [
+            20,
+            24
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "boyyN",
+              "name": "AttachedEvidence",
+              "width": "fill_container",
+              "fill": "#FFF8F0",
+              "cornerRadius": 12,
+              "gap": 10,
+              "padding": [
+                12,
+                14
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "21Wzd",
+                  "name": "evIc10",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "file-text",
+                  "iconFontFamily": "lucide",
+                  "fill": "#B8860B"
+                },
+                {
+                  "type": "frame",
+                  "id": "9uAnJ",
+                  "name": "evInfo",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "WjZok",
+                      "name": "evTitle10",
+                      "fill": "#B8860B",
+                      "content": "エビデンス: 禁煙",
+                      "fontFamily": "Outfit",
+                      "fontSize": 13,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "d48uD",
+                      "name": "evMetrics10",
+                      "fill": "#B8860B",
+                      "content": "+12分 · ¥1,240 · ¥5,690 /日",
+                      "fontFamily": "Outfit",
+                      "fontSize": 11
+                    }
+                  ]
+                },
+                {
+                  "type": "icon_font",
+                  "id": "LbHx7",
+                  "name": "evCheck10",
+                  "width": 18,
+                  "height": 18,
+                  "iconFontName": "circle-check-big",
+                  "iconFontFamily": "lucide",
+                  "fill": "#3D8A5A"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "7VOFE",
+              "name": "NameField",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "Cn5FR",
+                  "name": "nameLabel10",
+                  "fill": "#6D6C6A",
+                  "content": "習慣名",
+                  "fontFamily": "Outfit",
+                  "fontSize": 12,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "frame",
+                  "id": "5atSj",
+                  "name": "input",
+                  "width": "fill_container",
+                  "height": 48,
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 12,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "#D1D0CD"
+                  },
+                  "padding": [
+                    0,
+                    14
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "omkEU",
+                      "name": "nameValue10",
+                      "fill": "#1A1918",
+                      "content": "禁煙",
+                      "fontFamily": "Outfit",
+                      "fontSize": 15
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "cLbes",
+              "name": "TypeField",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "5sCJA",
+                  "name": "typeLabel10",
+                  "fill": "#6D6C6A",
+                  "content": "習慣タイプ",
+                  "fontFamily": "Outfit",
+                  "fontSize": 12,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "frame",
+                  "id": "9ww93",
+                  "name": "typeOptions",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "qo9o0",
+                      "name": "quitOpt",
+                      "width": "fill_container",
+                      "height": 44,
+                      "fill": "#3D8A5A",
+                      "cornerRadius": 12,
+                      "gap": 6,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "8dPjH",
+                          "name": "typeOpt1Txt",
+                          "fill": "#FFFFFF",
+                          "content": "やめる習慣",
+                          "fontFamily": "Outfit",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "GaCsA",
+                      "name": "buildOpt",
+                      "width": "fill_container",
+                      "height": 44,
+                      "fill": "#FFFFFF",
+                      "cornerRadius": 12,
+                      "stroke": {
+                        "align": "inside",
+                        "thickness": 1,
+                        "fill": "#D1D0CD"
+                      },
+                      "gap": 6,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "YlFfG",
+                          "name": "typeOpt2Txt",
+                          "fill": "#6D6C6A",
+                          "content": "続ける習慣",
+                          "fontFamily": "Outfit",
+                          "fontSize": 13,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "vV76O",
+              "name": "IconField",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "7nI7i",
+                  "name": "iconLabel10",
+                  "fill": "#6D6C6A",
+                  "content": "アイコン",
+                  "fontFamily": "Outfit",
+                  "fontSize": 12,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "frame",
+                  "id": "FEur0",
+                  "name": "iconOptions",
+                  "width": "fill_container",
+                  "gap": 8,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "M9Ld0",
+                      "name": "ic1",
+                      "width": 44,
+                      "height": 44,
+                      "fill": "#3D8A5A",
+                      "cornerRadius": 12,
+                      "layout": "vertical",
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "ekuwj",
+                          "name": "ic1txt",
+                          "content": "🚭",
+                          "fontFamily": "Inter",
+                          "fontSize": 22,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "9hWN6",
+                      "name": "ic2",
+                      "width": 44,
+                      "height": 44,
+                      "fill": "#FFFFFF",
+                      "cornerRadius": 12,
+                      "stroke": {
+                        "align": "inside",
+                        "thickness": 1,
+                        "fill": "#E5E4E1"
+                      },
+                      "layout": "vertical",
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "3oVxJ",
+                          "name": "ic2txt",
+                          "content": "🚬",
+                          "fontFamily": "Inter",
+                          "fontSize": 22,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "bQmOb",
+                      "name": "ic3",
+                      "width": 44,
+                      "height": 44,
+                      "fill": "#FFFFFF",
+                      "cornerRadius": 12,
+                      "stroke": {
+                        "align": "inside",
+                        "thickness": 1,
+                        "fill": "#E5E4E1"
+                      },
+                      "layout": "vertical",
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "06nC0",
+                          "name": "ic3txt",
+                          "content": "💪",
+                          "fontFamily": "Inter",
+                          "fontSize": 22,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "MdEN8",
+                      "name": "ic4",
+                      "width": 44,
+                      "height": 44,
+                      "fill": "#FFFFFF",
+                      "cornerRadius": 12,
+                      "stroke": {
+                        "align": "inside",
+                        "thickness": 1,
+                        "fill": "#E5E4E1"
+                      },
+                      "layout": "vertical",
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "3m8Bn",
+                          "name": "ic4txt",
+                          "content": "🏃",
+                          "fontFamily": "Inter",
+                          "fontSize": 22,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "YJMA2",
+                      "name": "ic5",
+                      "width": 44,
+                      "height": 44,
+                      "fill": "#FFFFFF",
+                      "cornerRadius": 12,
+                      "stroke": {
+                        "align": "inside",
+                        "thickness": 1,
+                        "fill": "#E5E4E1"
+                      },
+                      "layout": "vertical",
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "AJ2e6",
+                          "name": "ic5txt",
+                          "content": "📚",
+                          "fontFamily": "Inter",
+                          "fontSize": 22,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Cx8gi",
+              "name": "FreqField",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "W7Crc",
+                  "name": "freqLabel10",
+                  "fill": "#6D6C6A",
+                  "content": "頻度",
+                  "fontFamily": "Outfit",
+                  "fontSize": 12,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "frame",
+                  "id": "Ez9d2",
+                  "name": "freqOptions",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "Pnlt8",
+                      "name": "dailyOpt",
+                      "width": "fill_container",
+                      "height": 44,
+                      "fill": "#3D8A5A",
+                      "cornerRadius": 12,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "DkeNY",
+                          "name": "freqOpt1Txt",
+                          "fill": "#FFFFFF",
+                          "content": "毎日",
+                          "fontFamily": "Outfit",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "RO7yI",
+                      "name": "weeklyOpt",
+                      "width": "fill_container",
+                      "height": 44,
+                      "fill": "#FFFFFF",
+                      "cornerRadius": 12,
+                      "stroke": {
+                        "align": "inside",
+                        "thickness": 1,
+                        "fill": "#D1D0CD"
+                      },
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "XmY3p",
+                          "name": "freqOpt2Txt",
+                          "fill": "#6D6C6A",
+                          "content": "週1",
+                          "fontFamily": "Outfit",
+                          "fontSize": 13,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "OQxoq",
+                      "name": "customOpt",
+                      "width": "fill_container",
+                      "height": 44,
+                      "fill": "#FFFFFF",
+                      "cornerRadius": 12,
+                      "stroke": {
+                        "align": "inside",
+                        "thickness": 1,
+                        "fill": "#D1D0CD"
+                      },
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "LYwyg",
+                          "name": "freqOpt3Txt",
+                          "fill": "#6D6C6A",
+                          "content": "カスタム",
+                          "fontFamily": "Outfit",
+                          "fontSize": 13,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "VAXE4",
+          "name": "CreateBar",
+          "width": "fill_container",
+          "fill": "#F5F4F1",
+          "layout": "vertical",
+          "padding": [
+            16,
+            24,
+            34,
+            24
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "SOqwv",
+              "name": "CreateBtn",
+              "width": "fill_container",
+              "height": 52,
+              "fill": "#3D8A5A",
+              "cornerRadius": 14,
+              "gap": 8,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "ak6fG",
+                  "name": "createIc10",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "check_circle",
+                  "iconFontFamily": "Material Symbols Rounded",
+                  "fill": "#FFFFFF"
+                },
+                {
+                  "type": "text",
+                  "id": "OfNPm",
+                  "name": "createTxt10",
+                  "fill": "#FFFFFF",
+                  "content": "習慣を作成",
+                  "fontFamily": "Outfit",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "9Bdjl",
+      "x": 1506,
+      "y": 1112,
+      "name": "11. Evidence Manager",
+      "clip": true,
+      "width": 402,
+      "height": 870,
+      "fill": "#F5F4F1",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "rJw6b",
+          "name": "Header",
+          "width": "fill_container",
+          "height": 56,
+          "fill": "#FFFFFF",
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "bottom": 1
+            },
+            "fill": "#E5E4E1"
+          },
+          "padding": [
+            0,
+            20
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "Jffe9",
+              "name": "header11title",
+              "fill": "#1A1918",
+              "content": "禁煙",
+              "fontFamily": "Outfit",
+              "fontSize": 18,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "Bb4H7",
+              "name": "closeBtn",
+              "width": 32,
+              "height": 32,
+              "fill": "#F5F4F1",
+              "cornerRadius": 100,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "H8uWh",
+                  "x": 8,
+                  "y": 8,
+                  "name": "header11x",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "x",
+                  "iconFontFamily": "lucide",
+                  "fill": "#6D6C6A"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "VjoC5",
+          "name": "Content",
+          "clip": true,
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 20,
+          "padding": [
+            20,
+            24
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "SG3a9",
+              "name": "EvidenceSection",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 12,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Ip2MS",
+                  "name": "sectionHead",
+                  "width": "fill_container",
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "WbJAM",
+                      "name": "evSectionTitle11",
+                      "fill": "#1A1918",
+                      "content": "エビデンス",
+                      "fontFamily": "Outfit",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "iMcFg",
+                  "name": "EvidenceCards",
+                  "clip": true,
+                  "width": "fill_container",
+                  "fill": "#FFFFFF",
+                  "cornerRadius": 12,
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#1A191808",
+                    "offset": {
+                      "x": 0,
+                      "y": 2
+                    },
+                    "blur": 8
+                  },
+                  "layout": "vertical",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "yYiRB",
+                      "name": "Evidence1",
+                      "width": "fill_container",
+                      "stroke": {
+                        "align": "inside",
+                        "thickness": {
+                          "bottom": 1
+                        },
+                        "fill": "#E5E4E1"
+                      },
+                      "layout": "vertical",
+                      "gap": 10,
+                      "padding": [
+                        14,
+                        16
+                      ],
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "C5Lnl",
+                          "name": "topRow",
+                          "width": "fill_container",
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "EHuYf",
+                              "name": "info",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon_font",
+                                  "id": "qNC6E",
+                                  "name": "ev1ic",
+                                  "width": 16,
+                                  "height": 16,
+                                  "iconFontName": "file-text",
+                                  "iconFontFamily": "lucide",
+                                  "fill": "#B8860B"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "26LXs",
+                                  "name": "ev1name",
+                                  "fill": "#1A1918",
+                                  "content": "禁煙",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 14,
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "icon_font",
+                              "id": "3PSj8",
+                              "name": "ev1del",
+                              "width": 16,
+                              "height": 16,
+                              "iconFontName": "trash-2",
+                              "iconFontFamily": "lucide",
+                              "fill": "#A8A7A5"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "UmT2P",
+                          "name": "ev1metrics",
+                          "fill": "#6D6C6A",
+                          "content": "🏥 +12分  💰 ¥1,240  📈 ¥5,690 /日",
+                          "fontFamily": "Outfit",
+                          "fontSize": 11
+                        },
+                        {
+                          "type": "frame",
+                          "id": "nSBCN",
+                          "name": "weightRow",
+                          "width": "fill_container",
+                          "gap": 10,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "2UOBo",
+                              "name": "ev1wLbl",
+                              "fill": "#A8A7A5",
+                              "content": "適用率",
+                              "fontFamily": "Outfit",
+                              "fontSize": 11,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "LtqjO",
+                              "name": "slider",
+                              "width": "fill_container",
+                              "height": 6,
+                              "fill": "#E5E4E1",
+                              "cornerRadius": 3,
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "lmCPw",
+                                  "name": "fill",
+                                  "width": "fill_container",
+                                  "height": 6,
+                                  "fill": "#3D8A5A",
+                                  "cornerRadius": 3
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "n0FdZ",
+                              "name": "ev1wVal",
+                              "fill": "#1A1918",
+                              "content": "100%",
+                              "fontFamily": "Outfit",
+                              "fontSize": 13,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "aUvuS",
+                      "name": "Evidence2",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 10,
+                      "padding": [
+                        14,
+                        16
+                      ],
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "W3j2c",
+                          "name": "topRow",
+                          "width": "fill_container",
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "dCa1V",
+                              "name": "info",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon_font",
+                                  "id": "i9fij",
+                                  "name": "ev2ic",
+                                  "width": 16,
+                                  "height": 16,
+                                  "iconFontName": "file-text",
+                                  "iconFontFamily": "lucide",
+                                  "fill": "#B8860B"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "9jCLQ",
+                                  "name": "ev2name",
+                                  "fill": "#1A1918",
+                                  "content": "ポルノ禁止",
+                                  "fontFamily": "Outfit",
+                                  "fontSize": 14,
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "icon_font",
+                              "id": "1zvCU",
+                              "name": "ev2del",
+                              "width": 16,
+                              "height": 16,
+                              "iconFontName": "trash-2",
+                              "iconFontFamily": "lucide",
+                              "fill": "#A8A7A5"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "HmGVS",
+                          "name": "ev2metrics",
+                          "fill": "#6D6C6A",
+                          "content": "🏥 +7分  💰 ¥410  📈 ¥2,740 /日",
+                          "fontFamily": "Outfit",
+                          "fontSize": 11
+                        },
+                        {
+                          "type": "frame",
+                          "id": "OILga",
+                          "name": "weightRow",
+                          "width": "fill_container",
+                          "gap": 10,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "0gbaz",
+                              "name": "ev2wLbl",
+                              "fill": "#A8A7A5",
+                              "content": "適用率",
+                              "fontFamily": "Outfit",
+                              "fontSize": 11,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "ljSl1",
+                              "name": "slider",
+                              "width": "fill_container",
+                              "height": 6,
+                              "fill": "#E5E4E1",
+                              "cornerRadius": 3,
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "erNTB",
+                                  "name": "fill",
+                                  "width": "fill_container",
+                                  "height": 6,
+                                  "fill": "#3D8A5A",
+                                  "cornerRadius": 3
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "KWkXU",
+                              "name": "ev2wVal",
+                              "fill": "#1A1918",
+                              "content": "100%",
+                              "fontFamily": "Outfit",
+                              "fontSize": 13,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "V6guC",
+                  "name": "AddEvidenceBtn",
+                  "width": "fill_container",
+                  "height": 48,
+                  "cornerRadius": 12,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1.5,
+                    "fill": "#D1D0CD"
+                  },
+                  "gap": 8,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "C84nt",
+                      "name": "addEvIc11",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "add_circle",
+                      "iconFontFamily": "Material Symbols Rounded",
+                      "fill": "#3D8A5A"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Zqxlj",
+                      "name": "addEvTxt11",
+                      "fill": "#3D8A5A",
+                      "content": "エビデンスを追加",
+                      "fontFamily": "Outfit",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "xgPvc",
+              "name": "TotalImpact",
+              "width": "fill_container",
+              "fill": "#FFF8F0",
+              "cornerRadius": 12,
+              "padding": [
+                14,
+                16
+              ],
+              "justifyContent": "space_around",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "sX0Fj",
+                  "name": "health",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "3hX5V",
+                      "name": "total11aLbl",
+                      "fill": "#A8A7A5",
+                      "content": "合計 健康寿命",
+                      "fontFamily": "Outfit",
+                      "fontSize": 10,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "9RAMx",
+                      "name": "total11aVal",
+                      "fill": "#B8860B",
+                      "content": "+19分/日",
+                      "fontFamily": "Outfit",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "aU8lr",
+                  "name": "cost",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "V6eTo",
+                      "name": "total11bLbl",
+                      "fill": "#A8A7A5",
+                      "content": "合計 コスト",
+                      "fontFamily": "Outfit",
+                      "fontSize": 10,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "KfEos",
+                      "name": "total11bVal",
+                      "fill": "#B8860B",
+                      "content": "¥1,650/日",
+                      "fontFamily": "Outfit",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "h9Dje",
+                  "name": "income",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "YRXLN",
+                      "name": "total11cLbl",
+                      "fill": "#A8A7A5",
+                      "content": "合計 収入",
+                      "fontFamily": "Outfit",
+                      "fontSize": 10,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "97Bwo",
+                      "name": "total11cVal",
+                      "fill": "#B8860B",
+                      "content": "¥8,430/日",
+                      "fontFamily": "Outfit",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "uayZz",
+              "name": "divider",
+              "width": "fill_container",
+              "height": 1,
+              "fill": "#E5E4E1"
+            },
+            {
+              "type": "frame",
+              "id": "3FmOq",
+              "name": "NoteSection",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "jEsAO",
+                  "name": "noteTitle11",
+                  "fill": "#1A1918",
+                  "content": "適用率について",
+                  "fontFamily": "Outfit",
+                  "fontSize": 14,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "vyzKT",
+                  "name": "noteBody11",
+                  "fill": "#6D6C6A",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "エビデンスの適用率を変更すると、そのエビデンスのインパクト値に掛け算されます。例えば「禁煙」のエビデンスを50%に設定すると、タバコの量を半分にする目標に対応できます。",
+                  "lineHeight": 1.6,
+                  "fontFamily": "Outfit",
+                  "fontSize": 12
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 }
