@@ -41,7 +41,7 @@ function makeCompletionTyped(
 function makeHabit(overrides: Partial<Habit> & { id: string }): Habit {
   return {
     name: 'Test Habit',
-    icon: '✓',
+    icon: 'target',
     color: '#000000',
     frequency: 'everyday',
     type: 'positive',

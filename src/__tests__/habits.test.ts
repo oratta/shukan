@@ -37,7 +37,7 @@ function makeCompletionTyped(habitId: string, date: string, status: HabitComplet
 function makeHabit(overrides: Partial<Habit> & { id: string }): Habit {
   return {
     name: 'Test Habit',
-    icon: '✓',
+    icon: 'target',
     color: '#000000',
     frequency: 'everyday',
     type: 'positive',
@@ -311,7 +311,7 @@ describe('getHabitsWithStats - multi-evidence', () => {
     calculationParams: { dailyHealthMinutes: 30, dailyCostSaving: 500, dailyIncomeGain: 100 },
     confidenceLevel: 'high',
     defaultHabitType: 'quit',
-    defaultIcon: '🚭',
+    defaultIcon: 'cigarette-off',
   };
 
   const getArticle = (id: string) => id === 'quit_smoking' ? mockArticle : undefined;

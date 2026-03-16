@@ -33,7 +33,7 @@ const mockArticleQuitSmoking: LifeImpactArticle = {
   },
   confidenceLevel: 'high',
   defaultHabitType: 'quit',
-  defaultIcon: '🚭',
+  defaultIcon: 'cigarette-off',
 };
 
 const mockArticleDailyCardio: LifeImpactArticle = {
@@ -56,7 +56,7 @@ const mockArticleDailyCardio: LifeImpactArticle = {
   },
   confidenceLevel: 'high',
   defaultHabitType: 'positive',
-  defaultIcon: '🏃',
+  defaultIcon: 'person-standing',
 };
 
 function mockGetArticle(id: string): LifeImpactArticle | undefined {

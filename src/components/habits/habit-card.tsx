@@ -55,26 +55,29 @@ function DayStatusDot({
   );
 }
 
-const CELEBRATION_PARTICLES = ['🎉', '✨', '🎊', '⭐', '💫', '🌟'];
+const CELEBRATION_COLORS = ['#3D8A5A', '#5BAF7A', '#A8D5BA', '#D4AF37', '#E8C97A', '#7AB89B'];
 
 function CelebrationEffect() {
   return (
     <div className="pointer-events-none absolute inset-0 z-10">
-      {CELEBRATION_PARTICLES.map((emoji, i) => {
-        const angle = (i / CELEBRATION_PARTICLES.length) * 360;
+      {CELEBRATION_COLORS.map((color, i) => {
+        const angle = (i / CELEBRATION_COLORS.length) * 360;
         const rad = (angle * Math.PI) / 180;
         const tx = Math.cos(rad) * 28;
         const ty = Math.sin(rad) * 28;
         return (
           <span
             key={i}
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-sm animate-[celebration_600ms_ease-out_forwards]"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 animate-[celebration_600ms_ease-out_forwards]"
             style={{
               '--tx': `${tx}px`,
               '--ty': `${ty}px`,
             } as React.CSSProperties}
           >
-            {emoji}
+            <span
+              className="block size-2 rounded-full"
+              style={{ backgroundColor: color }}
+            />
           </span>
         );
       })}

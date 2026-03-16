@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { HeartPulse, Wallet, TrendingUp } from 'lucide-react';
+import { HeartPulse, Wallet, TrendingUp, PartyPopper } from 'lucide-react';
 import { calculateDailyImpact, formatHealthMinutes, formatCurrency } from '@/lib/impact';
 import { getArticle } from '@/data/impact-articles';
 import { cn } from '@/lib/utils';
@@ -66,7 +66,7 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
         'text-xs font-semibold',
         isPerfect ? 'text-green-700 dark:text-green-400' : 'text-muted-foreground'
       )}>
-        {isPerfect ? `🎉 ${t('perfect')}` : t('todayImpact')}
+        {isPerfect ? <><PartyPopper className="mr-1 inline size-3.5" />{t('perfect')}</> : t('todayImpact')}
       </p>
 
       <div className="mt-2 flex flex-wrap items-end gap-x-5 gap-y-1.5">

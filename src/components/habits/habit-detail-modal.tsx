@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { Rocket, X, Pencil, ChevronRight, ChevronLeft, Settings } from 'lucide-react';
+import { Rocket, X, Pencil, ChevronRight, ChevronLeft, Settings, Crown } from 'lucide-react';
 import { HabitIcon } from '@/components/ui/habit-icon';
 import {
   Dialog,
@@ -261,7 +261,7 @@ export function HabitDetailModal({
         <div className="flex gap-3 px-5">
           <div className="flex-1 rounded-xl bg-[#C8F0D8] p-4 dark:bg-green-900/30">
             <div className="flex items-baseline gap-1">
-              {habit.currentStreak >= 30 && <span>👑</span>}
+              {habit.currentStreak >= 30 && <Crown className="size-5 text-amber-500" />}
               <span className="text-3xl font-bold text-green-800 dark:text-green-300">
                 {habit.currentStreak}
               </span>
@@ -278,7 +278,7 @@ export function HabitDetailModal({
           </div>
           <div className="flex-1 rounded-xl bg-[#EDECEA] p-4 dark:bg-neutral-800">
             <div className="flex items-baseline gap-1">
-              {habit.longestStreak >= 30 && <span>👑</span>}
+              {habit.longestStreak >= 30 && <Crown className="size-5 text-amber-500" />}
               <span className="text-3xl font-bold text-neutral-800 dark:text-neutral-200">
                 {habit.longestStreak}
               </span>
