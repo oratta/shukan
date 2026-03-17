@@ -15,26 +15,40 @@ interface DailyImpactSummaryProps {
 export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
   const t = useTranslations('impact');
 
-  const { earned, total, isPerfect, hasImpact } = useMemo(() => {
+  const { earned, total, isPerfect, hasImpact, fiveDays } = useMemo(() => {
     let totalHealth = 0;
     let totalCost = 0;
     let totalIncome = 0;
     let earnedHealth = 0;
     let earnedCost = 0;
     let earnedIncome = 0;
+    let fiveDaysHealth = 0;
+    let fiveDaysCost = 0;
+    let fiveDaysIncome = 0;
 
     for (const habit of habits) {
-      if (habit.skippedToday) continue;
       if (habit.evidences.length === 0) continue;
       const daily = calculateDailyImpact(habit.evidences, getArticle);
-      totalHealth += daily.healthMinutes;
-      totalCost += daily.costSaving;
-      totalIncome += daily.incomeGain;
-      if (habit.completedToday) {
-        earnedHealth += daily.healthMinutes;
-        earnedCost += daily.costSaving;
-        earnedIncome += daily.incomeGain;
+
+      // Today's impact (skip excluded)
+      if (!habit.skippedToday) {
+        totalHealth += daily.healthMinutes;
+        totalCost += daily.costSaving;
+        totalIncome += daily.incomeGain;
+        if (habit.completedToday) {
+          earnedHealth += daily.healthMinutes;
+          earnedCost += daily.costSaving;
+          earnedIncome += daily.incomeGain;
+        }
       }
+
+      // 5 Days impact: count completed/rocket_used days across all recentDays
+      const completedDays = (habit.recentDays ?? []).filter(
+        (d) => d.status === 'completed' || d.status === 'rocket_used'
+      ).length;
+      fiveDaysHealth += daily.healthMinutes * completedDays;
+      fiveDaysCost += daily.costSaving * completedDays;
+      fiveDaysIncome += daily.incomeGain * completedDays;
     }
 
     const hasImpactValue = totalHealth > 0 || totalCost > 0 || totalIncome > 0;
@@ -48,6 +62,7 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
       total: { healthMinutes: totalHealth, costSaving: totalCost, incomeGain: totalIncome },
       isPerfect: isPerfectValue,
       hasImpact: hasImpactValue,
+      fiveDays: { healthMinutes: fiveDaysHealth, costSaving: fiveDaysCost, incomeGain: fiveDaysIncome },
     };
   }, [habits]);
 
@@ -118,6 +133,42 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
             )}
           </div>
           <span className="text-[9px] font-medium text-[#9C9B99]">{t('dailyIncome')}</span>
+        </div>
+      </div>
+
+      {/* 5 Days Impact */}
+      <div className="mt-3 border-t border-border pt-3">
+        <p className="text-xs font-semibold text-muted-foreground">
+          {t('fiveDaysImpact')}
+        </p>
+        <div className="mt-2 flex flex-wrap items-end gap-x-5 gap-y-1.5">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1">
+              <HeartPulse className="size-3.5 text-[#3D8A5A]" />
+              <span className="text-sm font-bold text-[#3D8A5A]">
+                +{formatHealthMinutes(fiveDays.healthMinutes)}
+              </span>
+            </div>
+            <span className="text-[9px] font-medium text-[#9C9B99]">{t('dailyHealth')}</span>
+          </div>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1">
+              <Wallet className="size-3.5 text-[#3D8A5A]" />
+              <span className="text-sm font-bold text-[#3D8A5A]">
+                {formatCurrency(fiveDays.costSaving, false)}
+              </span>
+            </div>
+            <span className="text-[9px] font-medium text-[#9C9B99]">{t('dailyCost')}</span>
+          </div>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1">
+              <TrendingUp className="size-3.5 text-[#3D8A5A]" />
+              <span className="text-sm font-bold text-[#3D8A5A]">
+                {formatCurrency(fiveDays.incomeGain, false)}
+              </span>
+            </div>
+            <span className="text-[9px] font-medium text-[#9C9B99]">{t('dailyIncome')}</span>
+          </div>
         </div>
       </div>
     </div>
