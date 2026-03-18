@@ -42,6 +42,7 @@ export default function DashboardPage() {
   } = useHabits();
   const [formOpen, setFormOpen] = useState(false);
   const [reviewSheetOpen, setReviewSheetOpen] = useState(false);
+  const [reviewHabits, setReviewHabits] = useState<Habit[]>([]);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [actionsHabitId, setActionsHabitId] = useState<string | null>(null);
   const [detailHabitId, setDetailHabitId] = useState<string | null>(null);
@@ -204,7 +205,10 @@ export default function DashboardPage() {
       {yesterdayUnreviewed.length > 0 && (
         <YesterdayReviewBanner
           unreviewedCount={yesterdayUnreviewed.length}
-          onOpen={() => setReviewSheetOpen(true)}
+          onOpen={() => {
+            setReviewHabits(yesterdayUnreviewed);
+            setReviewSheetOpen(true);
+          }}
         />
       )}
 
@@ -285,7 +289,7 @@ export default function DashboardPage() {
       <YesterdayReviewSheet
         open={reviewSheetOpen}
         onOpenChange={setReviewSheetOpen}
-        habits={yesterdayUnreviewed}
+        habits={reviewHabits}
         completions={completions}
         yesterdayDate={yesterdayDate}
         onDayStatusChange={setDayStatus}

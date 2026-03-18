@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import {
   Sheet,
@@ -51,6 +51,15 @@ export function YesterdayReviewSheet({
   const [mood, setMood] = useState<number | undefined>(undefined);
   const [comment, setComment] = useState('');
   const [noteValues, setNoteValues] = useState<Record<string, string>>({});
+
+  // Reset local state when sheet opens
+  useEffect(() => {
+    if (open) {
+      setMood(undefined);
+      setComment('');
+      setNoteValues({});
+    }
+  }, [open]);
 
   const formattedDate = new Date(yesterdayDate + 'T00:00:00').toLocaleDateString(locale, {
     month: 'long',

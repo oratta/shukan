@@ -262,6 +262,14 @@ export async function upsertCompletion(
   status: 'completed' | 'failed' | 'skipped'
 ): Promise<HabitCompletion> {
   const supabase = createClient();
+  // Preserve existing note when updating status
+  const { data: existing } = await supabase
+    .from('habit_completions')
+    .select('note')
+    .eq('habit_id', habitId)
+    .eq('date', date)
+    .maybeSingle();
+
   const { data, error } = await supabase
     .from('habit_completions')
     .upsert(
@@ -270,6 +278,7 @@ export async function upsertCompletion(
         habit_id: habitId,
         date,
         status,
+        note: existing?.note ?? null,
       },
       { onConflict: 'habit_id,date' }
     )
