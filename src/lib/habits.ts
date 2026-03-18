@@ -307,6 +307,37 @@ export function shouldShowToday(habit: Habit): boolean {
   return !habit.archived;
 }
 
+export function getEffectiveStatus(day: DayStatus): DayStatus['status'] {
+  if (day.status !== 'none') return day.status;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const dayDate = new Date(day.date + 'T00:00:00');
+  const diffDays = Math.round((today.getTime() - dayDate.getTime()) / (1000 * 60 * 60 * 24));
+  return diffDays > 5 ? 'failed' : 'none';
+}
+
+export function getYesterdayUnreviewedHabits(
+  habits: Habit[],
+  completions: HabitCompletion[]
+): Habit[] {
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = getDateString(yesterday);
+
+  return habits.filter((habit) => {
+    if (habit.archived) return false;
+    // Check if yesterday was a target day for this habit
+    if (!isTargetDay(habit, yesterday)) return false;
+    // Check if there's a completion record for yesterday
+    const completion = completions.find(
+      (c) => c.habitId === habit.id && c.date === yesterdayStr
+    );
+    // If no completion record, it's unreviewed
+    return !completion;
+  });
+}
+
 export function isSkippedToday(
   habitId: string,
   completions: HabitCompletion[]

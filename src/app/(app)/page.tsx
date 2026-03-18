@@ -9,13 +9,18 @@ import { HabitDetailModal } from '@/components/habits/habit-detail-modal';
 import { VsTemptationModal } from '@/components/habits/vs-temptation-modal';
 import { EvidenceArticleSheet } from '@/components/habits/evidence-article-sheet';
 import { DailyImpactSummary } from '@/components/habits/daily-impact-summary';
+import { YesterdayReviewBanner } from '@/components/habits/yesterday-review-banner';
+import { YesterdayReviewSheet } from '@/components/habits/yesterday-review-sheet';
 import { useHabits } from '@/hooks/useHabits';
-import { shouldShowToday, getHabitsWithStats, getTodayString } from '@/lib/habits';
+import { shouldShowToday, getHabitsWithStats, getTodayString, getYesterdayUnreviewedHabits } from '@/lib/habits';
 import { getArticle } from '@/data/impact-articles';
+import { useAuth } from '@/components/auth-provider';
+import { upsertDailyReflection } from '@/lib/supabase/habits';
 import type { Habit } from '@/types/habit';
 
 export default function DashboardPage() {
   const t = useTranslations();
+  const { user } = useAuth();
   const {
     habits,
     completions,
@@ -33,8 +38,10 @@ export default function DashboardPage() {
     addEvidence,
     removeEvidence,
     setEvidenceWeight,
+    updateNote,
   } = useHabits();
   const [formOpen, setFormOpen] = useState(false);
+  const [reviewSheetOpen, setReviewSheetOpen] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [actionsHabitId, setActionsHabitId] = useState<string | null>(null);
   const [detailHabitId, setDetailHabitId] = useState<string | null>(null);
@@ -45,6 +52,30 @@ export default function DashboardPage() {
     const filtered = habits.filter(shouldShowToday);
     return getHabitsWithStats(filtered, completions, urgeLogs, copingStepsMap, getArticle);
   }, [habits, completions, urgeLogs, copingStepsMap]);
+
+  const yesterdayUnreviewed = useMemo(
+    () => getYesterdayUnreviewedHabits(habits, completions),
+    [habits, completions]
+  );
+
+  const yesterdayDate = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }, []);
+
+  const handleSaveReflection = useCallback(
+    async (mood: number | undefined, comment: string) => {
+      if (!user) return;
+      if (mood !== undefined || comment.trim()) {
+        await upsertDailyReflection(user.id, yesterdayDate, { mood, comment });
+      }
+    },
+    [user, yesterdayDate]
+  );
 
   const activeHabits = todayHabits.filter((h) => !h.skippedToday);
   const completedCount = activeHabits.filter((h) => h.completedToday).length;
@@ -170,6 +201,13 @@ export default function DashboardPage() {
 
       <DailyImpactSummary habits={todayHabits} />
 
+      {yesterdayUnreviewed.length > 0 && (
+        <YesterdayReviewBanner
+          unreviewedCount={yesterdayUnreviewed.length}
+          onOpen={() => setReviewSheetOpen(true)}
+        />
+      )}
+
       <HabitList
         habits={todayHabits}
         onDayStatusChange={setDayStatus}
@@ -242,6 +280,17 @@ export default function DashboardPage() {
         open={!!openArticleId}
         onOpenChange={(open) => !open && setOpenArticleId(null)}
         articleId={openArticleId}
+      />
+
+      <YesterdayReviewSheet
+        open={reviewSheetOpen}
+        onOpenChange={setReviewSheetOpen}
+        habits={yesterdayUnreviewed}
+        completions={completions}
+        yesterdayDate={yesterdayDate}
+        onDayStatusChange={setDayStatus}
+        onNoteChange={updateNote}
+        onSaveReflection={handleSaveReflection}
       />
     </div>
   );

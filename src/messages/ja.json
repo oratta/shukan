@@ -90,7 +90,14 @@
     "skip": "スキップ",
     "unskip": "解除",
     "skippedSection": "スキップ中",
-    "iGaveIn": "負けた…"
+    "iGaveIn": "負けた…",
+    "reviewYesterday": "昨日の習慣をレビュー",
+    "reviewTitle": "{date}のレビュー",
+    "reviewDone": "完了",
+    "unreviewedCount": "{count}件未チェック",
+    "reviewNotePlaceholder": "メモ（任意）",
+    "reviewMoodLabel": "昨日の気分",
+    "reviewCommentPlaceholder": "昨日を振り返って一言..."
   },
   "stats": {
     "title": "統計",

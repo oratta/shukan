@@ -49,6 +49,7 @@ import {
   MessageCircleOff,
   Sparkles,
   ListChecks,
+  CalendarCheck,
 } from 'lucide-react';
 
 /** Lucide kebab-case name → Component mapping */
@@ -102,6 +103,7 @@ export const ICON_REGISTRY: Record<string, LucideIcon> = {
   'message-circle-off': MessageCircleOff,
   sparkles: Sparkles,
   'list-checks': ListChecks,
+  'calendar-check': CalendarCheck,
 };
 
 /** Icons available in the Habit Icon Picker */

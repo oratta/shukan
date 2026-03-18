@@ -1,4 +1,4 @@
-import type { Habit, HabitCompletion, CopingStep, UrgeLog } from '@/types/habit';
+import type { Habit, HabitCompletion, CopingStep, UrgeLog, DailyReflection } from '@/types/habit';
 import type { HabitEvidence } from '@/types/impact';
 import { isValidArticleId } from '@/types/impact';
 import { createClient } from './client';
@@ -47,6 +47,17 @@ interface CompletionRow {
   date: string;
   completed_at: string;
   status: string;
+  note: string | null;
+}
+
+interface DailyReflectionRow {
+  id: string;
+  user_id: string;
+  date: string;
+  mood: number | null;
+  comment: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 interface HabitEvidenceRow {
@@ -113,6 +124,19 @@ function toCompletion(row: CompletionRow): HabitCompletion {
     date: row.date,
     completedAt: row.completed_at,
     status: (row.status as 'completed' | 'failed' | 'rocket_used' | 'skipped') || 'completed',
+    ...(row.note != null ? { note: row.note } : {}),
+  };
+}
+
+function toDailyReflection(row: DailyReflectionRow): DailyReflection {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    date: row.date,
+    mood: row.mood ?? undefined,
+    comment: row.comment ?? undefined,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
   };
 }
 
@@ -505,4 +529,62 @@ export async function updateHabitSortOrders(
       .eq('id', id);
     if (error) throw error;
   }
+}
+
+// --- Completion Note ---
+
+export async function updateCompletionNote(
+  habitId: string,
+  date: string,
+  note: string
+): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from('habit_completions')
+    .update({ note })
+    .eq('habit_id', habitId)
+    .eq('date', date);
+  if (error) throw error;
+}
+
+// --- Daily Reflections ---
+
+export async function upsertDailyReflection(
+  userId: string,
+  date: string,
+  data: { mood?: number; comment?: string }
+): Promise<DailyReflection> {
+  const supabase = createClient();
+  const { data: result, error } = await supabase
+    .from('daily_reflections')
+    .upsert(
+      {
+        user_id: userId,
+        date,
+        mood: data.mood ?? null,
+        comment: data.comment ?? null,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id,date' }
+    )
+    .select()
+    .single();
+  if (error) throw error;
+  return toDailyReflection(result as DailyReflectionRow);
+}
+
+export async function getDailyReflection(
+  userId: string,
+  date: string
+): Promise<DailyReflection | null> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('daily_reflections')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('date', date)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  return toDailyReflection(data as DailyReflectionRow);
 }

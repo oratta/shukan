@@ -90,7 +90,14 @@
     "skip": "Skip",
     "unskip": "Unskip",
     "skippedSection": "Skipped",
-    "iGaveIn": "I gave in..."
+    "iGaveIn": "I gave in...",
+    "reviewYesterday": "Review yesterday's habits",
+    "reviewTitle": "Review for {date}",
+    "reviewDone": "Done",
+    "unreviewedCount": "{count} unchecked",
+    "reviewNotePlaceholder": "Note (optional)",
+    "reviewMoodLabel": "Yesterday's mood",
+    "reviewCommentPlaceholder": "Reflect on yesterday..."
   },
   "stats": {
     "title": "Statistics",
