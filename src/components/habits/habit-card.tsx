@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Check, ChevronDown, ChevronUp, Maximize2, GripVertical, SkipForward, Undo2 } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -234,6 +234,7 @@ export function HabitCard({
   const t = useTranslations('habits');
   const tDays = useTranslations('days');
   const tStats = useTranslations('stats');
+  const locale = useLocale();
   const isQuit = habit.type === 'quit';
   const isSkipped = habit.skippedToday;
   const today = getTodayString();
@@ -316,13 +317,15 @@ export function HabitCard({
           </div>
           <div className="flex items-center gap-1.5">
             {/* Past days only (skip index 0 = today), left=yesterday, right=oldest */}
-            {(habit.recentDays ?? []).slice(1).map((day) => (
-              <DayStatusDot
-                key={day.date}
-                day={day}
-                onTap={() => handleDotTap(day)}
-              />
-            ))}
+            {(habit.recentDays ?? []).slice(1).map((day) => {
+              const dayLabel = new Date(day.date + 'T00:00:00').toLocaleDateString(locale, { weekday: 'narrow' });
+              return (
+                <div key={day.date} className="flex flex-col items-center gap-0.5">
+                  <span className="text-[9px] text-muted-foreground leading-none">{dayLabel}</span>
+                  <DayStatusDot day={day} onTap={() => handleDotTap(day)} />
+                </div>
+              );
+            })}
           </div>
         </div>
 
