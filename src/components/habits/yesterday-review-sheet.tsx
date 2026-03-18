@@ -10,6 +10,7 @@ import {
   SheetFooter,
 } from '@/components/ui/sheet';
 import { HabitIcon } from '@/components/ui/habit-icon';
+import { Check, Minus, X, Frown, Meh, CircleMinus, Smile, Laugh } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Habit, HabitCompletion, DayStatus } from '@/types/habit';
 
@@ -24,17 +25,33 @@ interface YesterdayReviewSheetProps {
   onSaveReflection: (mood: number | undefined, comment: string) => void;
 }
 
-type ReviewStatus = 'none' | 'completed' | 'skipped' | 'failed';
+type SelectableStatus = 'completed' | 'skipped' | 'failed';
 
-function nextReviewStatus(current: DayStatus['status']): ReviewStatus {
-  if (current === 'none') return 'completed';
-  if (current === 'completed' || current === 'rocket_used') return 'skipped';
-  if (current === 'skipped') return 'failed';
-  // failed → none
-  return 'none';
-}
+const STATUS_BUTTONS: { status: SelectableStatus; Icon: typeof Check; activeClass: string }[] = [
+  {
+    status: 'completed',
+    Icon: Check,
+    activeClass: 'bg-[#3D8A5A]/10 border-[#3D8A5A] text-[#3D8A5A]',
+  },
+  {
+    status: 'skipped',
+    Icon: Minus,
+    activeClass: 'bg-gray-200 border-gray-400 text-gray-600 dark:bg-gray-700 dark:border-gray-500 dark:text-gray-300',
+  },
+  {
+    status: 'failed',
+    Icon: X,
+    activeClass: 'bg-[#D08068]/10 border-[#D08068] text-[#D08068]',
+  },
+];
 
-const MOOD_EMOJIS = ['😞', '😕', '😐', '🙂', '😄'];
+const MOOD_ICONS = [
+  { Icon: Frown, colorClass: 'text-red-400', value: 1 },
+  { Icon: Meh, colorClass: 'text-orange-400', value: 2 },
+  { Icon: CircleMinus, colorClass: 'text-gray-400', value: 3 },
+  { Icon: Smile, colorClass: 'text-lime-500', value: 4 },
+  { Icon: Laugh, colorClass: 'text-green-500', value: 5 },
+];
 
 export function YesterdayReviewSheet({
   open,
@@ -88,10 +105,11 @@ export function YesterdayReviewSheet({
     [completions, yesterdayDate, noteValues]
   );
 
-  const handleStatusTap = useCallback(
-    (habitId: string) => {
+  const handleStatusSelect = useCallback(
+    (habitId: string, tapped: SelectableStatus) => {
       const current = getStatus(habitId);
-      const next = nextReviewStatus(current);
+      // If same status tapped, reset to none. Otherwise, set to tapped.
+      const next = current === tapped ? 'none' : tapped;
       onDayStatusChange(habitId, yesterdayDate, next);
     },
     [getStatus, onDayStatusChange, yesterdayDate]
@@ -101,7 +119,6 @@ export function YesterdayReviewSheet({
     (habitId: string) => {
       const note = noteValues[habitId] ?? '';
       const status = getStatus(habitId);
-      // Only save note if there's a completion record
       if (status !== 'none') {
         onNoteChange(habitId, yesterdayDate, note);
       }
@@ -130,7 +147,7 @@ export function YesterdayReviewSheet({
             return (
               <div key={habit.id} className="flex flex-col gap-1.5">
                 <div className="flex items-center gap-3">
-                  {/* Icon */}
+                  {/* Habit icon */}
                   <div
                     className="size-8 rounded-full flex items-center justify-center shrink-0"
                     style={{ backgroundColor: habit.color + '33' }}
@@ -138,28 +155,37 @@ export function YesterdayReviewSheet({
                     <HabitIcon name={habit.icon} size={16} />
                   </div>
 
-                  {/* Name */}
+                  {/* Habit name */}
                   <span className="flex-1 text-sm font-medium leading-snug">
                     {habit.name}
                   </span>
 
-                  {/* Status dot */}
-                  <button
-                    type="button"
-                    onClick={() => handleStatusTap(habit.id)}
-                    className={cn(
-                      'size-6 rounded-full border-2 shrink-0 transition-all',
-                      (status === 'completed' || status === 'rocket_used') &&
-                        'bg-[#3D8A5A] border-[#3D8A5A]',
-                      status === 'failed' && 'bg-[#D08068] border-[#D08068]',
-                      status === 'skipped' && 'bg-gray-300 border-gray-300',
-                      status === 'none' && 'bg-transparent border-muted-foreground/40'
-                    )}
-                    aria-label={`${habit.name} status: ${status}`}
-                  />
+                  {/* Status select buttons */}
+                  <div className="flex gap-1 shrink-0">
+                    {STATUS_BUTTONS.map(({ status: btnStatus, Icon, activeClass }) => {
+                      const isActive = status === btnStatus ||
+                        (btnStatus === 'completed' && status === 'rocket_used');
+                      return (
+                        <button
+                          key={btnStatus}
+                          type="button"
+                          onClick={() => handleStatusSelect(habit.id, btnStatus)}
+                          className={cn(
+                            'size-7 rounded-md border flex items-center justify-center transition-all',
+                            isActive
+                              ? activeClass
+                              : 'border-muted-foreground/20 text-muted-foreground/40'
+                          )}
+                          aria-label={`${habit.name}: ${btnStatus}`}
+                        >
+                          <Icon size={14} />
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
-                {/* Memo field — only shown when status is set */}
+                {/* Memo field — shown when status is set */}
                 {status !== 'none' && (
                   <div className="pl-11">
                     <input
@@ -183,25 +209,22 @@ export function YesterdayReviewSheet({
         <div className="px-4 pt-4 pb-2 flex flex-col gap-3 border-t border-border mt-2">
           <p className="text-sm font-medium text-muted-foreground">{t('reviewMoodLabel')}</p>
           <div className="flex gap-2 justify-center">
-            {MOOD_EMOJIS.map((emoji, index) => {
-              const value = index + 1;
-              return (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setMood(mood === value ? undefined : value)}
-                  className={cn(
-                    'size-10 rounded-full border-2 flex items-center justify-center text-lg transition-all',
-                    mood === value
-                      ? 'border-primary bg-primary/10'
-                      : 'border-muted-foreground/20 bg-transparent'
-                  )}
-                  aria-label={`Mood ${value}`}
-                >
-                  {emoji}
-                </button>
-              );
-            })}
+            {MOOD_ICONS.map(({ Icon, colorClass, value }) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setMood(mood === value ? undefined : value)}
+                className={cn(
+                  'size-10 rounded-full border-2 flex items-center justify-center transition-all',
+                  mood === value
+                    ? 'border-primary bg-primary/10'
+                    : 'border-muted-foreground/20 bg-transparent'
+                )}
+                aria-label={`Mood ${value}`}
+              >
+                <Icon size={20} className={colorClass} />
+              </button>
+            ))}
           </div>
           <textarea
             className="w-full text-sm border border-muted-foreground/20 rounded-lg bg-transparent p-2 outline-none placeholder:text-muted-foreground/50 focus:border-muted-foreground/50 resize-none"

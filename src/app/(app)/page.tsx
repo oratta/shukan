@@ -206,7 +206,7 @@ export default function DashboardPage() {
         <YesterdayReviewBanner
           unreviewedCount={yesterdayUnreviewed.length}
           onOpen={() => {
-            setReviewHabits(yesterdayUnreviewed);
+            setReviewHabits(habits.filter(h => !h.archived));
             setReviewSheetOpen(true);
           }}
         />
