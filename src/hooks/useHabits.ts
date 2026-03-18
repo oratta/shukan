@@ -24,6 +24,7 @@ import {
   deleteHabitEvidence,
   updateHabitEvidenceWeight,
   replaceHabitEvidences,
+  updateCompletionNote,
 } from '@/lib/supabase/habits';
 
 export function useHabits() {
@@ -259,6 +260,22 @@ export function useHabits() {
     []
   );
 
+  const updateNote = useCallback(
+    async (habitId: string, date: string, note: string) => {
+      try {
+        await updateCompletionNote(habitId, date, note);
+        setCompletions((prev) =>
+          prev.map((c) =>
+            c.habitId === habitId && c.date === date ? { ...c, note } : c
+          )
+        );
+      } catch (err) {
+        console.error('updateNote failed:', err);
+      }
+    },
+    []
+  );
+
   const reorderHabits = useCallback(
     async (orderedIds: string[]) => {
       const updates = orderedIds.map((id, index) => ({ id, sortOrder: index }));
@@ -307,5 +324,6 @@ export function useHabits() {
     addEvidence,
     removeEvidence,
     setEvidenceWeight,
+    updateNote,
   };
 }

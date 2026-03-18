@@ -40,6 +40,17 @@ export interface HabitCompletion {
   date: string;
   completedAt: string;
   status: 'completed' | 'failed' | 'rocket_used' | 'skipped';
+  note?: string;
+}
+
+export interface DailyReflection {
+  id: string;
+  userId: string;
+  date: string;
+  mood?: number;
+  comment?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface DayStatus {
