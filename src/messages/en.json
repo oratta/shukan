@@ -221,6 +221,15 @@
     "feedbackCost": "Cost Savings Calculation",
     "feedbackIncome": "Income Gain Calculation"
   },
+  "reviewHistory": {
+    "title": "Review History",
+    "noRecord": "No record for this day",
+    "mood": "Mood",
+    "comment": "Comment",
+    "habits": "Habits",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month"
+  },
   "common": {
     "loading": "Loading...",
     "error": "Something went wrong",

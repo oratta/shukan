@@ -8,10 +8,13 @@ import { Card } from '@/components/ui/card';
 import { ProgressRing } from '@/components/habits/progress-ring';
 import { useHabits } from '@/hooks/useHabits';
 import { calculateTotalSavings, formatHealthMinutes, formatCurrency } from '@/lib/impact';
+import { useReviewHistory } from '@/hooks/useReviewHistory';
+import { ReviewCalendar } from '@/components/review/ReviewCalendar';
 
 export default function StatsPage() {
   const t = useTranslations();
   const { getStats, loading } = useHabits();
+  const reviewHistory = useReviewHistory();
 
   const stats = useMemo(() => {
     const withStats = getStats();
@@ -212,6 +215,29 @@ export default function StatsPage() {
             </Card>
           ))}
         </div>
+      </div>
+
+      {/* Review History Section */}
+      <div>
+        <div className="mb-4 border-t border-border pt-4">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            {t('reviewHistory.title')}
+          </h3>
+        </div>
+        <Card className="p-4">
+          <ReviewCalendar
+            displayYear={reviewHistory.displayYear}
+            displayMonth={reviewHistory.displayMonth}
+            selectedDate={reviewHistory.selectedDate}
+            reflections={reviewHistory.reflections}
+            completions={reviewHistory.completions}
+            isCurrentMonth={reviewHistory.isCurrentMonth}
+            loading={reviewHistory.loading}
+            onPrevMonth={reviewHistory.goToPrevMonth}
+            onNextMonth={reviewHistory.goToNextMonth}
+            onDateSelect={reviewHistory.selectDate}
+          />
+        </Card>
       </div>
     </div>
   );

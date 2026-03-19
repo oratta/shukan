@@ -597,3 +597,64 @@ export async function getDailyReflection(
   if (!data) return null;
   return toDailyReflection(data as DailyReflectionRow);
 }
+
+export async function getMonthlyReflections(
+  userId: string,
+  year: number,
+  month: number
+): Promise<DailyReflection[]> {
+  const supabase = createClient();
+  const prefix = `${year}-${String(month).padStart(2, '0')}-`;
+  const { data, error } = await supabase
+    .from('daily_reflections')
+    .select('*')
+    .eq('user_id', userId)
+    .like('date', `${prefix}%`)
+    .order('date', { ascending: true });
+  if (error) throw error;
+  return (data as DailyReflectionRow[]).map(toDailyReflection);
+}
+
+interface MonthlyCompletionRow {
+  id: string;
+  user_id: string;
+  habit_id: string;
+  date: string;
+  completed_at: string;
+  status: string;
+  note: string | null;
+  habits: {
+    name: string;
+    icon: string;
+    color: string;
+    archived: boolean;
+  } | null;
+}
+
+export interface MonthlyHabitCompletion extends HabitCompletion {
+  habitName: string;
+  habitIcon: string;
+  habitColor: string;
+}
+
+export async function getMonthlyCompletions(
+  userId: string,
+  year: number,
+  month: number
+): Promise<MonthlyHabitCompletion[]> {
+  const supabase = createClient();
+  const prefix = `${year}-${String(month).padStart(2, '0')}-`;
+  const { data, error } = await supabase
+    .from('habit_completions')
+    .select('*, habits(name, icon, color, archived)')
+    .eq('user_id', userId)
+    .like('date', `${prefix}%`)
+    .order('date', { ascending: true });
+  if (error) throw error;
+  return (data as MonthlyCompletionRow[]).map((row) => ({
+    ...toCompletion(row),
+    habitName: row.habits?.name ?? '',
+    habitIcon: row.habits?.icon ?? '',
+    habitColor: row.habits?.color ?? '',
+  }));
+}

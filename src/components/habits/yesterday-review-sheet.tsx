@@ -10,9 +10,10 @@ import {
   SheetFooter,
 } from '@/components/ui/sheet';
 import { HabitIcon } from '@/components/ui/habit-icon';
-import { Check, Minus, X, Frown, Meh, CircleMinus, Smile, Laugh } from 'lucide-react';
+import { Check, Minus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Habit, HabitCompletion, DayStatus } from '@/types/habit';
+import { MOOD_ICONS } from '@/lib/mood-icons';
 
 interface YesterdayReviewSheetProps {
   open: boolean;
@@ -43,14 +44,6 @@ const STATUS_BUTTONS: { status: SelectableStatus; Icon: typeof Check; activeClas
     Icon: X,
     activeClass: 'bg-[#D08068]/10 border-[#D08068] text-[#D08068]',
   },
-];
-
-const MOOD_ICONS = [
-  { Icon: Frown, colorClass: 'text-red-400', value: 1 },
-  { Icon: Meh, colorClass: 'text-orange-400', value: 2 },
-  { Icon: CircleMinus, colorClass: 'text-gray-400', value: 3 },
-  { Icon: Smile, colorClass: 'text-lime-500', value: 4 },
-  { Icon: Laugh, colorClass: 'text-green-500', value: 5 },
 ];
 
 export function YesterdayReviewSheet({
