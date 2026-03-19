@@ -318,12 +318,11 @@ export function getEffectiveStatus(day: DayStatus): DayStatus['status'] {
 
 export function getYesterdayUnreviewedHabits(
   habits: Habit[],
-  completions: HabitCompletion[]
+  completions: HabitCompletion[],
+  yesterdayDateStr: string
 ): Habit[] {
-  const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayStr = getDateString(yesterday);
+  // Parse the date string as local time (T00:00:00 without timezone = local)
+  const yesterday = new Date(yesterdayDateStr + 'T00:00:00');
 
   return habits.filter((habit) => {
     if (habit.archived) return false;
@@ -331,7 +330,7 @@ export function getYesterdayUnreviewedHabits(
     if (!isTargetDay(habit, yesterday)) return false;
     // Check if there's a completion record for yesterday
     const completion = completions.find(
-      (c) => c.habitId === habit.id && c.date === yesterdayStr
+      (c) => c.habitId === habit.id && c.date === yesterdayDateStr
     );
     // If no completion record, it's unreviewed
     return !completion;

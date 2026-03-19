@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { HabitList } from '@/components/habits/habit-list';
 import { HabitForm } from '@/components/habits/habit-form';
@@ -54,19 +54,22 @@ export default function DashboardPage() {
     return getHabitsWithStats(filtered, completions, urgeLogs, copingStepsMap, getArticle);
   }, [habits, completions, urgeLogs, copingStepsMap]);
 
-  const yesterdayUnreviewed = useMemo(
-    () => getYesterdayUnreviewedHabits(habits, completions),
-    [habits, completions]
-  );
-
-  const yesterdayDate = useMemo(() => {
+  // Compute yesterday's date client-side only to avoid SSR timezone mismatch
+  // (Vercel SSR runs in UTC, but user is in JST — causes 1-day offset between 00:00-08:59 JST)
+  const [yesterdayDate, setYesterdayDate] = useState('');
+  useEffect(() => {
     const d = new Date();
     d.setDate(d.getDate() - 1);
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    setYesterdayDate(`${year}-${month}-${day}`);
   }, []);
+
+  const yesterdayUnreviewed = useMemo(
+    () => yesterdayDate ? getYesterdayUnreviewedHabits(habits, completions, yesterdayDate) : [],
+    [habits, completions, yesterdayDate]
+  );
 
   const handleSaveReflection = useCallback(
     async (mood: number | undefined, comment: string) => {
