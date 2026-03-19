@@ -36,6 +36,7 @@ export function useReviewHistory() {
           setCompletions(comps);
         }
       } catch (err) {
+        console.error('[useReviewHistory] fetch failed:', err);
         if (!cancelled) {
           setError(err instanceof Error ? err.message : 'Failed to load data');
         }

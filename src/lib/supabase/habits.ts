@@ -604,12 +604,18 @@ export async function getMonthlyReflections(
   month: number
 ): Promise<DailyReflection[]> {
   const supabase = createClient();
-  const prefix = `${year}-${String(month).padStart(2, '0')}-`;
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const startDate = `${year}-${pad(month)}-01`;
+  // Next month's first day for exclusive upper bound
+  const nextMonth = month === 12 ? 1 : month + 1;
+  const nextYear = month === 12 ? year + 1 : year;
+  const endDate = `${nextYear}-${pad(nextMonth)}-01`;
   const { data, error } = await supabase
     .from('daily_reflections')
     .select('*')
     .eq('user_id', userId)
-    .like('date', `${prefix}%`)
+    .gte('date', startDate)
+    .lt('date', endDate)
     .order('date', { ascending: true });
   if (error) throw error;
   return (data as DailyReflectionRow[]).map(toDailyReflection);
@@ -643,12 +649,17 @@ export async function getMonthlyCompletions(
   month: number
 ): Promise<MonthlyHabitCompletion[]> {
   const supabase = createClient();
-  const prefix = `${year}-${String(month).padStart(2, '0')}-`;
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const startDate = `${year}-${pad(month)}-01`;
+  const nextMonth = month === 12 ? 1 : month + 1;
+  const nextYear = month === 12 ? year + 1 : year;
+  const endDate = `${nextYear}-${pad(nextMonth)}-01`;
   const { data, error } = await supabase
     .from('habit_completions')
     .select('*, habits(name, icon, color, archived)')
     .eq('user_id', userId)
-    .like('date', `${prefix}%`)
+    .gte('date', startDate)
+    .lt('date', endDate)
     .order('date', { ascending: true });
   if (error) throw error;
   return (data as MonthlyCompletionRow[]).map((row) => ({
