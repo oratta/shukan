@@ -155,7 +155,7 @@ export function ReviewCalendar({
                 className={cn(
                   'flex flex-col items-center justify-center rounded-lg py-1.5 gap-0.5 transition-all text-xs font-medium',
                   isFuture
-                    ? 'text-muted-foreground/30 pointer-events-none'
+                    ? 'text-gray-300 dark:text-gray-600 opacity-50 cursor-default'
                     : 'hover:bg-muted cursor-pointer',
                   isSelected && 'ring-2 ring-primary bg-primary/5'
                 )}
