@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const t = useTranslations();
@@ -65,6 +66,16 @@ export default function LoginPage() {
           </svg>
           {loading ? t('auth.signingIn') : t('auth.loginWith', { provider: 'Google' })}
         </button>
+
+        <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
+          <Link href="/privacy" className="hover:text-foreground transition-colors">
+            {t('settings.privacyPolicy')}
+          </Link>
+          <span>&middot;</span>
+          <Link href="/terms" className="hover:text-foreground transition-colors">
+            {t('settings.termsOfService')}
+          </Link>
+        </div>
       </div>
     </div>
   );

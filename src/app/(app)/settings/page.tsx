@@ -4,15 +4,28 @@ import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { Sun, Moon, Monitor, Trash2, Download, Upload, LogOut, User } from 'lucide-react';
+import Link from 'next/link';
+import { Sun, Moon, Monitor, Trash2, Download, Upload, LogOut, User, ExternalLink } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { HABITS_KEY, COMPLETIONS_KEY, getItem } from '@/lib/storage';
 import { useAuth } from '@/components/auth-provider';
 import { createClient } from '@/lib/supabase/client';
+import { deleteAccount } from './actions';
 
 export default function SettingsPage() {
   const t = useTranslations();
@@ -94,6 +107,18 @@ export default function SettingsPage() {
     const supabase = createClient();
     await supabase.auth.signOut();
     window.location.href = '/login';
+  };
+
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteAccount();
+      window.location.href = '/login';
+    } catch {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -237,6 +262,55 @@ export default function SettingsPage() {
         </div>
       </Card>
 
+      {user && (
+        <Card className="p-4 border-red-200 dark:border-red-900">
+          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-red-600 dark:text-red-400">
+            {t('settings.deleteAccount')}
+          </h3>
+
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">
+              {t('settings.deleteAccountDescription')}
+            </p>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/20"
+                >
+                  <Trash2 className="mr-2 size-4" />
+                  {t('settings.deleteAccount')}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    {t('settings.deleteAccountConfirm')}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {t('settings.deleteAccountDescription')}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>
+                    {t('common.cancel')}
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    variant="destructive"
+                    onClick={handleDeleteAccount}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? t('settings.deleting') : t('settings.deleteAccountButton')}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </Card>
+      )}
+
       <Card className="p-4">
         <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           {t('settings.about')}
@@ -244,6 +318,28 @@ export default function SettingsPage() {
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">{t('settings.version')}</span>
           <span className="font-mono">1.0.0</span>
+        </div>
+      </Card>
+
+      <Card className="p-4">
+        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+          {t('settings.legal')}
+        </h3>
+        <div className="space-y-1">
+          <Link
+            href="/privacy"
+            className="flex items-center justify-between rounded-md px-1 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+          >
+            <span>{t('settings.privacyPolicy')}</span>
+            <ExternalLink className="size-3.5" />
+          </Link>
+          <Link
+            href="/terms"
+            className="flex items-center justify-between rounded-md px-1 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+          >
+            <span>{t('settings.termsOfService')}</span>
+            <ExternalLink className="size-3.5" />
+          </Link>
         </div>
       </Card>
     </div>

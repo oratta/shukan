@@ -133,7 +133,15 @@
     "loginTitle": "Smitchへようこそ",
     "loginSubtitle": "習慣を記録して、人生を築こう。",
     "about": "このアプリについて",
-    "version": "バージョン"
+    "version": "バージョン",
+    "deleteAccount": "アカウント削除",
+    "deleteAccountConfirm": "アカウントを削除しますか？",
+    "deleteAccountDescription": "すべての習慣、記録、振り返りデータが完全に削除されます。この操作は取り消せません。",
+    "deleteAccountButton": "完全に削除する",
+    "deleting": "削除中...",
+    "legal": "法的情報",
+    "privacyPolicy": "プライバシーポリシー",
+    "termsOfService": "利用規約"
   },
   "days": {
     "sun": "日",

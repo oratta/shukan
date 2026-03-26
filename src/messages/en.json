@@ -133,7 +133,15 @@
     "loginTitle": "Welcome to Smitch",
     "loginSubtitle": "Track your habits, build your life.",
     "about": "About",
-    "version": "Version"
+    "version": "Version",
+    "deleteAccount": "Delete Account",
+    "deleteAccountConfirm": "Delete your account?",
+    "deleteAccountDescription": "All habits, records, and reflection data will be permanently deleted. This action cannot be undone.",
+    "deleteAccountButton": "Delete permanently",
+    "deleting": "Deleting...",
+    "legal": "Legal",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service"
   },
   "days": {
     "sun": "Sun",
