@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Shukan",
+    "name": "Smitch",
     "tagline": "毎日の積み重ねで、いい習慣を身につけよう"
   },
   "nav": {
@@ -130,7 +130,7 @@
     "signInDescription": "サインインして習慣をデバイス間で同期しましょう。",
     "signOut": "サインアウト",
     "syncEnabled": "データはクラウドに同期されています。",
-    "loginTitle": "Shukanへようこそ",
+    "loginTitle": "Smitchへようこそ",
     "loginSubtitle": "習慣を記録して、人生を築こう。",
     "about": "このアプリについて",
     "version": "バージョン"
@@ -145,7 +145,7 @@
     "sat": "土"
   },
   "auth": {
-    "loginTagline": "習慣を記録して、未来を作ろう",
+    "loginTagline": "科学的根拠に基づいた習慣で、人生を変える",
     "loginWith": "{provider}でログイン",
     "signingIn": "ログイン中...",
     "error": "認証に失敗しました。もう一度お試しください。",

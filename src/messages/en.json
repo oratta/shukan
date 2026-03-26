@@ -1,7 +1,7 @@
 {
   "app": {
-    "name": "Shukan",
-    "tagline": "Build better habits, one day at a time"
+    "name": "Smitch",
+    "tagline": "Switch your path."
   },
   "nav": {
     "today": "Home",
@@ -130,7 +130,7 @@
     "signInDescription": "Sign in to sync your habits across devices.",
     "signOut": "Sign Out",
     "syncEnabled": "Your data is synced to the cloud.",
-    "loginTitle": "Welcome to Shukan",
+    "loginTitle": "Welcome to Smitch",
     "loginSubtitle": "Track your habits, build your life.",
     "about": "About",
     "version": "Version"
@@ -145,7 +145,7 @@
     "sat": "Sat"
   },
   "auth": {
-    "loginTagline": "Track your habits, build your future",
+    "loginTagline": "Evidence-based habits that change your life",
     "loginWith": "Sign in with {provider}",
     "signingIn": "Signing in...",
     "error": "Authentication failed. Please try again.",

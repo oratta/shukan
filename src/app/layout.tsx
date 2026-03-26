@@ -16,20 +16,32 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Shukan - Habit Tracker",
-  description: "Build better habits, one day at a time",
+  title: "Smitch - Switch your path",
+  description: "Evidence-based life path builder. Choose the right habits backed by science.",
   manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+  openGraph: {
+    title: "Smitch - Switch your path",
+    description: "Evidence-based life path builder. Choose the right habits backed by science.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Shukan",
+    title: "Smitch",
   },
 };
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+    { media: "(prefers-color-scheme: light)", color: "#F8F9FA" },
+    { media: "(prefers-color-scheme: dark)", color: "#0F1923" },
   ],
   width: "device-width",
   initialScale: 1,

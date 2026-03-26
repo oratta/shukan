@@ -1,11 +1,11 @@
 {
-  "name": "Shukan - Habit Tracker",
-  "short_name": "Shukan",
-  "description": "Build better habits, one day at a time",
+  "name": "Smitch - Switch your path",
+  "short_name": "Smitch",
+  "description": "Evidence-based life path builder. Choose the right habits backed by science.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#0a0a0a",
+  "background_color": "#F8F9FA",
+  "theme_color": "#2B4162",
   "orientation": "portrait-primary",
   "icons": [
     {

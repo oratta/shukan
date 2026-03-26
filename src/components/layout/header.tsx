@@ -1,9 +1,10 @@
 'use client';
 
 import { useTheme } from 'next-themes';
-import { Sun, Moon, CheckSquare, User } from 'lucide-react';
+import { Sun, Moon, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LocaleSwitcher } from '@/components/locale-switcher';
+import { SmitchLogo } from '@/components/ui/smitch-logo';
 import { useAuth } from '@/components/auth-provider';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -26,10 +27,9 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4">
-        <div className="flex items-center gap-2">
-          <CheckSquare className="size-5 text-primary" />
-          <h1 className="text-lg font-bold tracking-tight">Shukan</h1>
-        </div>
+        <Link href="/" className="flex items-center">
+          <SmitchLogo height={22} />
+        </Link>
         <div className="flex items-center gap-1">
           {user && (
             <Link href="/settings" className="flex items-center">

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smitch Color Direction</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; padding: 24px; }
+  h1 { text-align: center; margin-bottom: 32px; font-size: 20px; color: #333; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; max-width: 1200px; margin: 0 auto; }
+  .card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  .card-header { padding: 20px 24px; color: white; }
+  .card-header h2 { font-size: 18px; margin-bottom: 4px; }
+  .card-header p { font-size: 12px; opacity: 0.8; }
+  .swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
+  .swatch { height: 64px; display: flex; align-items: flex-end; padding: 6px 8px; }
+  .swatch span { font-size: 10px; font-family: monospace; opacity: 0.9; }
+  .preview { padding: 20px 24px; }
+  .preview h3 { font-size: 14px; margin-bottom: 12px; color: #666; }
+  .mock { border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+  .mock-header { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .mock-sub { font-size: 12px; opacity: 0.6; margin-bottom: 12px; }
+  .mock-card { border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+  .mock-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .mock-text { font-size: 13px; }
+  .mock-badge { font-size: 10px; padding: 2px 8px; border-radius: 99px; margin-left: auto; }
+  .tags { padding: 16px 24px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-size: 11px; padding: 4px 10px; border-radius: 99px; background: #f0f0f0; color: #666; }
+
+  /* Direction A */
+  .dir-a .card-header { background: #2D6A4F; }
+  .dir-a .s1 { background: #2D6A4F; } .dir-a .s1 span { color: white; }
+  .dir-a .s2 { background: #52B788; } .dir-a .s2 span { color: white; }
+  .dir-a .s3 { background: #8B5E3C; } .dir-a .s3 span { color: white; }
+  .dir-a .s4 { background: #D4C5A9; } .dir-a .s4 span { color: #333; }
+  .dir-a .mock { background: #FAFAF5; color: #1B4332; }
+  .dir-a .mock-card { background: white; border: 1px solid #D4C5A9; }
+  .dir-a .mock-dot { background: #2D6A4F; }
+  .dir-a .mock-badge { background: #2D6A4F; color: white; }
+
+  /* Direction B */
+  .dir-b .card-header { background: #2B4162; }
+  .dir-b .s1 { background: #2B4162; } .dir-b .s1 span { color: white; }
+  .dir-b .s2 { background: #4A8FE7; } .dir-b .s2 span { color: white; }
+  .dir-b .s3 { background: #1B2838; } .dir-b .s3 span { color: white; }
+  .dir-b .s4 { background: #C9D1D9; } .dir-b .s4 span { color: #333; }
+  .dir-b .mock { background: #F8F9FA; color: #2B4162; }
+  .dir-b .mock-card { background: white; border: 1px solid #C9D1D9; }
+  .dir-b .mock-dot { background: #4A8FE7; }
+  .dir-b .mock-badge { background: #2B4162; color: white; }
+
+  /* Direction C */
+  .dir-c .card-header { background: #1A1A1A; }
+  .dir-c .s1 { background: #1A1A1A; } .dir-c .s1 span { color: white; }
+  .dir-c .s2 { background: #3D8A5A; } .dir-c .s2 span { color: white; }
+  .dir-c .s3 { background: #6B7280; } .dir-c .s3 span { color: white; }
+  .dir-c .s4 { background: #E5E5E5; } .dir-c .s4 span { color: #333; }
+  .dir-c .mock { background: #FFFFFF; color: #1A1A1A; border: 1px solid #E5E5E5; }
+  .dir-c .mock-card { background: #FAFAFA; border: 1px solid #E5E5E5; }
+  .dir-c .mock-dot { background: #3D8A5A; }
+  .dir-c .mock-badge { background: #1A1A1A; color: white; }
+
+  /* Dark mode previews */
+  .dark-section { margin-top: 32px; }
+  .dark-section h2 { text-align: center; margin-bottom: 16px; font-size: 16px; color: #666; }
+  .dark-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; max-width: 1200px; margin: 0 auto; }
+  .dark-card { border-radius: 12px; padding: 20px; }
+
+  .dark-a { background: #0D1F17; color: #E8F0EB; }
+  .dark-a .mock-card { background: #1A3328; border: 1px solid #2D6A4F40; }
+  .dark-a .mock-dot { background: #52B788; }
+  .dark-a .mock-badge { background: #52B788; color: #0D1F17; }
+
+  .dark-b { background: #0F1923; color: #D0D7E0; }
+  .dark-b .mock-card { background: #1B2838; border: 1px solid #4A8FE740; }
+  .dark-b .mock-dot { background: #4A8FE7; }
+  .dark-b .mock-badge { background: #4A8FE7; color: #0F1923; }
+
+  .dark-c { background: #0A0A0A; color: #E5E5E5; }
+  .dark-c .mock-card { background: #1A1A1A; border: 1px solid #333; }
+  .dark-c .mock-dot { background: #3D8A5A; }
+  .dark-c .mock-badge { background: #E5E5E5; color: #0A0A0A; }
+</style>
+</head>
+<body>
+
+<h1>Smitch - Color Direction Comparison</h1>
+
+<div class="grid">
+  <!-- Direction A: Deep Green + Earth Tone -->
+  <div class="card dir-a">
+    <div class="card-header">
+      <h2>A: Deep Green + Earth</h2>
+      <p>自然、成長、信頼 / Headspace + Notion</p>
+    </div>
+    <div class="swatches">
+      <div class="swatch s1"><span>#2D6A4F</span></div>
+      <div class="swatch s2"><span>#52B788</span></div>
+      <div class="swatch s3"><span>#8B5E3C</span></div>
+      <div class="swatch s4"><span>#D4C5A9</span></div>
+    </div>
+    <div class="preview">
+      <h3>Light Mode Preview</h3>
+      <div class="mock">
+        <div class="mock-header">Today's Habits</div>
+        <div class="mock-sub">3/5 completed</div>
+        <div class="mock-card">
+          <div class="mock-dot"></div>
+          <span class="mock-text">Morning Run</span>
+          <span class="mock-badge">+12min</span>
+        </div>
+        <div class="mock-card">
+          <div class="mock-dot" style="background:#D4C5A9"></div>
+          <span class="mock-text">Read 30 pages</span>
+        </div>
+      </div>
+    </div>
+    <div class="tags">
+      <span class="tag">植物図鑑</span>
+      <span class="tag">研究ノート</span>
+      <span class="tag">温かい</span>
+      <span class="tag">有機的</span>
+    </div>
+  </div>
+
+  <!-- Direction B: Indigo + Slate -->
+  <div class="card dir-b">
+    <div class="card-header">
+      <h2>B: Indigo + Slate</h2>
+      <p>知性、科学、信頼 / Linear + Calm</p>
+    </div>
+    <div class="swatches">
+      <div class="swatch s1"><span>#2B4162</span></div>
+      <div class="swatch s2"><span>#4A8FE7</span></div>
+      <div class="swatch s3"><span>#1B2838</span></div>
+      <div class="swatch s4"><span>#C9D1D9</span></div>
+    </div>
+    <div class="preview">
+      <h3>Light Mode Preview</h3>
+      <div class="mock">
+        <div class="mock-header">Today's Habits</div>
+        <div class="mock-sub">3/5 completed</div>
+        <div class="mock-card">
+          <div class="mock-dot"></div>
+          <span class="mock-text">Morning Run</span>
+          <span class="mock-badge">+12min</span>
+        </div>
+        <div class="mock-card">
+          <div class="mock-dot" style="background:#C9D1D9"></div>
+          <span class="mock-text">Read 30 pages</span>
+        </div>
+      </div>
+    </div>
+    <div class="tags">
+      <span class="tag">科学論文</span>
+      <span class="tag">天文台</span>
+      <span class="tag">知的</span>
+      <span class="tag">クール</span>
+    </div>
+  </div>
+
+  <!-- Direction C: Monochrome + Accent -->
+  <div class="card dir-c">
+    <div class="card-header">
+      <h2>C: Mono + Green Accent</h2>
+      <p>ミニマル、本質的 / Things 3 + Bear</p>
+    </div>
+    <div class="swatches">
+      <div class="swatch s1"><span>#1A1A1A</span></div>
+      <div class="swatch s2"><span>#3D8A5A</span></div>
+      <div class="swatch s3"><span>#6B7280</span></div>
+      <div class="swatch s4"><span>#E5E5E5</span></div>
+    </div>
+    <div class="preview">
+      <h3>Light Mode Preview</h3>
+      <div class="mock">
+        <div class="mock-header">Today's Habits</div>
+        <div class="mock-sub">3/5 completed</div>
+        <div class="mock-card">
+          <div class="mock-dot"></div>
+          <span class="mock-text">Morning Run</span>
+          <span class="mock-badge">+12min</span>
+        </div>
+        <div class="mock-card">
+          <div class="mock-dot" style="background:#E5E5E5"></div>
+          <span class="mock-text">Read 30 pages</span>
+        </div>
+      </div>
+    </div>
+    <div class="tags">
+      <span class="tag">Apple的</span>
+      <span class="tag">ミニマル</span>
+      <span class="tag">本質的</span>
+      <span class="tag">道具感</span>
+    </div>
+  </div>
+</div>
+
+<!-- Dark Mode -->
+<div class="dark-section">
+  <h2>Dark Mode Previews</h2>
+  <div class="dark-grid">
+    <div class="dark-card dark-a">
+      <div class="mock-header">A: Deep Green Dark</div>
+      <div class="mock-sub">Forest at night</div>
+      <div class="mock-card">
+        <div class="mock-dot"></div>
+        <span class="mock-text">Morning Run</span>
+        <span class="mock-badge">+12min</span>
+      </div>
+      <div class="mock-card">
+        <div class="mock-dot" style="background:#2D6A4F60"></div>
+        <span class="mock-text">Read 30 pages</span>
+      </div>
+    </div>
+
+    <div class="dark-card dark-b">
+      <div class="mock-header">B: Indigo Dark</div>
+      <div class="mock-sub">Deep ocean</div>
+      <div class="mock-card">
+        <div class="mock-dot"></div>
+        <span class="mock-text">Morning Run</span>
+        <span class="mock-badge">+12min</span>
+      </div>
+      <div class="mock-card">
+        <div class="mock-dot" style="background:#4A8FE740"></div>
+        <span class="mock-text">Read 30 pages</span>
+      </div>
+    </div>
+
+    <div class="dark-card dark-c">
+      <div class="mock-header">C: Mono Dark</div>
+      <div class="mock-sub">Pure black</div>
+      <div class="mock-card">
+        <div class="mock-dot"></div>
+        <span class="mock-text">Morning Run</span>
+        <span class="mock-badge">+12min</span>
+      </div>
+      <div class="mock-card">
+        <div class="mock-dot" style="background:#333"></div>
+        <span class="mock-text">Read 30 pages</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
