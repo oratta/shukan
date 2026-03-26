@@ -1,17 +1,29 @@
 'use client';
 
 import { useTheme } from 'next-themes';
-import { Sun, Moon, User } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { Sun, Moon, User, Home, Compass, BarChart3, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LocaleSwitcher } from '@/components/locale-switcher';
 import { SmitchLogo } from '@/components/ui/smitch-logo';
 import { useAuth } from '@/components/auth-provider';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { cn } from '@/lib/utils';
+
+const navItems = [
+  { href: '/', labelKey: 'today' as const, icon: Home },
+  { href: '/discover', labelKey: 'discover' as const, icon: Compass },
+  { href: '/stats', labelKey: 'stats' as const, icon: BarChart3 },
+  { href: '/settings', labelKey: 'settings' as const, icon: Settings },
+];
 
 export function Header() {
   const { theme, setTheme } = useTheme();
   const { user } = useAuth();
+  const pathname = usePathname();
+  const t = useTranslations('nav');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -30,9 +42,35 @@ export function Header() {
         <Link href="/" className="flex items-center">
           <SmitchLogo height={22} />
         </Link>
+
+        {/* Desktop nav - hidden on mobile (bottom nav handles it) */}
+        <nav className="hidden md:flex items-center gap-1">
+          {navItems.map((item) => {
+            const isActive =
+              item.href === '/'
+                ? pathname === '/'
+                : pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm transition-colors',
+                  isActive
+                    ? 'text-primary font-semibold bg-primary/5'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                )}
+              >
+                <item.icon className="size-4" />
+                <span>{t(item.labelKey)}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
         <div className="flex items-center gap-1">
           {user && (
-            <Link href="/settings" className="flex items-center">
+            <Link href="/settings" className="flex items-center md:hidden">
               {avatarUrl ? (
                 <img
                   src={avatarUrl}
