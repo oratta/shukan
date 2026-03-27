@@ -16,6 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://s-mitch.com"),
   title: "Smitch - Switch your path",
   description: "Evidence-based life path builder. Choose the right habits backed by science.",
   manifest: "/manifest.json",
@@ -30,6 +31,8 @@ export const metadata: Metadata = {
     title: "Smitch - Switch your path",
     description: "Evidence-based life path builder. Choose the right habits backed by science.",
     images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+    url: "https://s-mitch.com",
+    siteName: "Smitch",
   },
   appleWebApp: {
     capable: true,

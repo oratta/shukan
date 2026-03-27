@@ -166,8 +166,8 @@ export default function TermsPage() {
               本規約に関するご質問は以下までご連絡ください。
             </p>
             <p className="mt-2 text-sm">
-              <a href="mailto:privacy@smitch.app" className="underline underline-offset-2 hover:text-foreground text-muted-foreground">
-                privacy@smitch.app
+              <a href="mailto:privacy@s-mitch.com" className="underline underline-offset-2 hover:text-foreground text-muted-foreground">
+                privacy@s-mitch.com
               </a>
             </p>
           </section>
