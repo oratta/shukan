@@ -45,6 +45,15 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-impact-health: var(--impact-health);
+  --color-impact-cost: var(--impact-cost);
+  --color-impact-income: var(--impact-income);
+  --color-impact-bg: var(--impact-bg);
+  --color-streak: var(--streak);
 }
 
 :root {
@@ -81,6 +90,15 @@
   --sidebar-accent-foreground: oklch(0.35 0.05 250);
   --sidebar-border: oklch(0.86 0.01 250);
   --sidebar-ring: oklch(0.65 0.15 250);
+  --success: oklch(0.55 0.15 155);
+  --success-foreground: oklch(1 0 0);
+  --warning: oklch(0.7 0.12 85);
+  --warning-foreground: oklch(0.3 0.05 85);
+  --impact-health: oklch(0.55 0.15 155);
+  --impact-cost: oklch(0.65 0.12 85);
+  --impact-income: oklch(0.55 0.12 250);
+  --impact-bg: oklch(0.97 0.01 85);
+  --streak: oklch(0.65 0.12 30);
 }
 
 .dark {
@@ -115,6 +133,15 @@
   --sidebar-accent-foreground: oklch(0.87 0.01 250);
   --sidebar-border: oklch(0.35 0.05 250 / 40%);
   --sidebar-ring: oklch(0.65 0.15 250);
+  --success: oklch(0.65 0.15 155);
+  --success-foreground: oklch(0.15 0.02 155);
+  --warning: oklch(0.75 0.12 85);
+  --warning-foreground: oklch(0.2 0.05 85);
+  --impact-health: oklch(0.65 0.15 155);
+  --impact-cost: oklch(0.75 0.12 85);
+  --impact-income: oklch(0.65 0.12 250);
+  --impact-bg: oklch(0.25 0.02 85);
+  --streak: oklch(0.7 0.12 30);
 }
 
 @layer base {

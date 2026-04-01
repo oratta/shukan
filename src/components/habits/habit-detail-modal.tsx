@@ -259,20 +259,20 @@ export function HabitDetailModal({
 
         {/* Stats Row */}
         <div className="flex gap-3 px-5">
-          <div className="flex-1 rounded-xl bg-[#C8F0D8] p-4 dark:bg-green-900/30">
+          <div className="flex-1 rounded-xl bg-success/15 p-4">
             <div className="flex items-baseline gap-1">
               {habit.currentStreak >= 30 && <Crown className="size-5 text-amber-500" />}
-              <span className="text-3xl font-bold text-green-800 dark:text-green-300">
+              <span className="text-3xl font-bold text-success">
                 {habit.currentStreak}
               </span>
-              <span className="text-sm text-green-700 dark:text-green-400">
+              <span className="text-sm text-success/80">
                 {t('days')}
               </span>
             </div>
-            <p className="mt-1 text-xs text-green-700 dark:text-green-400">
+            <p className="mt-1 text-xs text-success/80">
               {t('currentStreak')}
             </p>
-            <p className="text-xs font-medium text-green-600 dark:text-green-500">
+            <p className="text-xs font-medium text-success">
               {streakPercent}%
             </p>
           </div>
@@ -336,7 +336,7 @@ export function HabitDetailModal({
               <button
                 type="button"
                 onClick={() => setEvidenceManagerOpen(true)}
-                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[#D4E8DA] bg-[#F8FBF9] px-3.5 py-2.5 text-sm font-medium text-[#3D8A5A] transition-colors hover:bg-[#EDF5F0]"
+                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-success/30 bg-success/5 px-3.5 py-2.5 text-sm font-medium text-success transition-colors hover:bg-success/10"
               >
                 <Settings className="size-4" />
                 {tEvidence('manage')}
@@ -443,7 +443,7 @@ export function HabitDetailModal({
                       className={cn(
                         'relative flex aspect-square items-center justify-center rounded-lg text-[10px] font-medium transition-all',
                         // Status colors
-                        isCompleted && 'bg-green-500 text-white dark:bg-green-600',
+                        isCompleted && 'bg-success text-success-foreground',
                         isFailed && !isRocketEligible && 'bg-[#D89575] text-white dark:bg-[#B87A5E]',
                         !isCompleted && !isFailed && !isFuture && 'text-foreground',
                         isFuture && 'text-muted-foreground/40',

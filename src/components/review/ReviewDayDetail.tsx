@@ -18,7 +18,7 @@ function StatusIcon({ status }: { status: string }) {
   switch (status) {
     case 'completed':
     case 'rocket_used':
-      return <Check size={14} className="text-green-500 shrink-0" />;
+      return <Check size={14} className="text-success shrink-0" />;
     case 'failed':
       return <X size={14} className="text-red-400 shrink-0" />;
     case 'skipped':

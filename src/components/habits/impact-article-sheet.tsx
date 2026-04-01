@@ -70,18 +70,18 @@ export function ImpactArticleSheet({
           <h2 className="mb-3 text-lg font-bold">{t('title')}</h2>
 
           {/* Metric summary - with labels and /日 */}
-          <div className="flex items-start gap-4 rounded-lg bg-[#FFF8F0] p-3">
+          <div className="flex items-start gap-4 rounded-lg bg-impact-bg p-3">
             <div className="flex flex-col items-start">
-              <span className="flex items-center gap-0.5 text-[10px] text-[#B8860B]/60"><HeartPulse className="size-3" /> {t('dailyHealth')}</span>
-              <span className="text-sm font-semibold text-[#B8860B]">+{dailyHealthMinutes}{t('minuteUnit')}{t('perDay')}</span>
+              <span className="flex items-center gap-0.5 text-[10px] text-impact-cost/60"><HeartPulse className="size-3" /> {t('dailyHealth')}</span>
+              <span className="text-sm font-semibold text-impact-cost">+{dailyHealthMinutes}{t('minuteUnit')}{t('perDay')}</span>
             </div>
             <div className="flex flex-col items-start">
-              <span className="flex items-center gap-0.5 text-[10px] text-[#B8860B]/60"><Wallet className="size-3" /> {t('dailyCost')}</span>
-              <span className="text-sm font-semibold text-[#B8860B]">¥{dailyCostSaving.toLocaleString()}{t('perDay')}</span>
+              <span className="flex items-center gap-0.5 text-[10px] text-impact-cost/60"><Wallet className="size-3" /> {t('dailyCost')}</span>
+              <span className="text-sm font-semibold text-impact-cost">¥{dailyCostSaving.toLocaleString()}{t('perDay')}</span>
             </div>
             <div className="flex flex-col items-start">
-              <span className="flex items-center gap-0.5 text-[10px] text-[#B8860B]/60"><TrendingUp className="size-3" /> {t('dailyIncome')}</span>
-              <span className="text-sm font-semibold text-[#B8860B]">¥{dailyIncomeGain.toLocaleString()}{t('perDay')}</span>
+              <span className="flex items-center gap-0.5 text-[10px] text-impact-cost/60"><TrendingUp className="size-3" /> {t('dailyIncome')}</span>
+              <span className="text-sm font-semibold text-impact-cost">¥{dailyIncomeGain.toLocaleString()}{t('perDay')}</span>
             </div>
           </div>
 
@@ -126,15 +126,15 @@ export function ImpactArticleSheet({
 
           {/* Cumulative savings if user has progress */}
           {habit.impactSavings && habit.impactSavings.completedDays > 0 && (
-            <div className="mt-6 rounded-lg bg-[#F0F7F2] p-3">
-              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[#3D8A5A]">
+            <div className="mt-6 rounded-lg bg-success/10 p-3">
+              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-success">
                 {t('yourSavings')}
               </h3>
-              <div className="space-y-1 text-sm text-[#3D8A5A]">
+              <div className="space-y-1 text-sm text-success">
                 <p className="flex items-center gap-1"><HeartPulse className="size-3.5" /> {t('dailyHealth')}: +{formatHealthMinutes(habit.impactSavings.healthMinutes, timeUnits)}</p>
                 <p className="flex items-center gap-1"><Wallet className="size-3.5" /> {t('dailyCost')}: {formatCurrency(habit.impactSavings.costSaving)}</p>
                 <p className="flex items-center gap-1"><TrendingUp className="size-3.5" /> {t('dailyIncome')}: {formatCurrency(habit.impactSavings.incomeGain)}</p>
-                <p className="text-xs text-[#3D8A5A]/70">
+                <p className="text-xs text-success/70">
                   ({habit.impactSavings.completedDays}{t('daysUnit')}{t('accumulated')})
                 </p>
               </div>

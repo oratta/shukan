@@ -94,12 +94,12 @@ export function UrgeFlow({
         <div className="flex flex-col gap-3 px-4 py-4">
           {allDone ? (
             <div className="flex flex-col items-center gap-3 py-8">
-              <CheckCircle2 className="size-16 text-green-500 animate-in zoom-in-50 duration-300" />
-              <p className="text-lg font-semibold text-green-600 dark:text-green-400">
+              <CheckCircle2 className="size-16 text-success animate-in zoom-in-50 duration-300" />
+              <p className="text-lg font-semibold text-success">
                 {t('urgeComplete')}
               </p>
               {dailyDone && (
-                <p className="text-sm font-medium text-green-500">
+                <p className="text-sm font-medium text-success">
                   {t('urgeDailyDone')}
                 </p>
               )}

@@ -68,7 +68,7 @@ const MOOD_ICONS: MoodConfig[] = [
   { icon: 'Meh', colorClass: 'text-orange-400', value: 2 },
   { icon: 'CircleMinus', colorClass: 'text-gray-400', value: 3 },
   { icon: 'Smile', colorClass: 'text-lime-500', value: 4 },
-  { icon: 'Laugh', colorClass: 'text-green-500', value: 5 },
+  { icon: 'Laugh', colorClass: 'text-success', value: 5 },
 ];
 
 describe('Mood icon configuration', () => {

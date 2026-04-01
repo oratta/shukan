@@ -13,5 +13,5 @@ export const MOOD_ICONS: MoodIconDef[] = [
   { Icon: Meh, colorClass: 'text-orange-400', value: 2, dotColor: 'bg-red-400' },
   { Icon: CircleMinus, colorClass: 'text-gray-400', value: 3, dotColor: 'bg-yellow-400' },
   { Icon: Smile, colorClass: 'text-lime-500', value: 4, dotColor: 'bg-green-400' },
-  { Icon: Laugh, colorClass: 'text-green-500', value: 5, dotColor: 'bg-green-400' },
+  { Icon: Laugh, colorClass: 'text-success', value: 5, dotColor: 'bg-success' },
 ];

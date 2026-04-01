@@ -73,11 +73,11 @@ export function ImpactBadge(props: ImpactBadgeProps) {
   return (
     <Wrapper
       {...wrapperProps}
-      className="flex w-full items-center justify-between rounded-xl border border-[#D4E8DA] bg-[#F8FBF9] px-3.5 py-3 text-left"
+      className="flex w-full items-center justify-between rounded-xl border border-success/20 bg-success/5 px-3.5 py-3 text-left"
     >
       <div className="flex flex-col items-center gap-0.5">
-        <HeartPulse className="size-4 text-[#3D8A5A]" />
-        <span className="text-sm font-bold text-[#3D8A5A]">
+        <HeartPulse className="size-4 text-success" />
+        <span className="text-sm font-bold text-success">
           +{formatHealthMinutes(values.healthMinutes)}
         </span>
         <span className="text-[9px] font-medium text-[#9C9B99]">
@@ -85,8 +85,8 @@ export function ImpactBadge(props: ImpactBadgeProps) {
         </span>
       </div>
       <div className="flex flex-col items-center gap-0.5">
-        <Wallet className="size-4 text-[#3D8A5A]" />
-        <span className="text-sm font-bold text-[#3D8A5A]">
+        <Wallet className="size-4 text-success" />
+        <span className="text-sm font-bold text-success">
           {formatCurrency(values.costSaving, useMan)}
         </span>
         <span className="text-[9px] font-medium text-[#9C9B99]">
@@ -94,8 +94,8 @@ export function ImpactBadge(props: ImpactBadgeProps) {
         </span>
       </div>
       <div className="flex flex-col items-center gap-0.5">
-        <TrendingUp className="size-4 text-[#3D8A5A]" />
-        <span className="text-sm font-bold text-[#3D8A5A]">
+        <TrendingUp className="size-4 text-success" />
+        <span className="text-sm font-bold text-success">
           {formatCurrency(values.incomeGain, useMan)}
         </span>
         <span className="text-[9px] font-medium text-[#9C9B99]">

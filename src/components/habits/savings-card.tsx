@@ -16,10 +16,10 @@ export function SavingsCard({ savings }: SavingsCardProps) {
   if (savings.completedDays === 0) return null;
 
   return (
-    <div className="flex items-center justify-between rounded-xl border border-[#D4E8DA] bg-[#F0F7F2] px-3.5 py-2.5">
+    <div className="flex items-center justify-between rounded-xl border border-success/20 bg-success/10 px-3.5 py-2.5">
       <div className="flex items-center gap-1.5">
-        <PiggyBank className="size-4 text-[#3D8A5A]" />
-        <span className="text-[11px] font-semibold text-[#3D8A5A]">
+        <PiggyBank className="size-4 text-success" />
+        <span className="text-[11px] font-semibold text-success">
           {t('cumulative')}
         </span>
       </div>

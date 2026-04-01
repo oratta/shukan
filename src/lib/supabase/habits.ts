@@ -322,6 +322,26 @@ export async function fetchCopingSteps(habitId: string): Promise<CopingStep[]> {
   return (data as CopingStepRow[]).map(toCopingStep);
 }
 
+export async function fetchCopingStepsByHabitIds(habitIds: string[]): Promise<Map<string, CopingStep[]>> {
+  if (habitIds.length === 0) return new Map();
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('coping_steps')
+    .select('*')
+    .in('habit_id', habitIds)
+    .order('sort_order', { ascending: true });
+
+  if (error) throw error;
+  const map = new Map<string, CopingStep[]>();
+  for (const row of (data as CopingStepRow[])) {
+    const step = toCopingStep(row);
+    const existing = map.get(row.habit_id) ?? [];
+    existing.push(step);
+    map.set(row.habit_id, existing);
+  }
+  return map;
+}
+
 export async function upsertCopingSteps(
   habitId: string,
   steps: { title: string; sortOrder: number }[]
@@ -420,37 +440,21 @@ export async function useRocketOnDate(
   date: string
 ): Promise<HabitCompletion> {
   const supabase = createClient();
-  // Upsert the completion as rocket_used (marks it as completed via rocket)
-  const { data: existing } = await supabase
+  const { data, error } = await supabase
     .from('habit_completions')
-    .select('*')
-    .eq('habit_id', habitId)
-    .eq('date', date)
-    .maybeSingle();
-
-  if (existing) {
-    const { data, error } = await supabase
-      .from('habit_completions')
-      .update({ status: 'rocket_used' })
-      .eq('id', existing.id)
-      .select()
-      .single();
-    if (error) throw error;
-    return toCompletion(data as CompletionRow);
-  } else {
-    const { data, error } = await supabase
-      .from('habit_completions')
-      .insert({
+    .upsert(
+      {
         user_id: userId,
         habit_id: habitId,
         date,
         status: 'rocket_used',
-      })
-      .select()
-      .single();
-    if (error) throw error;
-    return toCompletion(data as CompletionRow);
-  }
+      },
+      { onConflict: 'habit_id,date' }
+    )
+    .select()
+    .single();
+  if (error) throw error;
+  return toCompletion(data as CompletionRow);
 }
 
 // --- Habit Evidences ---

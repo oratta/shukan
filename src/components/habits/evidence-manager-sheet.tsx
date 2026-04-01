@@ -109,18 +109,18 @@ export function EvidenceManagerSheet({
 
           {/* Total annual impact summary */}
           {resolvedEvidences.length > 0 && (
-            <div className="shrink-0 border-b bg-[#F8FBF9] px-5 py-3">
+            <div className="shrink-0 border-b bg-success/5 px-5 py-3">
               <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                 {tImpact('title')}{tImpact('perYear')}
               </p>
               <div className="flex items-center justify-between">
-                <span className="flex items-center gap-1 text-sm font-bold text-[#3D8A5A]">
+                <span className="flex items-center gap-1 text-sm font-bold text-success">
                   <HeartPulse className="size-3.5" /> +{formatHealthMinutes(totalAnnualImpact.healthMinutes)}
                 </span>
-                <span className="flex items-center gap-1 text-sm font-bold text-[#3D8A5A]">
+                <span className="flex items-center gap-1 text-sm font-bold text-success">
                   <Wallet className="size-3.5" /> {formatCurrency(totalAnnualImpact.costSaving)}
                 </span>
-                <span className="flex items-center gap-1 text-sm font-bold text-[#3D8A5A]">
+                <span className="flex items-center gap-1 text-sm font-bold text-success">
                   <TrendingUp className="size-3.5" /> {formatCurrency(totalAnnualImpact.incomeGain)}
                 </span>
               </div>
@@ -156,7 +156,7 @@ export function EvidenceManagerSheet({
                         <button
                           type="button"
                           onClick={() => onRemoveEvidence(habitId, evidence.id)}
-                          className="shrink-0 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-500"
+                          className="shrink-0 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                         >
                           <Trash2 className="size-4" />
                         </button>
@@ -173,7 +173,7 @@ export function EvidenceManagerSheet({
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-muted-foreground">{t('weight')}</span>
-                          <span className="font-semibold text-[#3D8A5A]">
+                          <span className="font-semibold text-success">
                             {evidence.weight}%
                           </span>
                         </div>

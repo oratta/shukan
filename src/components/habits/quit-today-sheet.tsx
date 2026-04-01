@@ -56,7 +56,7 @@ export function QuitTodaySheet({
               onOpenChange(false);
             }}
           >
-            <CheckCircle2 className="size-5 text-green-500 shrink-0" />
+            <CheckCircle2 className="size-5 text-success shrink-0" />
             <div className="text-left">
               <div className="font-medium">{t('quitDailyOk')}</div>
               <div className="text-xs text-muted-foreground">{t('quitDailyOkDesc')}</div>

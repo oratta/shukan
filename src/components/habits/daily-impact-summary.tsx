@@ -73,13 +73,13 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
       className={cn(
         'rounded-xl border px-4 py-3 transition-all',
         isPerfect
-          ? 'border-green-300 bg-green-50 dark:border-green-700 dark:bg-green-950/30 animate-[perfectPulse_600ms_ease-out]'
+          ? 'border-success/40 bg-success/10 animate-[perfectPulse_600ms_ease-out]'
           : 'border-border bg-card'
       )}
     >
       <p className={cn(
         'text-xs font-semibold',
-        isPerfect ? 'text-green-700 dark:text-green-400' : 'text-muted-foreground'
+        isPerfect ? 'text-success' : 'text-muted-foreground'
       )}>
         {isPerfect ? <><PartyPopper className="mr-1 inline size-3.5" />{t('perfect')}</> : t('todayImpact')}
       </p>
@@ -88,8 +88,8 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
         {/* Health */}
         <div className="flex flex-col">
           <div className="flex items-center gap-1">
-            <HeartPulse className="size-3.5 text-[#3D8A5A]" />
-            <span className="text-sm font-bold text-[#3D8A5A]">
+            <HeartPulse className="size-3.5 text-success" />
+            <span className="text-sm font-bold text-success">
               {isPerfect
                 ? `+${formatHealthMinutes(earned.healthMinutes)}`
                 : `+${formatHealthMinutes(earned.healthMinutes)}`}
@@ -106,8 +106,8 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
         {/* Cost */}
         <div className="flex flex-col">
           <div className="flex items-center gap-1">
-            <Wallet className="size-3.5 text-[#3D8A5A]" />
-            <span className="text-sm font-bold text-[#3D8A5A]">
+            <Wallet className="size-3.5 text-success" />
+            <span className="text-sm font-bold text-success">
               {formatCurrency(earned.costSaving, false)}
             </span>
             {!isPerfect && (
@@ -122,8 +122,8 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
         {/* Income */}
         <div className="flex flex-col">
           <div className="flex items-center gap-1">
-            <TrendingUp className="size-3.5 text-[#3D8A5A]" />
-            <span className="text-sm font-bold text-[#3D8A5A]">
+            <TrendingUp className="size-3.5 text-success" />
+            <span className="text-sm font-bold text-success">
               {formatCurrency(earned.incomeGain, false)}
             </span>
             {!isPerfect && (
@@ -144,8 +144,8 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
         <div className="mt-2 flex flex-wrap items-end gap-x-5 gap-y-1.5">
           <div className="flex flex-col">
             <div className="flex items-center gap-1">
-              <HeartPulse className="size-3.5 text-[#3D8A5A]" />
-              <span className="text-sm font-bold text-[#3D8A5A]">
+              <HeartPulse className="size-3.5 text-success" />
+              <span className="text-sm font-bold text-success">
                 +{formatHealthMinutes(fiveDays.healthMinutes)}
               </span>
             </div>
@@ -153,8 +153,8 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-1">
-              <Wallet className="size-3.5 text-[#3D8A5A]" />
-              <span className="text-sm font-bold text-[#3D8A5A]">
+              <Wallet className="size-3.5 text-success" />
+              <span className="text-sm font-bold text-success">
                 {formatCurrency(fiveDays.costSaving, false)}
               </span>
             </div>
@@ -162,8 +162,8 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-1">
-              <TrendingUp className="size-3.5 text-[#3D8A5A]" />
-              <span className="text-sm font-bold text-[#3D8A5A]">
+              <TrendingUp className="size-3.5 text-success" />
+              <span className="text-sm font-bold text-success">
                 {formatCurrency(fiveDays.incomeGain, false)}
               </span>
             </div>

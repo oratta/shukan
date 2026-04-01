@@ -32,7 +32,7 @@ const STATUS_BUTTONS: { status: SelectableStatus; Icon: typeof Check; activeClas
   {
     status: 'completed',
     Icon: Check,
-    activeClass: 'bg-[#3D8A5A]/10 border-[#3D8A5A] text-[#3D8A5A]',
+    activeClass: 'bg-success/10 border-success text-success',
   },
   {
     status: 'skipped',

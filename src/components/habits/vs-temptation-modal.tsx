@@ -97,10 +97,10 @@ export function VsTemptationModal({
         <DialogTitle className="sr-only">{t('vsTemptation')}</DialogTitle>
         {showSuccess ? (
           <div className="flex flex-col items-center gap-3 py-12 animate-in zoom-in-75 duration-300">
-            <div className="flex size-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-950/40">
-              <Trophy className="size-8 text-green-600 dark:text-green-400" />
+            <div className="flex size-16 items-center justify-center rounded-full bg-success/15">
+              <Trophy className="size-8 text-success" />
             </div>
-            <p className="text-lg font-bold text-green-600 dark:text-green-400">
+            <p className="text-lg font-bold text-success">
               {t('iResisted')}
             </p>
           </div>
@@ -124,7 +124,7 @@ export function VsTemptationModal({
             {/* Progress section */}
             <div className="mx-5 mb-4 rounded-lg border p-3">
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                <span className="text-sm font-medium text-success">
                   {t('todayResisted', {
                     current: progressCurrent,
                     target: dailyTarget,
@@ -133,7 +133,7 @@ export function VsTemptationModal({
               </div>
               <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                 <div
-                  className="h-full rounded-full bg-green-500 transition-all duration-500"
+                  className="h-full rounded-full bg-success transition-all duration-500"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
@@ -161,7 +161,7 @@ export function VsTemptationModal({
                       className={cn(
                         'flex size-5 shrink-0 items-center justify-center rounded',
                         checked
-                          ? 'bg-green-500 text-white'
+                          ? 'bg-success text-success-foreground'
                           : 'border-2 border-muted-foreground/30'
                       )}
                     >
@@ -187,7 +187,7 @@ export function VsTemptationModal({
               <button
                 type="button"
                 onClick={handleResisted}
-                className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#3D8A5A] font-semibold text-white transition-colors hover:bg-[#3D8A5A]/90 active:bg-[#3D8A5A]/80"
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-success font-semibold text-success-foreground transition-colors hover:bg-success/90 active:bg-success/80"
               >
                 <Shield className="size-5" />
                 {t('iResisted')}

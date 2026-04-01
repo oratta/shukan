@@ -24,7 +24,6 @@ import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/components/auth-provider';
 import { createClient } from '@/lib/supabase/client';
-import { deleteAccount } from './actions';
 
 export default function SettingsPage() {
   const t = useTranslations();
@@ -77,7 +76,22 @@ export default function SettingsPage() {
   const handleDeleteAccount = async () => {
     setIsDeleting(true);
     try {
-      await deleteAccount();
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/delete-user`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${session?.access_token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      if (!response.ok) {
+        const body = await response.json();
+        throw new Error(body.error ?? 'Failed to delete account');
+      }
       window.location.href = '/login';
     } catch {
       setIsDeleting(false);
@@ -217,7 +231,7 @@ export default function SettingsPage() {
             variant="outline"
             size="sm"
             onClick={handleReset}
-            className="w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/20"
+            className="w-full justify-start text-destructive hover:bg-destructive/10 hover:text-destructive/90"
           >
             <Trash2 className="mr-2 size-4" />
             {t('settings.reset')}
@@ -227,7 +241,7 @@ export default function SettingsPage() {
 
       {user && (
         <Card className="p-4 border-red-200 dark:border-red-900">
-          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-red-600 dark:text-red-400">
+          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-destructive">
             {t('settings.deleteAccount')}
           </h3>
 
@@ -241,7 +255,7 @@ export default function SettingsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/20"
+                  className="w-full justify-start text-destructive hover:bg-destructive/10 hover:text-destructive/90"
                 >
                   <Trash2 className="mr-2 size-4" />
                   {t('settings.deleteAccount')}

@@ -98,7 +98,7 @@ export function EvidencePicker({
   const confidenceBadgeClass = (level: 'high' | 'medium' | 'low') => {
     switch (level) {
       case 'high':
-        return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
+        return 'bg-success/10 text-success';
       case 'medium':
         return 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400';
       case 'low':

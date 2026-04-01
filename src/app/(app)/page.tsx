@@ -195,7 +195,7 @@ export default function DashboardPage() {
       {totalCount > 0 && (
         <div className="h-2 overflow-hidden rounded-full bg-muted">
           <div
-            className="h-full rounded-full bg-green-500 transition-all duration-500 ease-out"
+            className="h-full rounded-full bg-success transition-all duration-500 ease-out"
             style={{
               width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%`,
             }}

@@ -13,7 +13,7 @@ import {
   deleteHabitById,
   deleteCompletion,
   upsertCompletion,
-  fetchCopingSteps,
+  fetchCopingStepsByHabitIds,
   upsertCopingSteps,
   fetchUrgeLogsForDate,
   insertUrgeLog,
@@ -55,17 +55,12 @@ export function useHabits() {
         setHabits(h);
         setCompletions(c);
 
-        // Load coping steps for quit habits
+        // Load coping steps for quit habits (single batch query)
         const quitHabits = h.filter((habit) => habit.type === 'quit');
         if (quitHabits.length > 0) {
-          const stepsEntries = await Promise.all(
-            quitHabits.map(async (habit) => {
-              const steps = await fetchCopingSteps(habit.id);
-              return [habit.id, steps] as [string, CopingStep[]];
-            })
-          );
+          const stepsMap = await fetchCopingStepsByHabitIds(quitHabits.map((habit) => habit.id));
           if (!cancelled) {
-            setCopingStepsMap(new Map(stepsEntries));
+            setCopingStepsMap(stepsMap);
           }
         }
 

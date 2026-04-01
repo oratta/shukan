@@ -14,6 +14,7 @@ import { getArticle } from '@/data/impact-articles';
 import { renderArticle, calculateAnnualImpact, formatHealthMinutes, formatCurrency } from '@/lib/impact';
 import type { ArticleId, CalcStep } from '@/types/impact';
 import { submitBadMark, removeBadMark, submitComment, getUserFeedback } from '@/lib/supabase/feedbacks';
+import { useAuth } from '@/components/auth-provider';
 
 /** Convert **bold** markers in text to <strong> elements */
 function parseBold(text: string): ReactNode[] {
@@ -140,6 +141,7 @@ export function EvidenceArticleSheet({
 }: EvidenceArticleSheetProps) {
   const t = useTranslations('impact');
   const tEvidence = useTranslations('evidence');
+  const { user } = useAuth();
 
   const article = useMemo(
     () => (articleId ? getArticle(articleId as ArticleId) : undefined),
@@ -163,24 +165,24 @@ export function EvidenceArticleSheet({
 
   // Load feedback state when sheet opens (SCENARIO-AF-09)
   useEffect(() => {
-    if (!open || !articleId) return;
+    if (!open || !articleId || !user) return;
     setCalcExpanded(false);
     setCommentText('');
     setShowThanks(false);
-    getUserFeedback(articleId).then(({ hasBadMark: has }) => setHasBadMark(has));
-  }, [open, articleId]);
+    getUserFeedback(user.id, articleId).then(({ hasBadMark: has }) => setHasBadMark(has));
+  }, [open, articleId, user]);
 
   // Bad mark toggle (SCENARIO-AF-01, AF-02, AF-08)
   const handleBadMarkToggle = useCallback(async () => {
-    if (!articleId || badMarkLoading) return;
+    if (!articleId || !user || badMarkLoading) return;
     const prev = hasBadMark;
     setHasBadMark(!prev); // optimistic
     setBadMarkLoading(true);
     try {
       if (prev) {
-        await removeBadMark(articleId);
+        await removeBadMark(user.id, articleId);
       } else {
-        await submitBadMark(articleId);
+        await submitBadMark(user.id, articleId);
       }
     } catch (err) {
       console.error('Bad mark toggle failed:', err);
@@ -188,14 +190,14 @@ export function EvidenceArticleSheet({
     } finally {
       setBadMarkLoading(false);
     }
-  }, [articleId, hasBadMark, badMarkLoading]);
+  }, [articleId, user, hasBadMark, badMarkLoading]);
 
   // Comment submit (SCENARIO-AF-04)
   const handleCommentSubmit = useCallback(async () => {
-    if (!articleId || !commentText.trim() || commentSending) return;
+    if (!articleId || !user || !commentText.trim() || commentSending) return;
     setCommentSending(true);
     try {
-      await submitComment(articleId, commentText.trim());
+      await submitComment(user.id, articleId, commentText.trim());
       setCommentText('');
       setShowThanks(true);
       setTimeout(() => setShowThanks(false), 3000);
@@ -204,7 +206,7 @@ export function EvidenceArticleSheet({
     } finally {
       setCommentSending(false);
     }
-  }, [articleId, commentText, commentSending]);
+  }, [articleId, user, commentText, commentSending]);
 
   if (!article || !articleId) {
     return (
@@ -230,7 +232,7 @@ export function EvidenceArticleSheet({
   const confidenceBadgeClass = (() => {
     switch (article.confidenceLevel) {
       case 'high':
-        return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
+        return 'bg-success/10 text-success';
       case 'medium':
         return 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400';
       case 'low':
@@ -280,13 +282,13 @@ export function EvidenceArticleSheet({
 
             {/* Impact badges row (annual) */}
             <div className="mt-3 flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF8F0] px-2.5 py-1 text-xs font-medium text-[#B8860B]">
+              <span className="inline-flex items-center gap-1 rounded-full bg-impact-bg px-2.5 py-1 text-xs font-medium text-impact-cost">
                 <HeartPulse className="size-3.5" /> +{formatHealthMinutes(annual.healthMinutes)}{t('perYear')}
               </span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF8F0] px-2.5 py-1 text-xs font-medium text-[#B8860B]">
+              <span className="inline-flex items-center gap-1 rounded-full bg-impact-bg px-2.5 py-1 text-xs font-medium text-impact-cost">
                 <Wallet className="size-3.5" /> {formatCurrency(annual.costSaving, false)}{t('perYear')}
               </span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#FFF8F0] px-2.5 py-1 text-xs font-medium text-[#B8860B]">
+              <span className="inline-flex items-center gap-1 rounded-full bg-impact-bg px-2.5 py-1 text-xs font-medium text-impact-cost">
                 <TrendingUp className="size-3.5" /> {formatCurrency(annual.incomeGain, false)}{t('perYear')}
               </span>
             </div>
@@ -440,7 +442,7 @@ export function EvidenceArticleSheet({
 
               {/* Thank you toast */}
               {showThanks && (
-                <p className="mt-2 text-xs font-medium text-green-600 dark:text-green-400">
+                <p className="mt-2 text-xs font-medium text-success">
                   {tEvidence('feedbackThanks')}
                 </p>
               )}

@@ -27,12 +27,12 @@ describe('MOOD_ICONS', () => {
     }
   });
 
-  it('mood 4 and 5 have green dotColor', async () => {
+  it('mood 4 and 5 have positive dotColor', async () => {
     const { MOOD_ICONS } = await import('@/lib/mood-icons');
     const mood4 = MOOD_ICONS.find((m) => m.value === 4)!;
     const mood5 = MOOD_ICONS.find((m) => m.value === 5)!;
     expect(mood4.dotColor).toContain('green');
-    expect(mood5.dotColor).toContain('green');
+    expect(mood5.dotColor).toContain('success');
   });
 
   it('mood 3 has yellow dotColor', async () => {

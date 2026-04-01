@@ -121,35 +121,35 @@ export default function StatsPage() {
             <h3 className="text-sm font-bold">
               {t('impact.totalSavings')}
             </h3>
-            <span className="rounded-full bg-[#3D8A5A] px-2 py-0.5 text-[10px] font-semibold text-white">
+            <span className="rounded-full bg-success px-2 py-0.5 text-[10px] font-semibold text-success-foreground">
               {t('impact.cumulative')}
             </span>
           </div>
           <div className="space-y-2">
-            <div className="flex items-center justify-between rounded-lg bg-[#FFF8F0] px-3 py-2.5">
+            <div className="flex items-center justify-between rounded-lg bg-impact-bg px-3 py-2.5">
               <div>
-                <div className="text-xs font-medium text-[#B8860B]">{t('impact.dailyHealth')}</div>
-                <div className="text-[10px] text-[#B8860B]/50">{t('impact.allHabitsTotal')}</div>
+                <div className="text-xs font-medium text-impact-cost">{t('impact.dailyHealth')}</div>
+                <div className="text-[10px] text-impact-cost/50">{t('impact.allHabitsTotal')}</div>
               </div>
-              <div className="text-lg font-bold text-[#B8860B]">
+              <div className="text-lg font-bold text-impact-cost">
                 +{formatHealthMinutes(stats.totalSavings.healthMinutes, { min: t('impact.minuteUnit'), hour: t('impact.hourUnit'), day: t('impact.dayUnit') })}
               </div>
             </div>
-            <div className="flex items-center justify-between rounded-lg bg-[#FFF8F0] px-3 py-2.5">
+            <div className="flex items-center justify-between rounded-lg bg-impact-bg px-3 py-2.5">
               <div>
-                <div className="text-xs font-medium text-[#B8860B]">{t('impact.dailyCost')}</div>
-                <div className="text-[10px] text-[#B8860B]/50">{t('impact.allHabitsTotal')}</div>
+                <div className="text-xs font-medium text-impact-cost">{t('impact.dailyCost')}</div>
+                <div className="text-[10px] text-impact-cost/50">{t('impact.allHabitsTotal')}</div>
               </div>
-              <div className="text-lg font-bold text-[#B8860B]">
+              <div className="text-lg font-bold text-impact-cost">
                 {formatCurrency(stats.totalSavings.costSaving)}
               </div>
             </div>
-            <div className="flex items-center justify-between rounded-lg bg-[#FFF8F0] px-3 py-2.5">
+            <div className="flex items-center justify-between rounded-lg bg-impact-bg px-3 py-2.5">
               <div>
-                <div className="text-xs font-medium text-[#B8860B]">{t('impact.dailyIncome')}</div>
-                <div className="text-[10px] text-[#B8860B]/50">{t('impact.allHabitsTotal')}</div>
+                <div className="text-xs font-medium text-impact-cost">{t('impact.dailyIncome')}</div>
+                <div className="text-[10px] text-impact-cost/50">{t('impact.allHabitsTotal')}</div>
               </div>
-              <div className="text-lg font-bold text-[#B8860B]">
+              <div className="text-lg font-bold text-impact-cost">
                 {formatCurrency(stats.totalSavings.incomeGain)}
               </div>
             </div>

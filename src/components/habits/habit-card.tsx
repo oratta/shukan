@@ -46,7 +46,7 @@ function DayStatusDot({
       }}
       className={cn(
         'flex items-center justify-center rounded-full size-3 transition-all',
-        (status === 'completed' || status === 'rocket_used') && 'bg-[#3D8A5A]',
+        (status === 'completed' || status === 'rocket_used') && 'bg-success',
         status === 'failed' && 'bg-[#D08068]',
         status === 'none' && 'border border-gray-300 bg-transparent',
         status === 'skipped' && 'bg-gray-300',
@@ -55,7 +55,7 @@ function DayStatusDot({
   );
 }
 
-const CELEBRATION_COLORS = ['#3D8A5A', '#5BAF7A', '#A8D5BA', '#D4AF37', '#E8C97A', '#7AB89B'];
+const CELEBRATION_COLORS = ['#4CAF76', '#5BAF7A', '#A8D5BA', '#D4AF37', '#E8C97A', '#7AB89B'];
 
 function CelebrationEffect() {
   return (
@@ -140,7 +140,7 @@ function StatusIndicator({
           <div className="flex size-8 items-center justify-center rounded-full bg-[#D08068]" />
         ) : (isCompleted || isDone) ? (
           /* Completed: solid green circle */
-          <div className="flex size-8 items-center justify-center rounded-full bg-[#3D8A5A]">
+          <div className="flex size-8 items-center justify-center rounded-full bg-success">
             <span className="text-[9px] font-bold text-white">
               {current}/{target}
             </span>
@@ -155,14 +155,14 @@ function StatusIndicator({
               />
               <circle
                 cx="16" cy="16" r={radius}
-                fill="none" stroke="#3D8A5A" strokeWidth="2.5"
+                fill="none" stroke="var(--success)" strokeWidth="2.5"
                 strokeDasharray={circumference}
                 strokeDashoffset={strokeDashoffset}
                 strokeLinecap="round"
                 className="transition-all duration-300"
               />
             </svg>
-            <span className="absolute text-[9px] font-bold text-[#3D8A5A]">
+            <span className="absolute text-[9px] font-bold text-success">
               {current}/{target}
             </span>
           </>
@@ -185,7 +185,7 @@ function StatusIndicator({
           }}
           className={cn(
             'flex size-8 shrink-0 items-center justify-center rounded-full transition-all',
-            weeklyDone ? 'bg-[#3D8A5A]' : 'border-2 border-gray-300',
+            weeklyDone ? 'bg-success' : 'border-2 border-gray-300',
           )}
         >
           {weeklyDone && (
@@ -208,7 +208,7 @@ function StatusIndicator({
         }}
         className={cn(
           'flex size-8 shrink-0 items-center justify-center rounded-full transition-all',
-          (todayStatus === 'completed' || todayStatus === 'rocket_used') && 'bg-[#3D8A5A]',
+          (todayStatus === 'completed' || todayStatus === 'rocket_used') && 'bg-success',
           todayStatus === 'failed' && 'bg-[#D08068]',
           todayStatus === 'none' && 'border-2 border-gray-300',
         )}
@@ -366,22 +366,22 @@ export function HabitCard({
             )}
 
             {/* Streak card */}
-            <div className="rounded-lg bg-[#C8F0D8] p-3">
+            <div className="rounded-lg bg-success/15 p-3">
               <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-[#3D8A5A]">
+                <span className="text-2xl font-bold text-success">
                   {habit.currentStreak}
                 </span>
-                <span className="text-sm text-[#3D8A5A]/70">
+                <span className="text-sm text-success/70">
                   {tStats('days')}
                 </span>
-                <span className="ml-auto text-xs text-[#3D8A5A]/60">
+                <span className="ml-auto text-xs text-success/60">
                   {t('streakGoal', { percent: streakPercent })}
                 </span>
               </div>
               {/* Progress bar */}
               <div className="mt-2 h-1.5 rounded-full bg-white">
                 <div
-                  className="h-full rounded-full bg-[#3D8A5A] transition-all duration-300"
+                  className="h-full rounded-full bg-success transition-all duration-300"
                   style={{ width: `${streakPercent}%` }}
                 />
               </div>
@@ -400,7 +400,7 @@ export function HabitCard({
                   e.stopPropagation();
                   onOpenDetail(habit.id);
                 }}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#3D8A5A] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#346F4B]"
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-success px-4 py-2.5 text-sm font-medium text-success-foreground transition-colors hover:bg-success/90"
               >
                 <Maximize2 className="size-4" />
                 {t('detail')}
