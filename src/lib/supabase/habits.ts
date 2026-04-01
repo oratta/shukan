@@ -153,11 +153,16 @@ export async function fetchHabits(): Promise<Habit[]> {
   );
 }
 
-export async function fetchCompletions(): Promise<HabitCompletion[]> {
+export async function fetchCompletions(days: number = 90): Promise<HabitCompletion[]> {
   const supabase = createClient();
+  const fromDate = new Date();
+  fromDate.setDate(fromDate.getDate() - days);
+  const fromDateStr = fromDate.toISOString().split('T')[0];
+
   const { data, error } = await supabase
     .from('habit_completions')
     .select('*')
+    .gte('date', fromDateStr)
     .order('date', { ascending: true });
 
   if (error) throw error;
@@ -530,14 +535,12 @@ export async function replaceHabitEvidences(
 export async function updateHabitSortOrders(
   updates: { id: string; sortOrder: number }[]
 ): Promise<void> {
+  if (updates.length === 0) return;
   const supabase = createClient();
-  for (const { id, sortOrder } of updates) {
-    const { error } = await supabase
-      .from('habits')
-      .update({ sort_order: sortOrder })
-      .eq('id', id);
-    if (error) throw error;
-  }
+  const { error } = await supabase.rpc('update_habit_sort_orders', {
+    updates: JSON.stringify(updates),
+  });
+  if (error) throw error;
 }
 
 // --- Completion Note ---

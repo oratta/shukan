@@ -1,16 +1,25 @@
 'use client';
 
-import { useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/components/auth-provider';
 import Link from 'next/link';
 
 export default function LoginPage() {
   const t = useTranslations();
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const authError = searchParams.get('error');
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.push('/');
+    }
+  }, [user, authLoading, router]);
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
