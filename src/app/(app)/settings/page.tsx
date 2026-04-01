@@ -22,7 +22,6 @@ import {
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
-import { HABITS_KEY, COMPLETIONS_KEY, getItem } from '@/lib/storage';
 import { useAuth } from '@/components/auth-provider';
 import { createClient } from '@/lib/supabase/client';
 import { deleteAccount } from './actions';
@@ -45,51 +44,15 @@ export default function SettingsPage() {
   };
 
   const handleExport = () => {
-    const data = {
-      habits: getItem(HABITS_KEY),
-      completions: getItem(COMPLETIONS_KEY),
-      exportedAt: new Date().toISOString(),
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], {
-      type: 'application/json',
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `shukan-backup-${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    // TODO: implement Supabase-based export
   };
 
   const handleImport = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const data = JSON.parse(event.target?.result as string);
-          if (data.habits) localStorage.setItem(HABITS_KEY, JSON.stringify(data.habits));
-          if (data.completions) localStorage.setItem(COMPLETIONS_KEY, JSON.stringify(data.completions));
-          window.location.reload();
-        } catch {
-          // Invalid file
-        }
-      };
-      reader.readAsText(file);
-    };
-    input.click();
+    // TODO: implement Supabase-based import
   };
 
   const handleReset = () => {
-    if (window.confirm(t('settings.resetConfirm'))) {
-      localStorage.removeItem(HABITS_KEY);
-      localStorage.removeItem(COMPLETIONS_KEY);
-      window.location.reload();
-    }
+    // TODO: implement Supabase-based reset
   };
 
   const themeOptions = [
