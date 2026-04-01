@@ -149,12 +149,12 @@ describe('Missing calculationLogic handling', () => {
 });
 
 /**
- * All 30 articles consistency check
+ * All articles consistency check
  */
 describe('All articles have valid calculationParams', () => {
-  it('all 30 articles should have positive calculationParams', () => {
+  it('all 35 articles should have positive calculationParams', () => {
     const articles = getArticleList();
-    expect(articles.length).toBe(30);
+    expect(articles.length).toBe(35);
 
     for (const { id } of articles) {
       const article = getArticle(id);
