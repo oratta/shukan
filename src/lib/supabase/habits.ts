@@ -10,7 +10,6 @@ interface HabitRow {
   description: string | null;
   life_significance: string | null;
   icon: string;
-  color: string;
   frequency: 'everyday' | 'weekday' | 'custom' | 'weekly';
   custom_days: number[] | null;
   type: string;
@@ -84,7 +83,6 @@ function toHabit(row: HabitRow, evidenceRows?: HabitEvidenceRow[]): Habit {
     description: row.description ?? undefined,
     lifeSignificance: row.life_significance ?? undefined,
     icon: row.icon,
-    color: row.color,
     frequency: row.frequency,
     customDays: row.custom_days ?? undefined,
     type: (row.type as 'positive' | 'quit') || 'positive',
@@ -193,7 +191,6 @@ export async function insertHabit(
       description: habit.description || null,
       life_significance: habit.lifeSignificance || null,
       icon: habit.icon,
-      color: habit.color,
       frequency: habit.frequency,
       custom_days: habit.customDays || null,
       type: habit.type || 'positive',
@@ -219,7 +216,6 @@ export async function updateHabitById(
   if (updates.description !== undefined) row.description = updates.description || null;
   if (updates.lifeSignificance !== undefined) row.life_significance = updates.lifeSignificance || null;
   if (updates.icon !== undefined) row.icon = updates.icon;
-  if (updates.color !== undefined) row.color = updates.color;
   if (updates.frequency !== undefined) row.frequency = updates.frequency;
   if (updates.customDays !== undefined) row.custom_days = updates.customDays || null;
   if (updates.type !== undefined) row.type = updates.type;
@@ -639,7 +635,6 @@ interface MonthlyCompletionRow {
   habits: {
     name: string;
     icon: string;
-    color: string;
     archived: boolean;
   } | null;
 }
@@ -647,7 +642,6 @@ interface MonthlyCompletionRow {
 export interface MonthlyHabitCompletion extends HabitCompletion {
   habitName: string;
   habitIcon: string;
-  habitColor: string;
 }
 
 export async function getMonthlyCompletions(
@@ -663,7 +657,7 @@ export async function getMonthlyCompletions(
   const endDate = `${nextYear}-${pad(nextMonth)}-01`;
   const { data, error } = await supabase
     .from('habit_completions')
-    .select('*, habits(name, icon, color, archived)')
+    .select('*, habits(name, icon, archived)')
     .eq('user_id', userId)
     .gte('date', startDate)
     .lt('date', endDate)
@@ -673,6 +667,5 @@ export async function getMonthlyCompletions(
     ...toCompletion(row),
     habitName: row.habits?.name ?? '',
     habitIcon: row.habits?.icon ?? '',
-    habitColor: row.habits?.color ?? '',
   }));
 }

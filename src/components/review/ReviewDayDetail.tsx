@@ -78,8 +78,7 @@ export function ReviewDayDetail({ date, reflection, completions }: ReviewDayDeta
                   <div className="flex items-center gap-2">
                     <StatusIcon status={c.status} />
                     <div
-                      className="size-5 rounded-full flex items-center justify-center shrink-0"
-                      style={{ backgroundColor: c.habitColor + '33' }}
+                      className="size-5 rounded-full flex items-center justify-center shrink-0 bg-muted"
                     >
                       <HabitIcon name={c.habitIcon} size={11} />
                     </div>

@@ -11,6 +11,17 @@ import { calculateTotalSavings, formatHealthMinutes, formatCurrency } from '@/li
 import { useReviewHistory } from '@/hooks/useReviewHistory';
 import { ReviewCalendar } from '@/components/review/ReviewCalendar';
 
+const CHART_COLORS = [
+  'oklch(0.6 0.2 260)',
+  'oklch(0.6 0.18 145)',
+  'oklch(0.65 0.2 30)',
+  'oklch(0.7 0.18 80)',
+  'oklch(0.6 0.2 300)',
+  'oklch(0.65 0.15 180)',
+  'oklch(0.65 0.2 50)',
+  'oklch(0.65 0.2 340)',
+];
+
 export default function StatsPage() {
   const t = useTranslations();
   const { getStats, loading } = useHabits();
@@ -187,7 +198,7 @@ export default function StatsPage() {
           {t('stats.perHabit')}
         </h3>
         <div className="space-y-2">
-          {stats.habits.map((habit) => (
+          {stats.habits.map((habit, index) => (
             <Card
               key={habit.id}
               className="flex items-center gap-3 p-3"
@@ -210,7 +221,7 @@ export default function StatsPage() {
                 progress={habit.completionRate}
                 size={40}
                 strokeWidth={3}
-                color={habit.color || 'oklch(0.6 0.2 260)'}
+                color={CHART_COLORS[index % CHART_COLORS.length]}
               />
             </Card>
           ))}

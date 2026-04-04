@@ -142,8 +142,7 @@ export function YesterdayReviewSheet({
                 <div className="flex items-center gap-3">
                   {/* Habit icon */}
                   <div
-                    className="size-8 rounded-full flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: habit.color + '33' }}
+                    className="size-8 rounded-full flex items-center justify-center shrink-0 bg-muted"
                   >
                     <HabitIcon name={habit.icon} size={16} />
                   </div>

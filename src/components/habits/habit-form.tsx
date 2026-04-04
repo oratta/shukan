@@ -40,17 +40,6 @@ import type { ArticleId } from '@/types/impact';
 
 import { ICON_OPTIONS } from '@/lib/icon-registry';
 
-const COLOR_OPTIONS = [
-  { value: 'oklch(0.6 0.2 260)', label: 'Blue' },
-  { value: 'oklch(0.6 0.18 145)', label: 'Green' },
-  { value: 'oklch(0.65 0.2 30)', label: 'Red' },
-  { value: 'oklch(0.7 0.18 80)', label: 'Yellow' },
-  { value: 'oklch(0.6 0.2 300)', label: 'Purple' },
-  { value: 'oklch(0.65 0.15 180)', label: 'Teal' },
-  { value: 'oklch(0.65 0.2 50)', label: 'Orange' },
-  { value: 'oklch(0.65 0.2 340)', label: 'Pink' },
-];
-
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 interface EvidenceEntry {
@@ -91,9 +80,6 @@ export function HabitForm({
     initialData?.lifeSignificance ?? ''
   );
   const [icon, setIcon] = useState(initialData?.icon ?? 'dumbbell');
-  const [color, setColor] = useState(
-    initialData?.color ?? 'oklch(0.6 0.2 260)'
-  );
   const [frequency, setFrequency] = useState<'everyday' | 'weekday' | 'custom' | 'weekly'>(
     initialData?.frequency ?? 'everyday'
   );
@@ -126,7 +112,6 @@ export function HabitForm({
     setDescription(initialData?.description ?? '');
     setLifeSignificance(initialData?.lifeSignificance ?? '');
     setIcon(initialData?.icon ?? 'dumbbell');
-    setColor(initialData?.color ?? 'oklch(0.6 0.2 260)');
     setFrequency(initialData?.frequency ?? 'everyday');
     setCustomDays(initialData?.customDays ?? [1, 2, 3, 4, 5]);
     setType(initialData?.type ?? 'positive');
@@ -156,7 +141,6 @@ export function HabitForm({
         description: description.trim() || undefined,
         lifeSignificance: lifeSignificance.trim() || undefined,
         icon,
-        color,
         frequency,
         customDays: frequency === 'custom' ? customDays : undefined,
         weeklyTarget: frequency === 'weekly' ? weeklyTarget : undefined,
@@ -174,7 +158,6 @@ export function HabitForm({
       setDescription('');
       setLifeSignificance('');
       setIcon('dumbbell');
-      setColor('oklch(0.6 0.2 260)');
       setFrequency('everyday');
       setCustomDays([1, 2, 3, 4, 5]);
       setWeeklyTarget(1);
@@ -432,26 +415,6 @@ export function HabitForm({
                   >
                     <HabitIcon name={iconName} size={18} />
                   </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>{t('color')}</Label>
-              <div className="flex flex-wrap gap-2">
-                {COLOR_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => setColor(opt.value)}
-                    className={cn(
-                      'size-8 rounded-full transition-all hover:scale-110',
-                      color === opt.value &&
-                        'ring-2 ring-primary ring-offset-2 ring-offset-background'
-                    )}
-                    style={{ backgroundColor: opt.value }}
-                    title={opt.label}
-                  />
                 ))}
               </div>
             </div>

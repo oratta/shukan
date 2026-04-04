@@ -6,7 +6,6 @@ export interface Habit {
   description?: string;
   lifeSignificance?: string;
   icon: string;
-  color: string;
   frequency: 'everyday' | 'weekday' | 'custom' | 'weekly';
   customDays?: number[];
   type: 'positive' | 'quit';
