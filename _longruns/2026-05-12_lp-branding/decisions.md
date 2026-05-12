@@ -56,3 +56,12 @@
 - **判断**: 本runでは「土台」（routing, shell, SEO, deploy 手順）のみ。LP の最終レイアウト・コピー・ビジュアル素材は codex + gpt-image-2 に別途委譲
 - **理由**: ユーザー指定。スコープを限定することで本runの確実性を担保し、デザイン創造性は codex+gpt-image-2 の得意領域で発揮させる
 - **エビデンス**: longrun-plan Step 4 Interview ラスト質問の回答「gpt-image2を使って、codexで作らせてみたいので、LPの具体的な構成はいいや」
+
+## D8: change-A 実装での自律判断（builder agentId TDD-run）
+- **日時**: 2026-05-12（builder 実装フェーズ）
+- **判断**:
+  - **D8-1: middleware test の rewrite 判定方法**: `NextResponse.rewrite()` の検証には `res.headers.get('x-middleware-rewrite')` を使う。Next.js が内部 rewrite を伝達する公式ヘッダで、Vitest から observable。`res.url` などの代替は `NextResponse` インスタンスでは null になるため不採用
+  - **D8-2: production 環境での `?marketing=1` 無視を追加テスト化**: spec の WHEN/THEN には明示されていないが、Risks 表「dev escape hatch が本番に混入すると SEO 操作の余地」を直接担保するため、S2 と同 describe ブロックに「production では `?marketing=1` を無視」テストを 1 ケース追加（11 tests / 8 Scenario）。可逆的・YAGNI 違反なし
+  - **D8-3: marketing layout は `<html>` を返さない**: Next.js App Router では nested layout は `<html>`/`<body>` を持たない方が安全（既存 RootLayout が html を提供）。`src/app/marketing/layout.tsx` は `<div lang="ja">` のラッパに留め、Provider/フォントは継承させる。代替案「marketing 専用 RootLayout として html を持つ」は (app) との競合・Provider 二重化のリスク有り、却下
+  - **D8-4: page を sync Server Component で実装**: D7 反論 2-D を遵守し `default function` は同期。テストでは `(MarketingPage as () => unknown)()` で同期実行し、React 要素ツリーを walk して text/href を集めて assert
+- **エビデンス**: 11/11 tests GREEN、既存 171 + 新規 11 = 182 PASS、build 成功（`/marketing` route 登録確認）、lint は既存 9 errors / 35 warnings のまま（新規追加ファイルでの新規違反ゼロ）

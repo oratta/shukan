@@ -11,64 +11,64 @@
 ### S1: www host returns marketing page at root
 - WHEN: GET `host: www.s-mitch.com` `pathname: /`
 - THEN: middleware が `/marketing` に internal rewrite、`auth.getUser` 非呼び出し
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S2: dev escape hatch in non-production
 - WHEN: dev サーバーで `pathname: /` + `?marketing=1`
 - THEN: `/marketing` に rewrite
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S3: apex unauthenticated user gets redirected to login
 - WHEN: 未ログイン GET `host: s-mitch.com` `pathname: /`
 - THEN: `/login` へリダイレクト（既存挙動）
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S4: apex authenticated user reaches home
 - WHEN: ログイン済み GET `host: s-mitch.com` `pathname: /`
 - THEN: 既存 `(app)/page.tsx` に到達
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S5: localhost without escape hatch behaves as apex
 - WHEN: GET `host: localhost:3000` `pathname: /` 未ログイン
 - THEN: 既存認証フロー（`/login` redirect）
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S6: apex direct /marketing rewritten to root
 - WHEN: GET `host: s-mitch.com` `pathname: /marketing`
 - THEN: `/` に internal rewrite で隠蔽
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S7: Supabase mock not called for www root
 - WHEN: Vitest で `@supabase/ssr` モック、`host: www.s-mitch.com` `pathname: /`
 - THEN: `createServerClient` mock call count = 0
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S8: /marketing renders standalone layout
 - WHEN: marketing route がレンダリングされる
 - THEN: Hero プレースホルダ + CTA → apex login + フッター（privacy/terms）が `(app)` 依存なしで描画
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
