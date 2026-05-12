@@ -29,6 +29,28 @@
 - **理由**: 同一 middleware で host 判定するため同一 deployment が必須。Cloudflare proxy ON では Vercel 証明書発行が遅延・失敗する事例あり
 - **エビデンス**: Plan Review SHOULD_FIX 4 指摘 → v2 で rules 明文化、APPROVE。MEMORY の Infrastructure 記載（apex は proxy OFF）と整合
 
+## D7: Spec Review 指摘の取捨（バイアス緩和ガード適用）
+- **日時**: 2026-05-12（Spec Review by longrun-reviewer agentId a177300e89e5cc043）
+- **REQUEST_CHANGES** だが BLOCKER 2件 + SHOULD_FIX 数件はすべて軽微で APPROVE 可能と判定。以下のとおり取捨:
+  - **指摘 1-A / 2-A / 3-A (a) 採用**: 全 change のファイルパスを `app/...` → `src/app/...` に統一（既存リポは `src/app/` 配下）。perl で一括置換、12 ファイル修正
+  - **指摘 3-D (a) 採用**: Next.js 16 で `headers()` は async 化。change-C tasks 2.1/2.2 で `await headers()` 必須、関数を `async` 化。design Risks にも追記
+  - **指摘 1-B (a) 採用**: change-A tasks 2.1 の分岐順序を厳格化（分岐1/2/3 で即 return、Supabase へ進まない）
+  - **指摘 1-C (a) 採用**: spec.md で `createServerClient` と `auth.getUser` の関係を明示
+  - **指摘 2-B (a) 採用**: Hero タグラインを `<h1>` 限定
+  - **指摘 2-C (a) 採用**: marketing 配下に inline SVG 禁止を明示。ロゴは `<Image>` 経由
+  - **指摘 3-C (a) 採用**: robots apex 用 Requirement 名に「preserves app non-indexed posture」を追加
+  - **指摘 X-A (a) 採用**: layout.tsx の責務を change-B = title+lang、change-C = openGraph/twitter を**追加**と明示
+  - **指摘 2-D (b) 反論**: marketing page は sync Server Component として実装する方針（state なし、async fetch なし）。RTL の async 対応は不要
+  - **指摘 3-E (b) 反論**: sitemap の `lastModified` は assert 不要（spec は `url` のみ assert）。tasks 2.2 にメモ追記済み
+
+## D6: Build Contract レビュー指摘の取捨（バイアス緩和ガード適用）
+- **日時**: 2026-05-12（Build Contract レビュー by longrun-reviewer agentId a7055e7a972126bc8）
+- **APPROVE** + 3指摘あり。以下のとおり取捨:
+  - **指摘1 (a) 採用**: `app/robots.ts` の apex 挙動を `disallow: '/'` と明示。受け入れ条件 12 と change-C rules を更新。理由: builder が自律判断する範囲を超え、spec が曖昧だったため
+  - **指摘2 (b) 反論**: OGP 画像パスは `public/og-image.png` を第一候補として流用する（builder は新規生成を検討してもよいが既存流用を優先）。理由: 嗜好レベル、build 影響なし
+  - **指摘3 (b) 反論**: www の `/marketing` 直接アクセスは本runでは隠蔽せず、duplicate content 微調整は後続 issue 扱い。理由: 嗜好レベル、本runの成功指標（直帰率/login遷移率）に影響しない。SEO 微調整は LP 実体（codex+gpt-image-2）完成後に判断
+- **エビデンス**: Agent 出力は本runディレクトリのチャットログに保持。指摘1の plan.md / decisions.md への反映は本コミットで完了
+
 ## D5: LP のコピー/レイアウト/ビジュアル本実装は本runスコープ外
 - **日時**: 2026-05-12
 - **判断**: 本runでは「土台」（routing, shell, SEO, deploy 手順）のみ。LP の最終レイアウト・コピー・ビジュアル素材は codex + gpt-image-2 に別途委譲

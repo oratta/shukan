@@ -1,11 +1,15 @@
 ---
-phase: Setup
+phase: Build Contract
 status: complete
-last_updated: 2026-05-12T16:40:00+09:00
+last_updated: 2026-05-12T16:55:00+09:00
 ---
 
 ## 完了フェーズ
 - [x] Setup: ツール検証 / OpenSpec 初期化 / schema longrun-tdd 設置 / .gitignore 更新
+- [x] Build Contract: APPROVED by longrun-reviewer (agentId a7055e7a972126bc8)
+  - 指摘1 (a) 採用 → plan.md change-C robots.ts apex `disallow: '/'` 明示
+  - 指摘2,3 (b) 反論 → decisions.md D6 に記録
+- [x] Build前半: OpenSpec change 作成（3件、全て validate pass）+ Spec Review APPROVE（agentId a177300e89e5cc043、BLOCKER 2件＋SHOULD_FIX を全採用）+ verification-guide.md 生成（20 Scenario）
 
 ## 次フェーズへの引き継ぎ
 - plan.md: `_longruns/2026-05-12_lp-branding/plan.md`（v2、APPROVE 済み）
