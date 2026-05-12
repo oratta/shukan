@@ -75,3 +75,13 @@
   - **D9-4: layout.tsx は `<html>` を返さず `<div lang="ja">` のみ**: D8-3 の方針を継続。metadata の `title` を `Smitch — Switch your path.`（em dash）に更新し、description を ja サブコピーに更新。openGraph/twitter は change-C 範囲のため本 change では追加しない（tasks 2.3 / design Non-Goals に従う）
   - **D9-5: 色は semantic class のみ（`bg-background`/`text-foreground`/`bg-primary`/`text-muted-foreground`/`border-border` 等）**: hex 直書きゼロを `grep -rnE '#[0-9A-Fa-f]{3,8}' src/app/marketing/` で検証。inline SVG なし、ロゴ画像も本 change では参照しない（codex+gpt-image-2 委譲領域、tasks 3.4 注記に従う）
 - **エビデンス**: 187/187 tests GREEN（baseline 182 + 新規 5）、build 成功、hex grep 0 件、lint baseline と同一の 44 problems / 9 errors（新規違反ゼロ）
+
+## D10: change-C 実装での自律判断（builder feature/seo-ogp-deploy）
+- **日時**: 2026-05-12（builder 実装フェーズ）
+- **判断**:
+  - **D10-1: `next/headers` のモック方式**: `vi.mock('next/headers', () => ({ headers: () => headersMock() }))` で `headers` を関数として再エクスポートし、内部の `headersMock` を `mockResolvedValue(new Headers({ host: '...' }))` で切り替える二段構成を採用。理由: `vi.mock` の factory に直接 `vi.fn()` を返すと hoisting の都合で `mockReset()` を `beforeEach` から触りにくいため、外側に名前付き mock を保持。design.md Risks の vitest mock 方針と一貫
+  - **D10-2: metadata に文言定数を抽出（`TITLE` / `DESCRIPTION`）**: layout.tsx で title / description / openGraph / twitter の 4 箇所に同一文字列が必要なため、ローカル定数に括り出して DRY。change-B の文言を維持しつつ change-C で追加するだけのため D7 指摘 X-A（責務分離）に違反しない
+  - **D10-3: 追加テスト「`NEXT_PUBLIC_MARKETING_HOSTS` が unset の場合 disallow / empty」**: spec S15-S18 の Scenario は host が apex の場合のみ要求するが、env 完全未設定（preview deployment の安全 fallback）も同等に disallow / empty を返すべきと判断し robots/sitemap 双方に 1 ケースずつ追加。design.md Risks「preview deployment で env 未設定 → robots が apex 扱い → preview がインデックスされない」を直接担保するため、可逆的・YAGNI 違反なし
+  - **D10-4: 動作確認 (tasks 3.4 / 3.5) は未実施で残し、deploy-steps.md (5) のユーザー確認チェックリストに包含**: dev server を本 builder run でバックグラウンド起動して curl 確認するより、デプロイ後のスモークテストで `curl https://www.s-mitch.com/robots.txt` を実施する方が SSL/host 両方を一気に検証できて費用対効果が高い。ユニットテストで host 分岐の関数挙動は全網羅済み、build で `/robots.txt` `/sitemap.xml` が dynamic route として登録されたことも確認済み
+  - **D10-5: deploy-steps.md は本runディレクトリ配下に保存（D4 継続）**: `_longruns/2026-05-12_lp-branding/deploy-steps.md`。長期保管が必要になれば後で `docs/deploy/` へ移動できるよう、内容はプロジェクト/ホスト名を明示してパス自己完結
+- **エビデンス**: 197/197 tests GREEN（baseline 187 + 新規 10）、build 成功（`/robots.txt` `/sitemap.xml` `ƒ` として route 登録）、lint baseline と同一の 9 errors / 35 warnings（新規違反ゼロ）、deploy-steps.md は 5 必須セクション + ロールバック手順 + smoke-test チェックリスト含む

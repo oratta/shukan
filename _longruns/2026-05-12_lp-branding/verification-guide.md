@@ -127,47 +127,47 @@
 ### S15: robots for www host allows all
 - WHEN: `src/app/robots.ts` default export、host = `www.s-mitch.com`
 - THEN: `{ rules: [{ userAgent: '*', allow: '/' }], sitemap: 'https://www.s-mitch.com/sitemap.xml' }`
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S16: robots for apex disallows everything
 - WHEN: `src/app/robots.ts`、host = `s-mitch.com`
 - THEN: `{ rules: [{ userAgent: '*', disallow: '/' }] }`
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S17: sitemap for www lists root URL
 - WHEN: `src/app/sitemap.ts`、host = `www.s-mitch.com`
 - THEN: `url` に `https://www.s-mitch.com/` を含む配列
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S18: sitemap for apex is empty
 - WHEN: `src/app/sitemap.ts`、host = `s-mitch.com`
 - THEN: 配列長 = 0
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S19: og:title and og:image present in HTML
 - WHEN: marketing page HTML レスポンス
 - THEN: `<meta property="og:title"`, `<meta property="og:description"`, `<meta property="og:image"`, `<meta name="twitter:card"` を含む
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S20: deploy-steps.md contains required steps
 - WHEN: `_longruns/2026-05-12_lp-branding/deploy-steps.md` が存在
 - THEN: (1) Vercel ドメイン追加 (2) Cloudflare CNAME proxy OFF (3) env 設定 (4) SSL 待ち (5) 動作確認チェックリスト
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
