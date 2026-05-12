@@ -48,3 +48,7 @@ next-env.d.ts
 .env*.local
 .playwright-cli/
 test-results/
+
+# longrun
+/_worktrees/
+openspec/config.yaml
