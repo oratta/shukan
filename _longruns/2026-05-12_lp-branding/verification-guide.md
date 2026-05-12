@@ -77,48 +77,48 @@
 ### S9: Hero section is visible
 - WHEN: marketing page がレンダリングされる
 - THEN: `<h1>` に "Switch your path."、ja サブコピーに「なりたい自分」「科学」
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S10: Problem and Solution texts coexist
 - WHEN: marketing page がレンダリングされる
 - THEN: ja Problem テキスト + Solution テキストの両方が存在
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S11: Primary CTA href points to login
 - WHEN: marketing page がレンダリングされる
 - THEN: 1 つの主要 CTA、href は `https://s-mitch.com/login`（または `NEXT_PUBLIC_APP_URL/login`）、accessible label は `copy.ts` の ja 文字列
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S12: Footer links resolve to legal pages
 - WHEN: marketing page がレンダリングされる
 - THEN: footer に `href="/privacy"` と `href="/terms"`、`Genetta Inc` テキスト
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S13: copy.ts exports core strings
 - WHEN: ビルド
 - THEN: `src/app/marketing/copy.ts` が `tagline`/`heroSubcopy`/`problemText`/`solutionText`/`ctaLabel`/`footerCredit` をエクスポート
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S14: No hardcoded hex in marketing pages
 - WHEN: `src/app/marketing/**/*.{ts,tsx}` を hex `#[0-9A-Fa-f]{3,8}` で grep
 - THEN: match count = 0（ロゴは `<Image>` 経由）
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 

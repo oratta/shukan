@@ -65,3 +65,13 @@
   - **D8-3: marketing layout は `<html>` を返さない**: Next.js App Router では nested layout は `<html>`/`<body>` を持たない方が安全（既存 RootLayout が html を提供）。`src/app/marketing/layout.tsx` は `<div lang="ja">` のラッパに留め、Provider/フォントは継承させる。代替案「marketing 専用 RootLayout として html を持つ」は (app) との競合・Provider 二重化のリスク有り、却下
   - **D8-4: page を sync Server Component で実装**: D7 反論 2-D を遵守し `default function` は同期。テストでは `(MarketingPage as () => unknown)()` で同期実行し、React 要素ツリーを walk して text/href を集めて assert
 - **エビデンス**: 11/11 tests GREEN、既存 171 + 新規 11 = 182 PASS、build 成功（`/marketing` route 登録確認）、lint は既存 9 errors / 35 warnings のまま（新規追加ファイルでの新規違反ゼロ）
+
+## D9: change-B 実装での自律判断（builder feature/lp-shell-and-copy）
+- **日時**: 2026-05-12（builder 実装フェーズ）
+- **判断**:
+  - **D9-1: テスト戦略 — `@testing-library/react` を追加せず tree-walking 方式を継続**: tasks 1.2 の「必要に応じて RTL を追加」に対し、追加せず既存 `middleware.test.ts` S8 と同じ tree-walking helper を採用。理由: (a) vitest 環境が `node`（DOM なし）で、jsdom 導入は他 7 ファイルへの副作用リスクあり、(b) sync Server Component の構造アサーション（h1/footer/href/text 存在）は walk で十分、(c) D7 反論 2-D「sync Server Component」方針と一貫。YAGNI 遵守
+  - **D9-2: copy.ts のキー設計と ja 文言**: spec 必須キー 6 個（`tagline`/`heroSubcopy`/`problemText`/`solutionText`/`ctaLabel`/`footerCredit`）のみエクスポート、locale 辞書化はしない。文言は product-concept.md「コアコンセプト」「他の習慣アプリとの決定的な違い」「ターゲットユーザー」セクションから抽出し、Voice & Tone（静かに寄り添う／押し付けない）を意識して 1〜2 文に圧縮。代替案「`as const` literal で文字列リテラル型を保持」は将来の英語化拡張時に `Record<Locale, string>` への移行が逆に冗長になるため不採用
+  - **D9-3: 主要 CTA は `<a>` 単一、aria-label を付けず可視テキストで accessible name を成立**: spec S11 の「accessible label = copy.ts の ja 文字列」を満たすため、`<a>{ctaLabel}</a>` の可視テキストをそのまま accessible name にする（aria-label を上書きしない）。Next.js `<Link>` ではなく `<a>` を選んだ理由: 遷移先が外部 origin（`https://s-mitch.com/login`）であり、`<Link>` のクライアントナビゲーション最適化は効かないため。design.md Risks「Server/Client 混在」と整合
+  - **D9-4: layout.tsx は `<html>` を返さず `<div lang="ja">` のみ**: D8-3 の方針を継続。metadata の `title` を `Smitch — Switch your path.`（em dash）に更新し、description を ja サブコピーに更新。openGraph/twitter は change-C 範囲のため本 change では追加しない（tasks 2.3 / design Non-Goals に従う）
+  - **D9-5: 色は semantic class のみ（`bg-background`/`text-foreground`/`bg-primary`/`text-muted-foreground`/`border-border` 等）**: hex 直書きゼロを `grep -rnE '#[0-9A-Fa-f]{3,8}' src/app/marketing/` で検証。inline SVG なし、ロゴ画像も本 change では参照しない（codex+gpt-image-2 委譲領域、tasks 3.4 注記に従う）
+- **エビデンス**: 187/187 tests GREEN（baseline 182 + 新規 5）、build 成功、hex grep 0 件、lint baseline と同一の 44 problems / 9 errors（新規違反ゼロ）

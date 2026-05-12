@@ -57,3 +57,24 @@ change-A で routing 基盤が整い、`src/app/marketing/page.tsx` は Hero プ
 ## Open Questions
 
 - なし（コピー出典 product-concept.md で確定）
+
+## Builder Decisions（実装時に確定）
+
+### D5: テストは tree-walking helper で実装（RTL 追加せず）
+
+- **判断**: tasks 1.2「必要に応じて RTL を追加」に対し追加せず、`middleware.test.ts` S8 と同じ手で書いた tree walker で構造アサーション
+- **代替案 A**: `@testing-library/react` + jsdom 環境
+- **却下理由**: vitest 環境が `node` で、jsdom 導入は他テスト 7 ファイルへの副作用リスク。sync Server Component の構造（h1/footer/href/text）assert には walker で十分。YAGNI
+
+### D6: 主要 CTA は素の `<a>`（Next `<Link>` ではなく）
+
+- **判断**: `<a href="https://s-mitch.com/login">{ctaLabel}</a>` を 1 つだけ配置
+- **代替案 A**: `next/link` の `<Link>` を使う
+- **却下理由**: 遷移先が別 origin（apex `s-mitch.com`）でクライアントナビゲーション最適化が効かない。素の anchor のほうが prefetch 等の副作用がなく、middleware test とも整合
+
+### D7: accessible label は可視テキスト経由（aria-label を上書きしない）
+
+- **判断**: CTA の accessible name は `<a>` 内の可視テキスト `ctaLabel` で成立させ、`aria-label` は付けない
+- **代替案 A**: `aria-label={ctaLabel}` を冗長に付与
+- **却下理由**: 可視テキストと aria-label が同一なら冗長。WAI-ARIA Authoring Practices 的にも冗長指定は推奨されない
+
