@@ -1,10 +1,28 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
+const TITLE = 'Smitch — Switch your path.';
+const DESCRIPTION =
+  'エビデンスベースのライフパスビルダー。「なりたい自分」に向かって、科学が習慣を導く。';
+
 export const metadata: Metadata = {
-  title: 'Smitch — Switch your path.',
-  description:
-    'エビデンスベースのライフパスビルダー。「なりたい自分」に向かって、科学が習慣を導く。',
+  title: TITLE,
+  description: DESCRIPTION,
+  // metadataBase makes relative image paths absolute in og:image / twitter:image (D3).
+  metadataBase: new URL('https://www.s-mitch.com'),
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: '/',
+    images: ['/og-image.png'],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: TITLE,
+    description: DESCRIPTION,
+    images: ['/og-image.png'],
+  },
 };
 
 export default function MarketingLayout({
