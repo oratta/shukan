@@ -1,8 +1,44 @@
 ---
-phase: Build Contract
+phase: Build
 status: complete
-last_updated: 2026-05-12T16:55:00+09:00
+last_updated: 2026-05-12T17:26:00+09:00
 ---
+
+## Changes 状態
+| Change | Tasks | Tests | Status |
+|--------|-------|-------|--------|
+| marketing-routing-middleware | 13/13 | 11 PASS | Merged (d0c9b63) |
+| lp-shell-and-copy | 13/13 | 5 PASS | Merged (394abde) |
+| seo-ogp-deploy | 13/15 (3.4/3.5 deploy smoke待ち) | 10 PASS | Merged (f77a3d3) |
+
+## verification-guide.md 進捗
+- 20/20 Scenarios: テスト実装完了 [x]
+- 20/20 Scenarios: ロジック実装完了 [x]
+- 0/20 Scenarios: 動作確認完了（Verify フェーズで）
+- 0/20 Scenarios: ユーザー確認完了（Feedback フェーズで）
+
+## Total tests
+197 PASS / 197 total（baseline 171 + change-A 11 + change-B 5 + change-C 10）
+
+## Build
+- `npm run build`: ✅ Compiled successfully
+- Routes: `/marketing`, `/robots.txt`, `/sitemap.xml`, 既存 (app) routes 全て登録
+
+## Verify結果
+| 軸 | スコア | しきい値 | 判定 | 検証Agent |
+|----|-------|---------|------|----------|
+| 品質 | 100% | 100% | ✅ | longrun-verifier (agentId a592bf531cb396a34) |
+| 完成度 | 96% | 80% | ✅ | longrun-verifier |
+| 機能性 | 100% (20/20 Scenarios) | 100% | ✅ | longrun-browser-verifier (agentId a019955fd549b768f) |
+| UX | 90% | 70% | ✅ | longrun-browser-verifier |
+
+ブラウザ検証は curl + grep + SSR HTML 検査で実施（Playwright MCP / claude-in-chrome 不在）。視覚レイアウト検証は本番デプロイ後の smoke-test に委譲。
+
+## Backlog 追加（本run由来）
+- LP html lang locale 動的化（next-intl 影響）
+- LP 本格デザイン（codex + gpt-image-2）
+- LP Analytics / A/B / waitlist
+- middleware host 大文字小文字対応
 
 ## 完了フェーズ
 - [x] Setup: ツール検証 / OpenSpec 初期化 / schema longrun-tdd 設置 / .gitignore 更新
@@ -10,6 +46,10 @@ last_updated: 2026-05-12T16:55:00+09:00
   - 指摘1 (a) 採用 → plan.md change-C robots.ts apex `disallow: '/'` 明示
   - 指摘2,3 (b) 反論 → decisions.md D6 に記録
 - [x] Build前半: OpenSpec change 作成（3件、全て validate pass）+ Spec Review APPROVE（agentId a177300e89e5cc043、BLOCKER 2件＋SHOULD_FIX を全採用）+ verification-guide.md 生成（20 Scenario）
+- [x] Build後半: 3 change を順次 TDD 実装（worktree → builder Agent → merge）
+  - change-A: worktree commit d0c9b63 → merge 37521dc
+  - change-B: worktree commit 394abde → merge f8732bc
+  - change-C: worktree commit f77a3d3 → merge b2a9a2d
 
 ## 次フェーズへの引き継ぎ
 - plan.md: `_longruns/2026-05-12_lp-branding/plan.md`（v2、APPROVE 済み）

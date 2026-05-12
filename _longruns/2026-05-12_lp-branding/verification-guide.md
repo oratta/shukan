@@ -13,7 +13,7 @@
 - THEN: middleware が `/marketing` に internal rewrite、`auth.getUser` 非呼び出し
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S2: dev escape hatch in non-production
@@ -21,7 +21,7 @@
 - THEN: `/marketing` に rewrite
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S3: apex unauthenticated user gets redirected to login
@@ -29,7 +29,7 @@
 - THEN: `/login` へリダイレクト（既存挙動）
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S4: apex authenticated user reaches home
@@ -37,7 +37,7 @@
 - THEN: 既存 `(app)/page.tsx` に到達
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S5: localhost without escape hatch behaves as apex
@@ -45,7 +45,7 @@
 - THEN: 既存認証フロー（`/login` redirect）
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S6: apex direct /marketing rewritten to root
@@ -53,7 +53,7 @@
 - THEN: `/` に internal rewrite で隠蔽
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S7: Supabase mock not called for www root
@@ -61,7 +61,7 @@
 - THEN: `createServerClient` mock call count = 0
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S8: /marketing renders standalone layout
@@ -69,7 +69,7 @@
 - THEN: Hero プレースホルダ + CTA → apex login + フッター（privacy/terms）が `(app)` 依存なしで描画
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ## change-B: lp-shell-and-copy
@@ -79,7 +79,7 @@
 - THEN: `<h1>` に "Switch your path."、ja サブコピーに「なりたい自分」「科学」
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S10: Problem and Solution texts coexist
@@ -87,7 +87,7 @@
 - THEN: ja Problem テキスト + Solution テキストの両方が存在
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S11: Primary CTA href points to login
@@ -95,7 +95,7 @@
 - THEN: 1 つの主要 CTA、href は `https://s-mitch.com/login`（または `NEXT_PUBLIC_APP_URL/login`）、accessible label は `copy.ts` の ja 文字列
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S12: Footer links resolve to legal pages
@@ -103,7 +103,7 @@
 - THEN: footer に `href="/privacy"` と `href="/terms"`、`Genetta Inc` テキスト
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S13: copy.ts exports core strings
@@ -111,7 +111,7 @@
 - THEN: `src/app/marketing/copy.ts` が `tagline`/`heroSubcopy`/`problemText`/`solutionText`/`ctaLabel`/`footerCredit` をエクスポート
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S14: No hardcoded hex in marketing pages
@@ -119,7 +119,7 @@
 - THEN: match count = 0（ロゴは `<Image>` 経由）
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ## change-C: seo-ogp-deploy
@@ -129,7 +129,7 @@
 - THEN: `{ rules: [{ userAgent: '*', allow: '/' }], sitemap: 'https://www.s-mitch.com/sitemap.xml' }`
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S16: robots for apex disallows everything
@@ -137,7 +137,7 @@
 - THEN: `{ rules: [{ userAgent: '*', disallow: '/' }] }`
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S17: sitemap for www lists root URL
@@ -145,7 +145,7 @@
 - THEN: `url` に `https://www.s-mitch.com/` を含む配列
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S18: sitemap for apex is empty
@@ -153,7 +153,7 @@
 - THEN: 配列長 = 0
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S19: og:title and og:image present in HTML
@@ -161,7 +161,7 @@
 - THEN: `<meta property="og:title"`, `<meta property="og:description"`, `<meta property="og:image"`, `<meta name="twitter:card"` を含む
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S20: deploy-steps.md contains required steps
@@ -169,5 +169,5 @@
 - THEN: (1) Vercel ドメイン追加 (2) Cloudflare CNAME proxy OFF (3) env 設定 (4) SSL 待ち (5) 動作確認チェックリスト
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
