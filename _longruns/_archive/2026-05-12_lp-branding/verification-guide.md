@@ -14,7 +14,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S2: dev escape hatch in non-production
 - WHEN: dev サーバーで `pathname: /` + `?marketing=1`
@@ -22,7 +22,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S3: apex unauthenticated user gets redirected to login
 - WHEN: 未ログイン GET `host: s-mitch.com` `pathname: /`
@@ -30,7 +30,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S4: apex authenticated user reaches home
 - WHEN: ログイン済み GET `host: s-mitch.com` `pathname: /`
@@ -38,7 +38,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S5: localhost without escape hatch behaves as apex
 - WHEN: GET `host: localhost:3000` `pathname: /` 未ログイン
@@ -46,7 +46,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S6: apex direct /marketing rewritten to root
 - WHEN: GET `host: s-mitch.com` `pathname: /marketing`
@@ -54,7 +54,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S7: Supabase mock not called for www root
 - WHEN: Vitest で `@supabase/ssr` モック、`host: www.s-mitch.com` `pathname: /`
@@ -62,7 +62,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S8: /marketing renders standalone layout
 - WHEN: marketing route がレンダリングされる
@@ -70,7 +70,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ## change-B: lp-shell-and-copy
 
@@ -80,7 +80,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S10: Problem and Solution texts coexist
 - WHEN: marketing page がレンダリングされる
@@ -88,7 +88,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S11: Primary CTA href points to login
 - WHEN: marketing page がレンダリングされる
@@ -96,7 +96,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S12: Footer links resolve to legal pages
 - WHEN: marketing page がレンダリングされる
@@ -104,7 +104,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S13: copy.ts exports core strings
 - WHEN: ビルド
@@ -112,7 +112,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S14: No hardcoded hex in marketing pages
 - WHEN: `src/app/marketing/**/*.{ts,tsx}` を hex `#[0-9A-Fa-f]{3,8}` で grep
@@ -120,7 +120,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ## change-C: seo-ogp-deploy
 
@@ -130,7 +130,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S16: robots for apex disallows everything
 - WHEN: `src/app/robots.ts`、host = `s-mitch.com`
@@ -138,7 +138,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S17: sitemap for www lists root URL
 - WHEN: `src/app/sitemap.ts`、host = `www.s-mitch.com`
@@ -146,7 +146,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S18: sitemap for apex is empty
 - WHEN: `src/app/sitemap.ts`、host = `s-mitch.com`
@@ -154,7 +154,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S19: og:title and og:image present in HTML
 - WHEN: marketing page HTML レスポンス
@@ -162,7 +162,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S20: deploy-steps.md contains required steps
 - WHEN: `_longruns/2026-05-12_lp-branding/deploy-steps.md` が存在
@@ -170,4 +170,4 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
