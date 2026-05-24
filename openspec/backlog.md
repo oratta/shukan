@@ -3,10 +3,7 @@
 ## LP / Marketing（2026-05-12 lp-branding run から）
 
 - `<html lang>` の locale 動的化: marketing host の場合は `ja` を強制したい（現状 next-intl の locale 由来で en になりがち）。RootLayout は apex と共有なので別アプローチ要検討（middleware で host 別 locale cookie 上書き、または marketing 専用 RootLayout）
-- LP の本格デザイン（codex + gpt-image-2 委譲）: 現状はプレースホルダ Hero + Problem→Solution + CTA + Footer のシンプル構成。本格ビジュアル・セクション構成（FAQ / Comparison / Testimonials 等）は別run
-- LP の Analytics 計測: PostHog 等で直帰率・CTA クリック率を計測
-- LP の A/B テスト: コアコピー A/B でコンバージョン測定
-- waitlist / メール取得: LP CTA とは別に「興味あり」層を捕捉
+- LP の A/B テスト: コアコピー A/B でコンバージョン測定（_longruns/2026-05-24_lp-image-code-workflow で単一バージョン実装、3 ヶ月実測してから判断）
 - middleware host 大文字小文字対応: `request.headers.get('host')` を `.toLowerCase()` し、env 側もマッチさせる堅牢化（実害は低い、Vercel/Cloudflare で正規化済み）
 
 ## Supabase/Vercel ベストプラクティス適用（残件）
