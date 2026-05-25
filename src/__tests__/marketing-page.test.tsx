@@ -1,13 +1,8 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-/**
- * Tree-walking helper for sync Server Component output.
- * Mirrors the approach used in middleware.test.ts S8 to avoid needing a DOM runtime.
- */
 type WalkResult = {
   texts: string[];
   hrefs: string[];
-  // Each element: { type, props } pairs
   elements: Array<{ type: unknown; props: Record<string, unknown> }>;
 };
 
@@ -33,125 +28,110 @@ function walk(node: unknown, acc: WalkResult): void {
   }
 }
 
-function getElementsByType(acc: WalkResult, type: string) {
-  return acc.elements.filter((e) => e.type === type);
+function collect(node: unknown): WalkResult {
+  const acc: WalkResult = { texts: [], hrefs: [], elements: [] };
+  walk(node, acc);
+  return acc;
 }
 
-const ORIGINAL_ENV = { ...process.env };
+function typeName(type: unknown): string {
+  if (typeof type === 'string') return type;
+  if (typeof type === 'function') return type.name;
+  if (typeof type === 'object' && type && 'render' in type) {
+    const render = (type as { render?: { name?: string } }).render;
+    return render?.name ?? '';
+  }
+  return '';
+}
 
-beforeEach(() => {
-  process.env = { ...ORIGINAL_ENV };
-  // Ensure NEXT_PUBLIC_APP_URL is unset so default falls through to https://s-mitch.com
-  delete process.env.NEXT_PUBLIC_APP_URL;
-});
-
-afterEach(() => {
-  process.env = { ...ORIGINAL_ENV };
-});
-
-describe('S13: copy.ts exports core strings', () => {
-  it('exports tagline, heroSubcopy, problemText, solutionText, ctaLabel, footerCredit', async () => {
-    const copy = await import('@/app/marketing/copy');
-    expect(typeof copy.tagline).toBe('string');
-    expect(copy.tagline).toBe('Switch your path.');
-
-    expect(typeof copy.heroSubcopy).toBe('string');
-    expect(copy.heroSubcopy.length).toBeGreaterThan(0);
-
-    expect(typeof copy.problemText).toBe('string');
-    expect(copy.problemText.length).toBeGreaterThan(0);
-
-    expect(typeof copy.solutionText).toBe('string');
-    expect(copy.solutionText.length).toBeGreaterThan(0);
-
-    expect(typeof copy.ctaLabel).toBe('string');
-    expect(copy.ctaLabel).toBe('アプリを始める');
-
-    expect(typeof copy.footerCredit).toBe('string');
-    expect(copy.footerCredit).toContain('Genetta');
-  });
-});
-
-describe('S9: Hero section is visible', () => {
-  it('renders <h1> with "Switch your path." and ja subcopy referencing "なりたい自分" and "科学"', async () => {
+describe('Smitch marketing landing page', () => {
+  it('assembles the eight image-to-code LP sections in order', async () => {
     const { default: MarketingPage } = await import('@/app/marketing/page');
-    const tree = (MarketingPage as () => unknown)();
-    const acc: WalkResult = { texts: [], hrefs: [], elements: [] };
-    walk(tree, acc);
+    const acc = collect((MarketingPage as () => unknown)());
 
-    // h1 contains tagline
-    const h1Elements = getElementsByType(acc, 'h1');
-    expect(h1Elements.length).toBe(1);
-    const h1Acc: WalkResult = { texts: [], hrefs: [], elements: [] };
-    walk(h1Elements[0].props.children, h1Acc);
-    expect(h1Acc.texts.join(' ')).toContain('Switch your path.');
+    const sectionNames = acc.elements
+      .map((element) => typeName(element.type))
+      .filter((name) =>
+        [
+          'Hero',
+          'Problem',
+          'Process',
+          'Detail',
+          'OutcomeGallery',
+          'SelectionCriterion',
+          'Testimony',
+          'CtaWaitlistForm',
+        ].includes(name)
+      );
 
-    // Subcopy references "なりたい自分" and "科学"
-    const joined = acc.texts.join(' ');
-    expect(joined).toContain('なりたい自分');
-    expect(joined).toContain('科学');
-  });
-});
-
-describe('S10: Problem and Solution texts coexist', () => {
-  it('renders both problemText and solutionText from copy.ts', async () => {
-    const [{ default: MarketingPage }, copy] = await Promise.all([
-      import('@/app/marketing/page'),
-      import('@/app/marketing/copy'),
+    expect(sectionNames).toEqual([
+      'Hero',
+      'Problem',
+      'Process',
+      'Detail',
+      'OutcomeGallery',
+      'SelectionCriterion',
+      'Testimony',
+      'CtaWaitlistForm',
     ]);
-    const tree = (MarketingPage as () => unknown)();
-    const acc: WalkResult = { texts: [], hrefs: [], elements: [] };
-    walk(tree, acc);
+  });
+
+  it('keeps footer legal links and brand credit visible', async () => {
+    const { default: MarketingPage } = await import('@/app/marketing/page');
+    const acc = collect((MarketingPage as () => unknown)());
     const joined = acc.texts.join(' ');
-    expect(joined).toContain(copy.problemText);
-    expect(joined).toContain(copy.solutionText);
+
+    expect(acc.hrefs).toContain('/privacy');
+    expect(acc.hrefs).toContain('/terms');
+    expect(joined).toContain('Switch your path.');
+    expect(joined).toContain('Genetta Inc.');
   });
-});
 
-describe('S11: Primary CTA href points to login', () => {
-  it('renders exactly one CTA anchor with href to https://s-mitch.com/login when NEXT_PUBLIC_APP_URL is unset, with copy.ts ctaLabel as accessible label', async () => {
-    // Vitest does not re-evaluate dynamically imported ESM modules after env change in the same run.
-    // page.tsx reads process.env at render time (function body), so we just need to delete the var before importing.
-    const { default: MarketingPage } = await import('@/app/marketing/page');
-    const copy = await import('@/app/marketing/copy');
-    const tree = (MarketingPage as () => unknown)();
-    const acc: WalkResult = { texts: [], hrefs: [], elements: [] };
-    walk(tree, acc);
+  it('renders hero headline, positioning copy, and primary section links', async () => {
+    const { Hero } = await import('@/components/landing/Hero');
+    const acc = collect(Hero());
+    const joined = acc.texts.join(' ');
 
-    // CTA: anchor whose href ends with /login
-    const loginAnchors = acc.elements.filter(
-      (e) => e.type === 'a' && typeof e.props.href === 'string' && (e.props.href as string).endsWith('/login')
-    );
-    expect(loginAnchors.length).toBe(1);
-    const cta = loginAnchors[0];
-    expect(cta.props.href).toBe('https://s-mitch.com/login');
-
-    // Accessible label: the visible text inside the CTA should be the copy.ts ctaLabel.
-    // (No aria-label override: ja label drives the accessible name.)
-    const labelAcc: WalkResult = { texts: [], hrefs: [], elements: [] };
-    walk(cta.props.children, labelAcc);
-    const labelText = labelAcc.texts.join('').trim();
-    expect(labelText).toBe(copy.ctaLabel);
+    expect(joined).toContain('人生は、');
+    expect(joined).toContain('続けた日数では');
+    expect(joined).toContain('科学的根拠のある習慣');
+    expect(acc.hrefs).toContain('#waitlist');
+    expect(acc.hrefs).toContain('#process');
   });
-});
 
-describe('S12: Footer links resolve to legal pages', () => {
-  it('renders footer with /privacy, /terms anchors and Genetta Inc credit', async () => {
-    const { default: MarketingPage } = await import('@/app/marketing/page');
-    const tree = (MarketingPage as () => unknown)();
-    const acc: WalkResult = { texts: [], hrefs: [], elements: [] };
-    walk(tree, acc);
+  it('renders the problem, process, detail, outcome, selection, and testimony section copy', async () => {
+    const [
+      { Problem },
+      { Process },
+      { Detail },
+      { OutcomeGallery },
+      { SelectionCriterion },
+      { Testimony },
+    ] = await Promise.all([
+      import('@/components/landing/Problem'),
+      import('@/components/landing/Process'),
+      import('@/components/landing/Detail'),
+      import('@/components/landing/OutcomeGallery'),
+      import('@/components/landing/SelectionCriterion'),
+      import('@/components/landing/Testimony'),
+    ]);
 
-    // There must be a <footer> element
-    const footers = getElementsByType(acc, 'footer');
-    expect(footers.length).toBe(1);
+    const joined = [
+      Problem(),
+      Process(),
+      Detail(),
+      OutcomeGallery(),
+      SelectionCriterion(),
+      Testimony(),
+    ]
+      .map((tree) => collect(tree).texts.join(' '))
+      .join(' ');
 
-    const footerAcc: WalkResult = { texts: [], hrefs: [], elements: [] };
-    walk(footers[0].props.children, footerAcc);
-
-    expect(footerAcc.hrefs).toContain('/privacy');
-    expect(footerAcc.hrefs).toContain('/terms');
-    const footerText = footerAcc.texts.join(' ');
-    expect(footerText.toLowerCase()).toContain('genetta inc');
+    expect(joined).toContain('習慣アプリに、');
+    expect(joined).toContain('能動的に選び取る');
+    expect(joined).toContain('判断材料');
+    expect(joined).toContain('生活に戻ってくるもの');
+    expect(joined).toContain('問題はそこではない');
+    expect(joined).toContain('ストリークを守るためではなく');
   });
 });
