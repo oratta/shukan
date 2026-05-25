@@ -1,8 +1,12 @@
 ---
 phase: Build
-status: in_progress
-last_updated: 2026-05-25T19:00:00+09:00
+status: abandoned
+last_updated: 2026-05-25T22:00:00+09:00
 ---
+
+> [!warning] ABANDONED (2026-05-25)
+> ユーザー判断により本ワークツリーは整理対象。詳細は `RETROSPECTIVE.md` 参照。
+> 次回 LP 構築は別ワークツリーで再着手する。
 
 ## 完了フェーズ
 

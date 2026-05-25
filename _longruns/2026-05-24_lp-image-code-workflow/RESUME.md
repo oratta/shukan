@@ -1,6 +1,13 @@
 # RESUME — LP image-to-code workflow longrun
 
-**次セッション開始時に最初に読むファイル。**
+> [!warning] このワークツリーは ABANDONED (2026-05-25)
+> ユーザー判断により「本ワークツリーではまともな LP は作れない」として整理対象になった。
+> 次回 LP 構築試行は **別ワークツリー** で行う。
+>
+> **次に読むべきドキュメント**: `_longruns/2026-05-24_lp-image-code-workflow/RETROSPECTIVE.md`
+> （ボツ理由 / 効いたこと / 効かなかったこと / 再利用資産 / 次回への提言）
+>
+> 本 RESUME.md は当時の状況スナップショットとして残す（履歴価値あり）。次回は RETROSPECTIVE.md と CLAUDE.md / docs/design / docs/research を起点にする。
 
 ---
 
