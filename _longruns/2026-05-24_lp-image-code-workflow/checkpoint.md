@@ -1,13 +1,30 @@
 ---
-phase: Build Contract
-status: complete
-last_updated: 2026-05-24T13:55:00+09:00
+phase: Build
+status: in_progress
+last_updated: 2026-05-25T19:00:00+09:00
 ---
 
 ## 完了フェーズ
 
 - [x] Setup: ツール検証 / コードベース調査 / ベースラインテスト
 - [x] Build Contract: longrun-reviewer APPROVED (BLOCKER 0 / SHOULD_FIX 0)
+- [x] Build / change-A (lp-foundation): APPROVED + 全 task `[x]` + 230 tests PASS + 6 commits
+
+## 進行中
+
+- [ ] Build / change-B〜G: **画像生成方式を変更中**（LP 全体 1 枚絵 → セクション別 8 枚個別生成、リサーチ §2.4 / §3.1 準拠）
+  - ユーザーが Codex App で 8 セクション画像を順次生成中
+  - ガイド: `_longruns/2026-05-24_lp-image-code-workflow/codex-app-section-prompts.md`
+  - 8 枚揃ったら Claude が独立コンポーネントとして実装 → marketing-preview で組み立て
+- [ ] Build / change-H: 統合 + GA4 + a11y + copy.ts 全面置換（change-B〜G 完了後）
+
+## 試作（参照価値あり、書き直し対象）
+
+- `src/components/landing/Hero.tsx` / `ProblemSolution.tsx` / `WhySmitch.tsx` / `HowItWorks.tsx` / `Evidence.tsx` / `CtaWaitlistForm.tsx`
+- `src/app/marketing-preview/page.tsx`
+- `public/landing/{hero, problem-solution, evidence, hero-codex, lp-mockup-full}.png`
+
+これらは「Claude が plan に沿って一度実装してみた素材」だが、ユーザー判断で「写真にメッセージ性がない / LP 全体 1 枚絵はリサーチ違反」として全面書き直しが確定。8 枚画像が揃ったら新画像 + リッチな editorial 構成で再実装する。
 
 ## ツール検証結果
 
@@ -15,49 +32,51 @@ last_updated: 2026-05-24T13:55:00+09:00
 - **git**: 2.40.1 on `lp-image-code-workflow`
 - **node**: v22.7.0, npm 10.8.3
 - **vitest**: 4.0.18 設定済み (`npm run test:run`)
-- **playwright**: `@playwright/test` インストール済み、`playwright.config.ts` なし（`e2e-verify.spec.ts` 単独で動作）
-- **OpenSpec 初期化状態**: ✅ 完了済み（`openspec/{backlog, changes, schemas, specs}` 全存在 + `longrun-tdd` schema fork 済み + `.gitignore` に `openspec/config.yaml` 追加済み）
+- **playwright**: `@playwright/test` インストール済み、`playwright.config.ts` なし
+- **OpenSpec 初期化状態**: ✅ 完了済み + `longrun-tdd` schema fork 済み
+- **Codex CLI**: `/Users/oratta/.superset/bin/codex` v0.133.0（`image` サブコマンドは**未提供**。`codex exec` 経由で gpt-image を呼び出す方法は試したが、品質的にユーザー却下 → ユーザーが Codex App で対応）
 
 ## ベースラインテスト結果
 
-- **vitest**: 11 test files / **197 tests / 全 PASS** (722ms)
-- 主要テストファイル: middleware.test.ts (11) / robots.test.ts (3) / sitemap.test.ts (3) / marketing-metadata.test.ts (4) / marketing-page.test.tsx (5) など、marketing 周辺は既に十分なテストカバレッジあり
+- 初期: 11 test files / 197 tests / 全 PASS
+- change-A 完了時: 13 test files / **230 tests / 全 PASS**（change-A で 33 tests 追加）
 
-## コードベース調査結果（Build フェーズで使用）
+## change-A 成果物
 
-### 既存実装の確認
+| ファイル | 内容 |
+|---|---|
+| `docs/design/DESIGN.md` | LP design system（OKLCh + HEX 併記、Codex Style Block 用） |
+| `docs/design/brand-references/README.md` | 16 枚 role-label 仕組み |
+| `docs/design/prompts/section-prompt-template.md` | リサーチ §5.1 ベースの汎用テンプレ |
+| `scripts/check-design-md-sync.sh` | globals.css と DESIGN.md の OKLCh diff 検出 |
+| `scripts/codex-image-gen.sh` | Codex CLI 薄ラッパ（D-A-3 通り未 install でも validation までは動く） |
+| `CLAUDE.md` | Smitch concept core + Hard rules |
+| `supabase/migrations/20260524000000_add_waitlist.sql` | waitlist テーブル（本番適用は change-G まで保留） |
 
-| 項目 | 状態 | 詳細 |
-|---|---|---|
-| **middleware host 判定実装** | ✅ **既存** | `src/middleware.ts` に `NEXT_PUBLIC_MARKETING_HOSTS` parsing + Branch 1〜4 の host 判定実装済み（plan の change-A 事前調査タスクで「改修不要」が確定） |
-| **既存 marketing LP** | ✅ 存在 | `src/app/marketing/{page.tsx, layout.tsx, copy.ts}` プレースホルダ実装 + `marketing-page.test.tsx` 5 テスト |
-| **shadcn primitives** | ✅ 14 個 install 済み | button, card, checkbox, dialog, input, label, select, textarea などフォーム必須は全部揃い |
-| **Supabase client** | ✅ `src/lib/supabase/{client.ts, server.ts}` | Browser/Server 分離パターン、cookie-based |
-| **最新 migration** | ✅ `20260402000000_drop_habit_color.sql` | waitlist 追加は `20260524000000_add_waitlist.sql` で続く |
-| **Tailwind v4** | ✅ `globals.css` に `@theme inline` OKLCh palette | tailwind.config.ts は不在（v4 流儀） |
-| **components.json** | ✅ style=new-york, baseColor=neutral, cssVariables=true | shadcn add で installable |
-| **GA4 実装** | ❌ 未実装 | change-H で新規追加 |
-| **next.config.ts images.formats** | ❌ デフォルト | change-H best effort で AVIF/WebP 追加 |
+## ユーザー手動タスク（未実施、change-A デプロイゲート）
 
-### 既存テストカバレッジ（regression 監視対象）
+1. Cloudflare DNS: `www.s-mitch.com` CNAME → `cname.vercel-dns.com`
+2. Vercel project `shukan` に `www.s-mitch.com` ドメイン追加（`vercel domains add www.s-mitch.com shukan`）
+3. Vercel env vars: `NEXT_PUBLIC_MARKETING_HOSTS=www.s-mitch.com` を Production + Preview に設定
 
-- `middleware.test.ts` 11 tests: host 判定の既存挙動を保証 → change-A で env 設定変えても middleware ロジック自体は触らないので壊れない想定
-- `marketing-page.test.tsx` 5 tests: 既存 LP の DOM 構造をテスト → **change-H で全面構築する際に意図的に書き換える**（現行テストは失敗する想定、置換する）
-- `marketing-metadata.test.ts` 4 tests: OG / Twitter card メタデータ → change-H で layout 編集する際に regression 防止
+完了すれば `https://www.s-mitch.com` で marketing route が表示される。change-B〜G の最終確認時 or change-H 後のいずれかのタイミングで実施。
 
-## 次フェーズへの引き継ぎ
+## 次セッションへの引き継ぎ
 
-- Setup フェーズ完了、Build Contract フェーズへ進む
-- change-A の「事前調査タスク」は既存 middleware 実装で完結（**改修不要**を decisions.md に記録）
-- 既存 197 tests が PASS している状態を基準とし、Build 後も全 PASS + 新規テスト追加が条件
-- 既存 `marketing-page.test.tsx` は change-H で書き換え対象（現行 5 tests は破棄、新 LP 用の tests に置き換え）
+**`_longruns/2026-05-24_lp-image-code-workflow/RESUME.md` を最初に読むこと。**
 
-## 次フェーズで使う重要パス
+RESUME.md に以下が記載済み:
 
-- plan.md: `_longruns/2026-05-24_lp-image-code-workflow/plan.md`
-- checkpoint.md: this file
-- decisions.md: `_longruns/2026-05-24_lp-image-code-workflow/decisions.md`
-- 既存 marketing: `src/app/marketing/{page.tsx, layout.tsx, copy.ts}`
-- 既存 middleware: `src/middleware.ts`
-- 既存 Supabase: `src/lib/supabase/{client.ts, server.ts}` + `supabase/migrations/`
-- shadcn primitives: `src/components/ui/`
+- 現在の状況（一行）
+- ユーザーが今やっていること
+- 次セッションで Claude がやるべきこと
+- 主要ファイルパス
+- 重要な決定事項（D-S-1〜D-S-5、D-A-1〜D-A-6）
+- やってはいけないアプローチ（試行錯誤の教訓）
+- 残タスク全体像
+
+## dev server
+
+- ポート 3000 は Obsidian 占有（kill 禁止）
+- 本プロジェクトは **3001** で起動: `PORT=3001 npm run dev`
+- 試作確認 URL: `http://localhost:3001/marketing-preview`

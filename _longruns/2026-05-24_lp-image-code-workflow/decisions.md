@@ -73,3 +73,49 @@
 - **対象 change**: change-A
 - **決定**: 「Smitch コンセプトコア」「LP image-to-code workflow ガイド」「Hard Rules」「Workflow rules」の 4 章構成。今後の change でも追記しやすい構造
 - **影響**: Claude Code が session 開始時に最初に読むファイルとして機能
+
+## Build フェーズ — change-B 画像生成方針の転換
+
+### D-S-3: LP 全体 1 枚絵生成は破綻 → セクション別 8 枚個別生成に切り替え
+
+- **日時**: 2026-05-25T17:00:00+09:00
+- **対象 change**: change-B〜G（画像生成プロセス全体）
+- **決定**: 各セクションの画像を **1792x1024 (16:9) で個別生成** する方式に切り替える。LP 全体 1 枚絵での生成は廃止
+- **エビデンス**:
+  - 試行: Codex App で LP 全体 1 枚絵 mockup を生成 → 各セクションの iPhone モック内テキスト / フォーム項目 / Outcome Gallery 6 枚カード等が縮小されて潰れる
+  - リサーチドキュメント `docs/research/lp-image-to-code-workflow-2026.md` §2.4: 「**1 枚絵で LP 全体を一度に出さない**。理由: 解像度・composition・text-safe zone が破綻しがち、修正コストが scenario あたり 5-10x」
+  - リサーチ §3.1: 「1 枚絵全体を渡すと Claude Code は overall composition に注目するが、**各セクションの細部が薄まる**」
+- **影響**: change-B〜G の plan を「セクションごとに 1 change」から実質「change-B 拡張で 8 セクション同時 = 1 change」に変更可能。openspec change を厳密に分けるか統合するかは次セッションでユーザーと確認
+
+### D-S-4: Style anchor は LP 全体 mockup 1 枚のみ
+
+- **日時**: 2026-05-25T17:30:00+09:00
+- **対象 change**: change-B〜G
+- **決定**: 各セクション生成プロンプトに添付する Style anchor 画像は、**ユーザーが Codex App で作った LP 全体 mockup 1 枚のみ**。既存生成済みの `public/landing/{hero, problem-solution, evidence}.png` は使わない
+- **エビデンス**:
+  - ユーザーフィードバック: 「メッセージ性のない本とコーヒーと眼鏡の画像」「無人静物の画像は LP コンセプトを訴えかけてこない」
+  - LP mockup（人物中心、editorial documentary、Deep Indigo + Cream + Warm wood）がコンセプト的に正しい方向
+- **影響**: `_longruns/2026-05-24_lp-image-code-workflow/codex-app-section-prompts.md` の共通ヘッダで「LP mockup のみを style anchor とする」と明示。既存 3 枚画像は試作素材として残すが、本番では使わない
+
+### D-S-5: 既存試作実装は書き直し前提で保持
+
+- **日時**: 2026-05-25T18:00:00+09:00
+- **対象 change**: change-B〜G
+- **決定**: 既存の `src/components/landing/*.tsx` 6 コンポーネント + `src/app/marketing-preview/page.tsx` + `public/landing/*.png` 5 枚は、8 セクション新画像が揃った後に**全面書き直し**する。ただし参照価値はあるので削除せず保持
+- **エビデンス**:
+  - 既存試作はユーザーの「とっとと進めて」を受けて Codex バックグラウンドで素材生成 + Claude が plan に沿って一気に実装したもの
+  - LP 全体 1 枚絵生成方式（D-S-3 で却下）の前提で組まれている
+  - 新画像（人物中心、リッチな editorial）に置き換える際にレイアウト・構造も書き直す必要あり
+- **影響**: 次セッションで新画像が届いた際の作業は「既存を改修」ではなく「新規実装、既存は参照のみ」。waitlist フォーム部分は shadcn primitives で再現する流れは維持
+
+## Codex CLI / Codex App についての技術メモ
+
+### D-T-1: Codex CLI 0.133.0 には `image` サブコマンドが存在しない
+
+- **日時**: 2026-05-25T16:00:00+09:00
+- **決定**: `codex image` の代わりに `env -u OPENAI_API_KEY codex exec` で自然言語プロンプトを渡し、Codex Agent の内部 imagegen ツールに画像生成させる方式が利用可能。生成画像は `~/.codex/generated_images/<session>/ig_*.png` に保存される
+- **エビデンス**:
+  - `codex --help` 出力に `image` サブコマンドなし
+  - vlog-album プラグイン（`~/.claude/plugins/marketplaces/marketing-harness/plugins/vlog-album/skills/vlog-album/SKILL.md`）が `env -u OPENAI_API_KEY codex exec` 方式の先行実装として動作
+  - 私が試したところ Codex Agent が画像を生成 → 指定パスへコピーまで実行可能（hero-codex.png / problem-solution.png / evidence.png / lp-mockup-full.png が成功例）
+- **影響**: 緊急時の Codex CLI 経由生成は可能だが、品質的に **Codex App（デスクトップ GPT）に投げる方が安定**。ユーザーが Codex App で対応する場合は CLI 経由ルートは不要
