@@ -17,3 +17,11 @@
 **理由**: workflow yaml で `npx next build` / `vitest` などのコマンドを参照するため、ローカルで `actionlint`/`npm test`/`npx next build` が実行できる状態を作る必要がある。
 
 **エビデンス**: `ls node_modules/.bin/vitest` が初回 not found → `npm install` 後に baseline test PASS（197 tests）。
+
+## D3: 2026-05-28 — Build Contract Round 2 で APPROVE、6 件全件採用
+
+**判断**: longrun-reviewer の Round 1 指摘（BLOCKER 1: Fork PR ガード、SHOULD_FIX 2: npm test step、SHOULD_FIX 3: Git Integration 切断順序、NOTE 4: change-A 独立性、SHOULD_FIX 5: TDD 適用方針、NOTE 6: setup-vercel-env.yml/e2e-tests スコープ外）を全件採用して plan.md を修正。Round 2 で APPROVE。
+
+**理由**: 6 件すべてバイアス緩和ガード（spec違反/契約違反/事実誤認/依存順序の誤り/セキュリティ）に該当。特に BLOCKER 1 は Fork PR からの secret 漏洩経路を塞ぐセキュリティ事項のため反論余地なし。
+
+**エビデンス**: TaskOutput a333d17f87f30c5af で Round 2 APPROVE 確認済み。

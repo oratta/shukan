@@ -1,8 +1,13 @@
 ---
-phase: Setup
+phase: Build Contract
 status: complete
-last_updated: 2026-05-28T09:34:00+09:00
+last_updated: 2026-05-28T09:50:00+09:00
 ---
+
+## Build Contract レビュー結果
+- Round 1: REQUEST_CHANGES（BLOCKER 2 + SHOULD_FIX 3 + NOTE 1）→ 全件採用して plan.md 修正
+- Round 2: APPROVE by longrun-reviewer
+- 指摘採用ログは decisions.md D3 参照
 
 ## ツール検証結果
 - openspec: /Users/oratta/.volta/bin/openspec (v1.2.0)
