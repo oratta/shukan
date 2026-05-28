@@ -58,6 +58,7 @@ OAK Casino で確立された 4 環境構成（dev / preview / staging / prod）
 - 既存 deploy（Vercel 自動）からの GitHub Actions への切替時のダウンタイム検証（理由: indie プロダクトで一時的なデプロイ停止は許容）
 - Smitch コードベースへの reusable workflow 抽出（理由: ワークフロー 4 本でまず動かし、抽象化は使用実績後）
 - 統合テストの新規追加（理由: 既存テストの実行で十分。新規 e2e は本タスクスコープ外）
+- OAK Casino の `setup-vercel-env.yml` 相当の補助 workflow（理由: Vercel env は `vercel env add` の手動実行手順を `github-setup.md` に記載することで代替。本タスクスコープ外）
 
 ## Changes分解
 
@@ -75,6 +76,7 @@ OAK Casino で確立された 4 環境構成（dev / preview / staging / prod）
   - "ドキュメントは Smitch の実プロジェクト ID と URL を使用すること（OAK Casino の値を残さない）"
   - "LIFF/LINE 関連記述は完全に削除すること"
   - "Staging が prod DB を参照する点のリスク注意書きを必ず含めること"
+  - "`vercel.json` の最終形は `{ \"github\": { \"enabled\": false } }` で確定済み。change-B の実装結果を待たずに記述してよい"
 
 ### change-B: GitHub Actions ワークフロー 4 本の配置 + vercel.json 更新
 - **スコープ**: `.github/workflows/` を新設し、以下 4 本を配置:
@@ -90,6 +92,9 @@ OAK Casino で確立された 4 環境構成（dev / preview / staging / prod）
   - "ci.yml の trigger は push を含まないこと（PR ラベル発火 + merge_group + workflow_dispatch のみ）"
   - "actionlint を CI に含めること（OAK Casino と同じく Docker 経由）"
   - "実装前に `cat package.json` で既存 scripts を確認し、`typecheck` スクリプトがあればそれを使用、なければ OAK Casino と同じ `npx next build` で代替"
+  - "ci.yml の `lint-and-typecheck` job に `npm test` または `npm run test:run` step を追加すること（OAK Casino 版にはない Smitch 必須追加）"
+  - "deploy-preview.yml の Fork PR ガード `if: github.event.pull_request.head.repo.full_name == github.repository` を job-level if に**必ず残す**（label.name フィルタと AND で結合）。Fork PR からの secret 漏洩防止のため"
+  - "Smitch では Playwright E2E test を CI に含めない（plan で除外明記）。OAK Casino 版 e2e-tests job は移植しないこと"
 
 ### change-C: GitHub Merge Queue + Branch Protection + Environment 設定手順書
 - **スコープ**: `docs/infrastructure/github-setup.md` を作成し、以下の GitHub 側設定手順を `gh` CLI コマンド + UI 操作の両方で記述:
@@ -125,6 +130,7 @@ OAK Casino で確立された 4 環境構成（dev / preview / staging / prod）
 - **config.yaml rules**:
   - "Cloudflare 操作は API キー操作を含まないこと（UI 手順のみ）"
   - "ラベル作成 (`gh label create preview`) はワークフロー merge 前に行う旨を verify 手順 1 として明記すること"
+  - "Vercel Git Integration 切断手順には『先に GitHub Actions 経由の staging デプロイが成功することを確認してから切断する』という順序条件を必ず含めること（切断を先に行うと staging 到達不能の窓が発生する）"
 
 ## 画面・UI設計
 （インフラタスクのため UI 変更なし）
@@ -142,6 +148,8 @@ OAK Casino で確立された 4 環境構成（dev / preview / staging / prod）
 
 ## 受け入れ条件
 
+**TDD 適用方針（本 run 特有）**: 本 run はインフラ構築のため、Vitest によるユニットテスト先行作成は**行わない**。各 Change の「テスト相当」は受け入れ条件 5-14 の assertion（ファイル存在 + grep + `actionlint` PASS + 既存 `npm test` / `npm run lint` / `npx next build` PASS）で代替する。OpenSpec `tasks.md` ではテスト作成タスクを「assertion コマンド実行タスク」として記述すること。
+
 **必須条件（常に含める）:**
 1. [ ] 全changeのOpenSpec仕様が作成・レビュー済み
 2. [ ] 全changeのテストが作成され全てPASSしている（**インフラ run のため、テスト = actionlint PASS + workflow 構文検証 + 既存 `npm test` PASS + `npm run lint` PASS で代替**）
@@ -151,13 +159,14 @@ OAK Casino で確立された 4 環境構成（dev / preview / staging / prod）
 **機能固有の条件:**
 5. [ ] `docs/infrastructure/environment-strategy.md` が存在し、OAK Casino の LIFF 関連記述が含まれていない（`grep -i liff docs/infrastructure/environment-strategy.md` が空）
 6. [ ] `.github/workflows/{ci,deploy-preview,deploy-staging,deploy-production}.yml` の 4 ファイルが存在し、`actionlint` で構文エラーなし
+6b. [ ] `ci.yml` の `lint-and-typecheck` job（または別 job）に `npm test` または `npm run test:run` を実行する step を含む（OAK Casino 版にはない Smitch 固有追加）
 7. [ ] `ci.yml` のトリガーが「PR ラベル発火 + `merge_group` + `workflow_dispatch` のみ」であること（`actionlint` PASS + ファイル全体を目視確認。`on.pull_request.types` に `synchronize`/`opened`/`reopened` 等の push 連動型が含まれていないことを人間が読んで確認する）
-8. [ ] `deploy-preview.yml` のトリガーが `pull_request: types: [labeled]` であり、job レベルに `if: github.event.label.name == 'preview'` ガードを持つ
+8. [ ] `deploy-preview.yml` のトリガーが `pull_request: types: [labeled]` であり、job レベル `if` が `github.event.label.name == 'preview' && github.event.pull_request.head.repo.full_name == github.repository` の**両方**を含む（Fork PR からの secret 漏洩防止ガードを必須化、OAK Casino オリジナル準拠）
 9. [ ] `deploy-staging.yml` のトリガーが `push: branches: [main]` で `concurrency: group: staging-deploy` を持つ
 10. [ ] `deploy-production.yml` のトリガーが `workflow_dispatch` で `environment: name: Production` を持つ
 11. [ ] `vercel.json` の `github` キーが `{ "enabled": false }` であり、`autoAlias` キーが**含まれていない**（`grep autoAlias vercel.json` が空であること + `grep -A 2 '"github"' vercel.json` が `"enabled": false` を含むこと）
 12. [ ] `docs/infrastructure/github-setup.md` に Merge Queue 設定の `gh` コマンド例 + 「PR 上では `ci` を Required Status Check に**しない**」設計理由が記載されている
-13. [ ] `docs/infrastructure/staging-domain-setup.md` に Cloudflare DNS / Vercel domain 追加 / **Vercel Git Integration 切断手順** / `gh label create preview` の 4 手順が全て含まれている
+13. [ ] `docs/infrastructure/staging-domain-setup.md` に Cloudflare DNS / Vercel domain 追加 / **Vercel Git Integration 切断手順（切断タイミング順序ガイダンス含む: 「main マージ → deploy-staging.yml 成功確認 → その後切断」を明記）** / `gh label create preview` の 4 手順が全て含まれている
 14. [ ] `docs/infrastructure/environment-strategy.md` に「Staging 動作確認時の禁則事項」セクションが存在し、prod DB 書き込みリスクと QA アカウント運用について記載されている
 
 **手動確認条件（自律 verify では到達できないため、ユーザー確認フェーズで判断）:**
