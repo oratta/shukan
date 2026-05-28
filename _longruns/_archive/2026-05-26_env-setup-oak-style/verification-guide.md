@@ -23,7 +23,7 @@
 - [x] テスト実装完了（assertion: `grep` ベース）
 - [x] ロジック実装完了（docs ファイル作成）
 - [x] 動作確認完了（grep PASS / Supabase ID 11 件・staging.s-mitch.com 8 件・s-mitch.com 表中）
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S2: LIFF/LINE 記述が含まれていない
 - WHEN: `grep -i liff docs/infrastructure/environment-strategy.md` 実行
@@ -31,7 +31,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了（`grep -ci liff` = 0, `grep -ci "line developers"` = 0, `grep -in "LIFF\|LINE"` = 0）
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S3: Staging 禁則事項セクションが (a)(b)(c) の 3 観点を含む
 - WHEN: 「禁則事項」セクションを読む
@@ -39,7 +39,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了（`### (a)`, `### (b)`, `### (c)` 3 つの小見出しで明記）
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S4: vercel.json 設計理由が記載されている
 - WHEN: `enabled: false` / `autoAlias` で検索
@@ -47,7 +47,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了（`"enabled": false` 1 件、`autoAlias` 2 件、no-op 説明あり）
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S5: 開発ワークフローセクションが新運用 5 段階を反映
 - WHEN: 「開発ワークフロー」セクションを読む
@@ -55,7 +55,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了（番号付き 5 段階フロー＋日常／Staging／Production の 3 個別フロー記述）
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ---
 
@@ -67,7 +67,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S7: ci.yml の label フィルタ
 - WHEN: 各 job の `if:` を読む
@@ -75,7 +75,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S8: ci.yml に npm test step がある
 - WHEN: `grep "npm test\|npm run test:run" .github/workflows/ci.yml`
@@ -83,7 +83,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S9: ci.yml に actionlint job がある
 - WHEN: `ci.yml` 内に `rhysd/actionlint` Docker image 参照
@@ -91,7 +91,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S10: deploy-preview.yml の job-level if（Fork PR ガード必須）
 - WHEN: `grep "head.repo.full_name == github.repository" .github/workflows/deploy-preview.yml`
@@ -99,7 +99,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S11: deploy-preview.yml の Preview URL コメント機能
 - WHEN: `grep "actions/github-script" .github/workflows/deploy-preview.yml`
@@ -107,7 +107,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S12: deploy-staging.yml の env override
 - WHEN: `deploy-staging.yml` を読む
@@ -115,7 +115,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S13: deploy-staging.yml の staging.s-mitch.com alias
 - WHEN: `grep "vercel alias" .github/workflows/deploy-staging.yml`
@@ -123,7 +123,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S14: deploy-production.yml の trigger と input
 - WHEN: `deploy-production.yml` を読む
@@ -131,7 +131,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S15: deploy-production.yml の Environment 指定
 - WHEN: `grep "environment:" -A 2 .github/workflows/deploy-production.yml`
@@ -139,7 +139,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S16: deploy-production.yml の confirm validation
 - WHEN: 最初の step を読む
@@ -147,7 +147,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S17: actionlint PASS
 - WHEN: `docker run --rm -v "$(pwd):/repo" --workdir /repo rhysd/actionlint:latest -color`
@@ -155,7 +155,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S18: vercel.json の github.enabled: false
 - WHEN: `grep -A 2 '"github"' vercel.json`
@@ -163,7 +163,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S19: vercel.json の autoAlias 削除
 - WHEN: `grep autoAlias vercel.json`
@@ -171,7 +171,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ---
 
@@ -183,7 +183,7 @@
 - [x] テスト実装完了（assertion: 表内に 9 件 + 2 件記載確認）
 - [x] ロジック実装完了（Secrets/Vars セクションに表形式で網羅）
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S21: gh CLI コマンド例がある
 - WHEN: `grep "gh secret set" docs/infrastructure/github-setup.md`
@@ -191,7 +191,7 @@
 - [x] テスト実装完了（grep "gh secret set\|gh secret list" = 14 件）
 - [x] ロジック実装完了（対話入力モード + pbpaste + ファイル流し込み 3 例記載）
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S22: PR 上で ci を Required にしない理由
 - WHEN: Branch Protection セクションを読む
@@ -199,7 +199,7 @@
 - [x] テスト実装完了（grep "Required Status Check" = 9 件、設計の前提セクション内に明記）
 - [x] ロジック実装完了（「設計の前提（重要）」サブセクションで詳細記述）
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S23: Merge Queue の Required Status Check 設定手順
 - WHEN: Merge Queue セクションを読む
@@ -207,7 +207,7 @@
 - [x] テスト実装完了（UI 4.2 手順 + gh api 例の両方で `ci` 指定箇所あり）
 - [x] ロジック実装完了（4.2 Merge Queue の設定セクションに UI 手順、`gh api` セクションに `required_merge_queue_checks` 例）
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S24: GitHub Environment 作成手順
 - WHEN: Environment セクションを読む
@@ -215,7 +215,7 @@
 - [x] テスト実装完了（grep "Production" = 15 件、UI 手順 + gh api 両方記載）
 - [x] ロジック実装完了（セクション 3 に UI 5 ステップ + `gh api environments/Production` PUT 例）
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S25: ラベル作成コマンド + タイミング警告
 - WHEN: ラベルセクションを読む
@@ -223,7 +223,7 @@
 - [x] テスト実装完了（grep "gh label create preview" = 1 件、「**重要: workflow merge 前に必ず作成すること。**」太字あり）
 - [x] ロジック実装完了（セクション 1 を最優先配置、確認/編集コマンド併記）
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S26: Vercel env 登録コマンド
 - WHEN: `grep "vercel env add" docs/infrastructure/github-setup.md`
@@ -231,7 +231,7 @@
 - [x] テスト実装完了（grep "vercel env add" = 7 件、Preview + Production 各 3 件 + 概要 1 件）
 - [x] ロジック実装完了（セクション 5 で Preview/Production 双方の `vercel env add <KEY> <scope>` 例 + 確認コマンド）
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ---
 
@@ -243,7 +243,7 @@
 - [x] テスト実装完了（assertion: `grep -c "Git Integration"` = 6）
 - [x] ロジック実装完了（セクション 3 に UI 5 ステップ詳細）
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S28: 切断タイミング順序ガイダンス
 - WHEN: 「切断タイミング」セクション
@@ -251,7 +251,7 @@
 - [x] テスト実装完了（assertion: `grep -c "main マージ\|deploy-staging.yml"` = 4）
 - [x] ロジック実装完了（「切断タイミング順序ガイダンス（最重要）」サブセクション + 復旧手順）
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S29: Cloudflare DNS 手順
 - WHEN: Cloudflare セクションを読む
@@ -259,7 +259,7 @@
 - [x] テスト実装完了（assertion: `grep -c "76.76.21.21\|Cloudflare"` = 17）
 - [x] ロジック実装完了（セクション 1 に UI 7 ステップ + 表形式 + apex 脚注）
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S30: Vercel domain 追加手順
 - WHEN: Vercel domain セクションを読む
@@ -267,7 +267,7 @@
 - [x] テスト実装完了（assertion: `grep -c "vercel domains add\|Vercel.*Domain"` = 3）
 - [x] ロジック実装完了（セクション 2 に CLI + UI 両手順 + `vercel domains inspect` 検証）
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S31: 動作確認 e2e フロー 5 ステップ
 - WHEN: 「動作確認 e2e フロー」セクション
@@ -275,4 +275,4 @@
 - [x] テスト実装完了（assertions: `gh label create preview` = 1, `workflow_dispatch|gh workflow run deploy-production` = 3）
 - [x] ロジック実装完了（セクション 4 に 5 ステップ + 各ステップに「期待結果」「失敗時の確認ポイント」併記）
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
