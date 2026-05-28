@@ -1,0 +1,102 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [main]
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  NODE_VERSION: '22'
+
+# main への push が連続した場合、前のデプロイをキャンセル
+concurrency:
+  group: staging-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Vercel CLI
+        run: npm i -g vercel
+
+      - name: Pull Vercel project settings
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Override env for Staging (prod Supabase)
+        env:
+          PROD_SUPABASE_URL: ${{ secrets.PROD_SUPABASE_URL }}
+          PROD_SUPABASE_ANON_KEY: ${{ secrets.PROD_SUPABASE_ANON_KEY }}
+          PROD_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.PROD_SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          # Staging は Preview env を継承するが、Supabase を本番 DB (prod) に差し替える。
+          # (2026-04-06 設計: staging/本番は同じ DB) → ステークホルダー/QA が
+          # 本番と同等データで動作確認可能。
+          # client bundle 焼込のため build 前に .vercel/.env.preview.local を override。
+          ENV_FILE=.vercel/.env.preview.local
+          if [ -f "$ENV_FILE" ]; then
+            sed -i -e '/^NEXT_PUBLIC_SUPABASE_URL=/d' \
+                   -e '/^NEXT_PUBLIC_SUPABASE_ANON_KEY=/d' \
+                   -e '/^SUPABASE_SERVICE_ROLE_KEY=/d' \
+                   "$ENV_FILE"
+            {
+              echo "NEXT_PUBLIC_SUPABASE_URL=\"$PROD_SUPABASE_URL\""
+              echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=\"$PROD_SUPABASE_ANON_KEY\""
+              echo "SUPABASE_SERVICE_ROLE_KEY=\"$PROD_SUPABASE_SERVICE_ROLE_KEY\""
+            } >> "$ENV_FILE"
+          fi
+
+      - name: Build
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Remove .git to bypass Vercel author check
+        run: rm -rf .git
+
+      - name: Deploy to Vercel (Preview)
+        id: deploy
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          PROD_SUPABASE_URL: ${{ secrets.PROD_SUPABASE_URL }}
+          PROD_SUPABASE_ANON_KEY: ${{ secrets.PROD_SUPABASE_ANON_KEY }}
+          PROD_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.PROD_SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          # Vercel Dashboard の Preview env は dev Supabase を指しているため、
+          # staging 用 deployment に限り -e で runtime env を上書きする。
+          # sed override (build step 前) は client bundle 焼込用で、こちらは
+          # サーバレス関数 runtime の process.env 用。二重注入は意図的。
+          DEPLOYMENT_URL=$(vercel deploy --prebuilt \
+            --token="$VERCEL_TOKEN" \
+            -e "NEXT_PUBLIC_SUPABASE_URL=$PROD_SUPABASE_URL" \
+            -e "NEXT_PUBLIC_SUPABASE_ANON_KEY=$PROD_SUPABASE_ANON_KEY" \
+            -e "SUPABASE_SERVICE_ROLE_KEY=$PROD_SUPABASE_SERVICE_ROLE_KEY")
+          echo "url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Alias staging domain
+        if: ${{ vars.STAGING_DOMAIN != '' }}
+        env:
+          STAGING_DOMAIN: ${{ vars.STAGING_DOMAIN }}
+          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
+        run: vercel alias "$DEPLOY_URL" "$STAGING_DOMAIN" --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Summary
+        env:
+          DEPLOY_URL: ${{ steps.deploy.outputs.url }}
+          STAGING_DOMAIN: ${{ vars.STAGING_DOMAIN }}
+        run: |
+          echo "### Staging Deploy Complete" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Deployment: $DEPLOY_URL" >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "$STAGING_DOMAIN" ]; then
+            echo "- Staging: https://$STAGING_DOMAIN" >> "$GITHUB_STEP_SUMMARY"
+          fi
