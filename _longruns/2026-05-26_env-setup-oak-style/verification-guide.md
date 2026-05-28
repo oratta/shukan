@@ -20,41 +20,41 @@
 ### S1: 4 環境の URL と Supabase 接続先の対応表が記載されている
 - WHEN: 運用者が `docs/infrastructure/environment-strategy.md` を開く
 - THEN: dev/preview/staging/prod の 4 環境の URL + Supabase ID の対応表が確認できる
-- [ ] テスト実装完了（assertion: `grep` ベース）
-- [ ] ロジック実装完了（docs ファイル作成）
-- [ ] 動作確認完了（grep PASS）
+- [x] テスト実装完了（assertion: `grep` ベース）
+- [x] ロジック実装完了（docs ファイル作成）
+- [x] 動作確認完了（grep PASS / Supabase ID 11 件・staging.s-mitch.com 8 件・s-mitch.com 表中）
 - [ ] ユーザー確認完了
 
 ### S2: LIFF/LINE 記述が含まれていない
 - WHEN: `grep -i liff docs/infrastructure/environment-strategy.md` 実行
 - THEN: 0 件
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
-- [ ] 動作確認完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
+- [x] 動作確認完了（`grep -ci liff` = 0, `grep -ci "line developers"` = 0, `grep -in "LIFF\|LINE"` = 0）
 - [ ] ユーザー確認完了
 
 ### S3: Staging 禁則事項セクションが (a)(b)(c) の 3 観点を含む
 - WHEN: 「禁則事項」セクションを読む
 - THEN: prod DB 書き込み / RLS / QA 専用アカウントの 3 点が明記
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
-- [ ] 動作確認完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
+- [x] 動作確認完了（`### (a)`, `### (b)`, `### (c)` 3 つの小見出しで明記）
 - [ ] ユーザー確認完了
 
 ### S4: vercel.json 設計理由が記載されている
 - WHEN: `enabled: false` / `autoAlias` で検索
 - THEN: Git 連携無効化 + autoAlias no-op の説明が見つかる
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
-- [ ] 動作確認完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
+- [x] 動作確認完了（`"enabled": false` 1 件、`autoAlias` 2 件、no-op 説明あり）
 - [ ] ユーザー確認完了
 
 ### S5: 開発ワークフローセクションが新運用 5 段階を反映
 - WHEN: 「開発ワークフロー」セクションを読む
 - THEN: Draft PR → ラベル → Ready/Merge Queue → main マージ → workflow_dispatch の 5 段階記述
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
-- [ ] 動作確認完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
+- [x] 動作確認完了（番号付き 5 段階フロー＋日常／Staging／Production の 3 個別フロー記述）
 - [ ] ユーザー確認完了
 
 ---
@@ -64,112 +64,112 @@
 ### S6: ci.yml のトリガー条件
 - WHEN: `ci.yml` の `on:` セクションを読む
 - THEN: `pull_request: types: [labeled]` + `merge_group` + `workflow_dispatch` の 3 種のみ、`synchronize`/`push` なし
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S7: ci.yml の label フィルタ
 - WHEN: 各 job の `if:` を読む
 - THEN: `preview` ラベル以外で発火しないガード
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S8: ci.yml に npm test step がある
 - WHEN: `grep "npm test\|npm run test:run" .github/workflows/ci.yml`
 - THEN: 1 件以上
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S9: ci.yml に actionlint job がある
 - WHEN: `ci.yml` 内に `rhysd/actionlint` Docker image 参照
 - THEN: actionlint job 定義あり
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S10: deploy-preview.yml の job-level if（Fork PR ガード必須）
 - WHEN: `grep "head.repo.full_name == github.repository" .github/workflows/deploy-preview.yml`
 - THEN: 1 件以上 + `label.name == 'preview'` も AND で含む
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S11: deploy-preview.yml の Preview URL コメント機能
 - WHEN: `grep "actions/github-script" .github/workflows/deploy-preview.yml`
 - THEN: 1 件以上
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S12: deploy-staging.yml の env override
 - WHEN: `deploy-staging.yml` を読む
 - THEN: `PROD_SUPABASE_URL/ANON_KEY/SERVICE_ROLE_KEY` を sed override + `vercel deploy -e` で runtime override + LIFF 言及なし
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S13: deploy-staging.yml の staging.s-mitch.com alias
 - WHEN: `grep "vercel alias" .github/workflows/deploy-staging.yml`
 - THEN: 1 件以上 + `concurrency: group: staging-deploy` も存在
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S14: deploy-production.yml の trigger と input
 - WHEN: `deploy-production.yml` を読む
 - THEN: `on: workflow_dispatch:` のみ + `inputs.confirm` (boolean) 定義
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S15: deploy-production.yml の Environment 指定
 - WHEN: `grep "environment:" -A 2 .github/workflows/deploy-production.yml`
 - THEN: `name: Production` + `url: https://${{ vars.PRODUCTION_DOMAIN }}`
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S16: deploy-production.yml の confirm validation
 - WHEN: 最初の step を読む
 - THEN: `confirm != 'true'` で `exit 1` するバリデーション
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S17: actionlint PASS
 - WHEN: `docker run --rm -v "$(pwd):/repo" --workdir /repo rhysd/actionlint:latest -color`
 - THEN: exit code 0、エラーゼロ
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S18: vercel.json の github.enabled: false
 - WHEN: `grep -A 2 '"github"' vercel.json`
 - THEN: `"enabled": false` を含む
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S19: vercel.json の autoAlias 削除
 - WHEN: `grep autoAlias vercel.json`
 - THEN: 0 件
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
