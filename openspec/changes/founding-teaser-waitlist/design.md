@@ -86,7 +86,27 @@
 4. change-B マージ後、カウンタAPIフェッチャーを正式パスに接続し、残り枠ライブ表示を有効化
 5. ロールバック: ページは `/founding` ルート削除のみで戻せる。`waitlist` テーブルは収集済みデータ保全のため drop しない（insert 経路が消えるだけで無害）
 
+## Implementation Decisions (TDD apply)
+
+### D7: 階層特典カードはインライン描画（ネスト component にしない）
+- **判断**: tier カードを `renderTierCard()` という helper 関数で page tree に**直接**埋め込む。`<TierCard/>` のような子 component にはしない
+- **理由**: 構造テスト（marketing-page.test 流の tree-walking）は関数 component の中身を展開しない。割引ラベル（"50% off" / "50%オフ"）と API 由来の残数を tree の text として検証可能にするには、page tree に literal text node として現れる必要がある
+- **代替案**: テスト側で `@testing-library/react` を導入して実レンダリング。却下理由: 既存テストは DOM ランタイム無しの tree-walking 方式で統一されており、依存を増やさない方が整合（YAGNI）
+
+### D8: WaitlistForm は client component、page テストでは文字列 `'form'` にモック
+- **判断**: `WaitlistForm` は `'use client'` + `useActionState` で実装。page 構造テストでは `vi.mock` で `WaitlistForm: 'form'` を返し、`<WaitlistForm/>` が素の `<form>` 要素として tree に現れるようにする
+- **理由**: client component の中身（hooks）は Server Component の同期 tree-walk では展開できない。フォーム挙動（バリデーション・upsert・i18n）は `founding-actions.test.ts` で独立検証し、page テストは「フォームが存在する」構造のみを担保する（責務分離）
+- **可逆性**: テストのモック差し替えのみで完結し、本番コードに影響しない
+
+### D9: Server Action は `(prevState, formData)` シグネチャ・source は定数 `'founding-teaser'`
+- **判断**: `submitWaitlist(prevState, formData)` を `useActionState` 互換のシグネチャで実装。`source` はアプリ側で `'founding-teaser'` 定数を渡す（DB default と一致）。email バリデーションは `^[^@\s]+@[^@\s]+\.[^@\s]+$`（DB CHECK と二層）
+- **理由**: D3（Server Action）と React 19 の `useActionState` を素直に繋ぐ標準形。source を定数にすることで将来の流入元別計測（別ページからの登録）にも 1 引数追加で拡張できる
+
+### D10: 残り枠フェッチャーのエンドポイントは env で差し替え可能・default `/api/founding/slots`
+- **判断**: `fetchRemainingSlots()` は `FOUNDING_COUNTER_API_URL`（明示指定）→ `NEXT_PUBLIC_APP_URL + /api/founding/slots`（default）の順で URL を解決。`next: { revalidate: 15 }` で change-B の 10〜30秒キャッシュ契約に合わせる。レスポンスが契約形状（`founder50/founder30` × `cap/claimed/remaining`）を満たさなければ `null`
+- **理由**: D5 の「フェッチャー 1 箇所隔離」を満たしつつ、change-B のパス未確定リスクを env で吸収。change-B 確定後はこのファイルだけ差し替える
+
 ## Open Questions
 
-- change-B の公開カウンタAPIの正式なパス・レスポンス形状（D5 のフェッチャー隔離で吸収。change-B 側の design で確定）
+- change-B の公開カウンタAPIの正式なパス・レスポンス形状（D5 のフェッチャー隔離で吸収。change-B 側の design で確定。default は `/api/founding/slots`、env `FOUNDING_COUNTER_API_URL` で上書き可能に実装済み）
 - ティザーの SEO/OGP メタデータをどこまで作り込むか（最低限の title/description は layout に置く。本格 OGP は marketing-seo の既存パターンに後続で合わせる）
