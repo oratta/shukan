@@ -1,7 +1,7 @@
 ---
 phase: Build
-status: in_progress
-last_updated: 2026-06-12T11:30:00+09:00
+status: complete
+last_updated: 2026-06-12T13:30:00+09:00
 ---
 
 # Checkpoint: 2026-06-12_onboarding-kpi
@@ -18,10 +18,24 @@ last_updated: 2026-06-12T11:30:00+09:00
 ## 完了フェーズ
 - [x] Setup: ツール検証・コードベース調査・ベースライン記録完了
 - [x] Build Contract: APPROVED by longrun-reviewer（1ラウンド、BLOCKER 0件。採用指摘1件→plan.md追記済み）
-- [ ] Build（前半完了: OpenSpec 3 change 作成・validate 済み・Spec Review 全APPROVE・verification-guide.md 生成済み。後半: TDD実装を A→B→C 直列で実行中。D-BUILD1 により per-change worktree なし）
-- [ ] Verify
+- [x] Build: 全3change実装完了（commits: A=784de6b / B=1b29cec / C=fea0834）。19 files / 308 tests PASS、lint ベースライン維持（9 errors/35 warnings、新規ゼロ）、build 成功。verification-guide.md 36/36 Scenario でテスト実装・ロジック実装 [x]
+- [x] Verify: PASS（2段階とも完了）
 - [ ] Feedback
 - [ ] Archive
+
+## Verify結果
+| 軸 | スコア | しきい値 | 判定 | 検証Agent |
+|----|-------|---------|------|----------|
+| 品質 | 100% | 100% | ✅ | longrun-verifier |
+| 完成度 | 86% | 80% | ✅ | longrun-verifier |
+| 機能性 | 100% (18/18) | 100% | ✅ | longrun-browser-verifier |
+| UX | 100% (5/5) | 70% | ✅ | longrun-browser-verifier |
+
+- 使用ツール: claude-in-chrome（Playwright MCP がセッション未提供のためフォールバック）
+- 修正ループ: 静的検証の指摘2件 → 1c5cec8（habit重複防止 D-C3・mock型追従）/ ブラウザ検証 C-S18 FAIL → 7069059（en i18n 統一 D-C4）→ 再検証 PASS
+- 検証で実確認済み: DB 書き込み（user_profiles/habits/habit_evidences）、失敗時再試行、ja 確定文言、en 全翻訳
+- dev サーバー: http://localhost:3002 起動中（3000 は別 worktree 使用中）
+- dev DB のテストデータ: user_profiles 0行・テスト habits 5行が残存（検証の副産物。ユーザー判断でクリア）
 
 ## コードベース調査サマリー（Explore Agent 実施）
 - 記事: `src/data/impact-articles/` 37ファイル。`ImpactArticle` 型は `src/types/impact.ts:90-135`（calculationParams: dailyHealthMinutes/dailyCostSaving/dailyIncomeGain）
