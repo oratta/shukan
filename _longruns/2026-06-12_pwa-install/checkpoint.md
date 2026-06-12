@@ -1,7 +1,7 @@
 ---
-phase: Build Contract
+phase: Build
 status: complete
-last_updated: 2026-06-12T11:20:00+09:00
+last_updated: 2026-06-12T13:15:00+09:00
 ---
 
 ## ツール検証結果
@@ -15,6 +15,13 @@ last_updated: 2026-06-12T11:20:00+09:00
 ## 完了フェーズ
 - [x] Setup: ランディレクトリ特定・plan.md解析・コードベース調査・ツール検証・ベースライン記録
 - [x] Build Contract: APPROVED by longrun-reviewer（Round 1、BLOCKER 0件。NOTE1=quit経路トリガーを plan.md に反映、D2参照）
+- [x] Spec Review: change-A APPROVE (Round 1) / change-B APPROVE (Round 2、status遷移ベーストリガー + isCompletionTransition 純関数化を反映。D3/D4参照)
+- [x] Build: 全change実装完了・マージ済み・worktree削除済み
+  - change-A: commit dd084a4（manifest.ts 新設、public/manifest.json 削除、layout 参照更新、+8 tests）
+  - change-B: commit 917c9fe（src/lib/pwa/ 純関数5モジュール、src/components/pwa/ 4コンポーネント、page.tsx トリガー、settings ヘルプ、pwa.* i18n、+54 tests）
+  - 統合検証: 259 tests 全PASS / `npm run build` 成功
+  - 既知の技術的負債: `npx tsc --noEmit` に既存テスト由来の型エラー9件（本runと無関係、D5参照。next build は PASS）
+  - verification-guide.md: 13/13 Scenario でテスト実装完了・ロジック実装完了 [x]
 
 ## 次フェーズへの引き継ぎ
 - Changes: change-A (pwa-manifest, 独立) → change-B (install-prompt-ui, Aに依存)。**直列実行**

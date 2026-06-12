@@ -42,3 +42,29 @@
 - design.md D2 の移行表に従い実装。追加4フィールドの値: `id: "/"`（start_url と一致）/ `lang: "en"`（name・description が英語のため）/ `dir: "ltr"` / `categories: ["health", "lifestyle", "productivity"]`
 - icons の purpose は未指定（plan.md rule: maskable にしない）。テストで `purpose === undefined` を明示アサートし退行を防止
 - theme_color "#2B4162" / background_color "#F8F9FA" は変更禁止制約どおり踏襲。テストで固定値アサート
+
+## D7: change-B 実装の自律判断（2026-06-12, builder）
+
+### D7-1: 完了トリガーの検出方式（status スナップショット ref）
+- design.md L94 の指定どおり、`(app)/page.tsx` で `todayHabits` から「習慣ID → today status（`recentDays[0].status`）」マップを導出し `useRef` で前回レンダーのスナップショットを保持。`useEffect([todayHabits])` 内でレンダー間に `isCompletionTransition(prev, next)` が true の習慣があれば `setJustCompleted(true)`
+- 初回レンダー（`prevStatusMapRef.current === null`）は遷移判定をスキップ → リロード/再訪で completedCount>0 でも発火しない（要件を構造的に保証）
+- `justCompleted` は React state のみ・永続化なし → リロードで必ず false に戻る
+- 選択肢評価: (a) 関数経路（setDayStatus/markQuitDailyDone）にフック → markQuitDailyDone 未配線・将来経路漏れリスクで却下 / (b) status スナップショット ref（採用・design 指定・経路非依存）/ (c) completions 配列差分 → 同等だが status マップの方がシンプル。YAGNI で (b)
+
+### D7-2: iOS 非 Safari / Android 非 Chrome を 'other' に倒す
+- `detectPlatform` で iOS は `CriOS|FxiOS|EdgiOS|OPiOS|GSA` を除外し Safari のみ 'ios-safari'、Android は `SamsungBrowser|EdgA|OPR|Firefox` を除外し Chrome のみ 'android-chrome'。それ以外は 'other'（非表示）
+- 根拠: design.md Risks「誤判定時は 'other' に倒して非表示」。誤った手順を出すより導線非表示を優先する保守的設計
+
+### D7-3: i18n キーは新規 `pwa.*` namespace に集約 + キー一覧を単一ソース化
+- `src/lib/pwa/message-keys.ts` に `PWA_MESSAGE_KEYS` を定義し、テスト（en/ja 両在チェック）とコンポーネントが同じ一覧を参照。en/ja とも `common` の後ろに追加し既存キーは無改変（制約遵守）
+
+### D7-4: 設定画面ヘルプは独立 Card + InstallHelpDialog（standalone は「追加済み」）
+- 設定画面に「ホーム画面に追加」専用 Card を追加し、タップで `InstallHelpDialog` を開く。ダイアログは `detectPlatform` の結果で iOS 図解 / Android ボタン / その他テキスト案内を出し分け、standalone なら DialogDescription に `help.installed`
+- 完了トリガー・dismiss 抑制は適用しない（常設の再到達導線・spec 要件どおり）
+
+### D7-5: バナー配置（BottomNav の上・非モーダル fixed）
+- `(app)/page.tsx` 末尾に `fixed inset-x-0 bottom-16 z-30 ... md:bottom-2` のコンテナで InstallBanner を配置。BottomNav（`h-16`・z-40・md:hidden）の上に重ね、pointer-events をブロックしない非モーダル設計。Card は shadcn 規約準拠
+
+### D7-6: `tsc --noEmit` 基準は D5 を踏襲
+- 本 change 実装後も `tsc --noEmit` の総エラーは 9 件（D5 の先行エラーと同一）。`grep -iE "pwa|page|settings"` で本 change ファイルのエラー 0 件を確認。`npm run build` EXIT 0・"Compiled successfully"。基準「本 change がエラーを増やさない + build PASS」を満たす
+- エビデンス: 全テスト 259 passed（baseline 205 + 新規 54）/ build EXIT 0
