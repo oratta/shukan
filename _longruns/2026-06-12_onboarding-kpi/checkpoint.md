@@ -36,8 +36,8 @@ last_updated: 2026-06-12T11:30:00+09:00
 ## Changes状態
 | Change | 依存 | Status |
 |--------|------|--------|
-| change-A: kpi-data-foundation | 独立 | Pending |
-| change-B: user-profiles-db | A | Pending |
+| change-A: kpi-data-foundation | 独立 | **Complete**（commit 784de6b。tasks 15/15、225 tests PASS、build成功、A-S1〜S11 テスト/ロジック [x]。代表記事は9件で確定=D-A1） |
+| change-B: user-profiles-db | A | **Complete**（tasks 16/16、15 files/258 tests PASS、lint ベースライン維持、build成功、B-S1〜S7 テスト/ロジック [x]。migration は timestamp 衝突回避し Management API で dev 適用=D-B1。RLS/CHECK は live スキーマ検証+migration-content test=D-B2） |
 | change-C: onboarding-flow | A, B | Pending |
 
 ## 次フェーズへの引き継ぎ

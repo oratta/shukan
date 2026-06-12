@@ -101,56 +101,56 @@
 ### B-S1: プロフィールの upsert（新規・更新・年収NULL）
 - WHEN: upsertUserProfile を新規/既存/annualIncome:null で呼ぶ
 - THEN: 1ユーザー1行で作成・更新され camelCase で返る。派生値カラムは存在しない。年収NULLでも保存できる
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### B-S2: gender の CHECK 制約
 - WHEN: gender に許可外の値で insert を試みる
 - THEN: CHECK 制約違反でエラーになり行は保存されない
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### B-S3: fetchUserProfile（camelCase / 未作成は null）
 - WHEN: 作成済み／未作成ユーザーで fetchUserProfile を呼ぶ
 - THEN: 作成済みは camelCase オブジェクト（trackedKpis は選択順の string 配列）、未作成はエラーなしで null
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### B-S4: 派生値計算（age / remainingLifeExpectancy / dailyWage / remainingWorkingYears）
 - WHEN: birthYear/gender/country/annualIncome 入りプロフィールで派生値計算を呼ぶ
 - THEN: age=現在年−birthYear、余命は平均余命表から、dailyWage=年収÷労働日数、残労働=退職年齢−age（65歳以上は 0）
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### B-S5: 年収未入力時の平均年収フォールバック
 - WHEN: annualIncome:null のプロフィールで日給計算を呼ぶ
 - THEN: 平均年収表（age×gender）から引いた値÷労働日数で dailyWage が算出され、NaN にならない
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### B-S6: プロフィール null 時の V2_DEFAULT_PROFILE フォールバック
 - WHEN: プロフィール null で派生値解決関数を呼ぶ
 - THEN: V2_DEFAULT_PROFILE 相当（42歳・男性・年収1500万・日給62,500・余命40年・残労働23年）の派生値が返る
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### B-S7: RLS 本人限定（select/insert/update のみ、delete 拒否）
 - WHEN: 本人セッションで自分の行を読み書き／他人の行を select・insert・update／自分の行を delete する
 - THEN: 本人は成功、他人の行は 0 行・拒否、delete はポリシーなしで拒否（user_settings と同型）
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 

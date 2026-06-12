@@ -76,3 +76,34 @@
   - (b) 不採用: DailyImpact のフィールドを optional にして呼び出し側を変えない → config.yaml rules「required で漏れを型検出」「3インターフェースに漏れなく追加」に反する
   - (c) 不採用: ヘルパー関数で 3軸→4軸 変換を新設 → D-8「新しい抽象化を導入しない」に反する
 - **エビデンス**: `npm run build` → Compiled successfully / 14 routes 生成成功。`npm run test:run` → 12 files / 225 tests PASS
+
+## D-B1: マイグレーション timestamp の衝突回避と直接適用（change-B / 2026-06-12）
+
+- **背景**: 当初 `supabase/migrations/20260612000000_user_profiles.sql` を作成して `supabase db push` を試行したが失敗。
+  - `supabase migration list` の結果、dev プロジェクト（xhqddzdpcpvxpprxykct）の remote 履歴に、このブランチに**存在しない** 3 migration が記録されていた:
+    - `20260612000000` = `add_subscriptions`（タイムスタンプが本 change と衝突）
+    - `20260612000100` = `waitlist`
+    - `20260612000200` = `founding_memberships`
+  - これらは別ブランチ（課金/ウェイトリスト系）で適用済みのもの。`public` スキーマにも `subscriptions` / `waitlist` / `founding_memberships` テーブルが実在する。
+- **決定**:
+  1. ローカル migration を `20260612010000_user_profiles.sql` にリネーム（remote の `...000200` より後・衝突しない timestamp）。
+  2. 別ブランチの 3 migration を本ブランチに `db pull` で取り込むことは**しない**（このブランチの責務外。履歴を汚さない）。
+  3. `supabase db push` は remote 履歴差分により拒否されるため、migration SQL を Supabase Management API（`/v1/projects/{ref}/database/query`、SUPABASE_ACCESS_TOKEN 認証）で**直接適用**し、`supabase_migrations.schema_migrations` に `20260612010000 / user_profiles` 行を手動 insert して履歴整合を取った。
+- **選択肢の比較**:
+  - (a) 採用: API 直接適用 + 履歴行 insert → 別ブランチの migration を取り込まずに dev へ適用でき、可逆（`drop table public.user_profiles` のみで撤回可能・独立テーブル）。
+  - (b) 不採用: `supabase db pull` で remote の 3 migration をローカルに取り込んでから push → 課金系 migration が本ブランチに混入し責務分離が崩れる。
+  - (c) 不採用: タイムスタンプを `000000` のまま `migration repair` → remote の `add_subscriptions` 行を本 change のものと誤認させることになり、履歴が壊れる。
+- **エビデンス（Management API クエリ結果）**:
+  - columns: user_id(uuid,PK) / birth_year(integer,null可) / gender(text,not null,default 'unspecified') / country(text,not null,default 'JP') / annual_income(bigint,null可) / currency(text,not null,default 'JPY') / tracked_kpis(ARRAY,not null,default '{}') / created_at / updated_at（9カラム、派生値カラムなし）
+  - CHECK: `user_profiles_gender_check` = `gender = ANY (ARRAY['male','female','other','unspecified'])`
+  - RLS: `relrowsecurity=true`、policy は select/insert/update の 3 つのみ（delete ポリシーなし＝user_settings 同型）
+
+## D-B2: RLS / CHECK の検証手段（change-B / 2026-06-12）
+
+- **背景**: B-S2（gender CHECK）/ B-S7（RLS 本人限定・delete 拒否）は認証セッション下の実 DB 動作。Management API は `auth.users` 等 auth スキーマへのクエリを 403（code 1010）で拒否するため、実ユーザーを使った live insert/delete テストは API からは不可。
+- **決定**: tasks.md / 指示の「RLS の実DB検証はユニットでは不可のため、マイグレーション SQL の内容検証（ポリシー定義の存在）で代替してよい」に従い、以下 2 層で検証する:
+  1. **live スキーマ検証**（Management API で公開系カタログを参照可能）:
+     - `pg_constraint`: `user_profiles_gender_check = CHECK (gender = ANY (ARRAY['male','female','other','unspecified']))` が存在
+     - `pg_class.relrowsecurity = true`、`pg_policy`: select/insert/update の 3 ポリシーのみ（delete なし）
+  2. **migration-content ユニットテスト**（`src/__tests__/user-profiles-migration.test.ts`）: DDL の CHECK 定義・RLS 有効化・3 ポリシー・delete ポリシー不在・全ポリシーの `auth.uid() = user_id` ガードを文字列レベルで検証。
+- **残作業**: 認証ユーザーでの実 insert/select/update/delete の動作確認（B-S2/B-S7 の「動作確認完了」）は change-C のオンボーディング画面実装時に実際の書き込み経路で確認する（本 change の「テスト実装完了」「ロジック実装完了」は上記で充足）。
