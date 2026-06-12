@@ -92,3 +92,17 @@ change-A の TDD 実装中に確定した設計判断。詳細は `openspec/chan
 - **品質指摘（FAIL要因）**: `api-stripe-portal.test.ts` の TS2554 ×4 → portal route の `POST()` を `POST(_request: Request)` に統一して解消（commit b70055c）。副作用として lint warnings 35→36（`_request` unused。eslint に argsIgnorePattern 未設定のため不可避。エラーは 9 のまま不変）
 - **完成度指摘（任意）**: `past_due` / `incomplete` は entitlement を即ブロックする仕様として**確定**。Stripe dunning の猶予は設けない（安全側・シンプル優先。plan.md の優先順位「シンプルさ > 拡張性」に従う）。将来 UX 苦情が出たら grace period を entitlement に追加する余地あり
 - **エビデンス**: `npx tsc --noEmit | grep api-stripe-portal` → 空 / `npm run test:run` → 382 passed / `npm run build` → 成功
+
+## D10: waitlist 登録バグ修正 — upsert(ignoreDuplicates) → insert + 23505 成功扱い（2026-06-12）
+
+ブラウザ検証（longrun-browser-verifier が実 DB で再現確認）で `/founding` の waitlist 登録が**新規メールでも全件失敗**していたバグの修正。詳細は `openspec/changes/founding-teaser-waitlist/design.md` の D11。
+
+- **原因**: `src/app/founding/actions.ts` の `.upsert({ onConflict: 'email', ignoreDuplicates: true })` を PostgREST が `INSERT ... ON CONFLICT DO NOTHING` にコンパイルする。PostgreSQL は ON CONFLICT の競合検出に対象行の SELECT 権限を要求するが、`waitlist` は設計（D4）上 anon に SELECT ポリシーを持たない（メール保護）。結果、新規メールでも RLS 違反 42501 で失敗していた
+- **修正**: 素の `.insert({ email, locale, source })` に置換し、`error.code === '23505'`（unique_violation = 既登録）を成功扱い、それ以外のエラーのみ `errorGeneric` を返す。RLS（anon insert-only / select 不可）は一切変更しない。重複無害化の意味論（重複は成功、追加行なし）は維持
+- **代替案と却下**: (A) anon SELECT ポリシー追加 → メール露出で D4 の保護崩壊・不可逆性高く却下 / (B) service_role 書き込み → D4「service_role をアプリに持ち込まない」に反し却下。可逆性とシンプルさ（YAGNI）で insert + 23505 を採用
+- **テスト**: モックテスト（`founding-actions.test.ts`）を insert + 23505 成功扱いに更新（新規成功 / 不正拒否 / 重複23505成功 / 非23505は generic）。実 DB 統合テスト `founding-waitlist-integration.test.ts` を新規追加（anon クライアントで新規 insert 成功 / 同一 email 再送 23505 経路 / 不正 email バリデーション拒否、`describe.skipIf(!hasEnv)` で env 未設定時 skip、テスト用 email `qa+waitlist-test@example.com` 固定で冪等）
+- **実 DB エビデンス**（`.env.local` の anon キーで実行）:
+  - 素の INSERT（新規 fresh email）→ `SUCCESS (201, new row)`（修正後は通る）
+  - 素の INSERT（同一 email 再送）→ `code=23505`（action が成功にマップ）
+  - 旧 `upsert(ignoreDuplicates)`（新規 email）→ `FAILS code=42501`（原バグを再現）
+- **検証**: `npm run test:run` → 386 passed（43 files、統合テストは実 DB に接続して GREEN） / `npx tsc --noEmit` → 新規エラーゼロ（既存の habits/impact/middleware テストの先行エラーのみ・自分の編集ファイルは clean） / `npm run lint` → 9 errors / 36 warnings（ベースライン維持・自分のファイルは指摘ゼロ） / `npm run build` → 成功（`/founding` route 生成） / dev サーバー 3001 で `/founding` 200・waitlist フォーム描画確認

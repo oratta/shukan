@@ -106,6 +106,21 @@
 - **判断**: `fetchRemainingSlots()` は `FOUNDING_COUNTER_API_URL`（明示指定）→ `NEXT_PUBLIC_APP_URL + /api/founding/slots`（default）の順で URL を解決。`next: { revalidate: 15 }` で change-B の 10〜30秒キャッシュ契約に合わせる。レスポンスが契約形状（`founder50/founder30` × `cap/claimed/remaining`）を満たさなければ `null`
 - **理由**: D5 の「フェッチャー 1 箇所隔離」を満たしつつ、change-B のパス未確定リスクを env で吸収。change-B 確定後はこのファイルだけ差し替える
 
+### D11: waitlist 書き込みは `upsert(ignoreDuplicates)` ではなく素の `insert()` + 23505 成功扱い（バグ修正）
+- **背景**: ブラウザ検証（longrun-browser-verifier が実 DB で再現確認）で、`/founding` の waitlist 登録が**新規メールでも全件失敗**することが判明
+- **原因**: D3 で採用した `.upsert({ onConflict: 'email', ignoreDuplicates: true })` は PostgREST が `INSERT ... ON CONFLICT DO NOTHING` にコンパイルする。PostgreSQL は ON CONFLICT の競合検出に対象行の読み取り（SELECT 権限）を要求するが、D4 で `waitlist` は anon に SELECT ポリシーを与えていない（メール保護）。結果、**新規メールでも RLS 違反 42501 で失敗**する
+- **エビデンス（実 DB anon クライアント）**:
+  - 素の INSERT（新規）→ 201 成功
+  - 素の INSERT（重複）→ 409 / Postgres code `23505`（unique_violation）
+  - `upsert(ignoreDuplicates)`（新規）→ 401 / code `42501`（RLS 違反。原因を再現）
+- **判断**: `.upsert(..., { ignoreDuplicates })` を素の `.insert()` に置き換え、エラーコード `23505` を**成功扱い**にする。これで「新規 → 201 成功」「重複 → 23505 を成功にマップし登録済みかどうかを漏らさない」を両立し、D4 の anon insert-only / select 不可の RLS 設計を一切変えずにフォームを通す。`23505` 以外のエラーは従来通り `errorGeneric` で返す
+- **代替案 A**: `waitlist` に anon SELECT ポリシーを追加して `upsert(ignoreDuplicates)` を成立させる
+- **却下理由**: メール一覧が anon に露出し D4 の情報保護設計が崩れる。RLS を緩めるのは不可逆性が高く却下
+- **代替案 B**: service_role で書き込む
+- **却下理由**: D4 の「service_role をアプリ実行系に持ち込まない」方針に反する
+- **重複無害化の意味論への影響**: D3/D4 の「重複は成功として扱い、追加行も作らない」は維持される（`unique(email)` が増殖を防ぎ、23505 を成功にマップするのでユーザー体験は不変）。Risks 表の該当行（unique + CHECK + upsert 無害化）は「upsert 無害化」を「insert + 23505 成功扱い」に読み替える
+- **テスト**: モックテスト（`founding-actions.test.ts`）を insert + 23505 成功扱いに更新。加えて**実 DB 統合テスト**（`founding-waitlist-integration.test.ts`）を追加し、anon クライアントで「新規 insert 成功 / 同一 email 再送 23505 経路 / 不正 email はバリデーション拒否」を検証。env 未設定環境では `describe.skipIf` で skip。anon に DELETE がないため、テスト用 email を `qa+waitlist-test@example.com` 固定にして重複成功経路で冪等化
+
 ## Open Questions
 
 - change-B の公開カウンタAPIの正式なパス・レスポンス形状（D5 のフェッチャー隔離で吸収。change-B 側の design で確定。default は `/api/founding/slots`、env `FOUNDING_COUNTER_API_URL` で上書き可能に実装済み）

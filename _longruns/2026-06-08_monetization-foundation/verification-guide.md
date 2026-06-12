@@ -51,7 +51,7 @@
   - **THEN** the handler MUST respond with HTTP 401 and MUST NOT call the Stripe API
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S6: Invalid plan is rejected
@@ -78,7 +78,7 @@
   - **THEN** the handler MUST respond with HTTP 400 and MUST NOT read or write the `subscriptions` table
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S9: Webhook bypasses auth middleware
@@ -87,7 +87,7 @@
   - **THEN** it MUST NOT include `/api/stripe/:path*` or any pattern matching `/api/stripe/webhook`, so unauthenticated Stripe servers can reach the endpoint
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S10: Duplicate event is acknowledged without side effects
@@ -240,7 +240,7 @@
   - **THEN** the handler MUST respond with HTTP 401 and MUST NOT call the Stripe API
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S27: User without billing history gets clear error
@@ -369,7 +369,7 @@
   - **THEN** the response MUST return aggregate remaining counts per tier derived from actual `founding_memberships` counts and the configured caps, and MUST NOT include any personal data
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S13: Counter response shape is the cross-change contract
@@ -378,7 +378,7 @@
   - **THEN** the response body MUST be a JSON object containing `founder50: { cap, claimed, remaining }` and `founder30: { cap, claimed, remaining }`, and consumers MUST read remaining counts from `founder50.remaining` / `founder30.remaining`
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S14: Counter response is short-cached
@@ -387,7 +387,7 @@
   - **THEN** responses MUST be cached with a revalidation window between 10 and 30 seconds, after which a fresh count MUST be served
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S15: Counter reflects a consumed slot
@@ -439,7 +439,7 @@
   - **AND** the page MUST contain a FAQ section with at least 3 question/answer pairs
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S2: No dark-pattern urgency devices
@@ -449,7 +449,7 @@
   - **AND** any scarcity numbers shown (remaining slots) MUST originate from live API data, never from literals in copy or components
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S3: Unauthenticated visitor sees the teaser
@@ -459,7 +459,7 @@
   - **AND** the visitor MUST NOT be redirected to `/login`
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S4: Middleware matcher is unchanged
@@ -468,7 +468,7 @@
   - **THEN** the exported `config.matcher` MUST NOT include `/founding`
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S5: Locale switches the rendered copy
@@ -478,7 +478,7 @@
   - **AND** when the `locale` cookie is `en` or absent, the page MUST render the English copy from `src/messages/en.json`
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S6: founding namespace keys exist in both locales
@@ -487,7 +487,7 @@
   - **THEN** both files MUST contain a `founding` namespace with an identical key set covering at minimum: hero, tier benefits, CS-priority promise, waitlist form labels/messages, and FAQ entries
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S7: Valid email is saved with locale and source
@@ -497,7 +497,7 @@
   - **AND** the form MUST show a success message in the visitor's locale
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S8: Invalid email is rejected before insert
@@ -507,7 +507,7 @@
   - **AND** the form MUST show a localized validation error
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S9: Duplicate email is neutralized
@@ -518,7 +518,7 @@
   - **AND** the form MUST show the same success message as a first-time signup
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S10: Anon can insert but cannot read
@@ -528,7 +528,7 @@
   - **AND** a subsequent SELECT on `waitlist` by the same anon client MUST return zero rows (or be denied)
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S11: Database-level constraints reject bad data
@@ -556,7 +556,7 @@
   - **THEN** the tier benefits section MUST display those exact numbers as the remaining slots for the 50% off and 30% off tiers
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S14: Counter API unavailable falls back without fake numbers
@@ -566,7 +566,7 @@
   - **AND** the page MUST NOT display any hardcoded or cached-stale slot number
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S15: No hardcoded slot numbers in source
@@ -575,7 +575,7 @@
   - **THEN** they MUST NOT contain literal remaining-slot numbers; tier capacity wording may describe the program (e.g., "first 50 members") only as static program description sourced from configuration-backed copy, while the "remaining" figures MUST come exclusively from the API response
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 
@@ -588,7 +588,7 @@
   - **AND** a Vitest structural test MUST assert the presence of each mandatory section label
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S2: Tokushoho page is reachable from pages that display prices
@@ -638,7 +638,7 @@
   - **AND** the amount charged at Stripe Checkout MUST equal the displayed tax-inclusive amount
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S7: User can reach cancellation from the billing screen
@@ -679,7 +679,7 @@
   - **AND** the existing privacy page structure (sections 1-12) MUST be preserved with clauses added, not replaced by a new page
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S11: Terms page no longer claims the service is free
@@ -689,5 +689,5 @@
   - **AND** the page MUST reference the existence of paid plans and point to the 特定商取引法に基づく表記 page for transaction terms
 - [x] テスト実装完了
 - [x] ロジック実装完了
-- [ ] 動作確認完了
+- [x] 動作確認完了
 - [ ] ユーザー確認完了
