@@ -11,88 +11,88 @@
 ### A-S1: 複数エビデンスのデイリーインパクト計算（4KPI）
 - WHEN: 習慣に複数のエビデンス（weight付き）が紐付いた状態で計算を実行する
 - THEN: デイリーインパクト = Σ(article.dailyX × weight / 100) で、4KPI（健康寿命分・前向きな気持ちの時間分・出費削減円・稼ぐ能力円）が計算される
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### A-S2: 累積インパクトに positiveMoodMinutes が含まれる
 - WHEN: 習慣の累積インパクトを計算する
 - THEN: completedDays × デイリーで累積され、LifeImpactSavings に positiveMoodMinutes が含まれる（completed/rocket_used のみカウント）
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### A-S3: エビデンス0件・存在しないarticleIdへの耐性
 - WHEN: エビデンス0件、または articleId 不明のエビデンスで計算する
 - THEN: impactSavings は undefined / 不明エビデンスはスキップされエラーにならない
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### A-S4: 既存3軸の計算結果の不変
 - WHEN: 既存テスト（impact.test.ts / calculation-logic.test.ts）を実行する
 - THEN: 既存3軸の期待値を一切変更せず全テスト PASS
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### A-S5: calculateTotalSavings の positiveMoodMinutes 総和
 - WHEN: positiveMood 値あり・なし混在の複数習慣で合計を計算する
 - THEN: 合計 positiveMoodMinutes は各習慣の総和。0（未設定）記事のみの習慣の寄与は 0 でエラーなし
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### A-S6: 全35記事の型適合（dailyPositiveMoodMinutes）
 - WHEN: `npm run build`（型チェック）を実行する
 - THEN: 全35記事が dailyPositiveMoodMinutes を持ち型エラーなし（未設定記事は 0 を明示）
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### A-S7: 代表記事の値と算出根拠
 - WHEN: ユニットテストで代表記事の calculationParams / calculationLogic を検証する
 - THEN: 10記事程度で dailyPositiveMoodMinutes > 0、全件に calculationLogic.positiveMood（固定前提16h/50%の根拠付き）が設定されている
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### A-S8: renderArticle の出力不変
 - WHEN: positiveMood 値を設定した記事で renderArticle を実行する
 - THEN: 出力は従来の4プレースホルダー置換のみ。positiveMood の段落は挿入されない
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### A-S9: KPI定義カタログ4件（確定文言）
 - WHEN: カタログを import して全定義を検証する
 - THEN: health_lifespan「健康寿命/分/長く健康でいられる自分へ」、positive_mood「前向きな気持ちの時間/分/前向きな気持ちで過ごせる自分へ」、cost_saving「出費削減/円/お金で諦めない自分へ」、earning「稼ぐ能力/円/稼ぐ力のある自分へ」。キー引き当て関数は未知キーで undefined
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### A-S10: 習慣プリセット（各KPI 3〜5個・参照妥当性）
 - WHEN: 各KPIキーで primaryKpis フィルタし、全プリセットの articleIds / primaryKpis を検証する
 - THEN: 4KPIすべてに3〜5個。articleIds は登録済み35記事のID、primaryKpis は4キーのいずれか。空配列なし
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### A-S11: 平均余命表・平均年収表の引き当てとフォールバック
 - WHEN: 引き当て関数を（42, 'male'）／範囲外年齢／gender 'other' で呼ぶ
 - THEN: 40〜44ブラケット×男性の値が返る。範囲外は最近傍ブラケット、性別未指定は男女平均でエラーなし。出典・参照年がコメントに明記
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 

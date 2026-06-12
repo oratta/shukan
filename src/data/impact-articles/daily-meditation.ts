@@ -45,6 +45,8 @@ export const dailyMeditation: LifeImpactArticle = {
       '瞑想自体は無料です。ストレス関連の消費行動（衝動買い・アルコール・外食）の減少と、メンタルヘルス関連の通院費削減を合わせると、1日あたり¥250のコスト削減と推定されます。',
     income:
       '年収1,500万円（日給¥62,500）に対して、瞑想による認知機能向上と感情制御の改善を控えめに2.5%と見積もると年間¥37.5万。Aetna社の導入事例では従業員の生産性が62分/週向上と報告されています。1日あたり¥1,200の収入ポテンシャルと推定されます。',
+    positiveMood:
+      'マインドフルネス瞑想は不安・うつに中程度の効果を示します（Goyal et al., 2014）。何もしないときに前向きでいられる時間（起床16時間のうち約50%＝480分）を基準に、気分改善効果を保守的に20%とみなすと、1日あたり約96分（480分×20%）、前向きな気持ちで過ごせる時間が増えると推定されます。',
     cumulative:
       '**1ヶ月続けると**：健康寿命+4時間、¥7,500節約、¥36,000の収入増。\n' +
       '**1年続けると**：健康寿命+2.4日、¥9.1万節約、¥43.8万の収入増。\n' +
@@ -56,6 +58,7 @@ export const dailyMeditation: LifeImpactArticle = {
     dailyHealthMinutes: 8,
     dailyCostSaving: 250,
     dailyIncomeGain: 1200,
+    dailyPositiveMoodMinutes: 96,
   },
 
   confidenceLevel: 'medium',
@@ -75,6 +78,11 @@ export const dailyMeditation: LifeImpactArticle = {
       { label: '認知機能向上', value: '111のRCTで認知機能全般の向上を確認', formula: '15000000 × 2.5% ÷ 365', result: '1027円/日' },
       { label: '企業導入事例', value: 'Aetna社で従業員の生産性62分/週向上の報告', result: '173円/日' },
       { label: '合計', formula: '1027 + 173', result: '1200円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: '不安・うつに中程度の効果（Goyal et al., 2014）。気分改善を保守的に20%' },
+      { label: '日割り計算', formula: '480分 × 20%', result: '96分/日' },
     ],
   },
 

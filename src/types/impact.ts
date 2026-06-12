@@ -110,6 +110,9 @@ export interface LifeImpactArticle {
     health: string;
     cost: string;
     income: string;
+    // 「前向きな気持ちの時間」KPIの推論段落。renderArticle では使用しない
+    // 計算・将来表示用のデータとして持つのみ（代表記事のみ設定）
+    positiveMood?: string;
     cumulative: string;
   };
 
@@ -118,6 +121,8 @@ export interface LifeImpactArticle {
     dailyHealthMinutes: number;
     dailyCostSaving: number;
     dailyIncomeGain: number;
+    // 「前向きな気持ちの時間」KPI（分/日）。0 = 未設定（UI 非表示判定に使える）
+    dailyPositiveMoodMinutes: number;
   };
 
   confidenceLevel: 'high' | 'medium' | 'low';
@@ -127,6 +132,8 @@ export interface LifeImpactArticle {
     health: CalcStep[];
     cost: CalcStep[];
     income: CalcStep[];
+    // dailyPositiveMoodMinutes > 0 の記事のみ設定（固定前提 16h/50% の根拠を明記）
+    positiveMood?: CalcStep[];
   };
 
   // Discover（マーケットプレイス）用メタデータ
@@ -162,4 +169,5 @@ export interface LifeImpactSavings {
   healthMinutes: number;
   costSaving: number;
   incomeGain: number;
+  positiveMoodMinutes: number;
 }

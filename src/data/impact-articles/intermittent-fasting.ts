@@ -56,6 +56,7 @@ export const intermittentFasting: LifeImpactArticle = {
     dailyHealthMinutes: 7,
     dailyCostSaving: 350,
     dailyIncomeGain: 800,
+    dailyPositiveMoodMinutes: 0,
   },
 
   confidenceLevel: 'medium',

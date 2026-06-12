@@ -51,6 +51,7 @@ export const quitSugar: LifeImpactArticle = {
     dailyHealthMinutes: 7,
     dailyCostSaving: 400,
     dailyIncomeGain: 900,
+    dailyPositiveMoodMinutes: 0,
   },
 
   confidenceLevel: 'medium',

@@ -40,6 +40,8 @@ export const dailyWalking: LifeImpactArticle = {
       'ウォーキング自体のコストはほぼゼロですが、運動習慣による医療費削減効果は大きい。厚労省データでは運動習慣のある人は年間医療費が約10万円低い。さらに通勤の一部を歩行に切り替えることで交通費も削減できます。1日あたり¥350のコスト削減と推定されます。',
     income:
       '年収1,500万円（日給¥62,500）に対して、ウォーキングによる創造性向上（60%増、Stanford研究）と集中力改善を控えめに2%の生産性向上と見積もると年間¥30万。さらにうつ病リスク26%低減（Schuch, 2018）による欠勤減少を加え、1日あたり¥1,100の収入ポテンシャルと推定されます。',
+    positiveMood:
+      'ウォーキングはうつ病リスクを26%低減します（Schuch, 2018）。何もしないときに前向きでいられる時間（480分/日）を基準に、気分改善を保守的に10%とみなすと、1日あたり約48分（480分×10%）、前向きな気持ちで過ごせる時間が増えると推定されます。',
     cumulative:
       '**1ヶ月続けると**：健康寿命+5.5時間、¥10,500節約、¥33,000の収入増。\n' +
       '**1年続けると**：健康寿命+3.3日、¥12.8万節約、¥40.2万の収入増。\n' +
@@ -51,6 +53,7 @@ export const dailyWalking: LifeImpactArticle = {
     dailyHealthMinutes: 11,
     dailyCostSaving: 350,
     dailyIncomeGain: 1100,
+    dailyPositiveMoodMinutes: 48,
   },
 
   confidenceLevel: 'high',
@@ -70,6 +73,11 @@ export const dailyWalking: LifeImpactArticle = {
       { label: '生産性向上', value: '創造性60%向上（Stanford研究）を控えめに2%と見積もり', formula: '15000000 × 2% ÷ 365', result: '822円/日' },
       { label: 'うつ病リスク低減', value: 'うつ病リスク26%低減（Schuch, 2018）による欠勤減少', result: '278円/日' },
       { label: '合計', formula: '822 + 278', result: '1100円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: 'うつ病リスク26%低減（Schuch, 2018）。気分改善を保守的に10%' },
+      { label: '日割り計算', formula: '480分 × 10%', result: '48分/日' },
     ],
   },
 

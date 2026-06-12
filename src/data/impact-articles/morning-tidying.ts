@@ -77,6 +77,7 @@ export const morningTidying: LifeImpactArticle = {
     dailyHealthMinutes: 4,
     dailyCostSaving: 350,
     dailyIncomeGain: 1370,
+    dailyPositiveMoodMinutes: 0,
   },
 
   confidenceLevel: 'medium',

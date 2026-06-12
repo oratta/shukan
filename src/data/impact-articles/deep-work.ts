@@ -55,6 +55,7 @@ export const deepWork: LifeImpactArticle = {
     dailyHealthMinutes: 4,
     dailyCostSaving: 200,
     dailyIncomeGain: 2500,
+    dailyPositiveMoodMinutes: 0,
   },
 
   confidenceLevel: 'medium',

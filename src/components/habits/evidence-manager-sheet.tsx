@@ -60,6 +60,7 @@ export function EvidenceManagerSheet({
         healthMinutes: article.calculationParams.dailyHealthMinutes * w,
         costSaving: article.calculationParams.dailyCostSaving * w,
         incomeGain: article.calculationParams.dailyIncomeGain * w,
+        positiveMoodMinutes: article.calculationParams.dailyPositiveMoodMinutes * w,
       });
       healthMinutes += annual.healthMinutes;
       costSaving += annual.costSaving;
@@ -141,6 +142,7 @@ export function EvidenceManagerSheet({
                     healthMinutes: article.calculationParams.dailyHealthMinutes * w,
                     costSaving: article.calculationParams.dailyCostSaving * w,
                     incomeGain: article.calculationParams.dailyIncomeGain * w,
+                    positiveMoodMinutes: article.calculationParams.dailyPositiveMoodMinutes * w,
                   });
 
                   return (

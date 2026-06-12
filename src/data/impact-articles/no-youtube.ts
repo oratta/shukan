@@ -78,6 +78,7 @@ export const noYoutube: LifeImpactArticle = {
     dailyHealthMinutes: 5,
     dailyCostSaving: 150,
     dailyIncomeGain: 4690,
+    dailyPositiveMoodMinutes: 0,
   },
 
   confidenceLevel: 'medium',

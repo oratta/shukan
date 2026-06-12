@@ -52,6 +52,7 @@ export const dailyStretching: LifeImpactArticle = {
     dailyHealthMinutes: 5,
     dailyCostSaving: 200,
     dailyIncomeGain: 600,
+    dailyPositiveMoodMinutes: 0,
   },
 
   confidenceLevel: 'medium',

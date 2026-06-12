@@ -291,6 +291,9 @@ function ArticleCard({
             healthMinutes,
             costSaving,
             incomeGain,
+            // positiveMood はこの change では UI 表示しない（既存3軸の表示は不変）。
+            // DailyImpact 型の必須フィールドを満たすため 0 を渡すのみ。
+            positiveMoodMinutes: 0,
           });
           return (
             <div className="text-[11px] text-muted-foreground space-y-0.5 mb-2">

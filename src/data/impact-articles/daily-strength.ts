@@ -70,6 +70,7 @@ export const dailyStrength: LifeImpactArticle = {
     dailyHealthMinutes: 8,
     dailyCostSaving: 200,
     dailyIncomeGain: 960,
+    dailyPositiveMoodMinutes: 0,
   },
 
   confidenceLevel: 'high',

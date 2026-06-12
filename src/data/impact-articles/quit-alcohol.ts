@@ -88,6 +88,7 @@ export const quitAlcohol: LifeImpactArticle = {
     dailyHealthMinutes: 8,
     dailyCostSaving: 800,
     dailyIncomeGain: 1640,
+    dailyPositiveMoodMinutes: 0,
   },
 
   confidenceLevel: 'high',

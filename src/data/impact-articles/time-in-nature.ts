@@ -46,6 +46,8 @@ export const timeInNature: LifeImpactArticle = {
       '公園や自然の中を歩くこと自体は無料です。ストレス関連の消費行動が減少し、メンタルヘルスの維持によりカウンセリングや薬の費用が節約できます。1日あたり¥200のコスト削減と推定されます。',
     income:
       '年収1,500万円（日給¥62,500）に対して、注意回復理論に基づく集中力の回復と創造性向上を控えめに1.5%と見積もると年間¥22.5万。さらにうつ・不安の予防による欠勤減少を加え、1日あたり¥800の収入ポテンシャルと推定されます。',
+    positiveMood:
+      '自然の中で週120分以上過ごす人は健康状態と幸福度が有意に高いと報告されています（White et al., 2019）。何もしないときに前向きでいられる時間（480分/日）を基準に、気分改善を保守的に15%とみなすと、1日あたり約72分（480分×15%）、前向きな気持ちで過ごせる時間が増えると推定されます。',
     cumulative:
       '**1ヶ月続けると**：健康寿命+3.5時間、¥6,000節約、¥24,000の収入増。\n' +
       '**1年続けると**：健康寿命+2.1日、¥7.3万節約、¥29.2万の収入増。\n' +
@@ -57,6 +59,7 @@ export const timeInNature: LifeImpactArticle = {
     dailyHealthMinutes: 7,
     dailyCostSaving: 200,
     dailyIncomeGain: 800,
+    dailyPositiveMoodMinutes: 72,
   },
 
   confidenceLevel: 'medium',
@@ -75,6 +78,11 @@ export const timeInNature: LifeImpactArticle = {
       { label: '基準日給', value: '年収1,500万円', formula: '15000000 ÷ 240日', result: '62500円/日' },
       { label: '注意回復効果', value: '集中力回復・創造性向上を控えめに1.5%', formula: '62500 × 1.5%', result: '938円/日' },
       { label: '保守的調整', value: 'うつ・不安予防による欠勤減少を含め下方調整', result: '800円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: '週120分の自然で健康・幸福度が有意に向上（White et al., 2019）。保守的に15%' },
+      { label: '日割り計算', formula: '480分 × 15%', result: '72分/日' },
     ],
   },
 
