@@ -133,3 +133,19 @@
 
 - **判断**: ウィザードの判断ロジック（遷移可否・バリデーション・フィルタ・書き込み順序・効果フォーマット）を `src/lib/onboarding.ts`（純粋関数＋オーケストレーション）に集約し、`src/app/onboarding/*` のクライアントコンポーネントは state 保持と JSX のみを担う。
 - **理由**: D-C1 のテスト戦略（node 環境でロジックを単体検証）を成立させるため。react-best-practices の「ロジックを副作用から分離」「テスタブルな純粋関数」にも整合。可逆（将来 Playwright を足してもこの分離は無駄にならない）。
+
+## D-C3: 部分失敗→再試行時の habit 重複防止（最小対応・change-C / 2026-06-12）
+
+- **背景**: longrun-verifier の静的検証で修正推奨。`runOnboardingWrite` は profile upsert（user_id PK で冪等）→ 各プリセットを insertHabit。insertHabit は冪等でないため、3プリセット中2件目で失敗→[4]で「はじめる」再押下すると、1件目の habit が再 insert され重複する（design D3 が許容していた「途中まで成功＝profile だけ」よりも実害が大きいケース）。
+- **判断（最小対応）**:
+  - `runOnboardingWrite` は「今回＋これまでに書き込みが成功した presetId 集合」を `Set<string>` で返す。失敗時は専用例外 `OnboardingWriteError` に `succeededPresetIds` を載せて throw する。
+  - 入力に `completedPresetIds?: ReadonlySet<string>` を追加し、その集合に含まれる presetId は habit insert をスキップする（未完了分のみ書き込む）。habit + evidences の両方が成功した時点で「完了」とマークする（evidences まで含めて成功扱い＝中途半端な habit を完了にしない）。
+  - 呼び出し側（onboarding-wizard）は `useRef<Set<string>>` で成功済み集合をレンダーをまたいで保持し、再試行時に `completedPresetIds` として渡す。成功時/失敗時とも ref を最新の成功集合に更新する。
+- **design D3 との関係**: D3 の「非トランザクション・クライアント側から既存ライブラリで順次書き込む」方針は維持する（RPC/トランザクション化はしない）。本対応は「再試行時に冪等性を呼び出し側の成功集合で担保する」だけの最小差分で、新しい抽象化・新テーブル・新 RPC を導入しない。profile upsert の冪等性（D3）はそのまま活かす。
+- **選択肢の比較**:
+  - (a) 採用: 成功済み presetId 集合を呼び出し側 ref で保持し未完了分のみ書く。最小差分・既存ライブラリ流用・可逆。クライアント state で完結。
+  - (b) 不採用: insertHabit を upsert 化（name+user_id で重複排除等）→ DB スキーマ/制約の変更が要り「既存テーブルは変更しない」制約に反する。habit 名重複は正常ケースもあり破壊的。
+  - (c) 不採用: 全体を Server Action / RPC で1トランザクション化 → D3 で「既存コードベースにパターンがなく不採用」と確定済み。スコープ超過。
+- **テスト**: `onboarding-write.test.ts` に2ケース追加 — 「失敗例外に成功 presetId 集合が載る（OnboardingWriteError）」「部分失敗→再試行で成功済みプリセットをスキップし重複 insert しない（再 insert は未完了分の『毎日の節約』のみ）」。
+- **エビデンス**: `npm run test:run` → 19 files / 310 tests PASS。`npx tsc --noEmit` → 9 errors（全てベースラインの既存・change-A/B/C 由来の新規ゼロ。habits.test.ts:310 の calculationParams エラーは dailyPositiveMoodMinutes:0 追加で解消）。`npm run lint` → 9 errors / 35 warnings（ベースライン維持・onboarding ファイルは0問題）。`npm run build` → Compiled successfully。
+- **verification-guide C-S14 との整合**: 「[4]に留まりエラー表示・再押下で再試行」という記述・挙動は不変。重複しなくなるだけで仕様の方向性は変わらない（記述変更不要）。

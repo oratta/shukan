@@ -188,42 +188,86 @@ export interface OnboardingWriteInput {
   selectedKpi: KpiKey;
   profile: OnboardingProfileInput;
   selectedPresetIds: string[];
+  /**
+   * 既に書き込み済みのプリセットID集合（部分失敗→再試行時に重複 insert を避ける・D-C3）。
+   * habit insert は冪等でないため、ここに含まれる presetId はスキップする。
+   * 省略時は空集合（初回書き込み）。
+   */
+  completedPresetIds?: ReadonlySet<string>;
 }
 
 /**
  * 完了時の一括書き込み（D3 の順序）:
  *   1. upsert user_profiles（tracked_kpis=選んだKPIキー。冪等＝再試行安全）
- *   2. 選んだプリセットごとに insert habits
+ *   2. 選んだプリセットごとに insert habits（completedPresetIds 済みはスキップ）
  *   3. その habit に replaceHabitEvidences（プリセットの articleIds、weight=100）
- * いずれかが失敗したら例外を投げる。呼び出し側は[4]に留まりエラー表示＋再試行する（C-S14）。
+ * いずれかが失敗したら、それまでに成功した presetId 集合を例外に載せて throw する。
+ * 呼び出し側は[4]に留まりエラー表示し、その集合を completedPresetIds に渡して再試行する（C-S14・D-C3）。
+ *
+ * @returns 今回 + これまでに書き込みが成功したプリセットID集合（全成功時の確認用）
  */
-export async function runOnboardingWrite(input: OnboardingWriteInput): Promise<void> {
+export async function runOnboardingWrite(
+  input: OnboardingWriteInput
+): Promise<Set<string>> {
   const birthYear =
     input.profile.age !== null ? new Date().getFullYear() - input.profile.age : null;
 
-  // 1. profile（冪等 upsert）
-  await upsertUserProfile(input.userId, {
-    birthYear,
-    gender: (input.profile.gender ?? 'unspecified') as ProfileGender,
-    country: input.profile.country,
-    annualIncome: input.profile.annualIncome,
-    currency: DEFAULT_CURRENCY,
-    trackedKpis: [input.selectedKpi],
-  });
+  // 既に書き込み済みのプリセットを引き継ぐ（再試行時の重複防止）
+  const completed = new Set<string>(input.completedPresetIds ?? []);
 
-  // 2 & 3. habits ＋ evidences（プリセット順）
-  for (const presetId of input.selectedPresetIds) {
-    const habitInput = buildHabitFromPreset(presetId);
-    const preset = getHabitPreset(presetId);
-    if (!habitInput || !preset) continue;
+  try {
+    // 1. profile（冪等 upsert。再試行で重複しない）
+    await upsertUserProfile(input.userId, {
+      birthYear,
+      gender: (input.profile.gender ?? 'unspecified') as ProfileGender,
+      country: input.profile.country,
+      annualIncome: input.profile.annualIncome,
+      currency: DEFAULT_CURRENCY,
+      trackedKpis: [input.selectedKpi],
+    });
 
-    const created = await insertHabit(input.userId, habitInput);
-    const evidences = preset.articleIds.map((articleId) => ({
-      articleId,
-      weight: 100,
-    }));
-    if (evidences.length > 0) {
-      await replaceHabitEvidences(created.id, evidences);
+    // 2 & 3. habits ＋ evidences（プリセット順・未完了分のみ）
+    for (const presetId of input.selectedPresetIds) {
+      if (completed.has(presetId)) continue; // 書き込み済みはスキップ（重複防止）
+
+      const habitInput = buildHabitFromPreset(presetId);
+      const preset = getHabitPreset(presetId);
+      if (!habitInput || !preset) {
+        completed.add(presetId); // 無効プリセットは「処理済み」扱いで再試行ループに残さない
+        continue;
+      }
+
+      const created = await insertHabit(input.userId, habitInput);
+      const evidences = preset.articleIds.map((articleId) => ({
+        articleId,
+        weight: 100,
+      }));
+      if (evidences.length > 0) {
+        await replaceHabitEvidences(created.id, evidences);
+      }
+      // habit + evidences の両方が成功した時点で「完了」とマーク
+      completed.add(presetId);
     }
+
+    return completed;
+  } catch (error) {
+    // それまでに成功した集合を例外に載せ、呼び出し側が再試行に引き継げるようにする
+    throw new OnboardingWriteError(error, completed);
+  }
+}
+
+/**
+ * 書き込み失敗時の例外。succeededPresetIds に「それまでに成功した presetId」を載せる。
+ * 呼び出し側はこれを completedPresetIds として再試行に渡し、重複 insert を避ける（D-C3）。
+ */
+export class OnboardingWriteError extends Error {
+  readonly cause: unknown;
+  readonly succeededPresetIds: Set<string>;
+
+  constructor(cause: unknown, succeededPresetIds: Set<string>) {
+    super(cause instanceof Error ? cause.message : 'onboarding write failed');
+    this.name = 'OnboardingWriteError';
+    this.cause = cause;
+    this.succeededPresetIds = succeededPresetIds;
   }
 }

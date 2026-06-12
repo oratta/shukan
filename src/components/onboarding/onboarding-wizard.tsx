@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Check, ChevronLeft } from "lucide-react";
@@ -17,6 +17,7 @@ import {
   presetsForKpi,
   presetPerTimeEffect,
   runOnboardingWrite,
+  OnboardingWriteError,
   type WizardState,
   type OnboardingGender,
 } from "@/lib/onboarding";
@@ -31,6 +32,9 @@ export function OnboardingWizard() {
   const [state, setState] = useState<WizardState>(createInitialWizardState);
   const [writing, setWriting] = useState(false);
   const [writeError, setWriteError] = useState(false);
+  // 部分失敗→再試行で habit が重複 insert されないよう、書き込み成功済みの
+  // プリセットID集合をレンダーをまたいで保持する（D-C3）。
+  const completedPresetIdsRef = useRef<Set<string>>(new Set());
 
   const setStep = (step: WizardState["step"]) =>
     setState((s) => ({ ...s, step }));
@@ -67,14 +71,21 @@ export function OnboardingWizard() {
     setWriting(true);
     setWriteError(false);
     try {
-      await runOnboardingWrite({
+      // 前回までに成功したプリセットを引き継ぎ、未完了分のみ書き込む（重複防止・D-C3）
+      const completed = await runOnboardingWrite({
         userId: user.id,
         selectedKpi: state.selectedKpi,
         profile: state.profile,
         selectedPresetIds: state.selectedPresetIds,
+        completedPresetIds: completedPresetIdsRef.current,
       });
+      completedPresetIdsRef.current = completed;
       router.push("/");
-    } catch {
+    } catch (error) {
+      // 失敗時も、それまでに成功した集合は次の再試行のために保持する
+      if (error instanceof OnboardingWriteError) {
+        completedPresetIdsRef.current = error.succeededPresetIds;
+      }
       setWriteError(true);
       setWriting(false);
     }

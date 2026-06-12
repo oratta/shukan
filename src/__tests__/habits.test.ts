@@ -307,7 +307,7 @@ describe('getHabitsWithStats - multi-evidence', () => {
     habitName: '禁煙',
     article: { researchBody: '', sources: [] },
     inferences: { health: '', cost: '', income: '', cumulative: '' },
-    calculationParams: { dailyHealthMinutes: 30, dailyCostSaving: 500, dailyIncomeGain: 100 },
+    calculationParams: { dailyHealthMinutes: 30, dailyCostSaving: 500, dailyIncomeGain: 100, dailyPositiveMoodMinutes: 0 },
     confidenceLevel: 'high',
     defaultHabitType: 'quit',
     defaultIcon: 'cigarette-off',

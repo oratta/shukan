@@ -14,7 +14,7 @@ vi.mock('@/lib/supabase/habits', () => ({
   replaceHabitEvidences: (...args: unknown[]) => replaceHabitEvidencesMock(...args),
 }));
 
-import { runOnboardingWrite } from '@/lib/onboarding';
+import { runOnboardingWrite, OnboardingWriteError } from '@/lib/onboarding';
 
 const callOrder: string[] = [];
 
@@ -109,9 +109,67 @@ describe('runOnboardingWrite — C-S14 失敗時の再試行', () => {
     insertHabitMock.mockImplementation(async (_u: string, habit: { name: string }) => ({
       id: `id-${habit.name}`,
     }));
-    await expect(runOnboardingWrite(input())).resolves.toBeUndefined();
+    const completed = await runOnboardingWrite(input());
+    expect(completed).toBeInstanceOf(Set);
     // profile は2回呼ばれる（冪等 upsert）
     expect(upsertUserProfileMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('失敗例外に「それまで成功した presetId 集合」が載る（OnboardingWriteError）', async () => {
+    // 1件目は成功・2件目で失敗
+    insertHabitMock
+      .mockImplementationOnce(async (_u: string, habit: { name: string }) => ({
+        id: `id-${habit.name}`,
+      }))
+      .mockImplementationOnce(async () => {
+        throw new Error('boom');
+      });
+
+    let caught: OnboardingWriteError | null = null;
+    try {
+      await runOnboardingWrite(input());
+    } catch (e) {
+      caught = e as OnboardingWriteError;
+    }
+    expect(caught).toBeInstanceOf(OnboardingWriteError);
+    // 1件目（cook_at_home）は成功済みとして集合に入る
+    expect([...caught!.succeededPresetIds]).toEqual(['cook_at_home']);
+  });
+
+  it('部分失敗→再試行で重複 insert しない（成功済みプリセットをスキップ）', async () => {
+    // 初回: 1件目成功・2件目失敗
+    insertHabitMock
+      .mockImplementationOnce(async (_u: string, habit: { name: string }) => ({
+        id: `id-${habit.name}`,
+      }))
+      .mockImplementationOnce(async () => {
+        throw new Error('boom');
+      });
+
+    let succeeded = new Set<string>();
+    try {
+      await runOnboardingWrite(input());
+    } catch (e) {
+      succeeded = (e as OnboardingWriteError).succeededPresetIds;
+    }
+
+    insertHabitMock.mockReset();
+    insertHabitMock.mockImplementation(async (_u: string, habit: { name: string }) => {
+      callOrder.push(`habit:${habit.name}`);
+      return { id: `id-${habit.name}` };
+    });
+    replaceHabitEvidencesMock.mockImplementation(async (habitId: string) => {
+      callOrder.push(`evidence:${habitId}`);
+      return [];
+    });
+
+    // 再試行: 成功済み（cook_at_home＝自炊する）は渡し、未完了分のみ書き込む
+    await runOnboardingWrite({ ...input(), completedPresetIds: succeeded });
+
+    // 自炊する は再 insert されない。毎日の節約 のみ insert される
+    const insertedNames = insertHabitMock.mock.calls.map((c) => (c[1] as { name: string }).name);
+    expect(insertedNames).toEqual(['毎日の節約']);
+    expect(insertedNames).not.toContain('自炊する');
   });
 
   it('プリセットが空の場合は何も書かない（呼び出し側でガードする前提でも安全）', async () => {
