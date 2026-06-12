@@ -51,3 +51,13 @@ change-A の TDD 実装中に確定した設計判断。詳細は `openspec/chan
 - **D9 Server Action シグネチャ `(prevState, formData)` / source 定数**: React 19 `useActionState` と素直に接続。email バリデーションは Server Action（厳格）と DB CHECK（緩い最終防衛線）の二層
 - **D10 残り枠フェッチャーのエンドポイント env 差し替え**: `FOUNDING_COUNTER_API_URL` → default `/api/founding/slots`。`next.revalidate: 15` で change-B の 10〜30秒キャッシュ契約に整合。契約形状（`founder50/founder30 × cap/claimed/remaining`）を満たさなければ `null` を返し数値非表示フォールバック。change-B 確定後はこの 1 ファイルのみ差し替え
 - **保留事項**: migration の `supabase db push`（tasks 1.3）と waitlist DB 行の手動確認（tasks 4.4）は、並行 run 制約によりマージ後にメインで適用・確認する。worktree からは push しない。ページ表示・i18n・RLS SQL 実装は完了済み
+
+## D6: change-B 実装判断（founding-member-program, TDD apply 2026-06-12）
+
+自律実行中（AskUserQuestion 不可）の設計判断。詳細は `openspec/changes/founding-member-program/design.md` の D7–D8。
+
+- **D6-1 plpgsql RPC は TS リファレンス実装テストで担保、実 DB 検証はマージ後**: dev DB は並行 run 制約で worktree から `supabase db push` できず、plpgsql を Vitest で直接実行する手段もない。よって tier フォールバック・並行 over-allocation 防止・冪等を `src/lib/founding/allocation.ts`（`decideTier` / `FoundingSlotStore` = COUNT ベース・founder_50→founder_30→none・unique(user_id) 冪等・advisory lock 直列化の async mutex 相当）の TS リファレンス実装に対するテスト（11 ケース、小 cap 2/3 境界＋50 並行 claim で over-allocation ゼロ）で担保。RPC 呼び出し層は `founding-admin.ts` を supabase client モックで検証。**実 plpgsql の実 DB 検証はマージ後の統合検証項目**（migration 適用 / 境界・並行 claim / count_founding_slots の anon 集計のみ露出 / RLS 本人 SELECT）。migration timestamp は `20260612000200`（000000/000100 使用済み回避）
+- **D6-2 確定 tier の Price 補正は冪等 `updateSubscriptionPrice` で常に適用**: 見込み Price を webhook まで運ばず、claim 確定 tier の Price へ常に寄せる。Stripe SDK 側で現 item.price が同一なら early return（no-op）。`proration_behavior: 'none'`。lifetime は subscription なしのため `applyFoundingClaim` で early return
+- **D6-3 server-only の Vitest スタブ**: `founding-admin.ts` の `import 'server-only'` が route テストの transitive import で throw するため、`vitest.setup.ts` で `vi.mock('server-only', () => ({}))` をグローバル設定（node env で no-op）。本番 bundle には影響しない可逆なテスト基盤変更
+- **D6-4 Checkout の tier-Price はフォールバック付き**: `resolveCheckoutPriceId` は `predictFoundingTier` 失敗（counter 未デプロイ・env 未設定）時に通常 Price へフォールバックし Checkout を壊さない。これにより change-A の既存 checkout テストも tier env 未設定で `price_monthly`（none フォールバック）に収束し後方互換
+- **保留事項**: tasks 1.6（`supabase db push` + 実 DB GREEN）/ tasks 3.1 の実 Price 作成（`npm run stripe:setup`、実テストキー必要）はマージ後にメインで実施。テスト・lint・build はワークツリー内で完了（317 passed / 新規 lint エラーゼロ / build 成功）

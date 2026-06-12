@@ -23,6 +23,12 @@ vi.mock('@/lib/supabase/subscriptions-admin', () => ({
   updateSubscriptionByStripeId: (...a: unknown[]) => updateSubscriptionByStripeIdMock(...a),
 }));
 
+// change-B integrates a founding-slot claim into the payment-success branch.
+// This change-A test isolates subscription sync; stub the claim as a no-op.
+vi.mock('@/lib/founding/webhook', () => ({
+  applyFoundingClaim: vi.fn().mockResolvedValue({ tier: 'none', discountPct: 0, confirmedPriceId: null }),
+}));
+
 // stripe is constructed inside the provider from env; supply secret + webhook secret
 beforeEach(() => {
   isEventProcessedMock.mockReset().mockResolvedValue(false);

@@ -6,6 +6,7 @@ import {
   upsertSubscriptionFromEvent,
   updateSubscriptionByStripeId,
 } from '@/lib/supabase/subscriptions-admin';
+import { applyFoundingClaim } from '@/lib/founding/webhook';
 
 /**
  * POST /api/stripe/webhook (change-A, design D1/D2/D7).
@@ -51,6 +52,13 @@ async function dispatch(event: BillingDomainEvent): Promise<void> {
         stripeCustomerId: event.stripeCustomerId,
         stripeSubscriptionId: event.stripeSubscriptionId,
         currentPeriodEnd: event.currentPeriodEnd,
+      });
+      // change-B: claim a founding slot ONLY here, on payment success (design D1/D5).
+      // Idempotent at the RPC (unique user_id) and gated by webhook idempotency.
+      await applyFoundingClaim({
+        userId: event.userId,
+        plan: event.plan,
+        stripeSubscriptionId: event.stripeSubscriptionId,
       });
       return;
     case 'subscription_status_changed':

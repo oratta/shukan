@@ -87,5 +87,6 @@ export {
   createCheckoutSession,
   createPortalSession,
   ensureCustomer,
+  updateSubscriptionPrice,
   verifyAndParseWebhook,
 } from './stripe';

@@ -2,7 +2,28 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getSubscriptionForUser } from '@/lib/supabase/subscriptions';
 import { createCheckoutSession, ensureCustomer } from '@/lib/billing/provider';
-import { isValidPlan, checkoutModeForPlan, resolvePriceId } from '@/lib/billing/config';
+import { isValidPlan, checkoutModeForPlan, resolvePriceId, type Plan } from '@/lib/billing/config';
+import { predictFoundingTier } from '@/lib/supabase/founding-admin';
+import { resolveFoundingPriceId } from '@/lib/founding/config';
+
+/**
+ * Resolve the Checkout Price for a plan (change-B, design D5).
+ *
+ * For subscription plans (monthly/annual) we pick the Price for the tier the user
+ * would land in right now, so the discount is visible at Checkout. The tier is
+ * only a prediction — the webhook re-evaluates and corrects on payment success.
+ * If the founding tier Price cannot be resolved (env unset / prediction failed),
+ * we fall back to the regular Price so Checkout never breaks.
+ */
+async function resolveCheckoutPriceId(plan: Plan): Promise<string> {
+  if (plan === 'lifetime') return resolvePriceId(plan);
+  try {
+    const tier = await predictFoundingTier();
+    return resolveFoundingPriceId(tier, plan);
+  } catch {
+    return resolvePriceId(plan);
+  }
+}
 
 /**
  * POST /api/stripe/checkout (change-A).
@@ -44,7 +65,7 @@ export async function POST(request: Request): Promise<Response> {
   const session = await createCheckoutSession({
     userId: user.id,
     customerId,
-    priceId: resolvePriceId(plan),
+    priceId: await resolveCheckoutPriceId(plan),
     mode: checkoutModeForPlan(plan),
     plan,
   });
