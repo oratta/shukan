@@ -117,3 +117,12 @@ src/components/pwa/
 ## Open Questions
 
 - なし（UI 細部は shadcn / 既存 `(app)` 画面の規約に従う。迷ったらシンプルな方を選ぶ — plan.md 意思決定ガイドライン）
+
+## Decisions（実装時、2026-06-12 builder）
+
+- **完了トリガー = status スナップショット ref**: `(app)/page.tsx` で習慣ID→today status マップを `useRef` 保持し、`useEffect([todayHabits])` で `isCompletionTransition` true なら `justCompleted`（React state）を立てる。初回レンダーはスキップ（リロードで非表示を構造的に保証）。setDayStatus/markQuitDailyDone どちらの経路でも検出。詳細は decisions.md D7-1
+- **UA 誤判定は 'other' に倒す**: iOS は CriOS/FxiOS 等、Android は SamsungBrowser/EdgA/Firefox 等を除外し Safari/Chrome のみ判定。誤った手順を出すより非表示を優先（保守的）。decisions.md D7-2
+- **i18n キーを単一ソース化**: `src/lib/pwa/message-keys.ts` の `PWA_MESSAGE_KEYS` をテストとコンポーネントで共有。新規 `pwa.*` namespace を `common` の後ろに追加（既存キー無改変）。decisions.md D7-3
+- **設定ヘルプ = 独立 Card + InstallHelpDialog**: standalone は「追加済み」、iOS 図解 / Android ボタン / その他テキスト案内を出し分け。完了トリガー・dismiss 抑制は非適用。decisions.md D7-4
+- **バナー配置**: BottomNav（z-40）の上に `fixed bottom-16 z-30 md:bottom-2` の非モーダル Card。decisions.md D7-5
+- **型チェック基準は D5 踏襲**: 本 change のファイルは型エラー 0、`npm run build` PASS、全テスト 259 passed。decisions.md D7-6
