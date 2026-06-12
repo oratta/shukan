@@ -1,7 +1,7 @@
 ---
-phase: Setup
+phase: Build Contract
 status: complete
-last_updated: 2026-06-12T11:13:00+09:00
+last_updated: 2026-06-12T11:20:00+09:00
 ---
 
 ## ツール検証結果
@@ -14,6 +14,7 @@ last_updated: 2026-06-12T11:13:00+09:00
 
 ## 完了フェーズ
 - [x] Setup: ランディレクトリ特定・plan.md解析・コードベース調査・ツール検証・ベースライン記録
+- [x] Build Contract: APPROVED by longrun-reviewer（Round 1、BLOCKER 0件。NOTE1=quit経路トリガーを plan.md に反映、D2参照）
 
 ## 次フェーズへの引き継ぎ
 - Changes: change-A (pwa-manifest, 独立) → change-B (install-prompt-ui, Aに依存)。**直列実行**
