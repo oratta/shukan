@@ -14,7 +14,7 @@
   - **WHEN** any Product Price used by the application (monthly / annual / lifetime) is inspected in Stripe
   - **THEN** its `tax_behavior` MUST be `inclusive`, and the amount charged at Checkout MUST equal the displayed tax-inclusive amount
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -23,7 +23,7 @@
   - **WHEN** the billing module resolves the price for plan `monthly`, `annual`, or `lifetime`
   - **THEN** it MUST return the Stripe Price ID from the corresponding environment variable, and MUST throw a descriptive configuration error if the variable is missing
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -32,7 +32,7 @@
   - **WHEN** the source tree is scanned for Stripe live/test secret key patterns (`sk_live_`, `sk_test_`, `whsec_`)
   - **THEN** no match MUST exist outside of `.env*` files and documentation examples
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -41,7 +41,7 @@
   - **WHEN** an authenticated user POSTs to `/api/stripe/checkout` with a valid plan (`monthly` / `annual` / `lifetime`)
   - **THEN** the handler MUST create a Checkout session tied to the user's Stripe Customer (with `user_id` carried in metadata or `client_reference_id`) and respond with the session URL
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -50,7 +50,7 @@
   - **WHEN** a request without a valid Supabase session POSTs to `/api/stripe/checkout`
   - **THEN** the handler MUST respond with HTTP 401 and MUST NOT call the Stripe API
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -59,7 +59,7 @@
   - **WHEN** an authenticated user POSTs to `/api/stripe/checkout` with an unknown plan value
   - **THEN** the handler MUST respond with HTTP 400 and MUST NOT create a Checkout session
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -68,7 +68,7 @@
   - **WHEN** a webhook request arrives with a signature correctly computed from the raw body and `STRIPE_WEBHOOK_SECRET`
   - **THEN** the handler MUST construct the event, dispatch it to the corresponding event handler, and respond with HTTP 200
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -77,7 +77,7 @@
   - **WHEN** a webhook request arrives with a missing or invalid `stripe-signature` header
   - **THEN** the handler MUST respond with HTTP 400 and MUST NOT read or write the `subscriptions` table
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -86,7 +86,7 @@
   - **WHEN** the middleware `config.matcher` in `src/middleware.ts` is inspected
   - **THEN** it MUST NOT include `/api/stripe/:path*` or any pattern matching `/api/stripe/webhook`, so unauthenticated Stripe servers can reach the endpoint
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -95,7 +95,7 @@
   - **WHEN** the same `checkout.session.completed` event (same Stripe event ID) is delivered twice
   - **THEN** the second delivery MUST respond with HTTP 200 and the `subscriptions` row MUST be identical to the state after the first delivery
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -104,7 +104,7 @@
   - **WHEN** a verified webhook event of a type outside the handled set is delivered
   - **THEN** the handler MUST respond with HTTP 200 without modifying the `subscriptions` table
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -113,7 +113,7 @@
   - **WHEN** an authenticated user queries the `subscriptions` table with the anon/authenticated role
   - **THEN** only the row where `user_id` equals the requesting user's ID MUST be returned, and rows of other users MUST NOT be readable
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -122,7 +122,7 @@
   - **WHEN** a verified `checkout.session.completed` event for a subscription-mode session is processed
   - **THEN** the user's `subscriptions` row MUST be upserted with `status: active`, the resolved `plan`, `stripe_customer_id`, `stripe_subscription_id`, and `current_period_end`
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -131,7 +131,7 @@
   - **WHEN** a verified `customer.subscription.updated` event is processed
   - **THEN** the matching `subscriptions` row (by `stripe_subscription_id`) MUST be updated with the event's `status`, `current_period_end`, and `cancel_at_period_end`
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -140,7 +140,7 @@
   - **WHEN** a verified `customer.subscription.deleted` event is processed
   - **THEN** the matching `subscriptions` row MUST be updated to `status: canceled`
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -149,7 +149,7 @@
   - **WHEN** a verified `invoice.paid` event for a subscription renewal is processed
   - **THEN** the matching `subscriptions` row MUST reflect `status: active` and the new `current_period_end`
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -158,7 +158,7 @@
   - **WHEN** a verified `checkout.session.completed` event for a payment-mode (lifetime) session is processed
   - **THEN** the user's `subscriptions` row MUST be upserted with `plan: lifetime` and `status: active`, and the paywall MUST treat the user as entitled regardless of `current_period_end` or trial state
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -167,7 +167,7 @@
   - **WHEN** a user starts the trial
   - **THEN** a `subscriptions` row MUST be created with `status: trialing` and `trial_end` = start time + configured trial days, without any Stripe API call requiring payment details
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -176,7 +176,7 @@
   - **WHEN** a user with `status: trialing` and `trial_end` in the future performs a gated action
   - **THEN** the action MUST be allowed without any paywall block
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -185,7 +185,7 @@
   - **WHEN** the trial-days configuration value is set to a non-default value (e.g., 3 for tests)
   - **THEN** newly started trials MUST compute `trial_end` from that value without code changes
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -194,7 +194,7 @@
   - **WHEN** a trial's `trial_end` passes without the user subscribing
   - **THEN** the `subscriptions` row MUST remain `status: trialing` (no background job or webhook transitions it), and entitlement MUST be evaluated purely from `trial_end < now`
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -203,7 +203,7 @@
   - **WHEN** a user whose `trial_end` is in the past and who has no active or lifetime subscription attempts a gated action
   - **THEN** the paywall gate MUST block the action and display the upgrade prompt (with a CTA leading toward Checkout)
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -212,7 +212,7 @@
   - **WHEN** a user with `status: active` (any plan) performs a gated action
   - **THEN** the action MUST proceed without the paywall appearing
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -221,7 +221,7 @@
   - **WHEN** the gated-action configuration (gated action set / limits) is changed via settings or environment values
   - **THEN** the paywall gate MUST honor the new configuration without modification to the gate component logic
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -230,7 +230,7 @@
   - **WHEN** an authenticated user with a `stripe_customer_id` POSTs to `/api/stripe/portal`
   - **THEN** the handler MUST create a Customer Portal session for that customer and respond with the portal URL
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -239,7 +239,7 @@
   - **WHEN** a request without a valid Supabase session POSTs to `/api/stripe/portal`
   - **THEN** the handler MUST respond with HTTP 401 and MUST NOT call the Stripe API
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -248,7 +248,7 @@
   - **WHEN** an authenticated user with no `stripe_customer_id` POSTs to `/api/stripe/portal`
   - **THEN** the handler MUST respond with HTTP 400 (or equivalent client error) explaining no billing profile exists, instead of throwing an unhandled error
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -257,7 +257,7 @@
   - **WHEN** application code outside `src/lib/billing/` (routes excluded only for raw-body signature plumbing) needs a checkout or portal session
   - **THEN** it MUST call the billing abstraction module rather than instantiating the Stripe SDK directly
 - [x] テスト実装完了
-- [ ] ロジック実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
