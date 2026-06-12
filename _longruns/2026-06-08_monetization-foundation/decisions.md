@@ -86,3 +86,9 @@ change-A の TDD 実装中に確定した設計判断。詳細は `openspec/chan
 - **D8-6 早期切替 CTA は `shouldOfferEarlySwitch`（active trial のみ）で出し分け**: `data-early-switch` セクションをトライアル中のみ描画、active 加入者には非表示。CTA は annual プランの確認ステップ → Checkout 導線に接続（割引はサブスクに適用、決済完了時点で確定＝change-B D5）。founding 5.1 の account UI 結線を完了
 - **D8-7 `create_habit` ゲートは既存 UX を壊さない action gate `shouldBlockCreateHabit`**: ホームの習慣追加（`handleAdd`）で `shouldBlockCreateHabit(subscription)` が true（非 entitled かつ `create_habit` ∈ gatedActions）の時のみ `/account?upgrade=1` へ遷移、それ以外は従来通りフォームを開く。entitled・active トライアルは挙動不変。ゲート判定は `isEntitled`/`isGatedAction`（change-A）を再利用し設定駆動（spec S24）。代替案: `PaywallGate` で FAB/フォームを常時ラップ → アクション型ゲートには冗長で、ブロック UI が常時マウントされ UX を変えるため不採用（action gate ヘルパに集約）
 - **保留事項（DEFERRED）**: 実機 E2E（PaywallGate ブロック → CTA → `/account` → 確認 → 実 Checkout 到達、トライアル中 vs 期限切れの出し分け、早期切替の決済完走）は実 Stripe テストキー + dev DB 適用が前提で、verification-guide の「動作確認完了 / ユーザー確認完了」（未チェック・人間ゲート）に残す。テスト（42 files / 382 passed）・新規 lint エラー/警告ゼロ（baseline 9 errors / 35 warnings 維持）・build 成功・`/account` route 生成確認はワークツリー内で完了
+
+## D9: 静的検証（Verify Step1）指摘への対応（2026-06-12）
+
+- **品質指摘（FAIL要因）**: `api-stripe-portal.test.ts` の TS2554 ×4 → portal route の `POST()` を `POST(_request: Request)` に統一して解消（commit b70055c）。副作用として lint warnings 35→36（`_request` unused。eslint に argsIgnorePattern 未設定のため不可避。エラーは 9 のまま不変）
+- **完成度指摘（任意）**: `past_due` / `incomplete` は entitlement を即ブロックする仕様として**確定**。Stripe dunning の猶予は設けない（安全側・シンプル優先。plan.md の優先順位「シンプルさ > 拡張性」に従う）。将来 UX 苦情が出たら grace period を entitlement に追加する余地あり
+- **エビデンス**: `npx tsc --noEmit | grep api-stripe-portal` → 空 / `npm run test:run` → 382 passed / `npm run build` → 成功
