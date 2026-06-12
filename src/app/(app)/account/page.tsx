@@ -5,10 +5,11 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useSubscription } from '@/hooks/useSubscription';
 import { fetchRemainingSlots, type RemainingSlots } from '@/app/founding/slots';
 import { getTrialDays, type Plan } from '@/lib/billing/config';
+import { AccountBilling } from '@/components/billing/account-billing';
 import {
-  AccountBilling,
-  type AccountBillingMessages,
-} from '@/components/billing/account-billing';
+  buildAccountBillingMessages,
+  type AccountTranslator,
+} from '@/app/(app)/account/account-messages';
 import {
   checkoutFlowReducer,
   initialCheckoutFlow,
@@ -69,56 +70,14 @@ export default function AccountPage() {
     };
   }, [flow.phase, flow.checkoutPlan]);
 
-  const messages: AccountBillingMessages = {
-    account: {
-      title: tAccount('title'),
-      currentPlanHeading: tAccount('currentPlanHeading'),
-      trialingStatus: tAccount('trialingStatus'),
-      trialEndedStatus: tAccount('trialEndedStatus'),
-      activePlanStatus: tAccount('activePlanStatus'),
-      noPlanStatus: tAccount('noPlanStatus'),
-      planMonthly: tAccount('planMonthly'),
-      planAnnual: tAccount('planAnnual'),
-      planLifetime: tAccount('planLifetime'),
-      choosePlanHeading: tAccount('choosePlanHeading'),
-      selectPlanButton: tAccount('selectPlanButton'),
-      perMonth: tAccount('perMonth'),
-      perYear: tAccount('perYear'),
-      oneTime: tAccount('oneTime'),
-      foundingHeading: tAccount('foundingHeading'),
-      foundingDescription: tAccount('foundingDescription'),
-      foundingTier50: tAccount('foundingTier50'),
-      foundingTier30: tAccount('foundingTier30'),
-      foundingRemaining: tAccount('foundingRemaining'),
-      foundingUnavailable: tAccount('foundingUnavailable'),
-      earlySwitchHeading: tAccount('earlySwitchHeading'),
-      earlySwitchButton: tAccount('earlySwitchButton'),
-      manageHeading: tAccount('manageHeading'),
-    },
-    checkout: {
-      title: tCheckout('title'),
-      subtitle: tCheckout('subtitle'),
-      recurringHeading: tCheckout('recurringHeading'),
-      recurringBody: tCheckout('recurringBody'),
-      priceHeading: tCheckout('priceHeading'),
-      perCycleMonthly: tCheckout('perCycleMonthly'),
-      perCycleAnnual: tCheckout('perCycleAnnual'),
-      annualTotalLabel: tCheckout('annualTotalLabel'),
-      annualTotalValue: tCheckout('annualTotalValue'),
-      trialHeading: tCheckout('trialHeading'),
-      trialBody: tCheckout('trialBody'),
-      cancelHeading: tCheckout('cancelHeading'),
-      cancelBody: tCheckout('cancelBody'),
-      lifetimeHeading: tCheckout('lifetimeHeading'),
-      lifetimeBody: tCheckout('lifetimeBody'),
-      lifetimePriceLabel: tCheckout('lifetimePriceLabel'),
-      taxNote: tCheckout('taxNote'),
-      tokushohoLink: tCheckout('tokushohoLink'),
-      tokushohoLinkText: tCheckout('tokushohoLinkText'),
-      confirmButton: tCheckout('confirmButton'),
-      backButton: tCheckout('backButton'),
-    },
-  };
+  // Build the view copy. Keys with ICU placeholders ({price}, {plan}, {days},
+  // {total}, {remaining}/{cap}) are passed as RAW templates and interpolated by
+  // the view from pricing.ts (change-D invariant). Resolving them via plain
+  // t(key) with no values throws FORMATTING_ERROR at runtime (D12).
+  const messages = buildAccountBillingMessages(
+    tAccount as unknown as AccountTranslator,
+    tCheckout as unknown as AccountTranslator,
+  );
 
   const handleEarlySwitch = () => {
     // The early-switch CTA leads into the same confirmation→checkout path; we
