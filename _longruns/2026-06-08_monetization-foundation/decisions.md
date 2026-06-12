@@ -21,3 +21,14 @@
   - 指摘4 (NOTE) 残り枠カウンタのキャッシュ → 採用（anon read 経路は機能要件）。公開エンドポイント+10〜30秒キャッシュ
   - 既存 /privacy /terms の存在 → 採用（事実）。change-D は既存ページへの追記と明記
 - **エビデンス**: reviewer 報告内の参照ファイル（src/middleware.ts の matcher、src/app/marketing/copy.ts、supabase/migrations/20260212000000_init_schema.sql の RLS 全件 `to authenticated`、src/app/privacy/・terms/ の存在）
+
+## D3: Spec Review 指摘の取捨選択（Build前半, 2026-06-12）
+
+- **判断**: longrun-reviewer の Spec Review 指摘5件を全て「(a) 採用」と判定し spec/tasks に反映。嗜好レベルの指摘なし
+- **判定内訳**:
+  - 指摘1 trial 失効の status 遷移セマンティクス → 採用（spec 曖昧性。builder が遷移ジョブの要否を迷う）。「status 遷移なし・`trial_end < now` 判定のみ」シナリオを change-A spec に追加
+  - 指摘2 (BLOCKER) `tax_behavior: inclusive` の受け皿不在 → 採用（change 間契約違反。Price は作成後に tax_behavior 変更不可）。change-A spec 本文+シナリオ、change-A tasks 1.2、change-B tasks 3.1 に反映
+  - 指摘3 残枠カウンタのレスポンス形状契約 → 採用（C/D との統合時のフィールド名食い違い防止）。change-B spec にレスポンス形状シナリオを追加
+  - 指摘4 change-B tasks section 1 が GREEN 先行 → 採用（longrun-tdd スキーマの TDD 強制に違反）。RED 先行に並べ替え
+  - 指摘5 (NOTE) 境界レース時の Price 補正が未テスト → 採用（課金額の正確性）。change-B spec にシナリオ、tasks 2.4 にテストケースを追加
+- **エビデンス**: 反映後 `openspec validate` 4 change 全て valid（2026-06-12 実行ログ）
