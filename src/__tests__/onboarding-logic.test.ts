@@ -5,7 +5,7 @@ import {
   canAdvanceFromProfile,
   canAdvanceFromPresets,
   buildHabitFromPreset,
-  presetPerTimeEffect,
+  presetPerTimeEffectValue,
   createInitialWizardState,
   type OnboardingProfileInput,
 } from '@/lib/onboarding';
@@ -106,21 +106,31 @@ describe('createInitialWizardState', () => {
   });
 });
 
-// --- C-S10: 1回あたりの効果フォーマット ---
-describe('presetPerTimeEffect', () => {
-  it('cost_saving は 出費 −円 表示（カタログ unit を使う）', () => {
-    // home_cooking が cost_saving の効果を持つ前提で正値が返る
-    const effect = presetPerTimeEffect('cook_at_home', 'cost_saving');
-    expect(effect).toMatch(/円/);
+// --- C-S10: 1回あたりの効果（構造化・ロケール非依存。文言は UI 側で i18n 適用） ---
+describe('presetPerTimeEffectValue', () => {
+  it('cost_saving は isReduction=true で正の value を返す（文言は含まない）', () => {
+    const effect = presetPerTimeEffectValue('cook_at_home', 'cost_saving');
+    expect(effect).not.toBeNull();
+    expect(effect!.kpi).toBe('cost_saving');
+    expect(effect!.value).toBeGreaterThan(0);
+    expect(effect!.isReduction).toBe(true);
   });
 
-  it('health_lifespan は 分 表示', () => {
-    const effect = presetPerTimeEffect('daily_cardio_habit', 'health_lifespan');
-    expect(effect).toMatch(/分/);
+  it('health_lifespan は isReduction=false で正の value を返す', () => {
+    const effect = presetPerTimeEffectValue('daily_cardio_habit', 'health_lifespan');
+    expect(effect).not.toBeNull();
+    expect(effect!.kpi).toBe('health_lifespan');
+    expect(effect!.value).toBeGreaterThan(0);
+    expect(effect!.isReduction).toBe(false);
   });
 
-  it('未知プリセットは空文字', () => {
-    expect(presetPerTimeEffect('___nope___', 'cost_saving')).toBe('');
+  it('返り値に日本語の単位文字列を含まない（ロケール非依存）', () => {
+    const effect = presetPerTimeEffectValue('cook_at_home', 'cost_saving');
+    expect(JSON.stringify(effect)).not.toMatch(/[円分]/);
+  });
+
+  it('未知プリセットは null', () => {
+    expect(presetPerTimeEffectValue('___nope___', 'cost_saving')).toBeNull();
   });
 });
 

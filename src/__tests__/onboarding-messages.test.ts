@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import ja from '@/messages/ja.json';
 import en from '@/messages/en.json';
 import { KPI_CATALOG } from '@/data/kpi/catalog';
+import { HABIT_PRESETS } from '@/data/habit-presets';
 
 // 確定文言は docs/context/onboarding-screens.md（2026-06-12 確定）から一字一句変えない。
 
@@ -141,5 +142,59 @@ describe('C-S18: en は ja と同一キー構造でキー欠落なし', () => {
     expect(str(onbEn.stepLabel)).toContain('{current}');
     expect(str(onbEn.stepLabel)).toContain('{total}');
     expect(str(obj(onbEn.step3).effectPerTime)).toContain('{effect}');
+  });
+});
+
+describe('C-S18: 画面[3]/[4] の表示に使う i18n キーが en に全て存在する', () => {
+  // wizard が静的カタログの日本語生文字列を直接表示しないよう、
+  // 表示に使う KPI コピー/名/単位・プリセット名・効果テンプレが en に揃うことを担保する。
+
+  for (const def of KPI_CATALOG) {
+    it(`kpi.${def.key} に headline/name/unit が en で存在し非空`, () => {
+      const card = obj(obj(onbEn.kpi)[def.key]);
+      expect(str(card.headline).length).toBeGreaterThan(0);
+      expect(str(card.name).length).toBeGreaterThan(0);
+      expect(str(card.unit).length).toBeGreaterThan(0);
+      // 単位が日本語（円/分）のまま残っていない
+      expect(str(card.unit)).not.toMatch(/[円分]/);
+    });
+  }
+
+  it('ja の kpi.unit は確定文言どおり（分/円・リグレッション防止）', () => {
+    const kj = obj(onbJa.kpi);
+    expect(str(obj(kj.health_lifespan).unit)).toBe('分');
+    expect(str(obj(kj.positive_mood).unit)).toBe('分');
+    expect(str(obj(kj.cost_saving).unit)).toBe('円');
+    expect(str(obj(kj.earning).unit)).toBe('円');
+  });
+
+  it('全プリセットの preset.<id> が ja/en の両方に存在し非空', () => {
+    const presetJa = obj(onbJa.preset);
+    const presetEn = obj(onbEn.preset);
+    for (const preset of HABIT_PRESETS) {
+      expect(presetJa[preset.id], `ja preset.${preset.id}`).toBeDefined();
+      expect(presetEn[preset.id], `en preset.${preset.id}`).toBeDefined();
+      expect(str(presetJa[preset.id]).length).toBeGreaterThan(0);
+      expect(str(presetEn[preset.id]).length).toBeGreaterThan(0);
+    }
+  });
+
+  it('ja の preset.<id> は habit-presets.ts の確定名と一致する', () => {
+    const presetJa = obj(onbJa.preset);
+    for (const preset of HABIT_PRESETS) {
+      expect(str(presetJa[preset.id])).toBe(preset.name);
+    }
+  });
+
+  it('効果テンプレ effectReduction/effectGain が ja/en に存在し補間キーを保持', () => {
+    for (const ns of [onbJa, onbEn]) {
+      const s3 = obj(ns.step3);
+      for (const key of ['effectReduction', 'effectGain']) {
+        const tmpl = str(s3[key]);
+        expect(tmpl).toContain('{kpiName}');
+        expect(tmpl).toContain('{value}');
+        expect(tmpl).toContain('{unit}');
+      }
+    }
   });
 });

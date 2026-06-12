@@ -15,7 +15,7 @@ import {
   validateProfileInput,
   canAdvanceFromPresets,
   presetsForKpi,
-  presetPerTimeEffect,
+  presetPerTimeEffectValue,
   runOnboardingWrite,
   OnboardingWriteError,
   type WizardState,
@@ -242,13 +242,30 @@ export function OnboardingWizard() {
         <section className="space-y-6">
           <BackLink label={t("back")} onClick={() => setStep(2)} />
           <Heading
-            title={t("step3.title", { copy: selectedKpiDef.headline })}
+            title={t("step3.title", {
+              copy: t(`kpi.${selectedKpiDef.key}.headline`),
+            })}
             subtitle={t("step3.subtitle")}
           />
           <div className="grid gap-3">
             {presets.map((preset) => {
               const selected = state.selectedPresetIds.includes(preset.id);
-              const effect = presetPerTimeEffect(preset.id, selectedKpiDef.key);
+              const effectData = presetPerTimeEffectValue(
+                preset.id,
+                selectedKpiDef.key
+              );
+              const effect = effectData
+                ? t(
+                    effectData.isReduction
+                      ? "step3.effectReduction"
+                      : "step3.effectGain",
+                    {
+                      kpiName: t(`kpi.${effectData.kpi}.name`),
+                      value: effectData.value.toLocaleString(),
+                      unit: t(`kpi.${effectData.kpi}.unit`),
+                    }
+                  )
+                : null;
               return (
                 <button
                   key={preset.id}
@@ -274,7 +291,7 @@ export function OnboardingWizard() {
                   </span>
                   <span className="min-w-0 flex-1 space-y-1">
                     <span className="block font-semibold leading-tight">
-                      {preset.name}
+                      {t(`preset.${preset.id}`)}
                     </span>
                     {effect && (
                       <span className="block text-xs text-muted-foreground">
@@ -303,7 +320,9 @@ export function OnboardingWizard() {
           <BackLink label={t("back")} onClick={() => setStep(3)} />
           <Heading
             title={t("step4.title")}
-            subtitle={t("step4.body", { kpiName: selectedKpiDef.name })}
+            subtitle={t("step4.body", {
+              kpiName: t(`kpi.${selectedKpiDef.key}.name`),
+            })}
           />
 
           <div className="rounded-2xl border border-border bg-card p-5">
@@ -312,7 +331,7 @@ export function OnboardingWizard() {
                 <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <KpiIcon name={selectedKpiDef.icon} className="size-5" />
                 </span>
-                {selectedKpiDef.name}
+                {t(`kpi.${selectedKpiDef.key}.name`)}
               </span>
               <span className="text-right">
                 <span className="text-xs text-muted-foreground">
@@ -321,7 +340,7 @@ export function OnboardingWizard() {
                 <span className="block text-2xl font-bold tabular-nums">
                   0
                   <span className="ml-1 text-sm font-normal text-muted-foreground">
-                    {selectedKpiDef.unit}
+                    {t(`kpi.${selectedKpiDef.key}.unit`)}
                   </span>
                 </span>
               </span>
@@ -344,7 +363,7 @@ export function OnboardingWizard() {
                     <span className="flex size-8 items-center justify-center rounded-lg bg-muted text-muted-foreground">
                       <KpiIcon name={preset.icon} className="size-4" />
                     </span>
-                    <span className="font-medium">{preset.name}</span>
+                    <span className="font-medium">{t(`preset.${preset.id}`)}</span>
                   </li>
                 );
               })}

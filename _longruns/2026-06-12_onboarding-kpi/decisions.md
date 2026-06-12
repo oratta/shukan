@@ -149,3 +149,22 @@
 - **テスト**: `onboarding-write.test.ts` に2ケース追加 — 「失敗例外に成功 presetId 集合が載る（OnboardingWriteError）」「部分失敗→再試行で成功済みプリセットをスキップし重複 insert しない（再 insert は未完了分の『毎日の節約』のみ）」。
 - **エビデンス**: `npm run test:run` → 19 files / 310 tests PASS。`npx tsc --noEmit` → 9 errors（全てベースラインの既存・change-A/B/C 由来の新規ゼロ。habits.test.ts:310 の calculationParams エラーは dailyPositiveMoodMinutes:0 追加で解消）。`npm run lint` → 9 errors / 35 warnings（ベースライン維持・onboarding ファイルは0問題）。`npm run build` → Compiled successfully。
 - **verification-guide C-S14 との整合**: 「[4]に留まりエラー表示・再押下で再試行」という記述・挙動は不変。重複しなくなるだけで仕様の方向性は変わらない（記述変更不要）。
+
+## D-C4: オンボーディング表示文言の i18n 化（en リグレッション修正・change-C / 2026-06-12）
+
+- **背景**: ブラウザ検証で C-S18（en ロケールで全文言が英語表示）が FAIL。画面[1]の KPI カードは英訳されるが、画面[3]タイトルの KPI コピー・習慣カード名・効果ラベル・画面[4]本文/KPIカードの KPI 名が日本語のまま残っていた。原因は onboarding-wizard.tsx が静的カタログ（`catalog.ts` / `habit-presets.ts` の日本語生文字列）を直接表示していたこと。`en.json` の `kpi.*.headline/name` 翻訳は既に存在するのに未使用だった。
+- **判断（表示は i18n / DB 書き込みは既存流儀を維持）**:
+  1. **表示**は全て next-intl の `t()` 経由に統一する。
+     - 画面[3]タイトル: `copy` を `t(\`kpi.${key}.headline\`)` に。
+     - 画面[3]/[4] の習慣名: `preset.name`（カタログ生文字列）→ `t(\`preset.${preset.id}\`)`。`onboarding.preset.<id>` キーを ja/en に新設（ja は habit-presets.ts の確定名と一字一句同一、en は翻訳）。
+     - 画面[4] 本文/KPIカードの KPI 名: `selectedKpiDef.name` → `t(\`kpi.${key}.name\`)`、単位 `selectedKpiDef.unit` → `t(\`kpi.${key}.unit\`)`（`kpi.<key>.unit` を ja=分/円・en=min/yen で新設）。
+     - 効果ラベル: `presetPerTimeEffect`（日本語ラベルを直接組み立てていた）を `presetPerTimeEffectValue` に置き換え、`{ kpi, value, isReduction } | null` の**ロケール非依存な構造化データ**を返す。UI 側で `step3.effectReduction`/`effectGain`（`{kpiName} ±{value}{unit}` テンプレ）に `t()` を適用してロケールに応じた文言を生成する。
+  2. **DB 書き込み**は変更しない。`buildHabitFromPreset` は従来どおり `preset.name`（日本語の確定名）を habit.name に保存する。
+     - 理由: 既存 Discover 採用フロー（`handleAddFromArticle`）は記事の `habitName`（日本語）を locale 問わずそのまま保存している。habit 名はユーザーデータであり、表示ロケールに依存して保存値が変わると DB 上の表現が不安定になる。既存アプリの流儀（保存は固定の日本語名・表示のみ翻訳）に合わせ、整合性を保つ。将来 habit 名の多言語表示が必要になれば、保存値はキー/正規名のまま表示層で翻訳する方針を踏襲できる。
+- **ja リグレッション防止**: `kpi.<key>.headline/name/description` と確定文言の一致、`kpi.<key>.unit` が分/円、`preset.<id>` が habit-presets.ts の確定名と一致、を `onboarding-messages.test.ts` に追加検証。既存の確定文言テストも無変更で全 PASS。
+- **C-S18 検証の追加**: `onboarding-messages.test.ts` に「画面[3]/[4]の表示に使う i18n キー（kpi headline/name/unit・全プリセット名・効果テンプレ）が en に全て存在し非空・単位に日本語が残らない」検証を追加。`onboarding-logic.test.ts` の `presetPerTimeEffect` テストは `presetPerTimeEffectValue` の構造化検証（返り値に円/分の日本語を含まない）に更新。
+- **選択肢の比較**:
+  - (a) 採用: 表示を t() 化＋効果は構造化データ返却＋DB 書き込みは日本語名維持。en/ja 両対応・既存保存流儀と整合・最小差分。
+  - (b) 不採用: catalog.ts / habit-presets.ts 自体を多言語化（オブジェクトに en フィールドを持たせる）→ 静的カタログ（D2/D10 の静的フロントエンド管理）に i18n 責務を持たせると messages との二重管理になる。next-intl の messages に一本化する既存方針に反する。
+  - (c) 不採用: DB に locale 依存の habit 名を保存 → 既存 Discover 流儀と不整合・保存値がロケールで揺れる。
+- **エビデンス**: `npm run test:run` → 19 files / 319 tests PASS（+9）。`npx tsc --noEmit` → 9 errors（全てベースライン既存・onboarding/i18n 由来の新規ゼロ）。`npm run lint` → 9 errors / 35 warnings（ベースライン維持・onboarding ファイルは0問題）。`npm run build` → Compiled successfully / `/onboarding` ルート生成。

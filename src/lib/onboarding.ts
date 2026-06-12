@@ -112,15 +112,28 @@ export function canAdvanceFromPresets(selectedPresetIds: string[]): boolean {
   return selectedPresetIds.length > 0;
 }
 
+/** 「1回あたりの効果」の構造化結果（UI 側で i18n を適用するためロケール非依存で返す）。 */
+export interface PresetEffect {
+  kpi: KpiKey;
+  /** 1回あたりの効果量（丸め済み・常に非負）。 */
+  value: number;
+  /** 出費削減（減らす量）なら true。表示時にマイナス符号を付ける。 */
+  isReduction: boolean;
+}
+
 /**
- * プリセットの「1回あたりの効果」を選んだ KPI 軸で整形する（C-S10）。
- * プリセットが参照する記事群の calculationParams を合算し、KPI の unit を付ける。
- * 未知プリセット・効果0は空文字（UI 非表示判定に使える）。
+ * プリセットの「1回あたりの効果」を選んだ KPI 軸で算出する（C-S10）。
+ * プリセットが参照する記事群の calculationParams を合算する。
+ * KPI名・単位・符号などの**文言は付けず**、構造化データで返す（en/ja の i18n は UI 側で適用）。
+ * 未知プリセット・効果0は null（UI 非表示判定に使える）。
  */
-export function presetPerTimeEffect(presetId: string, kpi: KpiKey): string {
+export function presetPerTimeEffectValue(
+  presetId: string,
+  kpi: KpiKey
+): PresetEffect | null {
   const preset = getHabitPreset(presetId);
   const def = getKpi(kpi);
-  if (!preset || !def) return '';
+  if (!preset || !def) return null;
 
   let value = 0;
   for (const articleId of preset.articleIds) {
@@ -143,14 +156,11 @@ export function presetPerTimeEffect(presetId: string, kpi: KpiKey): string {
     }
   }
 
-  if (value === 0) return '';
+  const rounded = Math.round(value);
+  if (rounded === 0) return null;
 
   // 出費削減は「減らす」量なのでマイナス表示、それ以外はプラス表示。
-  const rounded = Math.round(value);
-  if (kpi === 'cost_saving') {
-    return `${def.name} −${rounded.toLocaleString()}${def.unit}`;
-  }
-  return `${def.name} +${rounded.toLocaleString()}${def.unit}`;
+  return { kpi, value: rounded, isReduction: kpi === 'cost_saving' };
 }
 
 // ───────── [4] 完了時の書き込み ─────────
