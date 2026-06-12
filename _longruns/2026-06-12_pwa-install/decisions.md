@@ -21,3 +21,7 @@
 - 指摘3（SHOULD_FIX）「遷移判定を純関数 isCompletionTransition に切り出すべき」→ **採用**。根拠: plan.md 自身の rule「ロジックは src/lib/pwa/ の純関数に置く」との契約整合。rocket_used も完了扱い（habit-card.tsx:106-108 の既存仕様に整合）
 - 指摘4（NOTE）「『既存キー不変』THEN は機械検証不能」→ **採用（軽量）**。spec の THEN から削除（config.yaml rules / design 制約としては維持）
 - 修正後 `openspec validate install-prompt-ui --strict` → valid
+
+## D4: 仕様レビュー Round 2（2026-06-12）
+- change-B: install-prompt-ui → **APPROVE**（BLOCKER 0 / SHOULD_FIX 0。Round 1 の4指摘 + rocket_used 問題すべて反映確認済み）
+- 両 change とも実装フェーズへ進行可
