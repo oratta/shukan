@@ -141,7 +141,8 @@
     "deleting": "削除中...",
     "legal": "法的情報",
     "privacyPolicy": "プライバシーポリシー",
-    "termsOfService": "利用規約"
+    "termsOfService": "利用規約",
+    "tokushoho": "特定商取引法に基づく表記"
   },
   "days": {
     "sun": "日",
@@ -307,5 +308,38 @@
         }
       ]
     }
+  },
+  "checkout": {
+    "title": "ご購入内容の最終確認",
+    "subtitle": "下記の内容をご確認のうえ、お申し込みください。",
+    "recurringHeading": "①定期購入（自動更新）について",
+    "recurringBody": "本プランは定期購入（サブスクリプション）です。各契約期間の終了時に自動更新され、お支払い方法へ自動的に課金されます。",
+    "priceHeading": "②お支払い金額",
+    "perCycleMonthly": "月額 {price} / 月（毎月自動課金）",
+    "perCycleAnnual": "年額 {price} / 年（毎年自動課金）",
+    "annualTotalLabel": "1年間のお支払総額",
+    "annualTotalValue": "{total}",
+    "trialHeading": "③無料トライアルから有料への移行",
+    "trialBody": "無料トライアル（{days}日間）終了後に有料プランへ自動的に移行し、初回のお支払い（{price}）が発生します。トライアル期間中に解約された場合、料金は一切発生しません。",
+    "cancelHeading": "④解約について",
+    "cancelBody": "いつでも解約できます。アカウント設定の「お支払い・解約」から Stripe カスタマーポータルにアクセスし、ご自身で解約手続きを完了できます。解約手続きは次回更新日の前まで受け付けます。解約に伴う違約金・解約手数料は一切かかりません。",
+    "lifetimeHeading": "お支払い内容（買い切り）",
+    "lifetimeBody": "本プランは一回限りのお支払いです。定期購入ではありませんので、自動更新・継続課金は発生しません。",
+    "lifetimePriceLabel": "お支払金額",
+    "taxNote": "表示価格はすべて税込総額です。表示価格と実際のご請求額は一致します。",
+    "tokushohoLink": "特定商取引法に基づく表記",
+    "tokushohoLinkText": "取引条件の詳細は特定商取引法に基づく表記をご確認ください。",
+    "confirmButton": "同意して支払いに進む",
+    "backButton": "戻る"
+  },
+  "billing": {
+    "heading": "お支払い・解約",
+    "subscriptionStatus": "現在、有料プランをご利用中です。",
+    "noSubscription": "現在ご利用中の有料プランはありません。",
+    "manageButton": "お支払い・解約を管理する",
+    "portalDescription": "Stripe カスタマーポータルで、お支払い方法の変更・解約をご自身で行えます。",
+    "cancelAnytime": "いつでも解約できます。解約手続きは上のボタンからカスタマーポータルにアクセスして完了でき、解約に伴う違約金・解約手数料は一切かかりません。",
+    "tokushohoLinkText": "取引条件の詳細は特定商取引法に基づく表記をご確認ください。",
+    "tokushohoLink": "特定商取引法に基づく表記"
   }
 }

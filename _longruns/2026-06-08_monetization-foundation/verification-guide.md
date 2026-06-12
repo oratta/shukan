@@ -586,8 +586,8 @@
   - **WHEN** the 特定商取引法に基づく表記 page is rendered
   - **THEN** the page MUST contain section labels and values for: 事業者名（販売業者）、所在地、連絡先、販売価格、支払方法、支払時期、役務の提供時期、返品・解約に関する事項
   - **AND** a Vitest structural test MUST assert the presence of each mandatory section label
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -595,8 +595,8 @@
 - Requirement: Tokushoho disclosure page exists with all mandatory items
   - **WHEN** a page that displays subscription or Lifetime prices (LP footer, teaser, paywall, account/billing screen) is rendered
   - **THEN** the page MUST contain a link to the 特定商取引法に基づく表記 page
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -608,8 +608,8 @@
   - **AND** the screen MUST contain the date (or rule) when the free trial converts to a paid plan and the amount charged at that point
   - **AND** the screen MUST contain the cancellation method, deadline, and a statement that no cancellation penalty (違約金) applies
   - **AND** a Vitest test MUST assert the existence of all four items
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -617,8 +617,8 @@
 - Requirement: Final confirmation screen displays the four mandatory items before Checkout
   - **WHEN** the final confirmation screen is rendered
   - **THEN** the four mandatory items MUST be placed above (or adjacent to) the purchase confirmation button, not behind accordions, modals, tabs, or below-the-fold placement that requires scrolling on a standard viewport
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -626,8 +626,8 @@
 - Requirement: Final confirmation screen displays the four mandatory items before Checkout
   - **WHEN** the final confirmation screen is rendered for the Lifetime plan
   - **THEN** the screen MUST state that the purchase is a one-time payment (定期購入ではない旨) with the total tax-inclusive price
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -636,8 +636,8 @@
   - **WHEN** a price is displayed on any consumer-facing surface
   - **THEN** the displayed amount MUST be the tax-inclusive total with a 税込 indication
   - **AND** the amount charged at Stripe Checkout MUST equal the displayed tax-inclusive amount
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -646,8 +646,8 @@
   - **WHEN** a subscribed user opens the account/billing screen
   - **THEN** the screen MUST contain a link/button to the Stripe Customer Portal where the subscription can be canceled
   - **AND** any「いつでも解約」表示 MUST NOT be accompanied by extra conditions that contradict it
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -656,8 +656,8 @@
   - **WHEN** a remaining-slots figure（残り枠 N）is rendered on the teaser or paywall
   - **THEN** the figure MUST originate from the change-B counter API (real DB count), not a hardcoded or fabricated value
   - **AND** a test MUST verify the rendered figure is sourced from the counter, not a literal
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -666,8 +666,8 @@
   - **WHEN** a「○%OFF」label is rendered
   - **THEN** the referenced regular price MUST be the actual price charged to non-discounted users (月額 / 年額 / Lifetime の実販売価格)
   - **AND** no expired or never-used reference price may be shown
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -677,8 +677,8 @@
   - **THEN** the page MUST contain a clause about collecting email addresses via the waitlist and its purpose
   - **AND** the page MUST contain a clause stating that payment processing is delegated to Stripe and what data is sent to Stripe
   - **AND** the existing privacy page structure (sections 1-12) MUST be preserved with clauses added, not replaced by a new page
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -687,7 +687,7 @@
   - **WHEN** the `/terms` page is rendered after this change
   - **THEN** the page MUST NOT state that the service is provided 無償 as its only mode
   - **AND** the page MUST reference the existence of paid plans and point to the 特定商取引法に基づく表記 page for transaction terms
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
