@@ -1,0 +1,31 @@
+import type { MetadataRoute } from "next";
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    id: "/",
+    name: "Smitch - Switch your path",
+    short_name: "Smitch",
+    description:
+      "Evidence-based life path builder. Choose the right habits backed by science.",
+    lang: "en",
+    dir: "ltr",
+    categories: ["health", "lifestyle", "productivity"],
+    start_url: "/",
+    display: "standalone",
+    background_color: "#F8F9FA",
+    theme_color: "#2B4162",
+    orientation: "portrait-primary",
+    icons: [
+      {
+        src: "/icon-192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        src: "/icon-512.png",
+        sizes: "512x512",
+        type: "image/png",
+      },
+    ],
+  };
+}

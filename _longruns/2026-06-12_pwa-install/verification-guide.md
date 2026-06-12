@@ -12,32 +12,32 @@
 ### S1: Manifest is installable-complete at /manifest.webmanifest
 - WHEN: ブラウザで `/manifest.webmanifest` にアクセスする
 - THEN: name "Smitch - Switch your path" / short_name "Smitch" / icons 192・512 / start_url "/" / display "standalone" / id・lang・dir・categories / theme_color "#2B4162" / background_color "#F8F9FA" を含む JSON が返る
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S2: Manifest content is verified by unit tests
 - WHEN: `npm run test:run` を実行する
 - THEN: `src/app/manifest.ts` の返り値が name / short_name / 192・512 アイコン / start_url / display:"standalone" を含むことを検証する unit テストが PASS する
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S3: Page links to /manifest.webmanifest and old file is gone
 - WHEN: アプリの任意のページを開いて HTML の `<link rel="manifest">` を確認する
 - THEN: href が `/manifest.webmanifest` であり `/manifest.json` への参照は存在しない。リポジトリに `public/manifest.json` が存在しない
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
 ### S4: Reference consistency is verified by unit tests
 - WHEN: `npm run test:run` を実行する
 - THEN: `src/app/layout.tsx` が `/manifest.json` を参照していないこと、`public/manifest.json` が存在しないことを検証する unit テストが PASS する
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
