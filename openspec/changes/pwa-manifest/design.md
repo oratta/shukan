@@ -56,6 +56,10 @@ DOM 環境は導入しない（plan.md 制約）。`src/__tests__/pwa-manifest.t
 2. **layout.tsx 参照検証**: `layout.tsx` をファイルとして読み（`fs.readFileSync`）、`"/manifest.json"` 文字列を含まないことをアサート（既存 `src/__tests__/` のファイル内容アサート方式に準拠）
 3. **旧ファイル不存在検証**: `fs.existsSync("public/manifest.json")` が false であることをアサート
 
+### D5: 実装時の `tsc --noEmit` 先行エラーの扱い（builder, 2026-06-12）
+
+`npx tsc --noEmit` 全体では既存テストファイル（habits / impact / middleware）に 9 件の型エラーがあるが、これは本 change 由来ではない（base commit でも同数）。本 change の追加/変更ファイル（manifest.ts / layout.tsx / pwa-manifest.test.ts）は型エラーゼロであり、`next build` の TypeScript チェックも PASS する。既存テストの型エラー修正は plan.md のスコープ外（manifest と metadata の変更のみ）のため温存し、3.1 の達成基準は「本 change のファイルが型エラーを増やさないこと」とする。
+
 ## Risks / Trade-offs
 
 - **リスク: 参照と実体の不一致**（manifest.ts を置いたのに layout.tsx が `/manifest.json` のまま → 404）→ テスト2・3で機械的に検知する

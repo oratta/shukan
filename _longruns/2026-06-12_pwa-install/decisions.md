@@ -25,3 +25,20 @@
 ## D4: 仕様レビュー Round 2（2026-06-12）
 - change-B: install-prompt-ui → **APPROVE**（BLOCKER 0 / SHOULD_FIX 0。Round 1 の4指摘 + rocket_used 問題すべて反映確認済み）
 - 両 change とも実装フェーズへ進行可
+
+## D5: change-A 実装時の `tsc --noEmit` 既存エラーの扱い（2026-06-12, builder）
+- 事象: tasks 3.1「`npx tsc --noEmit` エラーなし」を実行すると 9 件のエラーが出る（habits.test.ts / impact.test.ts / middleware.test.ts。HabitCompletion の `id` 未定義、NODE_ENV read-only 等）
+- 判断: これらは**本 change 由来ではない先行エラー**。3つの選択肢を評価:
+  - (a) 既存テストの型エラーも修正する → スコープ外（plan.md は manifest と metadata の変更のみに限定）。YAGNI 違反かつ非可逆的な広範囲変更となり却下
+  - (b) tasks 3.1 を未達として失敗報告 → 本 change の品質を正しく表さない。却下
+  - (c) **本 change の追加/変更ファイルが型エラーゼロであることを確認し、それを 3.1 の達成基準とする** → 採用。可逆的・最小・plan のスコープに忠実
+- エビデンス:
+  - base commit を `git stash` した状態でも `tsc --noEmit` のエラー件数は同じ 9 件（先行エラーであることを実証）
+  - `npx tsc --noEmit 2>&1 | grep -E "manifest|layout"` → 0 件（本 change のファイルにエラーなし）
+  - `npm run build` の "Running TypeScript ..." フェーズは PASS（next の tsconfig は test ファイルを除外）し `/manifest.webmanifest` を Static route として生成
+- 結論: 本 change は型安全。先行エラーは別 change で扱うべき技術的負債として温存
+
+## D6: manifest フィールドの値確定（2026-06-12, builder）
+- design.md D2 の移行表に従い実装。追加4フィールドの値: `id: "/"`（start_url と一致）/ `lang: "en"`（name・description が英語のため）/ `dir: "ltr"` / `categories: ["health", "lifestyle", "productivity"]`
+- icons の purpose は未指定（plan.md rule: maskable にしない）。テストで `purpose === undefined` を明示アサートし退行を防止
+- theme_color "#2B4162" / background_color "#F8F9FA" は変更禁止制約どおり踏襲。テストで固定値アサート
