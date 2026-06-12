@@ -1,12 +1,38 @@
 ---
-phase: Build Contract
+phase: Build
 status: complete
-last_updated: 2026-06-12T09:15:00
+last_updated: 2026-06-12T11:00:00
 ---
 
 ## 完了フェーズ
 - [x] Setup: ツール検証・コードベース調査・ベースライン記録完了
 - [x] Build Contract: APPROVED by longrun-reviewer（ラウンド2。ラウンド1の指摘4件+既存コード問題2件を全採用して plan.md 反映 → D2 参照）
+- [x] Build前半: OpenSpec 4 change 作成・validate 済み + Spec Review（指摘5件全採用 → D3）+ verification-guide.md 生成（72 Scenario）
+- [x] Build後半: 4 change + 統合結線を TDD 実装、全て main にマージ済み
+
+## Build結果
+| Change | Branch (merged) | Tests | Status |
+|--------|----------------|-------|--------|
+| change-A stripe-billing-foundation | d64b6a4 | +52 | Complete（deferred: 実Stripeキー疎通） |
+| change-C founding-teaser-waitlist | 35444fa | +20 | Complete（migration は dev 適用済み） |
+| change-B founding-member-program | b74124f | +48 | Complete（RPC実DB検証は統合検証項目） |
+| change-D jp-legal-compliance | d9c36d9 | +32 | Complete（deferred: 事業者実値/弁護士レビュー） |
+| 統合結線 billing-integration | 5645b5e | +33 | Complete（/account・確認画面・PaywallGate結線） |
+
+- テスト: **382 passed / 42 files**（ベースライン 197 → +185）
+- build: 成功 / lint: ベースライン維持（9 errors / 35 warnings、全て既存ファイル由来）
+- verification-guide.md: 72/72 Scenario で「テスト実装完了」「ロジック実装完了」[x]
+- dev DB: migration 3本適用済み（add_subscriptions / waitlist / founding_memberships）。dev プロジェクトは paused から restore 済み
+
+## 既知の deferred（実環境・人間ゲート）
+1. 実 Stripe テストキー投入 → `npm run stripe:setup` で Products/Prices 実作成（tax_behavior: inclusive）→ Price ID を env へ
+2. 実 DB での plpgsql RPC 検証（小cap境界・並行claim・RLS）
+3. `LEGAL_*` 環境変数の事業者実値設定（未設定だと特商法ページに [要記入] が出る。リリースブロッカー）
+4. 法定文言の人間（弁護士）レビュー
+
+## 次フェーズへの引き継ぎ
+- 次: Verify（longrun-verifier 静的検証 → longrun-browser-verifier ブラウザ検証）
+- ブラウザ検証時の注意: Stripe 実キーなしのため Checkout 実遷移は不可。確認画面表示・paywall・ティザー・waitlist・カウンタAPI は検証可能
 
 ## ツール検証結果
 - openspec: /Users/oratta/.volta/bin/openspec (v1.2.0)
