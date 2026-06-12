@@ -1,7 +1,7 @@
 ---
-phase: Setup
-status: complete
-last_updated: 2026-06-12T10:55:00+09:00
+phase: Build
+status: in_progress
+last_updated: 2026-06-12T11:30:00+09:00
 ---
 
 # Checkpoint: 2026-06-12_onboarding-kpi
@@ -17,8 +17,8 @@ last_updated: 2026-06-12T10:55:00+09:00
 
 ## 完了フェーズ
 - [x] Setup: ツール検証・コードベース調査・ベースライン記録完了
-- [ ] Build Contract
-- [ ] Build
+- [x] Build Contract: APPROVED by longrun-reviewer（1ラウンド、BLOCKER 0件。採用指摘1件→plan.md追記済み）
+- [ ] Build（前半完了: OpenSpec 3 change 作成・validate 済み・Spec Review 全APPROVE・verification-guide.md 生成済み。後半: TDD実装を A→B→C 直列で実行中。D-BUILD1 により per-change worktree なし）
 - [ ] Verify
 - [ ] Feedback
 - [ ] Archive

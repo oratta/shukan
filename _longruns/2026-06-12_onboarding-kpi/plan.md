@@ -53,6 +53,7 @@
 
 ### change-A: kpi-data-foundation
 - **スコープ**: 記事の型拡張（T17）＋静的カタログ＋累積計算の4KPI化。
+  - 作業前提: 対象は `src/data/impact-articles/index.ts` に登録された35記事のみ。`src/data/impact-articles/LLM/` 配下の md はビルド対象外の素材で対象外
   - `src/types/impact.ts`: `calculationParams.dailyPositiveMoodMinutes` / `inferences.positiveMood` / `calculationLogic.positiveMood` / `LifeImpactSavings.positiveMoodMinutes` を追加
   - 全35記事を新しい型に適合させる（未設定記事は dailyPositiveMoodMinutes: 0）
   - 代表記事10記事程度に研究ベースの値と計算ロジックを設定（出発点の前提: 起きている時間16h／前向き割合50%、二重計上回避）

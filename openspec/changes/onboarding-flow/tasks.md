@@ -23,7 +23,7 @@
 - [ ] 4.3 画面[2] プロフィール入力を実装する: 年齢・性別・国（必須、国デフォルト日本）・年収（任意）、年収注記表示、必須未入力/不正値では「次へ」無効
 - [ ] 4.4 画面[3] 習慣のおすすめを実装する: タイトルに選んだKPIのなりたい自分コピーを差し込み、選んだKPIの `primaryKpis` に対応するプリセットのみ表示、各カードに1回あたりの効果表示、1つ以上選択で「この習慣ではじめる」有効（複数選択可）
 - [ ] 4.5 画面[4] 完了を実装する: 選んだKPI（現在値 0）と選んだ習慣のリスト表示、本文にKPI名を差し込み、「はじめる」ボタン
-- [ ] 4.6 完了時の一括書き込みを実装する: upsert user_profiles（tracked_kpis=選んだKPIキー）→ insert habits（選んだプリセット分）→ replaceHabitEvidences（プリセットの articleIds 分）→ 成功でホームへ遷移。失敗時は[4]に留まりエラー表示＋再試行可能
+- [ ] 4.6 完了時の一括書き込みを実装する: upsert user_profiles（tracked_kpis=選んだKPIキー）→ insert habits（選んだプリセット分）→ replaceHabitEvidences（プリセットの articleIds 分）→ 成功でホームへ遷移。失敗時は[4]に留まりエラー表示＋再試行可能。プリセット→Habit 変換時、`insertHabit` の必須フィールド（frequency / type / dailyTarget 等）は既存 Discover の習慣採用フローと同じ既定値で補う（type はプリセットの defaultHabitType。独自の既定値を発明しない）
 
 ## 5. デザイントーン仕上げ
 

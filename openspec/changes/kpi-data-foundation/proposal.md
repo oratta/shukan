@@ -26,7 +26,7 @@
 ## Impact
 
 - **影響コード**:
-  - `src/types/impact.ts`（型拡張）
+  - `src/types/impact.ts`（型拡張。`LifeImpactSavings.positiveMoodMinutes` 追加もここ）
   - `src/data/impact-articles/*.ts`（35記事すべて。うち10記事程度は研究ベース値＋算出根拠を設定）
   - `src/lib/impact.ts`（5関数＋2インターフェース）
   - `src/__tests__/impact.test.ts` / `src/__tests__/calculation-logic.test.ts`（positiveMood ケース追加。既存3軸の期待値は変更しない）
