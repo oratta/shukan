@@ -68,3 +68,14 @@
 ### D7-6: `tsc --noEmit` 基準は D5 を踏襲
 - 本 change 実装後も `tsc --noEmit` の総エラーは 9 件（D5 の先行エラーと同一）。`grep -iE "pwa|page|settings"` で本 change ファイルのエラー 0 件を確認。`npm run build` EXIT 0・"Compiled successfully"。基準「本 change がエラーを増やさない + build PASS」を満たす
 - エビデンス: 全テスト 259 passed（baseline 205 + 新規 54）/ build EXIT 0
+
+## D8: 静的検証 Round 1 の lint 指摘への対応（2026-06-12）
+- longrun-verifier 検出: `npm run lint` がベースライン 9 errors（先行負債）→ HEAD 12 errors。本 run 由来 +3（react-hooks/set-state-in-effect: install-banner.tsx / install-help-dialog.tsx / page.tsx）
+- 判断: 先行9件は D5 と同じ技術的負債として温存（本 run スコープ外）。**本 run 由来の3件は品質ゲート違反として修正**
+- 対応: longrun-builder（opus）が commit 14c0429 で修正。SSR/hydration 制約（navigator/matchMedia/localStorage は server に存在せず、useState 遅延初期化は hydration mismatch リスク）により構造的解消は不採用、eslint-disable + 理由コメントで抑制
+- エビデンス: 修正後 lint 9 errors / 259 tests PASS / build 成功（builder 報告。verifier 再検証中）
+
+## D9: 静的検証 最終結果（2026-06-12）
+- longrun-verifier 再検証: **品質 100% (4/4: test 259 PASS / build PASS / tsc本runファイル 0エラー / lint 9 errors=ベースライン同数) / 完成度 100% (7/7) → 総合 PASS**
+- 受け入れ条件 1〜12 全PASS（verifier 実測）
+- 申し送り: settings/page.tsx の未使用 import `cn`（warning）→ builder に削除依頼済み
