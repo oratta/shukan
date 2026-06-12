@@ -437,8 +437,8 @@
   - **AND** the page MUST contain the CS-priority promise message
   - **AND** the page MUST contain a waitlist email form
   - **AND** the page MUST contain a FAQ section with at least 3 question/answer pairs
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -447,8 +447,8 @@
   - **WHEN** the `/founding` page is rendered
   - **THEN** the page MUST NOT contain a countdown timer component
   - **AND** any scarcity numbers shown (remaining slots) MUST originate from live API data, never from literals in copy or components
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -457,8 +457,8 @@
   - **WHEN** a visitor without a Supabase session requests `/founding` (on the apex host or on a host listed in `NEXT_PUBLIC_MARKETING_HOSTS`)
   - **THEN** the teaser page MUST render with HTTP 200
   - **AND** the visitor MUST NOT be redirected to `/login`
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -466,8 +466,8 @@
 - Requirement: Founding teaser page is publicly accessible without authentication
   - **WHEN** `src/middleware.ts` is inspected after this change
   - **THEN** the exported `config.matcher` MUST NOT include `/founding`
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -476,8 +476,8 @@
   - **WHEN** the `/founding` page is rendered with the `locale` cookie set to `ja`
   - **THEN** the page MUST render the Japanese copy from the `founding` namespace in `src/messages/ja.json`
   - **AND** when the `locale` cookie is `en` or absent, the page MUST render the English copy from `src/messages/en.json`
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -485,8 +485,8 @@
 - Requirement: Founding teaser copy is localized via next-intl founding namespace
   - **WHEN** `src/messages/en.json` and `src/messages/ja.json` are parsed
   - **THEN** both files MUST contain a `founding` namespace with an identical key set covering at minimum: hero, tier benefits, CS-priority promise, waitlist form labels/messages, and FAQ entries
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -495,8 +495,8 @@
   - **WHEN** a visitor submits a syntactically valid email through the waitlist form while the locale cookie is `ja`
   - **THEN** a row MUST exist in `waitlist` with that email, `locale = 'ja'`, a non-empty `source`, and a `created_at` timestamp
   - **AND** the form MUST show a success message in the visitor's locale
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -505,8 +505,8 @@
   - **WHEN** a visitor submits a value that does not match the email format
   - **THEN** no row MUST be inserted into `waitlist`
   - **AND** the form MUST show a localized validation error
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -516,8 +516,8 @@
   - **THEN** the operation MUST complete without raising a visible error (upsert / ignore-duplicates semantics)
   - **AND** the table MUST still contain exactly one row for that email
   - **AND** the form MUST show the same success message as a first-time signup
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -526,8 +526,8 @@
   - **WHEN** a client using the anon key inserts a valid waitlist row
   - **THEN** the insert MUST succeed
   - **AND** a subsequent SELECT on `waitlist` by the same anon client MUST return zero rows (or be denied)
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -536,8 +536,8 @@
   - **WHEN** an insert is attempted with a malformed email or with an email that already exists
   - **THEN** the database MUST reject the malformed email via the CHECK constraint
   - **AND** the duplicate email MUST violate the `unique(email)` constraint unless the caller used upsert semantics
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -545,8 +545,8 @@
 - Requirement: Waitlist table enforces anon-insert-only RLS
   - **WHEN** the waitlist migration file is inspected
   - **THEN** it MUST contain SQL comments explaining why anon INSERT is allowed, why SELECT is restricted to service_role, and the abuse mitigations (unique email, format CHECK, upsert neutralization)
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -554,8 +554,8 @@
 - Requirement: Remaining slot display shows live counts from the founding counter API
   - **WHEN** the counter API responds with remaining counts for both tiers
   - **THEN** the tier benefits section MUST display those exact numbers as the remaining slots for the 50% off and 30% off tiers
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -564,8 +564,8 @@
   - **WHEN** the counter API is unreachable or returns an error
   - **THEN** the page MUST still render the tier benefits section without numeric remaining counts
   - **AND** the page MUST NOT display any hardcoded or cached-stale slot number
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -573,8 +573,8 @@
 - Requirement: Remaining slot display shows live counts from the founding counter API
   - **WHEN** the founding teaser components and the `founding` message namespace are inspected
   - **THEN** they MUST NOT contain literal remaining-slot numbers; tier capacity wording may describe the program (e.g., "first 50 members") only as static program description sourced from configuration-backed copy, while the "remaining" figures MUST come exclusively from the API response
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 

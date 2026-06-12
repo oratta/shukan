@@ -32,3 +32,13 @@
   - 指摘4 change-B tasks section 1 が GREEN 先行 → 採用（longrun-tdd スキーマの TDD 強制に違反）。RED 先行に並べ替え
   - 指摘5 (NOTE) 境界レース時の Price 補正が未テスト → 採用（課金額の正確性）。change-B spec にシナリオ、tasks 2.4 にテストケースを追加
 - **エビデンス**: 反映後 `openspec validate` 4 change 全て valid（2026-06-12 実行ログ）
+
+## change-C 実装判断（founding-teaser-waitlist, TDD apply 2026-06-12）
+
+自律実行中（AskUserQuestion 不可）の設計判断。詳細は `openspec/changes/founding-teaser-waitlist/design.md` の D7–D10。
+
+- **D7 階層特典カードはインライン描画**: tier カードを `renderTierCard()` helper で page tree に直接埋め込む。理由: 既存 tree-walking 構造テストは関数 component の中身を展開しないため、割引ラベル/API 残数を text node として検証可能にする必要がある。@testing-library 導入は YAGNI で却下
+- **D8 WaitlistForm は client component、page テストで `'form'` 文字列にモック**: フォーム挙動は `founding-actions.test.ts` で独立検証し、page テストは「フォーム存在」構造のみ担保（責務分離）。本番コードに影響しない可逆なテスト都合
+- **D9 Server Action シグネチャ `(prevState, formData)` / source 定数**: React 19 `useActionState` と素直に接続。email バリデーションは Server Action（厳格）と DB CHECK（緩い最終防衛線）の二層
+- **D10 残り枠フェッチャーのエンドポイント env 差し替え**: `FOUNDING_COUNTER_API_URL` → default `/api/founding/slots`。`next.revalidate: 15` で change-B の 10〜30秒キャッシュ契約に整合。契約形状（`founder50/founder30 × cap/claimed/remaining`）を満たさなければ `null` を返し数値非表示フォールバック。change-B 確定後はこの 1 ファイルのみ差し替え
+- **保留事項**: migration の `supabase db push`（tasks 1.3）と waitlist DB 行の手動確認（tasks 4.4）は、並行 run 制約によりマージ後にメインで適用・確認する。worktree からは push しない。ページ表示・i18n・RLS SQL 実装は完了済み
