@@ -31,7 +31,7 @@
 - [x] 4.4 `src/app/api/stripe/portal/route.ts` を作成（handler 内認可、customer 不在時 400、Portal URL 返却）
 - [x] 4.5 トライアル開始処理を実装（`status: trialing` + `trial_end = now + 設定日数` の行作成。カード不要・Stripe 非呼び出し）
 - [x] 4.6 `useSubscription`（または同等の取得 hook）と entitlement 判定の共有関数を実装（`subscriptions` のみ参照）
-- [x] 4.7 paywall ゲートコンポーネントを実装（非 entitled 時にゲート対象アクションをブロックし、Checkout への CTA を含むアップグレード導線を表示。確認ステップ経由で Checkout API を呼ぶ構造にし、change-D の最終確認画面を差し込める形にする）
+- [x] 4.7 paywall ゲートコンポーネントを実装（非 entitled 時にゲート対象アクションをブロックし、Checkout への CTA を含むアップグレード導線を表示。確認ステップ経由で Checkout API を呼ぶ構造にし、change-D の最終確認画面を差し込める形にする）。※billing-integration（D8）で本番ページへ結線完了：`PaywallGate` の `create_habit` ゲートをホームの習慣追加導線に組み込み（`shouldBlockCreateHabit`／entitled・トライアル中は従来 UX 維持・非 entitled は `/account?upgrade=1` へ）、CTA 先の `/account` で最終確認ステップ → `POST /api/stripe/checkout` を実装。`create-habit-gate.test.ts` / `account-billing.test.ts`
 - [x] 4.8 `npm run test:run` で新規テストが全て GREEN になることを確認する
 
 ## 5. 品質確認（REFACTOR + 検証）

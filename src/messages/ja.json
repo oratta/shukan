@@ -341,5 +341,30 @@
     "cancelAnytime": "いつでも解約できます。解約手続きは上のボタンからカスタマーポータルにアクセスして完了でき、解約に伴う違約金・解約手数料は一切かかりません。",
     "tokushohoLinkText": "取引条件の詳細は特定商取引法に基づく表記をご確認ください。",
     "tokushohoLink": "特定商取引法に基づく表記"
+  },
+  "account": {
+    "title": "プランと請求",
+    "currentPlanHeading": "現在のプラン",
+    "trialingStatus": "無料トライアル — 残り{days}日",
+    "trialEndedStatus": "無料トライアルは終了しました。",
+    "activePlanStatus": "現在のプラン：{plan}",
+    "noPlanStatus": "まだ有料プランはありません。",
+    "planMonthly": "月額",
+    "planAnnual": "年額",
+    "planLifetime": "買い切り",
+    "choosePlanHeading": "プランを選ぶ",
+    "selectPlanButton": "{plan}を選ぶ",
+    "perMonth": "{price} / 月",
+    "perYear": "{price} / 年",
+    "oneTime": "{price} 買い切り",
+    "foundingHeading": "ファウンディングメンバー枠",
+    "foundingDescription": "割引は決済完了時点の残り枠に応じてアカウントに永久ロックされます。偽のカウントダウンはありません。",
+    "foundingTier50": "最初のメンバー — 50%オフ、ずっと",
+    "foundingTier30": "次のメンバー — 30%オフ、ずっと",
+    "foundingRemaining": "残り {remaining} / {cap}",
+    "foundingUnavailable": "現在、残り枠の表示を一時的に取得できません。",
+    "earlySwitchHeading": "ファウンディング割引を早めに確定",
+    "earlySwitchButton": "今すぐ有料プランに切り替える",
+    "manageHeading": "請求の管理"
   }
 }

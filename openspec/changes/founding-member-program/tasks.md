@@ -30,7 +30,7 @@
 
 ## 5. 早期切替フロー + グランドファザリング
 
-- [x] 5.1 トライアル中ユーザー向けの早期切替導線ロジックを実装（`src/lib/founding/early-switch.ts`: `shouldOfferEarlySwitch` は active trial のみ true、`earlySwitchConfirmationCopy` は「割引は決済完了時点で確定」を誠実に伝え偽の緊急性なし。`founding-early-switch.test.ts`）。※フル account ページ UI は change スコープ外（本 change はゲーティングロジック＋確定パスを担保）
+- [x] 5.1 トライアル中ユーザー向けの早期切替導線ロジックを実装（`src/lib/founding/early-switch.ts`: `shouldOfferEarlySwitch` は active trial のみ true、`earlySwitchConfirmationCopy` は「割引は決済完了時点で確定」を誠実に伝え偽の緊急性なし。`founding-early-switch.test.ts`）。※account ページ UI への結線は billing-integration（D8）で完了：`/account` の `AccountBilling` がトライアル中のみ `data-early-switch` CTA を表示（active 加入者には非表示）し、CTA は確認ステップ → Checkout 導線に接続。`account-billing.test.ts` で trialing/active 出し分けを検証
 - [x] 5.2 早期切替テスト（`founding-webhook.test.ts` の課金成功パス＝早期切替も同一）: トライアル中の Checkout → 課金成功でその時点の tier がロックされ membership/subscriptions が更新される
 - [x] 5.3 グランドファザリングのテスト（`founding-webhook.test.ts`）: 更新イベント（invoice.paid / customer.subscription.updated）処理後も `claim_founding_slot` を再呼び出ししない（tier 別 Price 請求が維持され membership 行不変）
 
