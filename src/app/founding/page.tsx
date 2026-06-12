@@ -88,6 +88,9 @@ export default async function FoundingPage() {
           <a href="/terms" className="hover:underline">
             Terms
           </a>
+          <a href="/tokushoho" className="hover:underline">
+            特定商取引法に基づく表記
+          </a>
           <span className="ml-auto">© Genetta Inc.</span>
         </nav>
       </footer>

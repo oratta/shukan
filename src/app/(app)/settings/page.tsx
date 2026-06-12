@@ -24,6 +24,7 @@ import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/components/auth-provider';
 import { createClient } from '@/lib/supabase/client';
+import { BillingPortalCard } from '@/components/billing/billing-portal-card';
 
 export default function SettingsPage() {
   const t = useTranslations();
@@ -69,6 +70,30 @@ export default function SettingsPage() {
     const supabase = createClient();
     await supabase.auth.signOut();
     window.location.href = '/login';
+  };
+
+  // Open the Stripe Customer Portal (change-A `/api/stripe/portal`) so the user
+  // can cancel themselves — backs the「いつでも解約」claim (change-D S7 / D4).
+  const handleOpenPortal = async () => {
+    try {
+      const res = await fetch('/api/stripe/portal', { method: 'POST' });
+      if (!res.ok) return;
+      const { url } = (await res.json()) as { url?: string };
+      if (url) window.location.href = url;
+    } catch {
+      // No-op on failure; the user can retry.
+    }
+  };
+
+  const billingMessages = {
+    heading: t('billing.heading'),
+    subscriptionStatus: t('billing.subscriptionStatus'),
+    noSubscription: t('billing.noSubscription'),
+    manageButton: t('billing.manageButton'),
+    portalDescription: t('billing.portalDescription'),
+    cancelAnytime: t('billing.cancelAnytime'),
+    tokushohoLinkText: t('billing.tokushohoLinkText'),
+    tokushohoLink: t('billing.tokushohoLink'),
   };
 
   const [isDeleting, setIsDeleting] = useState(false);
@@ -298,6 +323,15 @@ export default function SettingsPage() {
         </div>
       </Card>
 
+      {user && (
+        <BillingPortalCard
+          hasSubscription
+          locale={locale as 'en' | 'ja'}
+          messages={billingMessages}
+          onOpenPortal={handleOpenPortal}
+        />
+      )}
+
       <Card className="p-4">
         <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           {t('settings.legal')}
@@ -315,6 +349,13 @@ export default function SettingsPage() {
             className="flex items-center justify-between rounded-md px-1 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
           >
             <span>{t('settings.termsOfService')}</span>
+            <ExternalLink className="size-3.5" />
+          </Link>
+          <Link
+            href="/tokushoho"
+            className="flex items-center justify-between rounded-md px-1 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+          >
+            <span>{t('settings.tokushoho')}</span>
             <ExternalLink className="size-3.5" />
           </Link>
         </div>

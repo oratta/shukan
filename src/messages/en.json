@@ -141,7 +141,8 @@
     "deleting": "Deleting...",
     "legal": "Legal",
     "privacyPolicy": "Privacy Policy",
-    "termsOfService": "Terms of Service"
+    "termsOfService": "Terms of Service",
+    "tokushoho": "Commercial Transaction Act Disclosure"
   },
   "days": {
     "sun": "Sun",
@@ -307,5 +308,38 @@
         }
       ]
     }
+  },
+  "checkout": {
+    "title": "Confirm your purchase",
+    "subtitle": "Please review the details below before continuing.",
+    "recurringHeading": "1. Recurring subscription (auto-renewal)",
+    "recurringBody": "This plan is a recurring subscription. It renews automatically at the end of each billing period and your payment method is charged automatically.",
+    "priceHeading": "2. Amount charged",
+    "perCycleMonthly": "{price} / month (billed monthly)",
+    "perCycleAnnual": "{price} / year (billed annually)",
+    "annualTotalLabel": "Total payable over one year",
+    "annualTotalValue": "{total}",
+    "trialHeading": "3. Free trial converting to paid",
+    "trialBody": "After your {days}-day free trial ends, the plan converts to paid automatically and the first charge ({price}) is made. If you cancel during the trial, you are not charged.",
+    "cancelHeading": "4. Cancellation",
+    "cancelBody": "You can cancel anytime via the Stripe Customer Portal from the billing settings. Cancellations are accepted up until the next renewal date. There is no cancellation penalty or fee.",
+    "lifetimeHeading": "Payment details (one-time)",
+    "lifetimeBody": "This plan is a one-time payment. It is not a subscription, so there is no auto-renewal or recurring charge.",
+    "lifetimePriceLabel": "Amount",
+    "taxNote": "All prices shown are tax-inclusive totals. The displayed price equals the amount charged.",
+    "tokushohoLink": "Commercial Transaction Act Disclosure",
+    "tokushohoLinkText": "See the Commercial Transaction Act Disclosure for full transaction terms.",
+    "confirmButton": "Agree and continue to payment",
+    "backButton": "Back"
+  },
+  "billing": {
+    "heading": "Billing & Cancellation",
+    "subscriptionStatus": "You currently have an active paid plan.",
+    "noSubscription": "You don't have an active paid plan.",
+    "manageButton": "Manage billing & cancellation",
+    "portalDescription": "Use the Stripe Customer Portal to change your payment method or cancel.",
+    "cancelAnytime": "Cancel anytime. You can complete cancellation yourself via the Customer Portal above, with no cancellation penalty or fee.",
+    "tokushohoLinkText": "See the Commercial Transaction Act Disclosure for full transaction terms.",
+    "tokushohoLink": "Commercial Transaction Act Disclosure"
   }
 }
