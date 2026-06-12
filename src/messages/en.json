@@ -246,5 +246,67 @@
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit"
+  },
+  "onboarding": {
+    "stepLabel": "Step {current} / {total}",
+    "back": "Back",
+    "step1": {
+      "title": "Which self do you want to switch to?",
+      "subtitle": "Start by focusing on just one. You can change it anytime.",
+      "next": "Next",
+      "note": "Every number is calculated based on scientific research"
+    },
+    "kpi": {
+      "health_lifespan": {
+        "headline": "Toward a self that stays healthy longer",
+        "name": "Healthy lifespan",
+        "description": "Records how many minutes your habits add to your healthy lifespan"
+      },
+      "positive_mood": {
+        "headline": "Toward a self that spends time feeling positive",
+        "name": "Time feeling positive",
+        "description": "Records how many minutes of feeling positive you gain"
+      },
+      "cost_saving": {
+        "headline": "Toward a self that never gives up because of money",
+        "name": "Cost saving",
+        "description": "Records how much (yen) you can cut from your lifetime spending"
+      },
+      "earning": {
+        "headline": "Toward a self with the power to earn",
+        "name": "Earning power",
+        "description": "Records how much (yen) your lifetime earning power rises"
+      }
+    },
+    "step2": {
+      "title": "We'll calculate with your numbers",
+      "subtitle": "We use these to calculate your chosen KPI for you.",
+      "age": "Age",
+      "gender": "Gender",
+      "country": "Country",
+      "annualIncome": "Annual income",
+      "optional": "Optional",
+      "genderMale": "Male",
+      "genderFemale": "Female",
+      "genderOther": "Other",
+      "countryJapan": "Japan",
+      "incomeNote": "If left blank, we calculate using the average income for your age, gender, and country",
+      "next": "Next"
+    },
+    "step3": {
+      "title": "Habits that work for \"{copy}\"",
+      "subtitle": "Pick one or more you can keep up. You can add or remove them later.",
+      "effectPerTime": "{effect} each time",
+      "start": "Start with these habits"
+    },
+    "step4": {
+      "title": "You're all set",
+      "body": "Starting with today's one rep, your \"{kpiName}\" begins to build up.",
+      "currentValueLabel": "Current value",
+      "habitsLabel": "Your habits",
+      "start": "Get started",
+      "writeError": "Failed to save. Please try again.",
+      "starting": "Setting up..."
+    }
   }
 }

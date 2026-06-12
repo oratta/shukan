@@ -107,3 +107,29 @@
      - `pg_class.relrowsecurity = true`、`pg_policy`: select/insert/update の 3 ポリシーのみ（delete なし）
   2. **migration-content ユニットテスト**（`src/__tests__/user-profiles-migration.test.ts`）: DDL の CHECK 定義・RLS 有効化・3 ポリシー・delete ポリシー不在・全ポリシーの `auth.uid() = user_id` ガードを文字列レベルで検証。
 - **残作業**: 認証ユーザーでの実 insert/select/update/delete の動作確認（B-S2/B-S7 の「動作確認完了」）は change-C のオンボーディング画面実装時に実際の書き込み経路で確認する（本 change の「テスト実装完了」「ロジック実装完了」は上記で充足）。
+
+---
+
+## D-C1: テスト戦略 — Playwright 未設定のため Vitest（node）で代替（change-C / 2026-06-12）
+
+- **背景**: tasks 2.1 は「Scenario を Playwright E2E に変換」。だが実環境は以下:
+  - `@playwright/test` は devDependency に入っているが **playwright.config.* も e2e ディレクトリも存在しない**（`ls playwright.config.*` → no matches）。
+  - vitest.config.ts は `environment: 'node'`／`exclude: ['**/*.spec.ts']`／`include: ['src/**/*.test.{ts,tsx}']`。**jsdom / happy-dom / Testing Library は未導入**（package.json に testing-library 系なし）。
+  - 既存のコンポーネント/SSR テスト（marketing-page.test.tsx・middleware.test.ts）は DOM ランタイムを使わず「同期 Server Component 出力の tree-walk」または「Supabase を vi.mock したリダイレクト検証」で実装されている。
+- **判断**: 指示の「Playwright が未設定なら Vitest + Testing Library でのコンポーネント/統合テストに代替してよい」に従う。さらに Testing Library も未導入のため、**既存リポジトリのテスト流儀（node 環境・vi.mock・tree-walk・純粋関数抽出）に合わせる**。実ブラウザ操作（クリック→state 遷移→画面遷移）の Scenario は後続 longrun-browser-verifier が verification-guide.md で実施する前提。
+  - 具体:
+    1. **リダイレクト誘導（C-S1〜C-S4, C-S15）**: `src/app/onboarding/layout.tsx` と `src/app/(app)/layout.tsx` を async Server Component として実装し、Supabase（server client）と next/navigation の `redirect` を vi.mock してユニット検証（middleware.test.ts と同流儀）。
+    2. **確定文言（C-S6, C-S8, C-S10, C-S12, C-S17 / en C-S18）**: ja.json / en.json の onboarding 名前空間を直接 import し、キーの存在・確定文言の一字一句一致・ja/en のキー構造一致を検証。
+    3. **画面ロジック（C-S5, C-S7, C-S9, C-S11, C-S16）**: ステップ遷移可否・単一選択・プロフィール入力バリデーション（必須・年齢不正値）・プリセット1つ以上・state リセットを、UI から切り出した純粋関数（`src/lib/onboarding.ts`）として実装しユニット検証。クライアントコンポーネントはこの純粋関数を使うだけにする（ロジックとレンダリングを分離）。
+    4. **完了時書き込み（C-S13, C-S14）**: 書き込みオーケストレーション（profile→habits→evidences の順序・失敗時に再試行可能・プリセット→Habit 変換の既定値）を `src/lib/onboarding.ts` の `runOnboardingWrite()` に切り出し、profiles/habits ライブラリを vi.mock して順序・引数・再試行を検証。
+    5. **プリセットフィルタ（C-S10）の表示効果**: 「1回あたりの効果」フォーマットも純粋関数化して検証。
+- **選択肢比較**:
+  - (a) 採用: 既存流儀（node/vi.mock/純粋関数抽出）。新規依存ゼロ・既存258テストと同一ランナー・ロジックを高速に網羅。可逆（後で Playwright を足せる）。
+  - (b) 不採用: Playwright を新規設定 → ブラウザ起動が必要で本 longrun の自律実行env で不安定。指示も「未設定なら代替してよい」。実ブラウザ確認は browser-verifier の担当。
+  - (c) 不採用: jsdom + Testing Library を導入 → 新規依存追加＋vitest 環境分岐が必要。YAGNI。クリック→state の検証は純粋関数抽出で十分カバーでき、真のブラウザ検証は browser-verifier が担う。
+- **影響**: tasks 2.1 は「Playwright E2E」から「Vitest（node）での同等カバレッジ」に読み替えて実装。tasks 6.3/6.4（実ブラウザ通し確認）は Verify フェーズ（browser-verifier）に委譲し注記を残す。
+
+## D-C2: ロジックとレンダリングの分離（change-C / 2026-06-12）
+
+- **判断**: ウィザードの判断ロジック（遷移可否・バリデーション・フィルタ・書き込み順序・効果フォーマット）を `src/lib/onboarding.ts`（純粋関数＋オーケストレーション）に集約し、`src/app/onboarding/*` のクライアントコンポーネントは state 保持と JSX のみを担う。
+- **理由**: D-C1 のテスト戦略（node 環境でロジックを単体検証）を成立させるため。react-best-practices の「ロジックを副作用から分離」「テスタブルな純粋関数」にも整合。可逆（将来 Playwright を足してもこの分離は無駄にならない）。
