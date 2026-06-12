@@ -75,6 +75,10 @@ export default function DashboardPage() {
     if (prevMap) {
       for (const [id, next] of nextMap) {
         if (isCompletionTransition(prevMap.get(id), next)) {
+          // Intentional: this effect's sole purpose is to detect a status
+          // transition across renders (impossible to derive synchronously) and
+          // flip the trigger flag. Behaviour is core to the PWA banner spec.
+          // eslint-disable-next-line react-hooks/set-state-in-effect
           setJustCompleted(true);
           break;
         }

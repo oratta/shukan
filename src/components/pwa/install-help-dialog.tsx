@@ -35,6 +35,10 @@ export function InstallHelpDialog({ open, onOpenChange }: InstallHelpDialogProps
     const isStandalone =
       window.matchMedia?.('(display-mode: standalone)').matches ||
       (navigator as Navigator & { standalone?: boolean }).standalone === true;
+    // Intentional mount-time sync: navigator/matchMedia only exist on the
+    // client, so platform must be resolved after hydration. Lazy useState init
+    // would run during SSR and cause a hydration mismatch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPlatform(detectPlatform(ua, !!isStandalone));
   }, []);
 

@@ -38,7 +38,12 @@ export function InstallBanner({ justCompleted, onDismiss }: InstallBannerProps) 
       window.matchMedia?.('(display-mode: standalone)').matches ||
       // iOS Safari legacy flag
       (navigator as Navigator & { standalone?: boolean }).standalone === true;
+    // Intentional mount-time sync: navigator/matchMedia/localStorage only exist
+    // on the client, so platform & dismissal must be resolved after hydration.
+    // Lazy useState init would run during SSR and cause a hydration mismatch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPlatform(detectPlatform(ua, !!isStandalone));
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDismissedAt(readDismissedAt(window.localStorage));
   }, []);
 
