@@ -1,8 +1,19 @@
 ---
-phase: Build
+phase: Verify
 status: complete
-last_updated: 2026-06-12T11:00:00
+last_updated: 2026-06-12T12:15:00
 ---
+
+## Verify結果
+| 軸 | スコア | しきい値 | 判定 | 検証Agent |
+|----|-------|---------|------|----------|
+| 品質 | 100% | 100% | ✅ | longrun-verifier |
+| 完成度 | 100% (14/14) | 80% | ✅ | longrun-verifier |
+| 機能性 | 100% (26/26 検証可能分。46件は認証/Stripeキー制約で人間委譲) | 100% | ✅ | longrun-browser-verifier (claude-in-chrome フォールバック。Playwright MCP 利用不可) |
+| UX | 100% (5/5) | 70% | ✅ | longrun-browser-verifier |
+
+- Verify中の修正2件: portal route POST シグネチャ（b70055c）/ waitlist upsert→insert+23505（c444fcc、実バグ。ブラウザ再検証で解消確認）
+- テスト最終: 386 passed / 43 files（実DB統合テスト1本含む）
 
 ## 完了フェーズ
 - [x] Setup: ツール検証・コードベース調査・ベースライン記録完了
