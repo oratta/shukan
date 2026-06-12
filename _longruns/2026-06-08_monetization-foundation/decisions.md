@@ -106,3 +106,7 @@ change-A の TDD 実装中に確定した設計判断。詳細は `openspec/chan
   - 素の INSERT（同一 email 再送）→ `code=23505`（action が成功にマップ）
   - 旧 `upsert(ignoreDuplicates)`（新規 email）→ `FAILS code=42501`（原バグを再現）
 - **検証**: `npm run test:run` → 386 passed（43 files、統合テストは実 DB に接続して GREEN） / `npx tsc --noEmit` → 新規エラーゼロ（既存の habits/impact/middleware テストの先行エラーのみ・自分の編集ファイルは clean） / `npm run lint` → 9 errors / 36 warnings（ベースライン維持・自分のファイルは指摘ゼロ） / `npm run build` → 成功（`/founding` route 生成） / dev サーバー 3001 で `/founding` 200・waitlist フォーム描画確認
+
+## D11: フィードバック対応 — founding ティザーに LocaleSwitcher 追加（2026-06-12）
+
+ユーザー指摘「日本語と英語を切り替えれるようにしてなかったっけ？」への対応。`/founding` は独自レイアウト（ヘッダーなし）で言語切替手段がなかったため、既存の `src/components/locale-switcher.tsx`（cookie ベース next-intl 切替・client component）を `src/app/founding/page.tsx` 上部右上に控えめに配置。新規切替コンポーネントは作らず再利用。`/tokushoho` は特商法上日本語が正のため対象外（不変更）。テストは `founding-page.test.tsx` の tree-walk 構造テストに LocaleSwitcher 存在検証を追加（WaitlistForm と同様にモック）。検証: `npm run test:run` → 387 passed / `npx tsc --noEmit` → 編集ファイル新規エラーゼロ / `npm run lint` → 9 errors / 36 warnings（ベースライン維持）/ `npm run build` → 成功（`/founding` route 生成）。

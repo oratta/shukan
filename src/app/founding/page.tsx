@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { WaitlistForm } from './waitlist-form';
 import { fetchRemainingSlots, type TierCount } from './slots';
+import { LocaleSwitcher } from '@/components/locale-switcher';
 
 type FaqItem = { q: string; a: string };
 
@@ -11,8 +12,13 @@ export default async function FoundingPage() {
 
   return (
     <main className="min-h-screen bg-background text-foreground">
+      {/* Quiet language toggle, top-right. Reuses the app-wide LocaleSwitcher. */}
+      <div className="mx-auto flex w-full max-w-2xl justify-end px-4 pt-4">
+        <LocaleSwitcher />
+      </div>
+
       {/* Hero */}
-      <section className="mx-auto w-full max-w-2xl px-4 py-16 space-y-4">
+      <section className="mx-auto w-full max-w-2xl px-4 pb-16 pt-8 space-y-4">
         <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           {t('hero.eyebrow')}
         </p>

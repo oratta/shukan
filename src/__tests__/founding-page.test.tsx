@@ -79,6 +79,16 @@ vi.mock('@/app/founding/waitlist-form', () => ({
   WaitlistForm: 'form',
 }));
 
+// --- Mock the client LocaleSwitcher so the page tree exposes a detectable node ---
+// Returning a function component named LocaleSwitcher lets the structural walk
+// find it by element type/name. The real cookie-based toggle behavior lives in
+// src/components/locale-switcher.tsx and is exercised in the running app.
+vi.mock('@/components/locale-switcher', () => ({
+  LocaleSwitcher: function LocaleSwitcher() {
+    return null;
+  },
+}));
+
 async function renderPage(): Promise<WalkResult> {
   const { default: FoundingPage } = await import('@/app/founding/page');
   const tree = await (FoundingPage as () => Promise<unknown>)();
@@ -121,6 +131,25 @@ describe('S1: All five sections are present', () => {
     for (const item of items) {
       expect(joined).toContain(item.q as string);
     }
+  });
+});
+
+describe('Feedback (D11): Locale switcher is present on the teaser', () => {
+  it('renders a LocaleSwitcher so EN/JA can be toggled from /founding', async () => {
+    fetchSlotsMock.mockResolvedValue(null);
+    const acc = await renderPage();
+
+    const switchers = acc.elements.filter((e) => {
+      const t = e.type;
+      const name =
+        typeof t === 'function'
+          ? (t as { name?: string }).name ?? ''
+          : typeof t === 'string'
+            ? t
+            : '';
+      return name === 'LocaleSwitcher';
+    });
+    expect(switchers.length).toBeGreaterThanOrEqual(1);
   });
 });
 
