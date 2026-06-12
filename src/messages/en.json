@@ -341,5 +341,30 @@
     "cancelAnytime": "Cancel anytime. You can complete cancellation yourself via the Customer Portal above, with no cancellation penalty or fee.",
     "tokushohoLinkText": "See the Commercial Transaction Act Disclosure for full transaction terms.",
     "tokushohoLink": "Commercial Transaction Act Disclosure"
+  },
+  "account": {
+    "title": "Plan & Billing",
+    "currentPlanHeading": "Your plan",
+    "trialingStatus": "Free trial — {days} days left",
+    "trialEndedStatus": "Your free trial has ended.",
+    "activePlanStatus": "Active plan: {plan}",
+    "noPlanStatus": "You don't have a paid plan yet.",
+    "planMonthly": "Monthly",
+    "planAnnual": "Annual",
+    "planLifetime": "Lifetime",
+    "choosePlanHeading": "Choose a plan",
+    "selectPlanButton": "Choose {plan}",
+    "perMonth": "{price} / month",
+    "perYear": "{price} / year",
+    "oneTime": "{price} one-time",
+    "foundingHeading": "Founding Member seats",
+    "foundingDescription": "Discounts are locked permanently to your account when your payment completes — based on the seats remaining at that moment. No fake countdowns.",
+    "foundingTier50": "First members — 50% off, forever",
+    "foundingTier30": "Next members — 30% off, forever",
+    "foundingRemaining": "{remaining} of {cap} left",
+    "foundingUnavailable": "Live seat counts are temporarily unavailable.",
+    "earlySwitchHeading": "Lock your founding discount early",
+    "earlySwitchButton": "Switch to a paid plan now",
+    "manageHeading": "Manage billing"
   }
 }

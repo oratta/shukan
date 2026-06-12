@@ -31,7 +31,7 @@
 
 ## 6. change-A / change-B 結合（依存タスク）
 
-- [ ] 6.1 [change-A 完了後] 最終確認画面をプラン選択 → Checkout セッション生成の間に挿入し、確認ボタンからのみ `/api/stripe/*` を呼ぶフローに結線。E2E（または統合テスト）で「確認画面を経由せずに Checkout に到達しない」ことを確認【DEFERRED: `FinalConfirmation` コンポーネント（props 駆動・テスト済み）は実装完了。Checkout フローへの挿入は change-A の paywall/checkout UI 結合時に実施。`PaywallGate` の CTA は既に `/account?upgrade=1` 経由の確認ステップを想定した設計】
+- [x] 6.1 [change-A 完了後] 最終確認画面をプラン選択 → Checkout セッション生成の間に挿入し、確認ボタンからのみ `/api/stripe/*` を呼ぶフローに結線。E2E（または統合テスト）で「確認画面を経由せずに Checkout に到達しない」ことを確認【billing-integration（D8）で結線完了。`/account` ページがプラン選択 → `FinalConfirmation` → 確認 → `POST /api/stripe/checkout` の導線を実装。Checkout 直行を不可能にする不変条件は純粋 reducer `checkoutFlowReducer`（SELECT_PLAN は checkout intent を出さない／CONFIRM のみが出す／idle からの CONFIRM は no-op）で担保し `account-billing.test.ts` で検証。確認画面を経ない導線は UI に存在しない】
 - [x] 6.2 [change-A 完了後] アカウント/設定画面に Customer Portal 導線（`BillingPortalCard`）を常設し、「いつでも解約」文言と実態の一致を担保。`POST /api/stripe/portal`（change-A 実装済み）を呼ぶ `handleOpenPortal` を結線。Portal のキャンセル有効化設定・テストモード解約完走は実環境タスクとして decisions.md D7 に記録
 - [x] 6.3 [change-B 完了後] 残り枠表示がカウンタ API の実数に接続されていること（ハードコード値でないこと）のユニットテストを有効化。割引率表示の参照価格が実販売価格（通常 Price）であることを assert（`src/__tests__/jp-scarcity-discount.test.tsx`）
 - [x] 6.4 [change-B/C 完了後] ティザー footer に特商法表記リンクを適用（2.3 で実施済み）。paywall 価格面への税込表記適用は change-A の paywall UI 結合時に実施【部分 DEFERRED: paywall は現状価格表示 UI を持たないため】
