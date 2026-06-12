@@ -1,11 +1,12 @@
 ---
-phase: Setup
+phase: Build Contract
 status: complete
-last_updated: 2026-06-12T09:05:00
+last_updated: 2026-06-12T09:15:00
 ---
 
 ## 完了フェーズ
 - [x] Setup: ツール検証・コードベース調査・ベースライン記録完了
+- [x] Build Contract: APPROVED by longrun-reviewer（ラウンド2。ラウンド1の指摘4件+既存コード問題2件を全採用して plan.md 反映 → D2 参照）
 
 ## ツール検証結果
 - openspec: /Users/oratta/.volta/bin/openspec (v1.2.0)
