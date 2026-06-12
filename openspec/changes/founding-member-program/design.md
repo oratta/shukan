@@ -84,7 +84,21 @@ Smitch のマネタイズ基盤 run（_longruns/2026-06-08_monetization-foundati
 - **代替案 A**: authenticated に INSERT を許可
 - **却下理由**: クライアントから直接枠確保できると「課金成功 Webhook 内でのみ確保」の不変条件が破れる
 
-## Risks / Trade-offs
+### D7: plpgsql RPC は TS リファレンス実装テストで担保し、実 DB 検証はマージ後（Apply, 2026-06-12）
+
+- **コンテキスト**: dev DB は並行 run 制約により worktree から `supabase db push` できない（plan.md 制約。20260612000000/000100 は使用済みのため本 migration は 20260612000200）。plpgsql を Vitest で直接実行する手段もない
+- **選択肢**: A: RPC 検証を全て deferred にしてテストなし / B: TS リファレンス実装（`decideTier` / `FoundingSlotStore`）で tier フォールバック・並行 over-allocation 防止・冪等の同一不変条件をテストし、RPC 呼び出し層は supabase client モックで検証、実 plpgsql 実行はマージ後の統合検証項目 / C: pglite 等で plpgsql をエミュレート
+- **決定**: B
+- **理由**: A は TDD の RED 先行（tasks 1.2/1.3）を満たせず境界・並行ロジックが無検証になる。C は pglite が `pg_advisory_xact_lock` / `generated always as identity` の完全サポートを保証せず、エミュレータ固有の挙動差で偽陽性/偽陰性のリスク。B は「同じ決定規則（COUNT ベース・founder_50→founder_30→none・unique(user_id) 冪等・advisory lock 直列化の async mutex 相当）」を TS で encode し、境界（小 cap 2/3）・50 並行 claim での over-allocation ゼロ・同一 user 重複 claim 単一 membership を実テストできる。RPC SQL は production authority、TS は同一不変条件のテスト対象、という責務で明示
+- **マージ後の統合検証項目**（必須）: (1) `supabase db push` で migration 適用 (2) 実 DB で小 cap による境界 claim と並行 claim を実行し over-allocation がないこと (3) `count_founding_slots()` が anon に集計値のみ返すこと (4) RLS で本人のみ自 membership を SELECT 可
+- **リスク**: TS リファレンスと plpgsql の実装乖離 → 同一の決定規則をコメントで相互参照（`allocation.ts` ヘッダ / migration コメント）し、マージ後検証で実 DB 挙動を確認して閉じる
+
+### D8: 確定 tier の Price 補正は冪等な `updateSubscriptionPrice` で常に適用（Apply, 2026-06-12）
+
+- **コンテキスト**: D5 の見込み/確定 tier 不一致補正。Webhook は checkout 時の見込み Price を知らない（ドメインイベントに含まれない）
+- **決定**: 見込み Price と比較せず、claim が確定した tier の Price へ「常に」`subscriptions.update` で寄せる。Stripe SDK 側で現 item.price が同一なら no-op（`updateSubscriptionPrice` 内で early return）
+- **理由**: 見込み Price を webhook まで運ぶ配管を増やさず、確定 tier の Price に収束させれば結果は同じ（グランドファザリングは Stripe ネイティブ Price で保証）。`proration_behavior: 'none'`（activation 時補正で日割り line を出さない）
+- **リスク**: lifetime（payment mode・subscription なし）は補正対象外 → `applyFoundingClaim` で plan==='lifetime' を early return
 
 - [Checkout 見込み tier と Webhook 確定 tier の不一致（境界レース）] → D5 の通り Webhook 側で Subscription Price を確定 tier に補正し、UI に確定タイミングを明記。境界テスト（小 cap）でこのパスを検証する
 - [advisory lock キーの衝突（他機能が同キーを使う）] → プロジェクト固有の定数キー（例: `hashtext('founding_memberships')`）を使い、マイグレーションにコメントで予約を明記

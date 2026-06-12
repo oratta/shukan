@@ -59,6 +59,28 @@ export async function createCheckoutSession(
   return { url: session.url };
 }
 
+/**
+ * Move a subscription onto a different Price (change-B, design D5 tier-race
+ * correction). Swaps the single subscription item's Price. Idempotent: if the
+ * subscription is already on `newPriceId`, this is a no-op. Subsequent renewals
+ * bill the new Price (Stripe-native grandfathering).
+ */
+export async function updateSubscriptionPrice(
+  subscriptionId: string,
+  newPriceId: string
+): Promise<void> {
+  const stripe = getStripe();
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  const item = subscription.items.data[0];
+  if (!item) return;
+  if (item.price?.id === newPriceId) return; // already correct — no-op
+  await stripe.subscriptions.update(subscriptionId, {
+    items: [{ id: item.id, price: newPriceId }],
+    // Tier correction at activation should not generate proration line items.
+    proration_behavior: 'none',
+  });
+}
+
 export async function createPortalSession(
   params: CreatePortalParams
 ): Promise<PortalSessionResult> {

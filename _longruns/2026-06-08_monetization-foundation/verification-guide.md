@@ -268,8 +268,8 @@
 - Requirement: Founding membership data model
   - **WHEN** a founding slot is successfully claimed for a user
   - **THEN** a `founding_memberships` row MUST exist with the user's `user_id`, the claimed `tier`, the matching `discount_pct`, the applied `stripe_price_id`, and a `claimed_at` timestamp, with `id` reflecting claim order
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -277,8 +277,8 @@
 - Requirement: Founding membership data model
   - **WHEN** a slot claim is attempted for a user who already has a `founding_memberships` row
   - **THEN** the claim MUST NOT create a second row, and the existing membership MUST remain unchanged
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -286,8 +286,8 @@
 - Requirement: Atomic tier allocation with fallback
   - **WHEN** a payment succeeds and the number of `founder_50` memberships is below the `founder_50` cap
   - **THEN** the claim MUST allocate a `founder_50` membership with `discount_pct = 50`
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -295,8 +295,8 @@
 - Requirement: Atomic tier allocation with fallback
   - **WHEN** a payment succeeds and the `founder_50` cap is already reached but `founder_30` capacity remains
   - **THEN** the claim MUST allocate a `founder_30` membership with `discount_pct = 30`
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -304,8 +304,8 @@
 - Requirement: Atomic tier allocation with fallback
   - **WHEN** a payment succeeds and both the `founder_50` and `founder_30` caps are reached
   - **THEN** no `founding_memberships` row MUST be created and the subscription MUST proceed at regular pricing (annual plan at the standard 20% off)
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -313,8 +313,8 @@
 - Requirement: Atomic tier allocation with fallback
   - **WHEN** multiple payment-success claims execute concurrently around a tier boundary
   - **THEN** the database MUST serialize the claims so the number of memberships in each tier never exceeds that tier's cap, with excess claims falling back to the next tier or regular pricing
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -322,8 +322,8 @@
 - Requirement: Slot claim occurs only on payment success
   - **WHEN** a new user signs up
   - **THEN** no `founding_memberships` row MUST be created and remaining-slot counts MUST be unchanged
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -331,8 +331,8 @@
 - Requirement: Slot claim occurs only on payment success
   - **WHEN** a user starts the 14-day card-free trial
   - **THEN** no `founding_memberships` row MUST be created and remaining-slot counts MUST be unchanged
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -340,8 +340,8 @@
 - Requirement: Slot claim occurs only on payment success
   - **WHEN** the Stripe webhook confirms a successful payment for a user without an existing membership
   - **THEN** the webhook handler MUST invoke the atomic slot-claim and record the resulting tier (if any) before completing webhook processing
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -349,8 +349,8 @@
 - Requirement: Stripe discount applied per tier
   - **WHEN** a user with an available founding tier completes Checkout
   - **THEN** the Stripe subscription MUST use the Price (or Coupon) corresponding to that tier's discount percentage, and the membership row MUST store that `stripe_price_id`
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -358,8 +358,8 @@
 - Requirement: Stripe discount applied per tier
   - **WHEN** a user starts Checkout while a tier (e.g., founder_50) appears available, but that tier's cap is exhausted by the time the payment-success webhook confirms the claim
   - **THEN** the claim MUST resolve to the actually-available tier (e.g., founder_30), the Stripe Subscription's Price MUST be updated to the confirmed tier's Price, and subsequent billing MUST use the corrected Price
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -367,8 +367,8 @@
 - Requirement: Public remaining-slot counter API
   - **WHEN** an unauthenticated GET request is made to the remaining-slot counter endpoint
   - **THEN** the response MUST return aggregate remaining counts per tier derived from actual `founding_memberships` counts and the configured caps, and MUST NOT include any personal data
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -376,8 +376,8 @@
 - Requirement: Public remaining-slot counter API
   - **WHEN** any consumer (founding-teaser-waitlist's live slot display, jp-legal-compliance's 景表法 verification) reads the counter endpoint
   - **THEN** the response body MUST be a JSON object containing `founder50: { cap, claimed, remaining }` and `founder30: { cap, claimed, remaining }`, and consumers MUST read remaining counts from `founder50.remaining` / `founder30.remaining`
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -385,8 +385,8 @@
 - Requirement: Public remaining-slot counter API
   - **WHEN** the counter endpoint is requested repeatedly
   - **THEN** responses MUST be cached with a revalidation window between 10 and 30 seconds, after which a fresh count MUST be served
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -394,8 +394,8 @@
 - Requirement: Public remaining-slot counter API
   - **WHEN** a founding slot is claimed and the cache window has elapsed
   - **THEN** the counter endpoint MUST return a remaining count reduced accordingly
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -403,8 +403,8 @@
 - Requirement: Early switch during trial locks the discount
   - **WHEN** a user in an active trial completes the early-switch Checkout and the payment succeeds
   - **THEN** the slot-claim MUST run with the tier availability at payment time, and the resulting discount MUST be recorded as the user's permanent founding discount
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -412,8 +412,8 @@
 - Requirement: Founding discount is grandfathered across renewals
   - **WHEN** a founding member's subscription renews and the renewal webhook event is processed
   - **THEN** the subscription MUST continue to be billed at the tier-discounted price and the `founding_memberships` row MUST remain unchanged
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
@@ -421,8 +421,8 @@
 - Requirement: Tier caps are configurable
   - **WHEN** the caps are configured to small test values (e.g., 2 and 3) and claims are executed past each boundary
   - **THEN** the allocation MUST fall back exactly at the configured caps, demonstrating the same boundary behavior as the production values (50 / 200)
-- [ ] テスト実装完了
-- [ ] ロジック実装完了
+- [x] テスト実装完了
+- [x] ロジック実装完了
 - [ ] 動作確認完了
 - [ ] ユーザー確認完了
 
