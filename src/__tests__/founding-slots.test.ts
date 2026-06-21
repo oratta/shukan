@@ -4,10 +4,13 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
  * S13/S14: Remaining slot fetcher (change-B counter API contract).
  * Requirement: Remaining slot display shows live counts from the founding counter API.
  *
- * The fetcher is the single isolation point for the change-B dependency.
+ * This HTTP fetcher is used ONLY by the client `/account` page (browser execution,
+ * relative fetch needs no env). The `/founding` teaser now calls getFoundingCounts
+ * directly server-side (D13). The fetcher always targets the relative path
+ * `/api/founding/slots` (no absolute-URL / env resolution).
  * Contract: { founder50: { cap, claimed, remaining }, founder30: { cap, claimed, remaining } }
  * On any failure (network error, non-OK, malformed shape) it returns null so the
- * page can omit numbers (no fake/stale values).
+ * caller can omit numbers (no fake/stale values).
  */
 
 const ORIGINAL_FETCH = global.fetch;
@@ -42,6 +45,37 @@ describe('S13: fetcher returns parsed slot counts on success', () => {
     expect(slots).not.toBeNull();
     expect(slots!.founder50.remaining).toBe(37);
     expect(slots!.founder30.remaining).toBe(192);
+  });
+
+  it('fetches the relative /api/founding/slots path (no absolute URL / env)', async () => {
+    const calledUrls: unknown[] = [];
+    const fetchSpy = vi.fn((url: unknown) => {
+      calledUrls.push(url);
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({
+          founder50: { cap: 50, claimed: 0, remaining: 50 },
+          founder30: { cap: 200, claimed: 0, remaining: 200 },
+        }),
+      });
+    });
+    global.fetch = fetchSpy as unknown as typeof fetch;
+    // Even if the legacy env vars are set, the fetcher must ignore them.
+    const prevCounter = process.env.FOUNDING_COUNTER_API_URL;
+    const prevApp = process.env.NEXT_PUBLIC_APP_URL;
+    process.env.FOUNDING_COUNTER_API_URL = 'https://example.com/whatever';
+    process.env.NEXT_PUBLIC_APP_URL = 'https://example.com';
+
+    const fetchRemainingSlots = await importFetcher();
+    await fetchRemainingSlots();
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(calledUrls[0]).toBe('/api/founding/slots');
+
+    if (prevCounter === undefined) delete process.env.FOUNDING_COUNTER_API_URL;
+    else process.env.FOUNDING_COUNTER_API_URL = prevCounter;
+    if (prevApp === undefined) delete process.env.NEXT_PUBLIC_APP_URL;
+    else process.env.NEXT_PUBLIC_APP_URL = prevApp;
   });
 });
 

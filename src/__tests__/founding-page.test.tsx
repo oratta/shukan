@@ -65,10 +65,15 @@ vi.mock('next-intl/server', () => ({
   getLocale: vi.fn(async () => 'en'),
 }));
 
-// --- Mock the slot fetcher; tests control the return value per case ---
-const fetchSlotsMock = vi.fn();
-vi.mock('@/app/founding/slots', () => ({
-  fetchRemainingSlots: (...args: unknown[]) => fetchSlotsMock(...args),
+// --- Mock server-only so the founding-admin import does not throw in node env ---
+vi.mock('server-only', () => ({}));
+
+// --- Mock getFoundingCounts directly; the teaser now calls it without HTTP ---
+// (Feedback/D13: the server component no longer self-fetches /api/founding/slots;
+// it calls the service-role aggregate directly and falls back to null on throw.)
+const getFoundingCountsMock = vi.fn();
+vi.mock('@/lib/supabase/founding-admin', () => ({
+  getFoundingCounts: (...args: unknown[]) => getFoundingCountsMock(...args),
 }));
 
 // --- Mock the client WaitlistForm so the page tree exposes a real <form> ---
@@ -98,12 +103,14 @@ async function renderPage(): Promise<WalkResult> {
 }
 
 beforeEach(() => {
-  fetchSlotsMock.mockReset();
+  getFoundingCountsMock.mockReset();
 });
 
 describe('S1: All five sections are present', () => {
   it('renders Hero (single h1) → tiers (50% & 30%) → CS promise → waitlist form → FAQ (>=3)', async () => {
-    fetchSlotsMock.mockResolvedValue(null);
+    getFoundingCountsMock.mockImplementation(async () => {
+      throw new Error('counter unavailable');
+    });
     const acc = await renderPage();
     const joined = acc.texts.join(' ');
 
@@ -136,7 +143,9 @@ describe('S1: All five sections are present', () => {
 
 describe('Feedback (D11): Locale switcher is present on the teaser', () => {
   it('renders a LocaleSwitcher so EN/JA can be toggled from /founding', async () => {
-    fetchSlotsMock.mockResolvedValue(null);
+    getFoundingCountsMock.mockImplementation(async () => {
+      throw new Error('counter unavailable');
+    });
     const acc = await renderPage();
 
     const switchers = acc.elements.filter((e) => {
@@ -155,7 +164,9 @@ describe('Feedback (D11): Locale switcher is present on the teaser', () => {
 
 describe('S2: No dark-pattern urgency devices', () => {
   it('renders no countdown component and no remaining-slot number literals in copy', async () => {
-    fetchSlotsMock.mockResolvedValue(null);
+    getFoundingCountsMock.mockImplementation(async () => {
+      throw new Error('counter unavailable');
+    });
     const acc = await renderPage();
 
     // No element whose type/name hints at a countdown timer
@@ -173,9 +184,9 @@ describe('S2: No dark-pattern urgency devices', () => {
   });
 });
 
-describe('S13: Live counts are rendered from the API', () => {
-  it('displays exact remaining numbers from the counter API for both tiers', async () => {
-    fetchSlotsMock.mockResolvedValue({
+describe('S13: Live counts are rendered from the direct aggregate', () => {
+  it('displays exact remaining numbers from getFoundingCounts for both tiers', async () => {
+    getFoundingCountsMock.mockResolvedValue({
       founder50: { cap: 50, claimed: 13, remaining: 37 },
       founder30: { cap: 200, claimed: 8, remaining: 192 },
     });
@@ -186,9 +197,11 @@ describe('S13: Live counts are rendered from the API', () => {
   });
 });
 
-describe('S14: Counter API unavailable falls back without fake numbers', () => {
-  it('renders tier benefits without numeric remaining counts when fetcher returns null', async () => {
-    fetchSlotsMock.mockResolvedValue(null);
+describe('S14: Counter unavailable falls back without fake numbers', () => {
+  it('renders tier benefits without numeric remaining counts when getFoundingCounts throws', async () => {
+    getFoundingCountsMock.mockImplementation(async () => {
+      throw new Error('counter unavailable');
+    });
     const acc = await renderPage();
     const joined = acc.texts.join(' ');
 

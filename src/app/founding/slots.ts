@@ -1,6 +1,12 @@
 /**
- * Remaining-slot fetcher — the single isolation point for the change-B
- * (founding-member-program) public counter API dependency.
+ * Remaining-slot HTTP fetcher for the public counter API (GET /api/founding/slots).
+ *
+ * Used ONLY by the client `/account` page, which runs in the browser where a
+ * relative fetch resolves against the current origin (no env / absolute URL
+ * needed). The `/founding` teaser (a Server Component) no longer goes through
+ * this fetcher — it calls `getFoundingCounts()` directly server-side to avoid an
+ * HTTP self-fetch and its env-URL dependency (Feedback / decisions D13; change-B
+ * is now integrated into the same app, so the indirection is unnecessary).
  *
  * Cross-change contract (change-B spec S13):
  *   {
@@ -8,13 +14,8 @@
  *     founder30: { cap: number, claimed: number, remaining: number }
  *   }
  *
- * While change-B is not yet deployed (no API), or on any fetch / shape failure,
- * this returns `null` so the teaser page omits the numbers instead of showing
- * invented or stale values (change-C design D5).
- *
- * The endpoint path is configurable via FOUNDING_COUNTER_API_URL and defaults to
- * the route change-B is expected to expose. When change-B lands, only this file
- * needs to change.
+ * On any fetch / shape failure, returns `null` so the caller omits the numbers
+ * instead of showing invented or stale values (change-C design D5).
  */
 
 export type TierCount = {
@@ -28,7 +29,7 @@ export type RemainingSlots = {
   founder30: TierCount;
 };
 
-const DEFAULT_COUNTER_PATH = '/api/founding/slots';
+const COUNTER_PATH = '/api/founding/slots';
 
 function isTierCount(value: unknown): value is TierCount {
   if (value === null || typeof value !== 'object') return false;
@@ -46,17 +47,11 @@ function isRemainingSlots(value: unknown): value is RemainingSlots {
   return isTierCount(v.founder50) && isTierCount(v.founder30);
 }
 
-function resolveCounterUrl(): string {
-  const explicit = process.env.FOUNDING_COUNTER_API_URL;
-  if (explicit) return explicit;
-  const base =
-    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '') ?? '';
-  return `${base}${DEFAULT_COUNTER_PATH}`;
-}
-
 export async function fetchRemainingSlots(): Promise<RemainingSlots | null> {
   try {
-    const res = await fetch(resolveCounterUrl(), {
+    // Relative path: this runs in the browser (client /account page), so it
+    // resolves against the current origin without any env / absolute URL.
+    const res = await fetch(COUNTER_PATH, {
       // Short cache window aligned with change-B's 10–30s revalidation contract.
       next: { revalidate: 15 },
     });

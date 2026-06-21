@@ -58,11 +58,19 @@ vi.mock('next-intl/server', () => ({
   getLocale: vi.fn(async () => 'en'),
 }));
 
-const fetchSlotsMock = vi.fn();
-vi.mock('@/app/founding/slots', () => ({
-  fetchRemainingSlots: (...args: unknown[]) => fetchSlotsMock(...args),
+vi.mock('server-only', () => ({}));
+
+// The teaser now calls getFoundingCounts directly (no HTTP self-fetch, D13).
+const getFoundingCountsMock = vi.fn();
+vi.mock('@/lib/supabase/founding-admin', () => ({
+  getFoundingCounts: (...args: unknown[]) => getFoundingCountsMock(...args),
 }));
 vi.mock('@/app/founding/waitlist-form', () => ({ WaitlistForm: 'form' }));
+vi.mock('@/components/locale-switcher', () => ({
+  LocaleSwitcher: function LocaleSwitcher() {
+    return null;
+  },
+}));
 
 async function renderFounding(): Promise<WalkResult> {
   const { default: FoundingPage } = await import('@/app/founding/page');
@@ -72,11 +80,14 @@ async function renderFounding(): Promise<WalkResult> {
   return acc;
 }
 
-beforeEach(() => fetchSlotsMock.mockReset());
+beforeEach(() => {
+  vi.resetModules();
+  getFoundingCountsMock.mockReset();
+});
 
 describe('S8: Remaining slots reflect the real counter', () => {
-  it('renders the exact remaining count returned by the counter API', async () => {
-    fetchSlotsMock.mockResolvedValue({
+  it('renders the exact remaining count returned by the counter aggregate', async () => {
+    getFoundingCountsMock.mockResolvedValue({
       founder50: { cap: 50, claimed: 41, remaining: 9 },
       founder30: { cap: 200, claimed: 5, remaining: 195 },
     });
@@ -87,8 +98,10 @@ describe('S8: Remaining slots reflect the real counter', () => {
     expect(joined).toContain('195');
   });
 
-  it('shows NO remaining-slot number when the counter API is unavailable (no fabricated count)', async () => {
-    fetchSlotsMock.mockResolvedValue(null);
+  it('shows NO remaining-slot number when the counter is unavailable (no fabricated count)', async () => {
+    getFoundingCountsMock.mockImplementation(async () => {
+      throw new Error('counter unavailable');
+    });
     const acc = await renderFounding();
     const joined = acc.texts.join(' ');
     // The remaining-label prefix should not be paired with a fabricated integer.

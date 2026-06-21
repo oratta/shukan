@@ -1,13 +1,33 @@
 import { getTranslations } from 'next-intl/server';
 import { WaitlistForm } from './waitlist-form';
-import { fetchRemainingSlots, type TierCount } from './slots';
+import { type TierCount } from './slots';
+import { getFoundingCounts } from '@/lib/supabase/founding-admin';
 import { LocaleSwitcher } from '@/components/locale-switcher';
 
 type FaqItem = { q: string; a: string };
 
+// Cache the rendered page for 15s, matching change-B's 10–30s counter contract.
+// The teaser reads aggregate slot counts directly (no HTTP self-fetch); the
+// route-segment revalidate keeps high-frequency reads off the DB while still
+// reflecting real counts (decisions D13).
+export const revalidate = 15;
+
+/**
+ * Read the per-tier aggregate counts directly from the service-role helper.
+ * On ANY failure (env missing, DB unavailable) returns null so the teaser omits
+ * the numbers — never a fabricated or stale count (change-C D5 / 景表法 D7-5).
+ */
+async function loadRemainingSlots(): Promise<Awaited<ReturnType<typeof getFoundingCounts>> | null> {
+  try {
+    return await getFoundingCounts();
+  } catch {
+    return null;
+  }
+}
+
 export default async function FoundingPage() {
   const t = await getTranslations('founding');
-  const slots = await fetchRemainingSlots();
+  const slots = await loadRemainingSlots();
   const faqItems = (t.raw('faq.items') as FaqItem[]) ?? [];
 
   return (
