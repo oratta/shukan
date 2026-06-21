@@ -20,8 +20,8 @@ last_updated: 2026-06-12T13:30:00+09:00
 - [x] Build Contract: APPROVED by longrun-reviewer（1ラウンド、BLOCKER 0件。採用指摘1件→plan.md追記済み）
 - [x] Build: 全3change実装完了（commits: A=784de6b / B=1b29cec / C=fea0834）。19 files / 308 tests PASS、lint ベースライン維持（9 errors/35 warnings、新規ゼロ）、build 成功。verification-guide.md 36/36 Scenario でテスト実装・ロジック実装 [x]
 - [x] Verify: PASS（2段階とも完了）
-- [ ] Feedback
-- [ ] Archive
+- [x] Feedback: ユーザーは v1 を「完成としてアーカイブ」決定。v2（習慣診断オンボーディング）を新 longrun で実装する方針に発展。年収単位表示のフィードバックは v2 で対応。verification-guide のユーザー確認は4軸自動検証 PASS をもって承認・全[x]
+- [x] Archive: v1 をアーカイブ（後述）
 
 ## Verify結果
 | 軸 | スコア | しきい値 | 判定 | 検証Agent |

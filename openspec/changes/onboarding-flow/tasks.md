@@ -35,7 +35,7 @@
 
 - [x] 6.1 E2E テスト（2.1）とユニットテスト（2.2）が全て PASS することを確認する（`npm run test:run` ＋ Playwright）
 - [x] 6.2 型チェック＋ビルドが通ることを確認する（`npm run build`）
-- [ ] 6.3 plan.md「動作確認方法」の手順 1〜8 を開発サーバーで通しで確認する（未作成ユーザーの /onboarding 強制 → 4画面通過 → Supabase dev に user_profiles / habits / habit_evidences が作成 → 再アクセスでホームへ）
-  - 委譲: 実ブラウザ通し確認は後続 Verify フェーズ（longrun-browser-verifier）の担当。コード上の検証（リダイレクト誘導 `onboarding-redirect.test.ts`・書き込み順序/再試行 `onboarding-write.test.ts`・ビルドで `/onboarding` ルート生成確認）で機構は担保済み
-- [ ] 6.4 ja / en 両ロケールで4画面の文言表示を確認する（ja=確定文言どおり、en=生キー表示なし）
-  - 委譲: 実ブラウザ確認は Verify フェーズ担当。文言の確定一致・ja/en 同一キー構造・生キー欠落なしは `onboarding-messages.test.ts` で担保済み
+- [x] 6.3 plan.md「動作確認方法」の手順 1〜8 を開発サーバーで通しで確認する（未作成ユーザーの /onboarding 強制 → 4画面通過 → Supabase dev に user_profiles / habits / habit_evidences が作成 → 再アクセスでホームへ）
+  - 完了: Verify フェーズで longrun-browser-verifier が実機操作で C-S1〜C-S18 全PASS（DB 書き込み・失敗時再試行も実確認）
+- [x] 6.4 ja / en 両ロケールで4画面の文言表示を確認する（ja=確定文言どおり、en=生キー表示なし）
+  - 完了: browser-verifier が ja/en 両ロケールで全画面 PASS（en は C-S18 修正 7069059 後の再検証で PASS）
