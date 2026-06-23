@@ -15,7 +15,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S2: Manifest content is verified by unit tests
 - WHEN: `npm run test:run` を実行する
@@ -23,7 +23,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S3: Page links to /manifest.webmanifest and old file is gone
 - WHEN: アプリの任意のページを開いて HTML の `<link rel="manifest">` を確認する
@@ -31,7 +31,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S4: Reference consistency is verified by unit tests
 - WHEN: `npm run test:run` を実行する
@@ -39,7 +39,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ## change-B: install-prompt-ui
 
@@ -49,7 +49,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S6: 完了への遷移判定が純関数で検証できる
 - WHEN: `isCompletionTransition(prev, next)` に非完了→completed/rocket_used、完了済→completed、非完了→failed 等の遷移を渡す
@@ -57,7 +57,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S7: iOS Safari で習慣を完了するとバナーが表示される
 - WHEN: iOS Safari（未インストール・dismiss 記録なし）でホーム画面の習慣を1つ完了させる（quit 習慣の完了でも同様）
@@ -65,7 +65,7 @@
 - [x] テスト実装完了（表示可否の判定ロジックは `shouldShowInstallBanner`（ios-safari→true）/ `detectPlatform` の unit テストでカバー。DOM レンダリング自体は手動確認に委譲）
 - [x] ロジック実装完了
 - [x] 動作確認完了（iOS Safari UA 偽装で、バナーと共有する `IosInstallInstructions` の2ステップ図解 — ①Share アイコン「共有ボタンをタップ」②SquarePlus アイコン「『ホーム画面に追加』を選択」— が live DOM に表示されることを確認。完了→バナー出現の page.tsx トリガー連携はソースで確認済み。実機での「習慣完了→バナー出現」の最終確認はユーザーに委譲）
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S8: Android Chrome ではネイティブのインストールプロンプトを発火できる
 - WHEN: Android Chrome（beforeinstallprompt 捕捉済み）で習慣を完了 → 「ホーム画面に追加」ボタンをタップ
@@ -73,7 +73,7 @@
 - [x] テスト実装完了（表示判定（android-chrome→true）は `shouldShowInstallBanner` / `detectPlatform` の unit テストでカバー。`prompt()` 発火の DOM 連携は手動確認に委譲）
 - [x] ロジック実装完了
 - [ ] 動作確認完了
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S9: standalone・その他環境ではバナーが表示されない
 - WHEN: インストール済み（standalone）またはデスクトップ等のその他環境で習慣を完了させる
@@ -81,7 +81,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了（デスクトップ（other）UA のホームでバナー非表示を live 確認。standalone/other → false は unit テストでカバー）
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S10: dismiss 後30日以内は再表示されない
 - WHEN: バナーの × で閉じて別の習慣を完了 / dismiss からちょうど30日 / 30日超の時点で完了
@@ -89,7 +89,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了（境界含む dismiss 抑制ロジック・localStorage key・ISO 8601 read/write は unit テスト 18 件でカバー。private mode の throw 耐性も検証済み）
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S11: 完了済み習慣があってもリロード後はバナーが表示されない
 - WHEN: 習慣完了でバナー表示後、ページをリロードまたは再訪する
@@ -97,7 +97,7 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了（iOS Safari UA を有効にしたまま、ホーム新規ロード（justCompleted:false）でバナーが live DOM に出ないことを確認。justCompleted:false → 常に false は unit テストでカバー）
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S12: 設定画面からいつでも案内ダイアログを開ける
 - WHEN: 設定画面で「ホーム画面に追加」項目をタップする（standalone 状態でも確認）
@@ -105,7 +105,7 @@
 - [x] テスト実装完了（出し分けの基となる `detectPlatform`（standalone 判定含む）は unit テストでカバー。ダイアログの DOM 表示は手動確認に委譲）
 - [x] ロジック実装完了
 - [x] 動作確認完了（設定→「ホーム画面に追加」クリックでダイアログが live で開くことを確認。desktop（other）UA では「スマホの Safari/Chrome で開いて」案内、iOS Safari UA 偽装では2ステップ図解が出し分けされることを両方確認。Escape/× でキャンセル可能）
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了
 
 ### S13: 全メッセージキーが en/ja 両方に存在する
 - WHEN: バナー・設定ヘルプで使用する全メッセージキーについて unit テストを実行する
@@ -113,4 +113,4 @@
 - [x] テスト実装完了
 - [x] ロジック実装完了
 - [x] 動作確認完了（11 個の `pwa.*` キーが en.json/ja.json 両方に存在することを直接確認 + pwa-messages.test.ts 23 件 PASS）
-- [ ] ユーザー確認完了
+- [x] ユーザー確認完了

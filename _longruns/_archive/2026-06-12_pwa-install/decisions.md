@@ -79,3 +79,11 @@
 - longrun-verifier 再検証: **品質 100% (4/4: test 259 PASS / build PASS / tsc本runファイル 0エラー / lint 9 errors=ベースライン同数) / 完成度 100% (7/7) → 総合 PASS**
 - 受け入れ条件 1〜12 全PASS（verifier 実測）
 - 申し送り: settings/page.tsx の未使用 import `cn`（warning）→ builder に削除依頼済み
+
+## D10: Feedback フェーズ・ユーザー確認（2026-06-23）
+- ユーザーがスマホ実機で動作確認 → 「OK」。verification-guide.md の全13 Scenario でユーザー確認完了 [x]
+- screenshots 警告（DevTools Manifest の "Richer PWA Install UI..."）: installability エラーではなく richer install UI 用。plan でスコープ外（将来改善）として据え置き合意。backlog に追加
+- モバイル実機検証のインフラ問題（Google OAuth が localhost にフォールバック）を解決:
+  - 原因: Supabase は localhost 以外の平文 HTTP リダイレクトを Site URL(localhost) にフォールバックさせる。HTTPS が必須
+  - 対応: Tailscale HTTPS（証明書）を有効化 → `tailscale serve --bg 3001` で `https://orattamacbook-pro-164.tailfbb398.ts.net` を Tailnet 内公開。Supabase dev の uri_allow_list に同 URL を登録（Management API）
+  - これはコード変更ではなくテスト環境設定（feature ブランチのコードには影響なし）

@@ -18,4 +18,4 @@
 - [x] 3.1 TypeScript 型チェック（`npx tsc --noEmit`）エラーなし — 本 change の追加/変更ファイル（manifest.ts / layout.tsx / pwa-manifest.test.ts）は型エラーゼロ。`npx tsc --noEmit` 全体では既存テストファイル（habits / impact / middleware）に 9 件の先行エラーがあるが本 change 由来ではない（base commit でも同数）。`next build` の TypeScript チェックは PASS
 - [x] 3.2 Next.js ビルド（`npx next build`）エラーなし — `/manifest.webmanifest` が Static route として生成されることを確認
 - [x] 3.3 Service Worker・追加依存パッケージが入っていないこと、テーマカラー・ブランド文言が変更されていないことを diff で確認する — package.json 無変更 / SW ファイルなし / theme_color #2B4162・background_color #F8F9FA 維持
-- [ ] 3.4 （手動）`npm run dev` → Chrome DevTools → Application → Manifest で `/manifest.webmanifest` が読め、installability エラーがないことを確認する — 手動確認のためユーザー検証に委譲
+- [x] 3.4 （手動）`npm run dev` → Chrome DevTools → Application → Manifest で `/manifest.webmanifest` が読め、installability エラーがないことを確認する — ユーザー確認済み（2026-06-23、スマホ実機で HTTPS 経由ログイン＋表示確認）。残る `screenshots` 警告は richer install UI 用で installability エラーではなく、plan でスコープ外（将来改善）

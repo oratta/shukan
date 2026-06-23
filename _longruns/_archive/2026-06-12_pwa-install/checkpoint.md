@@ -1,8 +1,12 @@
 ---
-phase: Verify
+phase: Feedback
 status: complete
-last_updated: 2026-06-12T14:10:00+09:00
+last_updated: 2026-06-23T16:30:00+09:00
 ---
+
+## Feedback結果
+- ユーザー実機確認（スマホ）→ OK。verification-guide.md 全13 Scenario でユーザー確認完了
+- モバイル検証のための OAuth/Tailscale HTTPS 設定を解決（D10）。screenshots 警告は backlog へ先送り
 
 ## Verify結果
 | 軸 | スコア | しきい値 | 判定 | 検証Agent |
