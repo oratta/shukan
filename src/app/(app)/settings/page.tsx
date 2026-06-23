@@ -5,8 +5,9 @@ import { useTheme } from 'next-themes';
 import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Sun, Moon, Monitor, Trash2, Download, Upload, LogOut, User, ExternalLink } from 'lucide-react';
+import { Sun, Moon, Monitor, Trash2, Download, Upload, LogOut, User, ExternalLink, Smartphone } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { InstallHelpDialog } from '@/components/pwa/install-help-dialog';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -20,7 +21,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/components/auth-provider';
 import { createClient } from '@/lib/supabase/client';
@@ -72,6 +72,8 @@ export default function SettingsPage() {
   };
 
   const [isDeleting, setIsDeleting] = useState(false);
+  const [installHelpOpen, setInstallHelpOpen] = useState(false);
+  const tPwa = useTranslations('pwa');
 
   const handleDeleteAccount = async () => {
     setIsDeleting(true);
@@ -201,6 +203,21 @@ export default function SettingsPage() {
 
       <Card className="p-4">
         <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+          {tPwa('help.title')}
+        </h3>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setInstallHelpOpen(true)}
+          className="w-full justify-start"
+        >
+          <Smartphone className="mr-2 size-4" />
+          {tPwa('help.title')}
+        </Button>
+      </Card>
+
+      <Card className="p-4">
+        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           {t('settings.data')}
         </h3>
 
@@ -319,6 +336,8 @@ export default function SettingsPage() {
           </Link>
         </div>
       </Card>
+
+      <InstallHelpDialog open={installHelpOpen} onOpenChange={setInstallHelpOpen} />
     </div>
   );
 }
