@@ -246,5 +246,26 @@
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit"
+  },
+  "pwa": {
+    "banner": {
+      "title": "Add Smitch to your Home Screen"
+    },
+    "dismiss": "Dismiss",
+    "ios": {
+      "intro": "Add Smitch to your Home Screen for one-tap access.",
+      "step1": "Tap the Share button",
+      "step2": "Choose \"Add to Home Screen\""
+    },
+    "android": {
+      "intro": "Add Smitch to your Home Screen for one-tap access.",
+      "button": "Add to Home Screen"
+    },
+    "help": {
+      "title": "Add to Home Screen",
+      "dialogTitle": "Add Smitch to Home Screen",
+      "installed": "Already added to your Home Screen.",
+      "unsupported": "Open Smitch in Safari or Chrome on your phone to add it to your Home Screen."
+    }
   }
 }

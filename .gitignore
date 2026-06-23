@@ -55,3 +55,7 @@ test-results/
 # longrun
 /_worktrees/
 openspec/config.yaml
+
+# Tailscale cert/key (tailscale cert が cwd に書く副産物)
+*.ts.net.crt
+*.ts.net.key

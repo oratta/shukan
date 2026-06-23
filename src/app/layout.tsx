@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://s-mitch.com"),
   title: "Smitch - Switch your path",
   description: "Evidence-based life path builder. Choose the right habits backed by science.",
-  manifest: "/manifest.json",
+  manifest: "/manifest.webmanifest",
   icons: {
     icon: [
       { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },

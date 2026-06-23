@@ -246,5 +246,26 @@
     "save": "保存",
     "delete": "削除",
     "edit": "編集"
+  },
+  "pwa": {
+    "banner": {
+      "title": "Smitch をホーム画面に追加"
+    },
+    "dismiss": "閉じる",
+    "ios": {
+      "intro": "ホーム画面に追加すると、ワンタップで Smitch を開けます。",
+      "step1": "共有ボタンをタップ",
+      "step2": "「ホーム画面に追加」を選択"
+    },
+    "android": {
+      "intro": "ホーム画面に追加すると、ワンタップで Smitch を開けます。",
+      "button": "ホーム画面に追加"
+    },
+    "help": {
+      "title": "ホーム画面に追加",
+      "dialogTitle": "Smitch をホーム画面に追加",
+      "installed": "すでにホーム画面に追加されています。",
+      "unsupported": "ホーム画面に追加するには、スマホの Safari または Chrome で Smitch を開いてください。"
+    }
   }
 }
