@@ -1,5 +1,5 @@
 ---
-phase: Verify
+phase: Archive
 status: complete
 last_updated: 2026-06-12T12:15:00
 ---
@@ -79,3 +79,18 @@ last_updated: 2026-06-12T12:15:00
 
 ## 次フェーズへの引き継ぎ
 - 次: Build Contract（longrun-reviewer で plan.md の Changes 分解レビュー）
+
+
+## Feedback/Archive（2026-06-24）
+Feedback ループで対応した項目（全て main ブランチにコミット済み）:
+- LocaleSwitcher を /founding に追加（f4a9884）
+- /account の intl FORMATTING_ERROR 修正（9f9b966）
+- /api/founding/slots 503 → service_role 設定 + ティザー self-fetch 廃止（83b8133）
+- origin/main（PR #9 PWA）取り込みマージ（ed5943a、messages 衝突解消・453→tests）
+- Stripe テストキー投入 + 価格7種生成（tax_behavior inclusive）+ 両 .env.local 反映
+- checkout 不具合の実機特定: .env.local の secret key 連結破損を修復 + Stripe アカウント事業者名未設定（ユーザー対応）
+- waitlist insert+23505 修正（c444fcc）
+- 自分の founding tier 表示機能を追加（2d79b6c）+ バッジ折返し修正（87afc4a）
+
+アーカイブ: OpenSpec 4 change を 2026-06-24-* として archive、delta spec をメイン spec に同期。ランディレクトリを _longruns/_archive/ へ移動。
+最終テスト: 472 passed。残課題（リリース前人間ゲート）: LEGAL_* 事業者実値・弁護士レビュー・本番 webhook 設定・Vercel env（SERVICE_ROLE_KEY / APP_URL / STRIPE_*）。
