@@ -4,6 +4,7 @@ import { useEffect, useReducer, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useSubscription } from '@/hooks/useSubscription';
 import { fetchRemainingSlots, type RemainingSlots } from '@/app/founding/slots';
+import type { FoundingTier } from '@/lib/founding/config';
 import { getTrialDays, type Plan } from '@/lib/billing/config';
 import { AccountBilling } from '@/components/billing/account-billing';
 import {
@@ -29,6 +30,7 @@ export default function AccountPage() {
   const tCheckout = useTranslations('checkout');
   const { subscription } = useSubscription();
   const [slots, setSlots] = useState<RemainingSlots | null>(null);
+  const [membershipTier, setMembershipTier] = useState<FoundingTier | null>(null);
   const [flow, dispatch] = useReducer(checkoutFlowReducer, undefined, initialCheckoutFlow);
 
   useEffect(() => {
@@ -36,6 +38,30 @@ export default function AccountPage() {
     fetchRemainingSlots().then((s) => {
       if (!cancelled) setSlots(s);
     });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // The user's CONFIRMED founding tier (Feedback D14). Authenticated, user-specific
+  // — read from /api/founding/membership (handler-level authz). When present it
+  // takes precedence over the tier predicted from the public counter. On any
+  // failure we leave it null and fall back to the prediction.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/founding/membership');
+        if (!res.ok) return;
+        const data = (await res.json()) as { tier?: unknown };
+        if (cancelled) return;
+        if (data.tier === 'founder_50' || data.tier === 'founder_30') {
+          setMembershipTier(data.tier);
+        }
+      } catch {
+        // Leave membershipTier null; the predicted tier is shown instead.
+      }
+    })();
     return () => {
       cancelled = true;
     };
@@ -89,6 +115,7 @@ export default function AccountPage() {
     <AccountBilling
       subscription={subscription}
       slots={slots}
+      membershipTier={membershipTier}
       locale={locale}
       messages={messages}
       trialDays={getTrialDays()}

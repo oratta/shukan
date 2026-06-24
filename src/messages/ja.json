@@ -363,6 +363,11 @@
     "foundingTier30": "次のメンバー — 30%オフ、ずっと",
     "foundingRemaining": "残り {remaining} / {cap}",
     "foundingUnavailable": "現在、残り枠の表示を一時的に取得できません。",
+    "yourTierHeading": "あなたのtier",
+    "yourTierPredicted": "今申し込むと【{tier}】が適用されます。",
+    "yourTierLocked": "あなたは【{tier}】です。",
+    "yourTierEnded": "Founding 枠は終了しました（通常価格）。",
+    "yourTierBadge": "← あなたのtier",
     "earlySwitchHeading": "ファウンディング割引を早めに確定",
     "earlySwitchButton": "今すぐ有料プランに切り替える",
     "manageHeading": "請求の管理"

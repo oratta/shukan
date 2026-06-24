@@ -691,3 +691,27 @@
 - [x] ロジック実装完了
 - [x] 動作確認完了
 - [ ] ユーザー確認完了
+
+## Feedback: /account「あなたのtier」明示 (D14)
+
+### F-D14-1: 未課金ユーザーに予測tierを表示
+- Requirement: account のファウンディング枠で自分が今どのtierに該当するか分かる（未課金時は残り枠から予測）
+  - **WHEN** ユーザーが founding 枠を確保しておらず（membership 無し）、`slots.founder50.remaining > 0`
+  - **THEN** 「今申し込むと【最初のメンバー｜50%オフ・永久】が適用されます」を表示し、50%オフ行をハイライトする
+  - **AND** founder50 満杯・founder30 に空き → 「次のメンバー｜30%オフ・永久」を予測表示
+  - **AND** 両方満杯 → 「Founding 枠は終了しました（通常価格）」
+- [x] テスト実装完了
+- [x] ロジック実装完了
+- [x] 動作確認完了 (tree-walk テスト account-your-tier.test.tsx: 残枠50%→予測50%行ハイライト / 50満杯→予測30% / 両満杯→終了文言、全 GREEN)
+- [ ] ユーザー確認完了
+
+### F-D14-2: 確保済みユーザーに確定tierを表示（認証付きエンドポイント）
+- Requirement: 既に founding 枠を確保済みなら確定 tier を予測より優先して表示
+  - **WHEN** 認証ユーザーが `founding_memberships` 行を持つ
+  - **THEN** `GET /api/founding/membership` が `{ tier }` を返し、「あなたは【最初のメンバー｜50%オフ・永久】です」等の確定文言を表示し該当行をハイライトする
+  - **AND** 未認証で `GET /api/founding/membership` を叩くと 401
+  - **AND** membership 無しなら `{ tier: null }` を返す
+- [x] テスト実装完了
+- [x] ロジック実装完了
+- [x] 動作確認完了 (dev 3000: `curl /api/founding/membership` 未認証→401 `{"error":"Unauthorized"}` ハンドラ認可・middleware リダイレクトでない / `/api/founding/slots` は public 200 維持)
+- [ ] ユーザー確認完了

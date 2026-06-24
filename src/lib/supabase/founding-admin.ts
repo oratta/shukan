@@ -16,7 +16,11 @@ import 'server-only';
  */
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { getFoundingCaps, type ResolvedTier } from '@/lib/founding/config';
+import {
+  getFoundingCaps,
+  type FoundingTier,
+  type ResolvedTier,
+} from '@/lib/founding/config';
 import { decideTier } from '@/lib/founding/allocation';
 
 let cached: SupabaseClient | null = null;
@@ -107,6 +111,28 @@ export async function getFoundingCounts(): Promise<FoundingCounts> {
     founder50: tier(cap50, claimedByTier.get('founder_50') ?? 0),
     founder30: tier(cap30, claimedByTier.get('founder_30') ?? 0),
   };
+}
+
+/**
+ * Read the founding tier locked to a specific user (Feedback D14).
+ *
+ * Returns the `tier` from the caller's own `founding_memberships` row, or `null`
+ * if they have not claimed a slot. Authorization is the route handler's job: it
+ * passes the id from `supabase.auth.getUser()`, so the service-role read here is
+ * always scoped to that authenticated user. Only the tier is selected — no other
+ * personal fields are exposed.
+ */
+export async function getFoundingMembershipForUser(
+  userId: string
+): Promise<FoundingTier | null> {
+  const { data, error } = await admin()
+    .from('founding_memberships')
+    .select('tier')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (error) throw new Error(`getFoundingMembershipForUser failed: ${error.message}`);
+  const tier = (data as { tier?: string } | null)?.tier;
+  return tier === 'founder_50' || tier === 'founder_30' ? tier : null;
 }
 
 /**

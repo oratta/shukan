@@ -126,3 +126,30 @@ change-A の TDD 実装中に確定した設計判断。詳細は `openspec/chan
 - **`/api/founding/slots` ルートは残置**: client account ページ + change-D 景表法の外部契約として必要（D4/D7-5）
 - **TDD（RED→GREEN）**: `founding-page.test.tsx` を `fetchRemainingSlots` モックから `getFoundingCounts` 直接モックへ変更し (a) 正常時に実数（remaining 37/192）描画 (b) `getFoundingCounts` throw 時に数値非表示フォールバック、を検証。`jp-scarcity-discount.test.tsx` も teaser 経路が `getFoundingCounts` に変わるため同様に変更（`vi.resetModules()` を beforeEach に追加して SUT であるページの catch を毎回フレッシュ import で検証）。`founding-slots.test.ts` に「絶対 URL env を設定しても相対 `/api/founding/slots` を fetch する」ケースを追加（env 依存撤去の回帰防止）。いずれも修正前は RED を確認
 - **検証**: `npm run test:run` → 393 passed（46 files・+3 は相対パステスト等） / `npx tsc --noEmit` → 編集ファイル新規エラーゼロ（残 9 件は既存の habits/impact/middleware テストのみ） / `npm run lint` → 9 errors / 36 warnings（ベースライン維持） / `npm run build` → 成功（`/founding` route 生成） / **実機**: PID 250（本プロジェクトの 3000 next-server）停止 → `npm run dev` 再起動（3001 の別プロジェクト pwa-implementation-plan PID 18342 は不可侵を維持）→ `.env.local` の `SUPABASE_SERVICE_ROLE_KEY` 読込状態で `curl localhost:3000/api/founding/slots` → HTTP 200 + 実 JSON（503 でない）、`curl localhost:3000/founding` → サーバーレンダー HTML に `Remaining: 50` / `Remaining: 200` の**実数**が描画（self-fetch なし・`loadRemainingSlots` 直接呼び）。確認後サーバー停止
+
+## D14: /account「あなたのtier」明示 — 未課金は予測tier / 確保済みは確定tier（Feedback, 2026-06-24）
+
+ユーザー要望「`/account` のファウンディングメンバー枠表示で、自分が今どのtier（最初のメンバー50%オフ / 次のメンバー30%オフ）に該当するのか分かるようにしてほしい」への対応。account のファウンディング枠セクションに「あなたのtier」を明示する。
+
+- **予測 tier の導出方法 — client 側で `slots` から `decideTier` を再利用**: 未課金（membership 無し）時は、既存の `fetchRemainingSlots()` で取得済みの公開カウンタ `slots`（`{founder50:{cap,remaining}, founder30:{...}}`）から予測 tier を導出する。判定ロジックは `src/lib/founding/allocation.ts` の `decideTier` をそのまま再利用（founder50 残>0→founder_50 / founder30 残>0→founder_30 / 両満杯→none）。`decideTier` は `counts`（claimed 数）を取るので、純粋関数 `predictTierFromSlots(slots)` を view 層に1つ追加し、`remaining` から `claimed = cap - remaining` を逆算して `decideTier` に渡す。**代替案**: (A) サーバーに予測専用エンドポイント追加 → 公開カウンタを既に client が持っているので不要・YAGNI 違反で却下 / (B) view で if 分岐を直書き → `decideTier` の単一ソースから逸れ、SQL RPC との一致が崩れるので却下。可逆かつ DRY な「`decideTier` 再利用」を採用。
+
+- **確定 tier の取得 — 認証付き `GET /api/founding/membership` を新設（middleware matcher は拡張しない）**: 既に Founding 枠を確保済み（課金後で `founding_memberships` 行あり）の場合は、認証ユーザー固有データなので公開カウンタからは出せない。`/api/stripe/checkout` と同じ認可方式（handler 内 `supabase.auth.getUser()`、middleware matcher は拡張しない＝design D1 と同じ方針）で `GET /api/founding/membership` を追加し `{ tier: 'founder_50' | 'founder_30' | null }` を返す。client から取得し、確定 tier があれば予測より**優先**して表示。**代替案**: (A) middleware matcher に追加 → D1（matcher を増やさず handler 内認可）方針に反するので却下 / (B) サブスク webhook で tier を subscriptions 行へ非正規化 → スキーマ変更で不可逆・スコープ外なので却下。handler 内認可の新エンドポイントを採用。
+
+- **membership getter — `getFoundingMembershipForUser(userId)` を `founding-admin.ts` に追加**: `founding_memberships` から自分の行の `tier` を読む getter。service-role admin client で `select('tier').eq('user_id', userId).maybeSingle()`。行が無ければ `null`。route handler は `auth.getUser()` で得た `user.id` を渡す（ユーザーは自分の行しか読めない＝認可は handler 側）。
+
+- **ハイライト — 該当 tier 行に枠線強調＋「← あなたのtier」バッジ、ブランドトーン維持**: 50%/30% 行のうち該当行を `data-account-your-tier` 付きで枠線強調し、控えめなバッジを添える。plan の「ゲーミフィケーション誇示 UI を作らない」方針に従い、派手な装飾・ステータス誇示はしない（静か・誠実トーン）。予測時は「今申し込むと適用されます」、確定時は「あなたは…です」の文言で区別。両満杯（none）時は「Founding 枠は終了しました（通常価格）」。
+
+- **データ取得は page.tsx 側（既存パターン踏襲）/ account-billing.tsx は純粋表示のまま**: 確定 tier は page.tsx の `useEffect` で `/api/founding/membership` を fetch し、予測 tier は `slots` から view 層の純粋関数で導出。view（account-billing.tsx）には `yourTier`/`yourTierStatus`（'predicted'|'locked'|'ended'|null）を props で渡し、tree-walk テスト可能な純粋表示を維持。
+
+- **i18n**: `account` 名前空間に en/ja 両方へキー追加（日本語が正）。文言は既存コピーの言い回し（「最初のメンバー」「次のメンバー」「50%オフ・永久」）に合わせ、造語を作らない。
+
+- **TDD（RED→GREEN）**: (1) `predictTierFromSlots` の純粋関数テスト（slots→tier 各境界） (2) `getFoundingMembershipForUser` の founding-admin モックテスト（行あり→tier / 行なし→null） (3) `GET /api/founding/membership` route テスト（未認証→401 / membership 無し→`{tier:null}` / membership あり→該当 tier、auth.getUser モック） (4) account-billing tree-walk テスト（未課金 founder50 空き→予測 50% 行ハイライト / 確定 founder_30→確定 30% 行ハイライト＆確定文言 / 両満杯→終了文言） (5) `account-intl-values` / messages の新キー存在。いずれも実装前に RED。
+
+- **検証エビデンス（D14）**: `npm run test:run` → 472 passed（54 files、+19 = 新規4テストファイル） / `npx tsc --noEmit` → 編集ファイル新規エラーゼロ（残 9 件は既存 habits/impact/middleware テストのみ） / `npm run lint` → 9 errors / 36 warnings（ベースライン維持・新規ゼロ） / `npm run build` → 成功（`/api/founding/membership` route 生成確認） / **実機**: 本プロジェクトの 3000 dev を再起動し `curl /api/founding/membership`（未認証）→ HTTP 401 `{"error":"Unauthorized"}`（ハンドラ内 `auth.getUser()` 認可・middleware リダイレクトでなく matcher 非拡張を確認）、`curl /api/founding/slots` → public 200 維持。確認後サーバー停止。
+- **追加した表示文言（en / ja）**:
+  - `yourTierHeading`: "Your tier" / "あなたのtier"
+  - `yourTierPredicted`: "Join now and you get {tier}." / "今申し込むと【{tier}】が適用されます。"
+  - `yourTierLocked`: "You are {tier}." / "あなたは【{tier}】です。"
+  - `yourTierEnded`: "Founding seats are gone (regular pricing)." / "Founding 枠は終了しました（通常価格）。"
+  - `yourTierBadge`: "← your tier" / "← あなたのtier"
+  - `{tier}` は既存の `foundingTier50`（"First members — 50% off, forever" / "最初のメンバー — 50%オフ、ずっと"）/ `foundingTier30`（"Next members — 30% off, forever" / "次のメンバー — 30%オフ、ずっと"）が view 層で補間される。

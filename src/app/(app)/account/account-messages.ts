@@ -60,6 +60,12 @@ export function buildAccountBillingMessages(
       foundingTier30: tAccount('foundingTier30'),
       foundingRemaining: accountRaw('foundingRemaining'),
       foundingUnavailable: tAccount('foundingUnavailable'),
+      yourTierHeading: tAccount('yourTierHeading'),
+      // {tier} is interpolated downstream by the view (Feedback D14) — pass raw.
+      yourTierPredicted: accountRaw('yourTierPredicted'),
+      yourTierLocked: accountRaw('yourTierLocked'),
+      yourTierEnded: tAccount('yourTierEnded'),
+      yourTierBadge: tAccount('yourTierBadge'),
       earlySwitchHeading: tAccount('earlySwitchHeading'),
       earlySwitchButton: tAccount('earlySwitchButton'),
       manageHeading: tAccount('manageHeading'),

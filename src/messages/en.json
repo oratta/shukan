@@ -363,6 +363,11 @@
     "foundingTier30": "Next members — 30% off, forever",
     "foundingRemaining": "{remaining} of {cap} left",
     "foundingUnavailable": "Live seat counts are temporarily unavailable.",
+    "yourTierHeading": "Your tier",
+    "yourTierPredicted": "Join now and you get {tier}.",
+    "yourTierLocked": "You are {tier}.",
+    "yourTierEnded": "Founding seats are gone (regular pricing).",
+    "yourTierBadge": "← your tier",
     "earlySwitchHeading": "Lock your founding discount early",
     "earlySwitchButton": "Switch to a paid plan now",
     "manageHeading": "Manage billing"

@@ -19,6 +19,8 @@ import type { SubscriptionState } from '@/lib/billing/entitlement';
 import { trialDaysRemaining } from '@/lib/billing/trial-status';
 import { formatTaxInclusivePrice, type Locale } from '@/lib/billing/pricing';
 import { shouldOfferEarlySwitch } from '@/lib/founding/early-switch';
+import { decideTier } from '@/lib/founding/allocation';
+import type { FoundingTier, ResolvedTier } from '@/lib/founding/config';
 import type { RemainingSlots } from '@/app/founding/slots';
 import {
   FinalConfirmation,
@@ -46,6 +48,11 @@ export interface AccountMessages {
   foundingTier30: string;
   foundingRemaining: string;
   foundingUnavailable: string;
+  yourTierHeading: string;
+  yourTierPredicted: string;
+  yourTierLocked: string;
+  yourTierEnded: string;
+  yourTierBadge: string;
   earlySwitchHeading: string;
   earlySwitchButton: string;
   manageHeading: string;
@@ -59,6 +66,12 @@ export interface AccountBillingMessages {
 export interface AccountBillingProps {
   subscription: SubscriptionState | null;
   slots: RemainingSlots | null;
+  /**
+   * The founding tier locked to this user (from /api/founding/membership), or
+   * null if they have not claimed a slot yet. When set, it takes precedence over
+   * the tier predicted from `slots` (Feedback D14).
+   */
+  membershipTier?: FoundingTier | null;
   locale?: Locale;
   messages: AccountBillingMessages;
   trialDays?: number;
@@ -79,6 +92,24 @@ function interpolate(template: string, vars: Record<string, string>): string {
   );
 }
 
+/**
+ * Predict the tier the next claim would land in, from the PUBLIC counter `slots`
+ * (Feedback D14). Reuses `decideTier` (src/lib/founding/allocation.ts), the same
+ * COUNT-based rule the `claim_founding_slot` RPC enforces, so the prediction can
+ * never disagree with the server. `claimed` is reconstructed as `cap - remaining`
+ * from each tier's counts. Returns null when slots are unavailable (the page then
+ * shows nothing rather than an invented tier).
+ */
+export function predictTierFromSlots(slots: RemainingSlots | null): ResolvedTier | null {
+  if (!slots) return null;
+  const counts = {
+    founder_50: slots.founder50.cap - slots.founder50.remaining,
+    founder_30: slots.founder30.cap - slots.founder30.remaining,
+  };
+  const caps = { cap50: slots.founder50.cap, cap30: slots.founder30.cap };
+  return decideTier(counts, caps).tier;
+}
+
 function planLabel(plan: Plan, m: AccountMessages): string {
   if (plan === 'monthly') return m.planMonthly;
   if (plan === 'annual') return m.planAnnual;
@@ -95,6 +126,7 @@ function planPriceLine(plan: Plan, m: AccountMessages, locale: Locale): string {
 export function AccountBilling({
   subscription,
   slots,
+  membershipTier = null,
   locale = 'ja',
   messages,
   trialDays = 14,
@@ -145,9 +177,43 @@ export function AccountBilling({
     statusLine = m.noPlanStatus;
   }
 
-  const foundingRows: Array<{ label: string; count: { cap: number; remaining: number } | null }> = [
-    { label: m.foundingTier50, count: slots ? slots.founder50 : null },
-    { label: m.foundingTier30, count: slots ? slots.founder30 : null },
+  // "Your tier" (Feedback D14). A confirmed membership (locked) takes precedence
+  // over the tier predicted from the public counter. `none` (both tiers full and
+  // no membership) shows the ended message; null means we can't tell (no slots).
+  const predictedTier = predictTierFromSlots(slots);
+  const yourTier: ResolvedTier | null = membershipTier ?? predictedTier;
+  const yourTierStatus: 'locked' | 'predicted' | 'ended' | null = membershipTier
+    ? 'locked'
+    : predictedTier === 'none'
+      ? 'ended'
+      : predictedTier === 'founder_50' || predictedTier === 'founder_30'
+        ? 'predicted'
+        : null;
+
+  const tierLabelFor = (tier: FoundingTier): string =>
+    tier === 'founder_50' ? m.foundingTier50 : m.foundingTier30;
+
+  let yourTierLine: string | null = null;
+  if (yourTierStatus === 'ended') {
+    yourTierLine = m.yourTierEnded;
+  } else if (
+    (yourTierStatus === 'locked' || yourTierStatus === 'predicted') &&
+    (yourTier === 'founder_50' || yourTier === 'founder_30')
+  ) {
+    const template = yourTierStatus === 'locked' ? m.yourTierLocked : m.yourTierPredicted;
+    yourTierLine = interpolate(template, { tier: tierLabelFor(yourTier) });
+  }
+
+  const highlightedTier: FoundingTier | null =
+    yourTier === 'founder_50' || yourTier === 'founder_30' ? yourTier : null;
+
+  const foundingRows: Array<{
+    tier: FoundingTier;
+    label: string;
+    count: { cap: number; remaining: number } | null;
+  }> = [
+    { tier: 'founder_50', label: m.foundingTier50, count: slots ? slots.founder50 : null },
+    { tier: 'founder_30', label: m.foundingTier30, count: slots ? slots.founder30 : null },
   ];
 
   return (
@@ -178,23 +244,50 @@ export function AccountBilling({
         </p>
         {slots ? (
           <ul className="space-y-1">
-            {foundingRows.map((row) => (
-              <li key={row.label} className="flex items-baseline justify-between text-sm">
-                <span className="text-foreground">{row.label}</span>
-                {row.count ? (
-                  <span className="font-medium text-foreground">
-                    {interpolate(m.foundingRemaining, {
-                      remaining: String(row.count.remaining),
-                      cap: String(row.count.cap),
-                    })}
+            {foundingRows.map((row) => {
+              const isYours = row.tier === highlightedTier;
+              return (
+                <li
+                  key={row.label}
+                  {...(isYours ? { 'data-account-your-tier': row.tier } : {})}
+                  className={
+                    isYours
+                      ? 'flex items-baseline justify-between gap-2 rounded-md border border-foreground/40 bg-foreground/[0.03] px-2 py-1 text-sm'
+                      : 'flex items-baseline justify-between gap-2 text-sm'
+                  }
+                >
+                  <span className="text-foreground">
+                    {row.label}
+                    {isYours ? (
+                      <span className="ml-2 text-xs font-medium text-muted-foreground">
+                        {m.yourTierBadge}
+                      </span>
+                    ) : null}
                   </span>
-                ) : null}
-              </li>
-            ))}
+                  {row.count ? (
+                    <span className="whitespace-nowrap font-medium text-foreground">
+                      {interpolate(m.foundingRemaining, {
+                        remaining: String(row.count.remaining),
+                        cap: String(row.count.cap),
+                      })}
+                    </span>
+                  ) : null}
+                </li>
+              );
+            })}
           </ul>
         ) : (
           <p className="text-xs text-muted-foreground">{m.foundingUnavailable}</p>
         )}
+
+        {yourTierLine ? (
+          <div data-account-your-tier-line className="pt-1">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {m.yourTierHeading}
+            </p>
+            <p className="mt-1 text-sm text-foreground">{yourTierLine}</p>
+          </div>
+        ) : null}
       </section>
 
       {/* Early-switch CTA — trialing users only */}
