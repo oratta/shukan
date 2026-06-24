@@ -89,15 +89,14 @@ export default function DashboardPage() {
 
   // Compute yesterday's date client-side only to avoid SSR timezone mismatch
   // (Vercel SSR runs in UTC, but user is in JST — causes 1-day offset between 00:00-08:59 JST)
-  const [yesterdayDate, setYesterdayDate] = useState('');
-  useEffect(() => {
+  const [yesterdayDate] = useState(() => {
     const d = new Date();
     d.setDate(d.getDate() - 1);
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
-    setYesterdayDate(`${year}-${month}-${day}`);
-  }, []);
+    return `${year}-${month}-${day}`;
+  });
 
   const yesterdayUnreviewed = useMemo(
     () => yesterdayDate ? getYesterdayUnreviewedHabits(habits, completions, yesterdayDate) : [],

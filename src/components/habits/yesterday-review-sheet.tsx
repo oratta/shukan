@@ -62,9 +62,11 @@ export function YesterdayReviewSheet({
   const [comment, setComment] = useState('');
   const [noteValues, setNoteValues] = useState<Record<string, string>>({});
 
-  // Reset local state when sheet opens
+  // Reset local state when sheet opens.
+  // シート open 時に入力 state を一度リセットする意図的パターンのため同期 setState が必要。
   useEffect(() => {
     if (open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMood(undefined);
       setComment('');
       setNoteValues({});
