@@ -259,7 +259,7 @@ export function AccountBilling({
                   <span className="text-foreground">
                     {row.label}
                     {isYours ? (
-                      <span className="ml-2 text-xs font-medium text-muted-foreground">
+                      <span className="ml-2 inline-block shrink-0 whitespace-nowrap text-xs font-medium text-muted-foreground">
                         {m.yourTierBadge}
                       </span>
                     ) : null}
