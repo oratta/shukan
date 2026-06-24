@@ -100,6 +100,7 @@ function StatusIndicator({
 
   const todayStatus = habit.recentDays?.[0]?.status ?? 'none';
 
+  // 未完了→完了への遷移を検知して祝福演出を一度だけ表示する意図的パターン。
   useEffect(() => {
     if (
       prevStatusRef.current !== null &&
@@ -107,6 +108,7 @@ function StatusIndicator({
       prevStatusRef.current !== 'rocket_used' &&
       (todayStatus === 'completed' || todayStatus === 'rocket_used')
     ) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowCelebration(true);
       const timer = setTimeout(() => setShowCelebration(false), 700);
       return () => clearTimeout(timer);

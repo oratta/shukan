@@ -2,7 +2,7 @@ name: Deploy Preview
 
 on:
   pull_request:
-    types: [labeled]
+    types: [opened, synchronize, reopened, ready_for_review]
 
 # 同一 PR の古いデプロイをキャンセルし、最新 commit のみデプロイする
 concurrency:
@@ -19,8 +19,8 @@ env:
 jobs:
   deploy-preview:
     name: Deploy Preview to Vercel
-    # `preview` ラベル付与時のみ + Fork PR では Secret を渡さないため job ごとスキップする
-    if: github.event.label.name == 'preview' && github.event.pull_request.head.repo.full_name == github.repository
+    # Draft 中は skip（Ready for review で発火） + Fork PR では Secret を渡さないため job ごとスキップする
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}

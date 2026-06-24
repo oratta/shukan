@@ -26,7 +26,10 @@ export function Header() {
   const t = useTranslations('nav');
   const [mounted, setMounted] = useState(false);
 
+  // next-themes ハイドレーション対策: サーバーでは theme が未確定なので、
+  // マウント後にのみテーマ依存 UI を描画する意図的な mounted パターン。
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
