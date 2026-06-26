@@ -1,31 +1,33 @@
 name: CI
 
 on:
+  push:
+    branches: [main]
   pull_request:
-    types: [labeled]
-  merge_group:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
 
 env:
   NODE_VERSION: '22'
 
 # デプロイフロー:
-# - Preview (PR): deploy-preview.yml が `preview` ラベル付与で実行
+# - Preview (PR): deploy-preview.yml が Ready for review で実行
 # - Staging (main push): deploy-staging.yml が自動実行
 # - Production: deploy-production.yml を workflow_dispatch で手動実行
 # このワークフローはチェック(lint + typecheck + test + actionlint)を担当
 #
-# トリガー設計:
-# - pull_request: types: [labeled] + label.name == 'preview' フィルタ
-# - merge_group: Merge Queue 経由の最終 CI
+# トリガー設計（oak-casino と同じ Draft + Ready for review 方式）:
+# - push (main): マージ後の最終 CI
+# - pull_request: Draft 中は job 側 `draft == false` ガードで skip し、
+#   「Ready for review」ボタン（ready_for_review）で発火する
 # - workflow_dispatch: 手動トリガー
-# push トリガーは含めない（PR push の都度発火しない要件）
 
 jobs:
   actionlint:
     name: Actionlint
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || github.event.label.name == 'preview'
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     steps:
       - uses: actions/checkout@v4
 
@@ -37,7 +39,7 @@ jobs:
   lint-and-typecheck:
     name: Lint & Type Check & Test
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || github.event.label.name == 'preview'
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     steps:
       - uses: actions/checkout@v4
 

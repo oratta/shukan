@@ -141,7 +141,8 @@
     "deleting": "Deleting...",
     "legal": "Legal",
     "privacyPolicy": "Privacy Policy",
-    "termsOfService": "Terms of Service"
+    "termsOfService": "Terms of Service",
+    "tokushoho": "Commercial Transaction Act Disclosure"
   },
   "days": {
     "sun": "Sun",
@@ -246,6 +247,130 @@
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit"
+  },
+  "founding": {
+    "hero": {
+      "eyebrow": "Founding Members",
+      "title": "Join early, and the discount stays with you for good.",
+      "subtitle": "Smitch is just getting started. The people who help us early deserve to be treated well for the long run — so a Founding Member discount stays with your account, permanently."
+    },
+    "tiers": {
+      "heading": "Two Founding Member tiers",
+      "remainingLabel": "Remaining",
+      "soldOutLabel": "Filled",
+      "founder50": {
+        "name": "First members",
+        "description": "The earliest supporters receive 50% off, locked in permanently.",
+        "discountLabel": "50% off, forever",
+        "capWording": "Reserved for the first members"
+      },
+      "founder30": {
+        "name": "Next members",
+        "description": "The next group receives 30% off, also locked in permanently.",
+        "discountLabel": "30% off, forever",
+        "capWording": "Reserved for the next members"
+      },
+      "note": "When the seats are taken, that's it — no fake countdowns, no resets. The numbers above, when shown, are the real remaining counts."
+    },
+    "promise": {
+      "heading": "We'll have your back first",
+      "body": "Founding Members are prioritized when you reach out to us. Your questions, your reports, your ideas go to the front of the line. You helped us begin, and we don't forget that."
+    },
+    "waitlist": {
+      "heading": "Tell us you're interested",
+      "description": "We're not charging anything yet. Leave your email and we'll let you know when Founding Member seats open. No spam, just the one message that matters.",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "you@example.com",
+      "submit": "Join the waitlist",
+      "submitting": "Sending...",
+      "success": "Thank you. You're on the list — we'll reach out when seats open.",
+      "errorInvalid": "Please enter a valid email address.",
+      "errorGeneric": "Something went wrong. Please try again in a moment."
+    },
+    "faq": {
+      "heading": "Honest answers",
+      "items": [
+        {
+          "q": "Is the discount really permanent?",
+          "a": "Yes. As long as your Founding Member account stays active, the discount applies to your billing for good. It's our way of thanking the people who showed up early."
+        },
+        {
+          "q": "Is there a free period?",
+          "a": "There's a card-free trial when billing launches, so you can try Smitch before deciding. Joining the waitlist costs nothing and commits you to nothing."
+        },
+        {
+          "q": "Can I cancel anytime?",
+          "a": "Always. You can cancel whenever you like, with no penalty and no questions. We'd rather you stay because Smitch helps, not because leaving is hard."
+        },
+        {
+          "q": "What happens to my email?",
+          "a": "We only use it to tell you when Founding Member seats open. We don't sell it or send unrelated marketing. You can ask us to delete it at any time."
+        }
+      ]
+    }
+  },
+  "checkout": {
+    "title": "Confirm your purchase",
+    "subtitle": "Please review the details below before continuing.",
+    "recurringHeading": "1. Recurring subscription (auto-renewal)",
+    "recurringBody": "This plan is a recurring subscription. It renews automatically at the end of each billing period and your payment method is charged automatically.",
+    "priceHeading": "2. Amount charged",
+    "perCycleMonthly": "{price} / month (billed monthly)",
+    "perCycleAnnual": "{price} / year (billed annually)",
+    "annualTotalLabel": "Total payable over one year",
+    "annualTotalValue": "{total}",
+    "trialHeading": "3. Free trial converting to paid",
+    "trialBody": "After your {days}-day free trial ends, the plan converts to paid automatically and the first charge ({price}) is made. If you cancel during the trial, you are not charged.",
+    "cancelHeading": "4. Cancellation",
+    "cancelBody": "You can cancel anytime via the Stripe Customer Portal from the billing settings. Cancellations are accepted up until the next renewal date. There is no cancellation penalty or fee.",
+    "lifetimeHeading": "Payment details (one-time)",
+    "lifetimeBody": "This plan is a one-time payment. It is not a subscription, so there is no auto-renewal or recurring charge.",
+    "lifetimePriceLabel": "Amount",
+    "taxNote": "All prices shown are tax-inclusive totals. The displayed price equals the amount charged.",
+    "tokushohoLink": "Commercial Transaction Act Disclosure",
+    "tokushohoLinkText": "See the Commercial Transaction Act Disclosure for full transaction terms.",
+    "confirmButton": "Agree and continue to payment",
+    "backButton": "Back"
+  },
+  "billing": {
+    "heading": "Billing & Cancellation",
+    "subscriptionStatus": "You currently have an active paid plan.",
+    "noSubscription": "You don't have an active paid plan.",
+    "manageButton": "Manage billing & cancellation",
+    "portalDescription": "Use the Stripe Customer Portal to change your payment method or cancel.",
+    "cancelAnytime": "Cancel anytime. You can complete cancellation yourself via the Customer Portal above, with no cancellation penalty or fee.",
+    "tokushohoLinkText": "See the Commercial Transaction Act Disclosure for full transaction terms.",
+    "tokushohoLink": "Commercial Transaction Act Disclosure"
+  },
+  "account": {
+    "title": "Plan & Billing",
+    "currentPlanHeading": "Your plan",
+    "trialingStatus": "Free trial — {days} days left",
+    "trialEndedStatus": "Your free trial has ended.",
+    "activePlanStatus": "Active plan: {plan}",
+    "noPlanStatus": "You don't have a paid plan yet.",
+    "planMonthly": "Monthly",
+    "planAnnual": "Annual",
+    "planLifetime": "Lifetime",
+    "choosePlanHeading": "Choose a plan",
+    "selectPlanButton": "Choose {plan}",
+    "perMonth": "{price} / month",
+    "perYear": "{price} / year",
+    "oneTime": "{price} one-time",
+    "foundingHeading": "Founding Member seats",
+    "foundingDescription": "Discounts are locked permanently to your account when your payment completes — based on the seats remaining at that moment. No fake countdowns.",
+    "foundingTier50": "First members — 50% off, forever",
+    "foundingTier30": "Next members — 30% off, forever",
+    "foundingRemaining": "{remaining} of {cap} left",
+    "foundingUnavailable": "Live seat counts are temporarily unavailable.",
+    "yourTierHeading": "Your tier",
+    "yourTierPredicted": "Join now and you get {tier}.",
+    "yourTierLocked": "You are {tier}.",
+    "yourTierEnded": "Founding seats are gone (regular pricing).",
+    "yourTierBadge": "← your tier",
+    "earlySwitchHeading": "Lock your founding discount early",
+    "earlySwitchButton": "Switch to a paid plan now",
+    "manageHeading": "Manage billing"
   },
   "pwa": {
     "banner": {

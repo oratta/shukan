@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // longrun build worktrees (temporary checkouts, scanned copies cause false positives)
+    "_worktrees/**",
   ]),
 ]);
 

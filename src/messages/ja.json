@@ -141,7 +141,8 @@
     "deleting": "削除中...",
     "legal": "法的情報",
     "privacyPolicy": "プライバシーポリシー",
-    "termsOfService": "利用規約"
+    "termsOfService": "利用規約",
+    "tokushoho": "特定商取引法に基づく表記"
   },
   "days": {
     "sun": "日",
@@ -246,6 +247,130 @@
     "save": "保存",
     "delete": "削除",
     "edit": "編集"
+  },
+  "founding": {
+    "hero": {
+      "eyebrow": "Founding Members",
+      "title": "早く参加すると、割引がずっとあなたのものになります。",
+      "subtitle": "Smitch はまだ始まったばかりです。初期に力を貸してくれた人には、長くきちんと向き合いたい。だから Founding Member の割引は、あなたのアカウントにずっと残り続けます。"
+    },
+    "tiers": {
+      "heading": "Founding Member は2つの枠",
+      "remainingLabel": "残り",
+      "soldOutLabel": "満了",
+      "founder50": {
+        "name": "最初のメンバー",
+        "description": "いちばん早く支えてくれた方は、50%オフがずっと適用されます。",
+        "discountLabel": "ずっと50%オフ",
+        "capWording": "最初のメンバーのための枠"
+      },
+      "founder30": {
+        "name": "次のメンバー",
+        "description": "次のグループの方は、30%オフがずっと適用されます。",
+        "discountLabel": "ずっと30%オフ",
+        "capWording": "次のメンバーのための枠"
+      },
+      "note": "枠が埋まったら、そこで締め切ります。偽のカウントダウンもリセットもありません。上に数が出ているときは、それが本当の残数です。"
+    },
+    "promise": {
+      "heading": "まず、あなたを優先します",
+      "body": "Founding Member の方からのお問い合わせは、優先して対応します。質問も、不具合の報告も、アイデアも、先頭で受け取ります。始まりを支えてくれたことを、わたしたちは忘れません。"
+    },
+    "waitlist": {
+      "heading": "興味があることを教えてください",
+      "description": "まだ料金はいただきません。メールアドレスを残していただければ、Founding Member の枠が開いたときにお知らせします。迷惑メールは送りません。大切な一通だけです。",
+      "emailLabel": "メールアドレス",
+      "emailPlaceholder": "you@example.com",
+      "submit": "ウェイトリストに登録",
+      "submitting": "送信中...",
+      "success": "ありがとうございます。登録できました。枠が開いたらご連絡します。",
+      "errorInvalid": "有効なメールアドレスを入力してください。",
+      "errorGeneric": "うまく送信できませんでした。少し時間をおいて、もう一度お試しください。"
+    },
+    "faq": {
+      "heading": "正直にお答えします",
+      "items": [
+        {
+          "q": "割引は本当にずっと続きますか？",
+          "a": "はい。Founding Member のアカウントが有効なあいだ、割引はずっと請求に適用されます。早くから来てくれた方への、わたしたちなりのお礼です。"
+        },
+        {
+          "q": "無料で試せる期間はありますか？",
+          "a": "課金が始まるときに、カード不要のお試し期間を用意します。決める前に Smitch を試せます。ウェイトリストへの登録は無料で、何の義務も生じません。"
+        },
+        {
+          "q": "いつでも解約できますか？",
+          "a": "いつでも解約できます。違約金も、引き止めもありません。やめにくいからではなく、役に立つから続けてほしいと思っています。"
+        },
+        {
+          "q": "メールアドレスはどう扱われますか？",
+          "a": "Founding Member の枠が開いたお知らせにだけ使います。販売したり、関係のない宣伝を送ったりはしません。いつでも削除を依頼できます。"
+        }
+      ]
+    }
+  },
+  "checkout": {
+    "title": "ご購入内容の最終確認",
+    "subtitle": "下記の内容をご確認のうえ、お申し込みください。",
+    "recurringHeading": "①定期購入（自動更新）について",
+    "recurringBody": "本プランは定期購入（サブスクリプション）です。各契約期間の終了時に自動更新され、お支払い方法へ自動的に課金されます。",
+    "priceHeading": "②お支払い金額",
+    "perCycleMonthly": "月額 {price} / 月（毎月自動課金）",
+    "perCycleAnnual": "年額 {price} / 年（毎年自動課金）",
+    "annualTotalLabel": "1年間のお支払総額",
+    "annualTotalValue": "{total}",
+    "trialHeading": "③無料トライアルから有料への移行",
+    "trialBody": "無料トライアル（{days}日間）終了後に有料プランへ自動的に移行し、初回のお支払い（{price}）が発生します。トライアル期間中に解約された場合、料金は一切発生しません。",
+    "cancelHeading": "④解約について",
+    "cancelBody": "いつでも解約できます。アカウント設定の「お支払い・解約」から Stripe カスタマーポータルにアクセスし、ご自身で解約手続きを完了できます。解約手続きは次回更新日の前まで受け付けます。解約に伴う違約金・解約手数料は一切かかりません。",
+    "lifetimeHeading": "お支払い内容（買い切り）",
+    "lifetimeBody": "本プランは一回限りのお支払いです。定期購入ではありませんので、自動更新・継続課金は発生しません。",
+    "lifetimePriceLabel": "お支払金額",
+    "taxNote": "表示価格はすべて税込総額です。表示価格と実際のご請求額は一致します。",
+    "tokushohoLink": "特定商取引法に基づく表記",
+    "tokushohoLinkText": "取引条件の詳細は特定商取引法に基づく表記をご確認ください。",
+    "confirmButton": "同意して支払いに進む",
+    "backButton": "戻る"
+  },
+  "billing": {
+    "heading": "お支払い・解約",
+    "subscriptionStatus": "現在、有料プランをご利用中です。",
+    "noSubscription": "現在ご利用中の有料プランはありません。",
+    "manageButton": "お支払い・解約を管理する",
+    "portalDescription": "Stripe カスタマーポータルで、お支払い方法の変更・解約をご自身で行えます。",
+    "cancelAnytime": "いつでも解約できます。解約手続きは上のボタンからカスタマーポータルにアクセスして完了でき、解約に伴う違約金・解約手数料は一切かかりません。",
+    "tokushohoLinkText": "取引条件の詳細は特定商取引法に基づく表記をご確認ください。",
+    "tokushohoLink": "特定商取引法に基づく表記"
+  },
+  "account": {
+    "title": "プランと請求",
+    "currentPlanHeading": "現在のプラン",
+    "trialingStatus": "無料トライアル — 残り{days}日",
+    "trialEndedStatus": "無料トライアルは終了しました。",
+    "activePlanStatus": "現在のプラン：{plan}",
+    "noPlanStatus": "まだ有料プランはありません。",
+    "planMonthly": "月額",
+    "planAnnual": "年額",
+    "planLifetime": "買い切り",
+    "choosePlanHeading": "プランを選ぶ",
+    "selectPlanButton": "{plan}を選ぶ",
+    "perMonth": "{price} / 月",
+    "perYear": "{price} / 年",
+    "oneTime": "{price} 買い切り",
+    "foundingHeading": "ファウンディングメンバー枠",
+    "foundingDescription": "割引は決済完了時点の残り枠に応じてアカウントに永久ロックされます。偽のカウントダウンはありません。",
+    "foundingTier50": "最初のメンバー — 50%オフ、ずっと",
+    "foundingTier30": "次のメンバー — 30%オフ、ずっと",
+    "foundingRemaining": "残り {remaining} / {cap}",
+    "foundingUnavailable": "現在、残り枠の表示を一時的に取得できません。",
+    "yourTierHeading": "あなたのtier",
+    "yourTierPredicted": "今申し込むと【{tier}】が適用されます。",
+    "yourTierLocked": "あなたは【{tier}】です。",
+    "yourTierEnded": "Founding 枠は終了しました（通常価格）。",
+    "yourTierBadge": "← あなたのtier",
+    "earlySwitchHeading": "ファウンディング割引を早めに確定",
+    "earlySwitchButton": "今すぐ有料プランに切り替える",
+    "manageHeading": "請求の管理"
   },
   "pwa": {
     "banner": {

@@ -15,6 +15,8 @@ import { useHabits } from '@/hooks/useHabits';
 import { shouldShowToday, getHabitsWithStats, getTodayString, getYesterdayUnreviewedHabits } from '@/lib/habits';
 import { getArticle } from '@/data/impact-articles';
 import { useAuth } from '@/components/auth-provider';
+import { useSubscription } from '@/hooks/useSubscription';
+import { shouldBlockCreateHabit } from '@/lib/billing/create-habit-gate';
 import { upsertDailyReflection } from '@/lib/supabase/habits';
 import { InstallBanner } from '@/components/pwa/install-banner';
 import { isCompletionTransition, type DayStatus as PwaDayStatus } from '@/lib/pwa/completion';
@@ -23,6 +25,7 @@ import type { Habit } from '@/types/habit';
 export default function DashboardPage() {
   const t = useTranslations();
   const { user } = useAuth();
+  const { subscription } = useSubscription();
   const {
     habits,
     completions,
@@ -89,15 +92,14 @@ export default function DashboardPage() {
 
   // Compute yesterday's date client-side only to avoid SSR timezone mismatch
   // (Vercel SSR runs in UTC, but user is in JST — causes 1-day offset between 00:00-08:59 JST)
-  const [yesterdayDate, setYesterdayDate] = useState('');
-  useEffect(() => {
+  const [yesterdayDate] = useState(() => {
     const d = new Date();
     d.setDate(d.getDate() - 1);
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
-    setYesterdayDate(`${year}-${month}-${day}`);
-  }, []);
+    return `${year}-${month}-${day}`;
+  });
 
   const yesterdayUnreviewed = useMemo(
     () => yesterdayDate ? getYesterdayUnreviewedHabits(habits, completions, yesterdayDate) : [],
@@ -134,9 +136,16 @@ export default function DashboardPage() {
   );
 
   const handleAdd = useCallback(() => {
+    // Gate the `create_habit` action behind entitlement (change-A S24). Entitled
+    // users and active-trial users keep the original UX (the form opens); when the
+    // gate applies, route to the billing/confirmation flow instead of opening it.
+    if (shouldBlockCreateHabit(subscription)) {
+      window.location.href = '/account?upgrade=1';
+      return;
+    }
     setEditingHabit(null);
     setFormOpen(true);
-  }, []);
+  }, [subscription]);
 
   const handleEdit = useCallback(
     (id: string) => {

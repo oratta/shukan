@@ -430,7 +430,7 @@ export async function deleteUrgeLog(id: string): Promise<void> {
 
 // --- Rocket ---
 
-export async function useRocketOnDate(
+export async function redeemRocketOnDate(
   userId: string,
   habitId: string,
   date: string

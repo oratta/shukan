@@ -106,8 +106,10 @@ export function HabitForm({
   const [pickerOpen, setPickerOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
-  // Sync state when initialData/initialCopingSteps change (e.g., editing a different habit)
+  // Sync state when initialData/initialCopingSteps change (e.g., editing a different habit).
+  // prop 変化時に編集対象を意図的に state へリセットするパターンのため同期 setState が必要。
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setName(initialData?.name ?? '');
     setDescription(initialData?.description ?? '');
     setLifeSignificance(initialData?.lifeSignificance ?? '');
