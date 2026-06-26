@@ -15,6 +15,8 @@ import { useHabits } from '@/hooks/useHabits';
 import { shouldShowToday, getHabitsWithStats, getTodayString, getYesterdayUnreviewedHabits } from '@/lib/habits';
 import { getArticle } from '@/data/impact-articles';
 import { useAuth } from '@/components/auth-provider';
+import { useSubscription } from '@/hooks/useSubscription';
+import { shouldBlockCreateHabit } from '@/lib/billing/create-habit-gate';
 import { upsertDailyReflection } from '@/lib/supabase/habits';
 import { InstallBanner } from '@/components/pwa/install-banner';
 import { isCompletionTransition, type DayStatus as PwaDayStatus } from '@/lib/pwa/completion';
@@ -23,6 +25,7 @@ import type { Habit } from '@/types/habit';
 export default function DashboardPage() {
   const t = useTranslations();
   const { user } = useAuth();
+  const { subscription } = useSubscription();
   const {
     habits,
     completions,
@@ -133,9 +136,16 @@ export default function DashboardPage() {
   );
 
   const handleAdd = useCallback(() => {
+    // Gate the `create_habit` action behind entitlement (change-A S24). Entitled
+    // users and active-trial users keep the original UX (the form opens); when the
+    // gate applies, route to the billing/confirmation flow instead of opening it.
+    if (shouldBlockCreateHabit(subscription)) {
+      window.location.href = '/account?upgrade=1';
+      return;
+    }
     setEditingHabit(null);
     setFormOpen(true);
-  }, []);
+  }, [subscription]);
 
   const handleEdit = useCallback(
     (id: string) => {
