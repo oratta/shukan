@@ -43,3 +43,16 @@
   - 統合検証 AC#4: tsc クリーン / 634 tests PASS / lint 0 errors / next build 成功
   - **`supabase db push` 完了**: 20260627000000_habit_status.sql を dev(xhqddzdpcpvxpprxykct)に適用。migration list で Local/Remote 全一致。AC#5/#6 が実 DB で充足。要フォロー(1) クローズ
   - **残**: 要フォロー(2) 実ブラウザ E2E（AC#10）未実行 / 残UX（[2]プリセット disabled 表示）は未対応
+- 2026-06-28: 残UX 修正完了（commit 178dc53）。PresetCard に disabled prop 追加、[2]セクションB で isPresetEstablished の
+  プリセットを opacity-50+pointer-events-none+aria-disabled で無効化、subtitle「習慣化済みで選択中」。en/ja に alreadyEstablished 追加。
+  634 tests / tsc / lint 0 errors / build すべて PASS
+- 2026-06-28: **要フォロー(2) 実ブラウザ E2E 完了**（claude-in-chrome、dev サーバ localhost:3000、ユーザーはログイン済み）。
+  [0]→[1]→[2]→[3]→[4]→[5]→ホーム を通しで完走。GIF（onboarding-v2-flow.gif）でユーザーに共有。検証結果:
+  - [0] イントロ / [1] プロフィール（年齢40・性別male・国JP・年収空）/ [2] 習慣選択（established=タバコをやめる10年前・active=集中して働く）
+  - **UX修正の実証**: セクションB の「タバコをやめる」が disabled=true/aria-disabled/opacity-50/pointer-events-none・subtitle「習慣化済みで選択中です」
+  - AC#11: 「診断する」は active 1件選択で活性（ゲート動作）/ AC#12: [4]過去ブロックは established ありで表示・「推定」バッジ付き
+  - [4] 二段構え結果: 過去（established のみ）健康寿命+2年/出費削減−2,976,338円/稼ぐ能力+13,657,550円、未来（active のみ）稼ぐ能力+30,000,000円。D1 対称 horizon 動作
+  - **DB 永続化検証（Management API）**: habits = タバコをやめる(status=established, established_since=2016-06-27＝10年前正確) / 集中して働く(status=active, established_since=null)。
+    user_profiles = birth_year=1986(age40変換正確)/gender=male/country=JP/annual_income=null/currency=JPY/tracked_kpis=[health_lifespan,positive_mood,cost_saving,earning]（全4軸=D5）
+  - AC#5/#6/#10/#11/#12/D5 すべて実 DB・実ブラウザで充足
+  - **注意**: 検証はユーザーの実 dev アカウントで実施。タバコをやめる/集中して働く の2習慣が追加され user_profile が upsert で上書きされた（要クリーンアップ判断）
