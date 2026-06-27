@@ -511,7 +511,7 @@ function PresetCard({
       aria-pressed={selected}
       aria-disabled={disabled || undefined}
       className={cn(
-        "flex items-center gap-4 rounded-2xl border p-4 text-left transition-all",
+        "flex w-full items-center gap-4 rounded-2xl border p-4 text-left transition-all",
         disabled
           ? "cursor-not-allowed opacity-50 pointer-events-none border-border bg-card"
           : selected
