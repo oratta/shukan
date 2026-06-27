@@ -41,6 +41,7 @@ export function VsTemptationModal({
   useEffect(() => {
     if (open && !initializedRef.current) {
       initializedRef.current = true;
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot reset when modal opens
       setCheckedSteps(new Set());
       setLogId(null);
       setShowSuccess(false);

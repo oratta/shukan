@@ -119,3 +119,44 @@ builder 自律デフォルト可能だが、ドリフト防止のため APPROVE 
   プリセットID入力形）で算出する。「いつから」は `yearsAgoToEstablishedSince(yearsAgo)`（年数→YYYY-MM-DD・
   負値は0年クランプ）で日付化し、保存時も同関数を再利用して [4] 表示と保存値を一致させる。
 - 根拠: 保存に依存しない計算入力で [4] を描け、表示と DB 書き込みの過去 horizon が同一根拠になる（不整合防止）。
+
+## 2026-06-27 verify round 1 fix: 品質ゲート（lint/tsc）と a11y 修正
+
+### D-V1: pre-existing lint エラー 9 件を抑制/改名で解消（新規コードは 0 エラー）
+- 問題: `npm run lint` が exit:1（9 errors）。内訳は react-hooks/set-state-in-effect 7件・
+  react-hooks/preserve-manual-memoization 1件・react-hooks/rules-of-hooks 1件。すべて change-A/B/C 投入前から
+  onboarding-data-setup ブランチに存在する pre-existing エラー（新規 onboarding/lifetime-impact コードは 0 エラー）。
+  だが verify は lint 全体 exit:0 を要求するため放置不可。
+- 決定:
+  (1) rules-of-hooks（useHabits.ts:203）= `useRocketOnDate` を `redeemRocketOnDate` に改名。`use` 接頭辞を
+      ESLint が React Hook と誤判定していたため。CRUD 関数（src/lib/supabase/habits.ts）・呼び出し側を一括改名。
+  (2) set-state-in-effect 7件 = いずれも「マウント時1回 / open 時リセット / 状態遷移トリガ」の意図的パターン。
+      `// eslint-disable-next-line react-hooks/set-state-in-effect -- <理由>` で局所抑制。
+  (3) preserve-manual-memoization 1件（impact-article-sheet.tsx）= getArticle は純粋静的ルックアップで memo deps
+      は意図的。同様に局所 disable。
+- 根拠: 機能変更ゼロで可逆。改名は副作用が機能でなく命名のみ（hook 判定回避が目的）。disable は理由コメント付きで
+  局所最小。pre-existing を本 longrun の品質ゲートで解消するのが YAGNI かつ blast radius 最小。
+
+### D-V2: pre-existing tsc エラー 9 件をテスト型修正で解消
+- 問題: `npx tsc --noEmit` が 9 errors。habits.test.ts/impact.test.ts の makeCompletion ヘルパーが
+  HabitCompletion に存在しない `id` を指定（completedAt 欠落）、habits.test.ts のインライン Habit リテラルが
+  存在しない `userId` を指定し必須 `status`/`icon`/`dailyTarget` を欠落、middleware.test.ts が読み取り専用
+  `NODE_ENV` への代入と spread 引数型不一致。
+- 決定: makeCompletion から `id` を除去し必須 `completedAt` を補完。Habit リテラルから `userId` を除去し
+  `status:'active'`/`icon`/`dailyTarget` を補完（型と一致）。NODE_ENV は `(process.env as { NODE_ENV?: string })`
+  キャストで代入、createServerClient mock は呼び出しを関数型キャストして spread を許容。
+- 根拠: テストの型を実型（types/habit.ts）に正しく追従させるだけの修正で、振る舞い・アサーションは不変。359 tests 全 PASS 維持。
+
+### D-V3: [2] 画面「いつから？」年数 input に label 紐付け（a11y）
+- 問題: onboarding-wizard.tsx の established プリセットの年数 input が `<label>` と htmlFor/id で紐付いておらず、
+  スクリーンリーダーが入力欄の用途を読み上げられない。
+- 決定: input に `id={`since-${preset.id}`}` を付与し、隣接 label を `<label htmlFor={`since-${preset.id}`}>` に変更。
+  preset.id でユニークな id を保証（複数 established 行でも衝突しない）。
+- 根拠: WCAG ラベル紐付けの最小修正。可逆・副作用なし。
+
+### D-V4: supabase db push（status/established_since 実 DB 適用）は履歴整合後に保留（D-A3 踏襲）
+- 問題: status/established_since 列は SQL 定義済みだが dev DB との migration 履歴乖離のため db push 未実施。
+  AC#5/AC#6 は純粋関数テストで検証済みだが実 DB 反映は未完。
+- 決定: 本 verify ラウンドのスコープ（lint/tsc/a11y のコード品質修正）外。D-A3 の判断どおり、履歴整合後に
+  ユーザーまたは統合フェーズで実 DB 適用する。コードと SQL 定義は適用可能な状態で維持。
+- 根拠: builder 環境は dev DB の migration 履歴整合操作（破壊的になりうる）を自律実行すべきでない。安全側に倒す。

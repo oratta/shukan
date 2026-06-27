@@ -80,9 +80,9 @@ function makeEvidence(articleId: string, weight: number): HabitEvidence {
 
 function makeCompletion(habitId: string, date: string, status: string = 'completed'): HabitCompletion {
   return {
-    id: `comp-${date}`,
     habitId,
     date,
+    completedAt: `${date}T00:00:00.000Z`,
     status: status as HabitCompletion['status'],
   };
 }

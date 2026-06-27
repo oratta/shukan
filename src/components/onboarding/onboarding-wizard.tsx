@@ -223,10 +223,14 @@ export function OnboardingWizard() {
                     />
                     {selected && since && (
                       <div className="flex items-center gap-2 pl-2 text-sm">
-                        <label className="text-muted-foreground">
+                        <label
+                          htmlFor={`since-${preset.id}`}
+                          className="text-muted-foreground"
+                        >
                           {t("habits.sinceLabel")}
                         </label>
                         <input
+                          id={`since-${preset.id}`}
                           type="number"
                           inputMode="numeric"
                           min={0}

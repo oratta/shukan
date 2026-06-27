@@ -107,6 +107,7 @@ function StatusIndicator({
       prevStatusRef.current !== 'rocket_used' &&
       (todayStatus === 'completed' || todayStatus === 'rocket_used')
     ) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- celebration triggered on status transition
       setShowCelebration(true);
       const timer = setTimeout(() => setShowCelebration(false), 700);
       return () => clearTimeout(timer);

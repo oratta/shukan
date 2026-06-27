@@ -108,6 +108,7 @@ export function HabitForm({
 
   // Sync state when initialData/initialCopingSteps change (e.g., editing a different habit)
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sync form fields when editing a different habit
     setName(initialData?.name ?? '');
     setDescription(initialData?.description ?? '');
     setLifeSignificance(initialData?.lifeSignificance ?? '');

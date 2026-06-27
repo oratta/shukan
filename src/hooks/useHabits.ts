@@ -18,7 +18,7 @@ import {
   fetchUrgeLogsForDate,
   insertUrgeLog,
   updateUrgeLog,
-  useRocketOnDate,
+  redeemRocketOnDate,
   updateHabitSortOrders,
   insertHabitEvidence,
   deleteHabitEvidence,
@@ -200,7 +200,7 @@ export function useHabits() {
   const useRocket = useCallback(
     async (habitId: string, date: string) => {
       if (!user) return;
-      const updated = await useRocketOnDate(user.id, habitId, date);
+      const updated = await redeemRocketOnDate(user.id, habitId, date);
       setCompletions((prev) => {
         const filtered = prev.filter((c) => !(c.habitId === habitId && c.date === date));
         return [...filtered, updated];

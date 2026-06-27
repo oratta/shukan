@@ -35,6 +35,7 @@ export function ImpactArticleSheet({
   const timeUnits = { min: t('minuteUnit'), hour: t('hourUnit'), day: t('dayUnit') };
 
   const article = useMemo(
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization -- getArticle is a pure static lookup; memo deps are intentional
     () => (habit?.impactArticleId ? getArticle(habit.impactArticleId) : undefined),
     [habit?.impactArticleId]
   );

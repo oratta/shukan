@@ -65,6 +65,7 @@ export function YesterdayReviewSheet({
   // Reset local state when sheet opens
   useEffect(() => {
     if (open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reset local form state when sheet opens
       setMood(undefined);
       setComment('');
       setNoteValues({});

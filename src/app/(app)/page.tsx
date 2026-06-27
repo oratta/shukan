@@ -63,6 +63,7 @@ export default function DashboardPage() {
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot init of derived date on mount
     setYesterdayDate(`${year}-${month}-${day}`);
   }, []);
 
