@@ -160,3 +160,24 @@ builder 自律デフォルト可能だが、ドリフト防止のため APPROVE 
 - 決定: 本 verify ラウンドのスコープ（lint/tsc/a11y のコード品質修正）外。D-A3 の判断どおり、履歴整合後に
   ユーザーまたは統合フェーズで実 DB 適用する。コードと SQL 定義は適用可能な状態で維持。
 - 根拠: builder 環境は dev DB の migration 履歴整合操作（破壊的になりうる）を自律実行すべきでない。安全側に倒す。
+
+## 2026-06-28 origin/main 統合と db push（要フォロー(1) 解決）
+
+### D-M1: db push 乖離はユーザー指摘どおり「main 先行マージ」で解決
+- 乖離の正体: worktree 分岐（merge-base 895c9ce）後に origin/main が monetization の 3 migration
+  （20260612000000_add_subscriptions / 000100_waitlist / 000200_founding_memberships）を追加し dev に適用済み。
+  しかしこの worktree の local migrations にそれらのファイルが無く、`db push` が「remote にあって local に無い」乖離を検知して停止していた（D-A3）。
+- 決定: 破壊的 repair/pull ではなく **origin/main を feature ブランチにマージ**。3 ファイルが local に入り履歴整合。
+  user_profiles(20260612010000) は既に dev 適用済みと判明。残る未適用は habit_status(20260627000000) のみ。
+- 結果: `supabase db push` で habit_status を dev に適用。migration list で Local/Remote 全一致。AC#5/#6 実 DB 充足。
+
+### D-M2: マージコンフリクト 10 件の解消方針
+- messages en/ja.json: onboarding(ours) と founding/checkout/billing/account/pwa(main) は別トップレベルキーで
+  意味的衝突なし → 両保持。en/ja キーパリティ一致を確認。
+- page.tsx: import は pwa(main)+HabitInsertInput(ours) 併合。yesterdayDate は main の遅延 useState 初期化を採用
+  （ours の setState-in-effect 残骸は、setter 無し const 宣言に対する呼び出しでバグのため破棄）。
+- habit 系 7 コンポーネント: 同一 eslint-disable の差分のみ。理由コメント付き ours を採用。
+  impact-article-sheet のみ useMemo を撤去した main 側を採用（getArticle は純粋ルックアップで毎回呼んでも安価）。
+- habits.ts / useHabits.ts は status/established_since を保持したまま自動マージ成功。
+- npm install で stripe 等 6 パッケージ追加（main の monetization 依存）。
+- 統合検証: tsc クリーン / 634 tests PASS / lint 0 errors / next build 成功（AC#4 充足）。
