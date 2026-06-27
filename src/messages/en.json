@@ -326,6 +326,7 @@
       "activeNote": "Pick one or more to run the diagnosis.",
       "sinceLabel": "Since when?",
       "sinceUnit": "years ago",
+      "alreadyEstablished": "Already selected as an established habit",
       "effectPerTime": "{effect} each time",
       "effectReduction": "{kpiName} −{value}{unit}",
       "effectGain": "{kpiName} +{value}{unit}",

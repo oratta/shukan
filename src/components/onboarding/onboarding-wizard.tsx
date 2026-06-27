@@ -266,6 +266,7 @@ export function OnboardingWizard() {
             />
             <div className="grid gap-3">
               {presets.map((preset) => {
+                const establishedHere = isPresetEstablished(state, preset.id);
                 const selected = isPresetActive(state, preset.id);
                 const effect = formatPerTimeEffect(t, preset.id);
                 return (
@@ -273,8 +274,15 @@ export function OnboardingWizard() {
                     key={`act-${preset.id}`}
                     label={t(`preset.${preset.id}`)}
                     icon={preset.icon}
-                    subtitle={effect ? t("habits.effectPerTime", { effect }) : undefined}
+                    subtitle={
+                      establishedHere
+                        ? t("habits.alreadyEstablished")
+                        : effect
+                        ? t("habits.effectPerTime", { effect })
+                        : undefined
+                    }
                     selected={selected}
+                    disabled={establishedHere}
                     onClick={() => setState((s) => toggleActive(s, preset.id))}
                   />
                 );
@@ -475,21 +483,27 @@ function PresetCard({
   subtitle,
   selected,
   onClick,
+  disabled = false,
 }: {
   label: string;
   icon: string;
   subtitle?: string;
   selected: boolean;
   onClick: () => void;
+  disabled?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       aria-pressed={selected}
+      aria-disabled={disabled || undefined}
       className={cn(
         "flex items-center gap-4 rounded-2xl border p-4 text-left transition-all",
-        selected
+        disabled
+          ? "cursor-not-allowed opacity-50 pointer-events-none border-border bg-card"
+          : selected
           ? "border-primary bg-primary/5 ring-2 ring-primary/30"
           : "border-border bg-card hover:border-primary/40"
       )}

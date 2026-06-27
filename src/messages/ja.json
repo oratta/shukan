@@ -326,6 +326,7 @@
       "activeNote": "1つ以上選ぶと診断できます。",
       "sinceLabel": "いつから？",
       "sinceUnit": "年前",
+      "alreadyEstablished": "「習慣化済み」で選択中です",
       "effectPerTime": "1回ごとに {effect}",
       "effectReduction": "{kpiName} −{value}{unit}",
       "effectGain": "{kpiName} +{value}{unit}",
