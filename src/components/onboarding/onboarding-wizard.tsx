@@ -171,18 +171,29 @@ export function OnboardingWizard() {
             </Field>
 
             <Field label={t("profile.annualIncome")} hint={t("profile.optional")}>
-              <input
-                type="number"
-                inputMode="numeric"
-                min={0}
-                value={state.profile.annualIncome ?? ""}
-                onChange={(e) =>
-                  updateProfile({
-                    annualIncome: e.target.value === "" ? null : Number(e.target.value),
-                  })
-                }
-                className={inputClass(!!profileErrors.annualIncome)}
-              />
+              <div className="relative">
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  placeholder={t("profile.incomePlaceholder")}
+                  value={
+                    state.profile.annualIncome === null
+                      ? ""
+                      : state.profile.annualIncome / 10000
+                  }
+                  onChange={(e) =>
+                    updateProfile({
+                      annualIncome:
+                        e.target.value === "" ? null : Number(e.target.value) * 10000,
+                    })
+                  }
+                  className={cn(inputClass(!!profileErrors.annualIncome), "pr-14")}
+                />
+                <span className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-sm text-muted-foreground">
+                  {t("profile.incomeUnit")}
+                </span>
+              </div>
               <p className="mt-2 text-xs text-muted-foreground">
                 {t("profile.incomeNote")}
               </p>

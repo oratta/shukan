@@ -309,6 +309,8 @@
       "gender": "性別",
       "country": "国",
       "annualIncome": "年収",
+      "incomeUnit": "万円",
+      "incomePlaceholder": "例: 500",
       "optional": "任意",
       "genderMale": "男性",
       "genderFemale": "女性",

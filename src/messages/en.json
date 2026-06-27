@@ -309,6 +309,8 @@
       "gender": "Gender",
       "country": "Country",
       "annualIncome": "Annual income",
+      "incomeUnit": "× 10,000 yen",
+      "incomePlaceholder": "e.g. 500",
       "optional": "Optional",
       "genderMale": "Male",
       "genderFemale": "Female",
