@@ -68,3 +68,50 @@ builder が「テスト実装完了」「ロジック実装完了」を進捗に
 > 備考: future は active のみ・past は established のみで期間排他のため二重計上なし。per-time 効果は
 > presetPerTimeEffectValue を future/past 共通で再利用（plan.md change-B）。onboarding プリセットは
 > everyday（頻度=1/日）前提のため頻度乗数は持たない（D3）。
+
+## change-C: onboarding-v2-flow
+
+### C-S1: [0]→[5] 通し完走で user_profiles と habits（established/active）を保存（AC#10）
+- WHEN [4] の「この内容ではじめる」を押す THEN runOnboardingWrite が user_profiles を upsert（trackedKpis=全KpiKey）し、
+  established 習慣（status='established' + established_since）と active 習慣（status='active'）を insert する。
+- 検証: `src/__tests__/onboarding-write.test.ts`（v2: profile→established→active 順 / status・established_since 配線 / trackedKpis=4軸）
+- [x] テスト実装完了
+- [x] ロジック実装完了（`src/lib/onboarding.ts` runOnboardingWrite / buildHabitFromPreset / OnboardingWriteInput v2）
+
+### C-S2: [2]セクションB（active）が0選択で「診断する」非活性・1つ以上で活性（AC#11）
+- WHEN セクションB が0件 THEN canAdvanceFromHabits=false／1件以上 THEN true（セクションA は任意なのでゲートに含めない）。
+- 検証: `src/__tests__/onboarding-logic.test.ts`（canAdvanceFromHabits）
+- [x] テスト実装完了
+- [x] ロジック実装完了（`src/lib/onboarding.ts` canAdvanceFromHabits）
+
+### C-S3: [2]セクションA/B のプリセット相互排他（D2・二重計上防止）
+- WHEN プリセットをセクションA に入れる THEN セクションB から除外（逆も同様）。同一プリセットが established と active の
+  両方に入らないことを保証する。
+- 検証: `src/__tests__/onboarding-logic.test.ts`（toggleEstablished / toggleActive 相互排他）
+- [x] テスト実装完了
+- [x] ロジック実装完了（`src/lib/onboarding.ts` toggleEstablished / toggleActive）
+
+### C-S4: [4]結果ブロック1（過去累積）は既存習慣がある場合のみ表示（AC#12）
+- WHEN established 習慣が1件以上 THEN shouldShowPastBlock=true／0件 THEN false。結果は computeLifetimeImpact で算出。
+- 検証: `src/__tests__/onboarding-logic.test.ts`（shouldShowPastBlock / buildLifetimeImpactInput）
+- [x] テスト実装完了
+- [x] ロジック実装完了（`src/lib/onboarding.ts` shouldShowPastBlock / buildLifetimeImpactInput / profileInputToUserProfile）
+
+### C-S5: セクションA「いつから」年数→開始日（established_since）への変換
+- WHEN yearsAgo=N THEN established_since = N年前の日付（YYYY-MM-DD）。負値は0年にクランプ。
+- 検証: `src/__tests__/onboarding-logic.test.ts`（yearsAgoToEstablishedSince）
+- [x] テスト実装完了
+- [x] ロジック実装完了（`src/lib/onboarding.ts` yearsAgoToEstablishedSince）
+
+### C-S6: en/ja 両ロケールで v2 全画面の文言が揃う（en リグレッションなし）（AC#13）
+- WHEN onboarding 名前空間を比較 THEN ja/en でキー一致・全非空・補間キー保持。[0]〜[5] の確定文言（ja）が
+  `docs/context/onboarding-screens-v2.md` どおり。KPI 4軸同列（KPI選択ステップなし）。
+- 検証: `src/__tests__/onboarding-messages.test.ts`（v2: intro/profile/habits/calculating/result/done + en パリティ）
+- [x] テスト実装完了
+- [x] ロジック実装完了（`src/messages/ja.json` / `src/messages/en.json` onboarding v2）
+
+> 備考: 誘導リダイレクト（未完了→/onboarding）は change-A/B/C を通じて `onboarding-guard` が担い、
+> `onboarding-redirect.test.ts`（C-S1〜C-S4・C-S15）で維持される（v2 でも変更なし）。
+> Playwright E2E（実ブラウザ通し）は Google OAuth + 稼働サーバを要し本環境では自動実行不可のため、
+> [0]→[5] のロジック（state 遷移・ゲート・保存オーケストレーション）を node 環境 Vitest で固定する
+> （v1 と同じ方針・decisions.md D-C5）。

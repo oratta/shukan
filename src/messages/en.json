@@ -250,12 +250,6 @@
   "onboarding": {
     "stepLabel": "Step {current} / {total}",
     "back": "Back",
-    "step1": {
-      "title": "Which self do you want to switch to?",
-      "subtitle": "Start by focusing on just one. You can change it anytime.",
-      "next": "Next",
-      "note": "Every number is calculated based on scientific research"
-    },
     "kpi": {
       "health_lifespan": {
         "headline": "Toward a self that stays healthy longer",
@@ -301,9 +295,15 @@
       "cut_digital_distraction": "Cut digital distractions",
       "keep_learning": "Keep learning"
     },
-    "step2": {
-      "title": "We'll calculate with your numbers",
-      "subtitle": "We use these to calculate your chosen KPI for you.",
+    "intro": {
+      "title": "How much difference will your daily habits make over a lifetime?",
+      "subtitle": "Just answer a few questions. We’ll diagnose how much impact your habits create over a lifetime for the you of today.",
+      "cta": "Start the diagnosis",
+      "note": "Every number is calculated based on scientific research"
+    },
+    "profile": {
+      "title": "Tell us about yourself",
+      "subtitle": "We use this to calculate your lifetime impact just for you.",
       "age": "Age",
       "gender": "Gender",
       "country": "Country",
@@ -316,22 +316,48 @@
       "incomeNote": "If left blank, we calculate using the average income for your age, gender, and country",
       "next": "Next"
     },
-    "step3": {
-      "title": "Habits that work for \"{copy}\"",
-      "subtitle": "Pick one or more you can keep up. You can add or remove them later.",
+    "habits": {
+      "title": "Tell us about your habits",
+      "subtitle": "Pick ones you can keep up. You can add or remove them later.",
+      "establishedHeading": "Already a habit for you",
+      "establishedNote": "Choosing these marks them as established and calculates what you’ve already built up.",
+      "activeHeading": "Habits you want to start",
+      "activeNote": "Pick one or more to run the diagnosis.",
+      "sinceLabel": "Since when?",
+      "sinceUnit": "years ago",
       "effectPerTime": "{effect} each time",
-      "effectReduction": "{kpiName} −{value} {unit}",
-      "effectGain": "{kpiName} +{value} {unit}",
-      "start": "Start with these habits"
+      "effectReduction": "{kpiName} −{value}{unit}",
+      "effectGain": "{kpiName} +{value}{unit}",
+      "cta": "Run the diagnosis"
     },
-    "step4": {
-      "title": "You're all set",
-      "body": "Starting with today's one rep, your \"{kpiName}\" begins to build up.",
-      "currentValueLabel": "Current value",
-      "habitsLabel": "Your habits",
-      "start": "Get started",
-      "writeError": "Failed to save. Please try again.",
-      "starting": "Setting up..."
-    }
+    "calculating": {
+      "title": "Calculating your lifetime…",
+      "phase1": "Adding up what you’ve already built…",
+      "phase2": "Cross-checking with research data…",
+      "phase3": "Calculating what you’ll build from here…"
+    },
+    "result": {
+      "title": "Your lifetime impact",
+      "pastHeading": "You’ve already built up this much",
+      "futureHeading": "Keep going and you’ll build up this much",
+      "estimatedLabel": "estimated",
+      "valueGain": "+{value}{unit}",
+      "valueReduction": "−{value}{unit}",
+      "unitYear": "yr",
+      "unitYen": "yen",
+      "futureNote": "The future amount is the difference if you keep today’s one rep for a lifetime.",
+      "cta": "Start with this",
+      "footnote": "You can review the assumptions (age, gender, country, income) in settings anytime"
+    },
+    "done": {
+      "title": "You’re all set",
+      "body": "Starting with today’s one rep, your impact begins to build up.",
+      "establishedLabel": "Established",
+      "activeLabel": "Starting now",
+      "establishedBadge": "Established",
+      "cta": "Get started"
+    },
+    "writeError": "Failed to save. Please try again.",
+    "starting": "Setting up..."
   }
 }

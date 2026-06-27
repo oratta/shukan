@@ -89,3 +89,33 @@ builder 自律デフォルト可能だが、ドリフト防止のため APPROVE 
 - 決定: `migration repair` / `db pull` は共有 dev DB の履歴を書き換える破壊的操作のため builder では実行しない。
   マイグレーション SQL は `add column if not exists` で冪等・非破壊。実 push は履歴整合後にユーザー or 統合フェーズで行う。
 - 根拠: 意思決定ガイドライン「DB は後方互換厳守・共有状態を壊さない」。冪等 SQL なので後追い push は安全。
+
+## 2026-06-27 change-C: onboarding-v2-flow 実装の設計判断
+
+### D-C4: v1 onboarding モジュール/テストを v2 に作り替え（KPI 選択ステップ撤去）
+- 問題: plan は「v1 wizard を v2 6画面に作り替え」。v1 の `src/lib/onboarding.ts`（WizardState step1-4 /
+  selectedKpi / presetsForKpi / 単一 selectedKpi の OnboardingWriteInput）と対応テストが v2 と非互換。
+- 決定: onboarding モジュールを v2 にフル置換。WizardState を `step:0..5 / profile / established[] / activePresetIds`
+  に再定義し、KPI 選択を撤去（[4] は4軸同列・D5 で trackedKpis=全 KpiKey）。[2] は全プリセットカタログ提示（D6）。
+  `presetPerTimeEffectValue`（lifetime-impact が参照）は API を変えず維持。v1 専用テスト（onboarding-logic /
+  onboarding-write / onboarding-messages）は v2 仕様で書き直す。redirect-guard（onboarding-redirect.test.ts）は
+  v2 でも不変なので変更しない。
+- 根拠: 唯一の非テスト consumer は wizard 本体（同時に作り替え）と lifetime-impact（`presetPerTimeEffectValue`
+  のみ・維持）。可逆かつ blast radius 最小。plan の「単一 selectedKpi 前提は撤去 or 配列化」に従う。
+
+### D-C5: Playwright E2E は本環境で自動実行不可 → [0]→[5] ロジックを node Vitest で固定
+- 問題: AC#10 は [0]→[5] 通し完走を E2E（Playwright）で要求するが、本リポの Playwright（`e2e-verify.spec.ts`）は
+  Google OAuth + 稼働サーバを前提とし、builder 環境（認証なし・サーバ起動不可）では自動実行できない。
+- 決定: v1 と同方針（D-C1/D-C2）で、UI はロジック（onboarding.ts）を消費するだけにし、[0]→[5] の核（state 遷移・
+  セクションA/B 相互排他・診断ゲート・結果ブロック表示・保存オーケストレーション）を node 環境 Vitest で固定する。
+  実ブラウザ通しは change-C verifier（sonnet）スコープで担う（checkpoint のモデル割当どおり）。
+- 根拠: 意思決定ガイドライン「正しさ優先」。テスト可能な核を純粋関数に寄せ回帰に強くする。可逆（後で Playwright
+  を足せる）。component 自体は build（next build）＋ lint で静的健全性を担保。
+
+### D-C6: 結果は保存前にプリセット選択状態から算出（established_since は年数→日付変換）
+- 問題: [4] 結果は habits 保存前（プリセット選択状態）に見せる。established の過去累積には開始日が要る。
+- 決定: `buildLifetimeImpactInput(state)` が active=future・established=past 母集団に振り分け、
+  `profileInputToUserProfile` で入力プロフィールを計算用 UserProfile に変換、`computeLifetimeImpact`（D-B1 の
+  プリセットID入力形）で算出する。「いつから」は `yearsAgoToEstablishedSince(yearsAgo)`（年数→YYYY-MM-DD・
+  負値は0年クランプ）で日付化し、保存時も同関数を再利用して [4] 表示と保存値を一致させる。
+- 根拠: 保存に依存しない計算入力で [4] を描け、表示と DB 書き込みの過去 horizon が同一根拠になる（不整合防止）。

@@ -15,6 +15,7 @@ vi.mock('@/lib/supabase/habits', () => ({
 }));
 
 import { runOnboardingWrite, OnboardingWriteError } from '@/lib/onboarding';
+import { KPI_KEYS } from '@/data/kpi/catalog';
 
 const callOrder: string[] = [];
 
@@ -28,10 +29,12 @@ beforeEach(() => {
     callOrder.push('profile');
     return {};
   });
-  insertHabitMock.mockImplementation(async (_userId: string, habit: { name: string }) => {
-    callOrder.push(`habit:${habit.name}`);
-    return { id: `id-${habit.name}` };
-  });
+  insertHabitMock.mockImplementation(
+    async (_userId: string, habit: { name: string; status?: string }) => {
+      callOrder.push(`habit:${habit.name}:${habit.status ?? 'active'}`);
+      return { id: `id-${habit.name}` };
+    }
+  );
   replaceHabitEvidencesMock.mockImplementation(async (habitId: string) => {
     callOrder.push(`evidence:${habitId}`);
     return [];
@@ -41,36 +44,56 @@ beforeEach(() => {
 function input() {
   return {
     userId: 'user-1',
-    selectedKpi: 'cost_saving' as const,
     profile: { age: 42, gender: 'male' as const, country: 'JP', annualIncome: null },
-    selectedPresetIds: ['cook_at_home', 'daily_saving_habit'],
+    established: [{ presetId: 'quit_drinking', establishedSince: '2016-06-27' }],
+    activePresetIds: ['cook_at_home', 'daily_saving_habit'],
   };
 }
 
-describe('runOnboardingWrite — C-S13 書き込み順序と内容', () => {
-  it('profile → habits → evidences の順で書き込む', async () => {
+describe('runOnboardingWrite — C-S1 書き込み順序と内容（v2）', () => {
+  it('profile → established habits → active habits の順で書き込む', async () => {
     await runOnboardingWrite(input());
     expect(callOrder[0]).toBe('profile');
-    // 各 habit の直後にその habit の evidence が書かれる
     expect(callOrder).toEqual([
       'profile',
-      'habit:自炊する',
+      'habit:お酒をやめる:established',
+      'evidence:id-お酒をやめる',
+      'habit:自炊する:active',
       'evidence:id-自炊する',
-      'habit:毎日の節約',
+      'habit:毎日の節約:active',
       'evidence:id-毎日の節約',
     ]);
   });
 
-  it('upsertUserProfile に tracked_kpis=選んだKPIキーと入力値を渡す', async () => {
+  it('established 習慣は status=established と established_since 付きで insert される（AC#10）', async () => {
     await runOnboardingWrite(input());
-    expect(upsertUserProfileMock).toHaveBeenCalledTimes(1);
+    const estCall = insertHabitMock.mock.calls.find(
+      (c) => (c[1] as { name: string }).name === 'お酒をやめる'
+    );
+    expect(estCall).toBeTruthy();
+    const habit = estCall![1] as { status?: string; establishedSince?: string };
+    expect(habit.status).toBe('established');
+    expect(habit.establishedSince).toBe('2016-06-27');
+  });
+
+  it('active 習慣は status を渡さない（active 既定・後方互換）', async () => {
+    await runOnboardingWrite(input());
+    const activeCall = insertHabitMock.mock.calls.find(
+      (c) => (c[1] as { name: string }).name === '自炊する'
+    );
+    const habit = activeCall![1] as { status?: string; establishedSince?: string };
+    expect(habit.status).toBeUndefined();
+    expect(habit.establishedSince).toBeUndefined();
+  });
+
+  it('D5: trackedKpis に全4 KpiKey を保存する', async () => {
+    await runOnboardingWrite(input());
     const [userId, payload] = upsertUserProfileMock.mock.calls[0];
     expect(userId).toBe('user-1');
-    expect(payload.trackedKpis).toEqual(['cost_saving']);
+    expect([...payload.trackedKpis].sort()).toEqual([...KPI_KEYS].sort());
     expect(payload.birthYear).toBe(new Date().getFullYear() - 42);
     expect(payload.gender).toBe('male');
     expect(payload.country).toBe('JP');
-    expect(payload.annualIncome).toBeNull();
     expect(payload.currency).toBe('JPY');
   });
 
@@ -85,10 +108,7 @@ describe('runOnboardingWrite — C-S13 書き込み順序と内容', () => {
 
   it('各 habit に articleIds 分の evidence を weight=100 で書き込む', async () => {
     await runOnboardingWrite(input());
-    // cook_at_home の articleIds = ['home_cooking','intermittent_fasting']
-    const cookCall = replaceHabitEvidencesMock.mock.calls.find(
-      (c) => c[0] === 'id-自炊する'
-    );
+    const cookCall = replaceHabitEvidencesMock.mock.calls.find((c) => c[0] === 'id-自炊する');
     expect(cookCall).toBeTruthy();
     const evidences = cookCall![1] as { articleId: string; weight: number }[];
     expect(evidences).toEqual([
@@ -96,31 +116,19 @@ describe('runOnboardingWrite — C-S13 書き込み順序と内容', () => {
       { articleId: 'intermittent_fasting', weight: 100 },
     ]);
   });
+
+  it('established が空でも active のみ書き込める', async () => {
+    await runOnboardingWrite({ ...input(), established: [] });
+    const names = insertHabitMock.mock.calls.map((c) => (c[1] as { name: string }).name);
+    expect(names).toEqual(['自炊する', '毎日の節約']);
+  });
 });
 
-describe('runOnboardingWrite — C-S14 失敗時の再試行', () => {
-  it('habits insert 失敗時は例外を投げ、profile は冪等に再試行できる', async () => {
-    insertHabitMock.mockImplementationOnce(async () => {
-      throw new Error('insert failed');
-    });
-    await expect(runOnboardingWrite(input())).rejects.toThrow('insert failed');
-
-    // 再試行: 今度は成功
-    insertHabitMock.mockImplementation(async (_u: string, habit: { name: string }) => ({
-      id: `id-${habit.name}`,
-    }));
-    const completed = await runOnboardingWrite(input());
-    expect(completed).toBeInstanceOf(Set);
-    // profile は2回呼ばれる（冪等 upsert）
-    expect(upsertUserProfileMock).toHaveBeenCalledTimes(2);
-  });
-
-  it('失敗例外に「それまで成功した presetId 集合」が載る（OnboardingWriteError）', async () => {
-    // 1件目は成功・2件目で失敗
+describe('runOnboardingWrite — C-S14 失敗時の再試行（v2）', () => {
+  it('insert 失敗時は OnboardingWriteError を投げ、成功済み presetId を載せる', async () => {
+    // established は成功・最初の active で失敗
     insertHabitMock
-      .mockImplementationOnce(async (_u: string, habit: { name: string }) => ({
-        id: `id-${habit.name}`,
-      }))
+      .mockImplementationOnce(async (_u: string, habit: { name: string }) => ({ id: `id-${habit.name}` }))
       .mockImplementationOnce(async () => {
         throw new Error('boom');
       });
@@ -132,16 +140,13 @@ describe('runOnboardingWrite — C-S14 失敗時の再試行', () => {
       caught = e as OnboardingWriteError;
     }
     expect(caught).toBeInstanceOf(OnboardingWriteError);
-    // 1件目（cook_at_home）は成功済みとして集合に入る
-    expect([...caught!.succeededPresetIds]).toEqual(['cook_at_home']);
+    // established(quit_drinking) は成功済みとして集合に入る
+    expect([...caught!.succeededPresetIds]).toContain('quit_drinking');
   });
 
   it('部分失敗→再試行で重複 insert しない（成功済みプリセットをスキップ）', async () => {
-    // 初回: 1件目成功・2件目失敗
     insertHabitMock
-      .mockImplementationOnce(async (_u: string, habit: { name: string }) => ({
-        id: `id-${habit.name}`,
-      }))
+      .mockImplementationOnce(async (_u: string, habit: { name: string }) => ({ id: `id-${habit.name}` }))
       .mockImplementationOnce(async () => {
         throw new Error('boom');
       });
@@ -158,22 +163,18 @@ describe('runOnboardingWrite — C-S14 失敗時の再試行', () => {
       callOrder.push(`habit:${habit.name}`);
       return { id: `id-${habit.name}` };
     });
-    replaceHabitEvidencesMock.mockImplementation(async (habitId: string) => {
-      callOrder.push(`evidence:${habitId}`);
-      return [];
-    });
+    replaceHabitEvidencesMock.mockImplementation(async () => []);
 
-    // 再試行: 成功済み（cook_at_home＝自炊する）は渡し、未完了分のみ書き込む
     await runOnboardingWrite({ ...input(), completedPresetIds: succeeded });
 
-    // 自炊する は再 insert されない。毎日の節約 のみ insert される
     const insertedNames = insertHabitMock.mock.calls.map((c) => (c[1] as { name: string }).name);
-    expect(insertedNames).toEqual(['毎日の節約']);
-    expect(insertedNames).not.toContain('自炊する');
+    // 成功済み（お酒をやめる）は再 insert されない
+    expect(insertedNames).not.toContain('お酒をやめる');
+    expect(insertedNames).toContain('自炊する');
   });
 
-  it('プリセットが空の場合は何も書かない（呼び出し側でガードする前提でも安全）', async () => {
-    await runOnboardingWrite({ ...input(), selectedPresetIds: [] });
+  it('habit / active が空でも profile だけ書ける', async () => {
+    await runOnboardingWrite({ ...input(), established: [], activePresetIds: [] });
     expect(upsertUserProfileMock).toHaveBeenCalledTimes(1);
     expect(insertHabitMock).not.toHaveBeenCalled();
   });

@@ -1,29 +1,43 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Check, ChevronLeft } from "lucide-react";
+import { Check, ChevronLeft, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth-provider";
 import { KPI_CATALOG, type KpiKey } from "@/data/kpi/catalog";
 import { KpiIcon } from "@/components/onboarding/kpi-icon";
 import {
   createInitialWizardState,
-  canAdvanceFromKpi,
   canAdvanceFromProfile,
   validateProfileInput,
-  canAdvanceFromPresets,
-  presetsForKpi,
+  canAdvanceFromHabits,
+  allHabitPresets,
+  isPresetEstablished,
+  isPresetActive,
+  toggleEstablished,
+  toggleActive,
+  setEstablishedYearsAgo,
   presetPerTimeEffectValue,
+  buildLifetimeImpactInput,
+  shouldShowPastBlock,
   runOnboardingWrite,
+  yearsAgoToEstablishedSince,
   OnboardingWriteError,
   type WizardState,
   type OnboardingGender,
 } from "@/lib/onboarding";
+import {
+  computeLifetimeImpact,
+  type LifetimeImpactResult,
+} from "@/lib/lifetime-impact";
 import { getHabitPreset } from "@/data/habit-presets";
 
-const TOTAL_STEPS = 4;
+// [0]イントロ 〜 [5]完了 の6画面。進捗バーは入力ステップ [1][2] のみを数える
+// （[0]/[3]/[4]/[5] は遷移・演出・結果なので「ステップN/M」のMには含めない）。
+const FORM_STEPS = 2; // [1] プロフィール / [2] 習慣選択
+const CALCULATING_MS = 2600;
 
 export function OnboardingWizard() {
   const t = useTranslations("onboarding");
@@ -32,57 +46,49 @@ export function OnboardingWizard() {
   const [state, setState] = useState<WizardState>(createInitialWizardState);
   const [writing, setWriting] = useState(false);
   const [writeError, setWriteError] = useState(false);
-  // 部分失敗→再試行で habit が重複 insert されないよう、書き込み成功済みの
-  // プリセットID集合をレンダーをまたいで保持する（D-C3）。
+  // 部分失敗→再試行で habit が重複 insert されないよう、成功済みのプリセットID集合を保持（D-C3）。
   const completedPresetIdsRef = useRef<Set<string>>(new Set());
 
-  const setStep = (step: WizardState["step"]) =>
-    setState((s) => ({ ...s, step }));
+  const setStep = (step: WizardState["step"]) => setState((s) => ({ ...s, step }));
 
-  const selectedKpiDef = useMemo(
-    () => KPI_CATALOG.find((d) => d.key === state.selectedKpi) ?? null,
-    [state.selectedKpi]
-  );
-
-  const presets = useMemo(
-    () => (state.selectedKpi ? presetsForKpi(state.selectedKpi) : []),
-    [state.selectedKpi]
-  );
-
+  const presets = allHabitPresets();
   const profileErrors = validateProfileInput(state.profile);
-
-  // ───────── ステップ操作 ─────────
-  const selectKpi = (key: KpiKey) =>
-    setState((s) => ({ ...s, selectedKpi: key }));
-
-  const togglePreset = (id: string) =>
-    setState((s) => ({
-      ...s,
-      selectedPresetIds: s.selectedPresetIds.includes(id)
-        ? s.selectedPresetIds.filter((p) => p !== id)
-        : [...s.selectedPresetIds, id],
-    }));
 
   const updateProfile = (patch: Partial<WizardState["profile"]>) =>
     setState((s) => ({ ...s, profile: { ...s.profile, ...patch } }));
 
+  // [4] 結果（過去累積＋未来一生分）。step が 4 のときだけ計算する。
+  const result: LifetimeImpactResult | null = useMemo(() => {
+    if (state.step < 4) return null;
+    return computeLifetimeImpact(buildLifetimeImpactInput(state));
+  }, [state]);
+
+  // [3] 計算中アニメーション → 数秒で [4] へ自動遷移
+  useEffect(() => {
+    if (state.step !== 3) return;
+    const id = setTimeout(() => setStep(4), CALCULATING_MS);
+    return () => clearTimeout(id);
+  }, [state.step]);
+
   const handleStart = async () => {
-    if (!user || !state.selectedKpi) return;
+    if (!user) return;
     setWriting(true);
     setWriteError(false);
     try {
-      // 前回までに成功したプリセットを引き継ぎ、未完了分のみ書き込む（重複防止・D-C3）
       const completed = await runOnboardingWrite({
         userId: user.id,
-        selectedKpi: state.selectedKpi,
         profile: state.profile,
-        selectedPresetIds: state.selectedPresetIds,
+        established: state.established.map((e) => ({
+          presetId: e.presetId,
+          establishedSince: yearsAgoToEstablishedSince(e.yearsAgo),
+        })),
+        activePresetIds: state.activePresetIds,
         completedPresetIds: completedPresetIdsRef.current,
       });
       completedPresetIdsRef.current = completed;
-      router.push("/");
+      setWriting(false);
+      setStep(5);
     } catch (error) {
-      // 失敗時も、それまでに成功した集合は次の再試行のために保持する
       if (error instanceof OnboardingWriteError) {
         completedPresetIdsRef.current = error.succeededPresetIds;
       }
@@ -93,76 +99,33 @@ export function OnboardingWizard() {
 
   return (
     <div className="space-y-8">
-      <StepProgress current={state.step} total={TOTAL_STEPS} />
+      {(state.step === 1 || state.step === 2) && (
+        <StepProgress current={state.step} total={FORM_STEPS} />
+      )}
 
-      {state.step === 1 && (
-        <section className="space-y-6">
-          <Heading
-            title={t("step1.title")}
-            subtitle={t("step1.subtitle")}
-          />
-          <div className="grid gap-3">
-            {KPI_CATALOG.map((def) => {
-              const selected = state.selectedKpi === def.key;
-              return (
-                <button
-                  key={def.key}
-                  type="button"
-                  onClick={() => selectKpi(def.key)}
-                  aria-pressed={selected}
-                  className={cn(
-                    "flex items-start gap-4 rounded-2xl border p-4 text-left transition-all",
-                    selected
-                      ? "border-primary bg-primary/5 ring-2 ring-primary/30"
-                      : "border-border bg-card hover:border-primary/40"
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "flex size-11 shrink-0 items-center justify-center rounded-xl",
-                      selected
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-muted-foreground"
-                    )}
-                  >
-                    <KpiIcon name={def.icon} className="size-5" />
-                  </span>
-                  <span className="min-w-0 flex-1 space-y-1">
-                    <span className="block font-semibold leading-tight">
-                      {t(`kpi.${def.key}.headline`)}
-                    </span>
-                    <span className="block text-sm text-muted-foreground">
-                      {t(`kpi.${def.key}.name`)}
-                    </span>
-                    <span className="block text-xs text-muted-foreground/80">
-                      {t(`kpi.${def.key}.description`)}
-                    </span>
-                  </span>
-                  {selected && (
-                    <Check className="size-5 shrink-0 text-primary" aria-hidden />
-                  )}
-                </button>
-              );
-            })}
+      {/* ───────── [0] イントロ ───────── */}
+      {state.step === 0 && (
+        <section className="flex min-h-[60dvh] flex-col justify-center space-y-8 text-center">
+          <div className="space-y-3">
+            <h1 className="text-3xl font-bold leading-tight tracking-tight">
+              {t("intro.title")}
+            </h1>
+            <p className="text-base text-muted-foreground">{t("intro.subtitle")}</p>
           </div>
-          <p className="text-center text-xs text-muted-foreground">
-            {t("step1.note")}
-          </p>
-          <PrimaryButton
-            disabled={!canAdvanceFromKpi(state.selectedKpi)}
-            onClick={() => setStep(2)}
-          >
-            {t("step1.next")}
-          </PrimaryButton>
+          <div className="space-y-3">
+            <PrimaryButton onClick={() => setStep(1)}>{t("intro.cta")}</PrimaryButton>
+            <p className="text-xs text-muted-foreground">{t("intro.note")}</p>
+          </div>
         </section>
       )}
 
-      {state.step === 2 && (
+      {/* ───────── [1] プロフィール ───────── */}
+      {state.step === 1 && (
         <section className="space-y-6">
-          <BackLink label={t("back")} onClick={() => setStep(1)} />
-          <Heading title={t("step2.title")} subtitle={t("step2.subtitle")} />
+          <BackLink label={t("back")} onClick={() => setStep(0)} />
+          <Heading title={t("profile.title")} subtitle={t("profile.subtitle")} />
           <div className="space-y-5">
-            <Field label={t("step2.age")}>
+            <Field label={t("profile.age")}>
               <input
                 type="number"
                 inputMode="numeric"
@@ -178,7 +141,7 @@ export function OnboardingWizard() {
               />
             </Field>
 
-            <Field label={t("step2.gender")}>
+            <Field label={t("profile.gender")}>
               <select
                 value={state.profile.gender ?? ""}
                 onChange={(e) =>
@@ -191,26 +154,23 @@ export function OnboardingWizard() {
                 <option value="" disabled>
                   —
                 </option>
-                <option value="male">{t("step2.genderMale")}</option>
-                <option value="female">{t("step2.genderFemale")}</option>
-                <option value="other">{t("step2.genderOther")}</option>
+                <option value="male">{t("profile.genderMale")}</option>
+                <option value="female">{t("profile.genderFemale")}</option>
+                <option value="other">{t("profile.genderOther")}</option>
               </select>
             </Field>
 
-            <Field label={t("step2.country")}>
+            <Field label={t("profile.country")}>
               <select
                 value={state.profile.country}
                 onChange={(e) => updateProfile({ country: e.target.value })}
                 className={inputClass(false)}
               >
-                <option value="JP">{t("step2.countryJapan")}</option>
+                <option value="JP">{t("profile.countryJapan")}</option>
               </select>
             </Field>
 
-            <Field
-              label={t("step2.annualIncome")}
-              hint={t("step2.optional")}
-            >
+            <Field label={t("profile.annualIncome")} hint={t("profile.optional")}>
               <input
                 type="number"
                 inputMode="numeric"
@@ -218,177 +178,362 @@ export function OnboardingWizard() {
                 value={state.profile.annualIncome ?? ""}
                 onChange={(e) =>
                   updateProfile({
-                    annualIncome:
-                      e.target.value === "" ? null : Number(e.target.value),
+                    annualIncome: e.target.value === "" ? null : Number(e.target.value),
                   })
                 }
                 className={inputClass(!!profileErrors.annualIncome)}
               />
               <p className="mt-2 text-xs text-muted-foreground">
-                {t("step2.incomeNote")}
+                {t("profile.incomeNote")}
               </p>
             </Field>
           </div>
           <PrimaryButton
             disabled={!canAdvanceFromProfile(state.profile)}
-            onClick={() => setStep(3)}
+            onClick={() => setStep(2)}
           >
-            {t("step2.next")}
+            {t("profile.next")}
           </PrimaryButton>
         </section>
       )}
 
-      {state.step === 3 && selectedKpiDef && (
+      {/* ───────── [2] 習慣選択（2分類） ───────── */}
+      {state.step === 2 && (
         <section className="space-y-6">
-          <BackLink label={t("back")} onClick={() => setStep(2)} />
-          <Heading
-            title={t("step3.title", {
-              copy: t(`kpi.${selectedKpiDef.key}.headline`),
-            })}
-            subtitle={t("step3.subtitle")}
-          />
-          <div className="grid gap-3">
-            {presets.map((preset) => {
-              const selected = state.selectedPresetIds.includes(preset.id);
-              const effectData = presetPerTimeEffectValue(
-                preset.id,
-                selectedKpiDef.key
-              );
-              const effect = effectData
-                ? t(
-                    effectData.isReduction
-                      ? "step3.effectReduction"
-                      : "step3.effectGain",
-                    {
-                      kpiName: t(`kpi.${effectData.kpi}.name`),
-                      value: effectData.value.toLocaleString(),
-                      unit: t(`kpi.${effectData.kpi}.unit`),
-                    }
-                  )
-                : null;
-              return (
-                <button
-                  key={preset.id}
-                  type="button"
-                  onClick={() => togglePreset(preset.id)}
-                  aria-pressed={selected}
-                  className={cn(
-                    "flex items-center gap-4 rounded-2xl border p-4 text-left transition-all",
-                    selected
-                      ? "border-primary bg-primary/5 ring-2 ring-primary/30"
-                      : "border-border bg-card hover:border-primary/40"
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "flex size-11 shrink-0 items-center justify-center rounded-xl",
-                      selected
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-muted-foreground"
-                    )}
-                  >
-                    <KpiIcon name={preset.icon} className="size-5" />
-                  </span>
-                  <span className="min-w-0 flex-1 space-y-1">
-                    <span className="block font-semibold leading-tight">
-                      {t(`preset.${preset.id}`)}
-                    </span>
-                    {effect && (
-                      <span className="block text-xs text-muted-foreground">
-                        {t("step3.effectPerTime", { effect })}
-                      </span>
-                    )}
-                  </span>
-                  {selected && (
-                    <Check className="size-5 shrink-0 text-primary" aria-hidden />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-          <PrimaryButton
-            disabled={!canAdvanceFromPresets(state.selectedPresetIds)}
-            onClick={() => setStep(4)}
-          >
-            {t("step3.start")}
-          </PrimaryButton>
-        </section>
-      )}
+          <BackLink label={t("back")} onClick={() => setStep(1)} />
+          <Heading title={t("habits.title")} subtitle={t("habits.subtitle")} />
 
-      {state.step === 4 && selectedKpiDef && (
-        <section className="space-y-6">
-          <BackLink label={t("back")} onClick={() => setStep(3)} />
-          <Heading
-            title={t("step4.title")}
-            subtitle={t("step4.body", {
-              kpiName: t(`kpi.${selectedKpiDef.key}.name`),
-            })}
-          />
-
-          <div className="rounded-2xl border border-border bg-card p-5">
-            <div className="flex items-center justify-between">
-              <span className="flex items-center gap-3 font-semibold">
-                <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <KpiIcon name={selectedKpiDef.icon} className="size-5" />
-                </span>
-                {t(`kpi.${selectedKpiDef.key}.name`)}
-              </span>
-              <span className="text-right">
-                <span className="text-xs text-muted-foreground">
-                  {t("step4.currentValueLabel")}
-                </span>
-                <span className="block text-2xl font-bold tabular-nums">
-                  0
-                  <span className="ml-1 text-sm font-normal text-muted-foreground">
-                    {t(`kpi.${selectedKpiDef.key}.unit`)}
-                  </span>
-                </span>
-              </span>
+          {/* セクションA: 既に習慣になっているもの（established） */}
+          <div className="space-y-3">
+            <SectionHeading
+              title={t("habits.establishedHeading")}
+              note={t("habits.establishedNote")}
+            />
+            <div className="grid gap-3">
+              {presets.map((preset) => {
+                const selected = isPresetEstablished(state, preset.id);
+                const since = state.established.find((e) => e.presetId === preset.id);
+                return (
+                  <div key={`est-${preset.id}`} className="space-y-2">
+                    <PresetCard
+                      label={t(`preset.${preset.id}`)}
+                      icon={preset.icon}
+                      selected={selected}
+                      onClick={() => setState((s) => toggleEstablished(s, preset.id))}
+                    />
+                    {selected && since && (
+                      <div className="flex items-center gap-2 pl-2 text-sm">
+                        <label className="text-muted-foreground">
+                          {t("habits.sinceLabel")}
+                        </label>
+                        <input
+                          type="number"
+                          inputMode="numeric"
+                          min={0}
+                          max={80}
+                          value={since.yearsAgo}
+                          onChange={(e) =>
+                            setState((s) =>
+                              setEstablishedYearsAgo(
+                                s,
+                                preset.id,
+                                e.target.value === "" ? 0 : Number(e.target.value)
+                              )
+                            )
+                          }
+                          className="w-20 rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                        />
+                        <span className="text-muted-foreground">
+                          {t("habits.sinceUnit")}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-muted-foreground">
-              {t("step4.habitsLabel")}
-            </p>
-            <ul className="space-y-2">
-              {state.selectedPresetIds.map((id) => {
-                const preset = getHabitPreset(id);
-                if (!preset) return null;
+          {/* セクションB: これから始めたいもの（active） */}
+          <div className="space-y-3">
+            <SectionHeading
+              title={t("habits.activeHeading")}
+              note={t("habits.activeNote")}
+            />
+            <div className="grid gap-3">
+              {presets.map((preset) => {
+                const selected = isPresetActive(state, preset.id);
+                const effect = formatPerTimeEffect(t, preset.id);
                 return (
-                  <li
-                    key={id}
-                    className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3"
-                  >
-                    <span className="flex size-8 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-                      <KpiIcon name={preset.icon} className="size-4" />
-                    </span>
-                    <span className="font-medium">{t(`preset.${preset.id}`)}</span>
-                  </li>
+                  <PresetCard
+                    key={`act-${preset.id}`}
+                    label={t(`preset.${preset.id}`)}
+                    icon={preset.icon}
+                    subtitle={effect ? t("habits.effectPerTime", { effect }) : undefined}
+                    selected={selected}
+                    onClick={() => setState((s) => toggleActive(s, preset.id))}
+                  />
                 );
               })}
-            </ul>
+            </div>
           </div>
+
+          <PrimaryButton
+            disabled={!canAdvanceFromHabits(state.activePresetIds)}
+            onClick={() => setStep(3)}
+          >
+            {t("habits.cta")}
+          </PrimaryButton>
+        </section>
+      )}
+
+      {/* ───────── [3] 計算中 ───────── */}
+      {state.step === 3 && (
+        <section className="flex min-h-[60dvh] flex-col items-center justify-center space-y-6 text-center">
+          <Loader2 className="size-10 animate-spin text-primary" aria-hidden />
+          <h1 className="text-xl font-bold tracking-tight">{t("calculating.title")}</h1>
+          <ul className="space-y-1.5 text-sm text-muted-foreground" aria-live="polite">
+            <li>{t("calculating.phase1")}</li>
+            <li>{t("calculating.phase2")}</li>
+            <li>{t("calculating.phase3")}</li>
+          </ul>
+        </section>
+      )}
+
+      {/* ───────── [4] 結果（二段構え） ───────── */}
+      {state.step === 4 && result && (
+        <section className="space-y-6">
+          <Heading title={t("result.title")} subtitle={t("result.futureNote")} />
+
+          {/* ブロック1: 過去累積（既存習慣がある場合のみ） */}
+          {shouldShowPastBlock(result) && (
+            <ResultBlock
+              heading={t("result.pastHeading")}
+              estimatedLabel={t("result.estimatedLabel")}
+              result={result}
+              variant="past"
+              t={t}
+            />
+          )}
+
+          {/* ブロック2: 未来一生分 */}
+          <ResultBlock
+            heading={t("result.futureHeading")}
+            result={result}
+            variant="future"
+            t={t}
+          />
 
           {writeError && (
             <div
               role="alert"
               className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive"
             >
-              {t("step4.writeError")}
+              {t("writeError")}
             </div>
           )}
 
           <PrimaryButton disabled={writing} onClick={handleStart}>
-            {writing ? t("step4.starting") : t("step4.start")}
+            {writing ? t("starting") : t("result.cta")}
           </PrimaryButton>
+          <p className="text-center text-xs text-muted-foreground">
+            {t("result.footnote")}
+          </p>
+        </section>
+      )}
+
+      {/* ───────── [5] 完了 ───────── */}
+      {state.step === 5 && (
+        <section className="space-y-6">
+          <Heading title={t("done.title")} subtitle={t("done.body")} />
+
+          {state.established.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-muted-foreground">
+                {t("done.establishedLabel")}
+              </p>
+              <ul className="space-y-2">
+                {state.established.map((e) => (
+                  <HabitRow
+                    key={e.presetId}
+                    presetId={e.presetId}
+                    label={t(`preset.${e.presetId}`)}
+                    badge={t("done.establishedBadge")}
+                  />
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-muted-foreground">
+              {t("done.activeLabel")}
+            </p>
+            <ul className="space-y-2">
+              {state.activePresetIds.map((id) => (
+                <HabitRow key={id} presetId={id} label={t(`preset.${id}`)} />
+              ))}
+            </ul>
+          </div>
+
+          <PrimaryButton onClick={() => router.push("/")}>{t("done.cta")}</PrimaryButton>
         </section>
       )}
     </div>
   );
 }
 
+// ───────── 結果ブロック ─────────
+
+function ResultBlock({
+  heading,
+  estimatedLabel,
+  result,
+  variant,
+  t,
+}: {
+  heading: string;
+  estimatedLabel?: string;
+  result: LifetimeImpactResult;
+  variant: "past" | "future";
+  t: ReturnType<typeof useTranslations>;
+}) {
+  return (
+    <div className="space-y-3 rounded-2xl border border-border bg-card p-5">
+      <div className="flex items-center justify-between">
+        <h2 className="font-semibold">{heading}</h2>
+        {estimatedLabel && (
+          <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+            {estimatedLabel}
+          </span>
+        )}
+      </div>
+      <ul className="grid gap-3 sm:grid-cols-2">
+        {KPI_CATALOG.map((def) => {
+          const value = result.byKpi[def.key][variant];
+          return (
+            <li key={def.key} className="flex items-center gap-3">
+              <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <KpiIcon name={def.icon} className="size-5" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-xs text-muted-foreground">
+                  {t(`kpi.${def.key}.name`)}
+                </span>
+                <span className="block text-lg font-bold tabular-nums">
+                  {formatKpiValue(t, def.key, value)}
+                </span>
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+/** KPI 値を符号付き・単位付きで表示する。健康寿命/前向きは年、出費削減/稼ぐ能力は円。 */
+function formatKpiValue(
+  t: ReturnType<typeof useTranslations>,
+  kpi: KpiKey,
+  value: number
+): string {
+  const isMinute = kpi === "health_lifespan" || kpi === "positive_mood";
+  const unit = isMinute ? t("result.unitYear") : t("result.unitYen");
+  const tmpl = kpi === "cost_saving" ? "result.valueReduction" : "result.valueGain";
+  return t(tmpl, { value: value.toLocaleString(), unit });
+}
+
+/** プリセットの「1回あたり効果」を i18n 済み文字列にする（複数 KPI のうち効果のある最初の軸）。 */
+function formatPerTimeEffect(
+  t: ReturnType<typeof useTranslations>,
+  presetId: string
+): string | null {
+  const preset = getHabitPreset(presetId);
+  if (!preset) return null;
+  for (const kpi of preset.primaryKpis) {
+    const eff = presetPerTimeEffectValue(presetId, kpi);
+    if (!eff) continue;
+    return t(eff.isReduction ? "habits.effectReduction" : "habits.effectGain", {
+      kpiName: t(`kpi.${eff.kpi}.name`),
+      value: eff.value.toLocaleString(),
+      unit: t(`kpi.${eff.kpi}.unit`),
+    });
+  }
+  return null;
+}
+
 // ───────── プレゼンテーション小物 ─────────
+
+function PresetCard({
+  label,
+  icon,
+  subtitle,
+  selected,
+  onClick,
+}: {
+  label: string;
+  icon: string;
+  subtitle?: string;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={selected}
+      className={cn(
+        "flex items-center gap-4 rounded-2xl border p-4 text-left transition-all",
+        selected
+          ? "border-primary bg-primary/5 ring-2 ring-primary/30"
+          : "border-border bg-card hover:border-primary/40"
+      )}
+    >
+      <span
+        className={cn(
+          "flex size-11 shrink-0 items-center justify-center rounded-xl",
+          selected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+        )}
+      >
+        <KpiIcon name={icon} className="size-5" />
+      </span>
+      <span className="min-w-0 flex-1 space-y-1">
+        <span className="block font-semibold leading-tight">{label}</span>
+        {subtitle && (
+          <span className="block text-xs text-muted-foreground">{subtitle}</span>
+        )}
+      </span>
+      {selected && <Check className="size-5 shrink-0 text-primary" aria-hidden />}
+    </button>
+  );
+}
+
+function HabitRow({
+  presetId,
+  label,
+  badge,
+}: {
+  presetId: string;
+  label: string;
+  badge?: string;
+}) {
+  const preset = getHabitPreset(presetId);
+  if (!preset) return null;
+  return (
+    <li className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3">
+      <span className="flex size-8 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+        <KpiIcon name={preset.icon} className="size-4" />
+      </span>
+      <span className="flex-1 font-medium">{label}</span>
+      {badge && (
+        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
+          {badge}
+        </span>
+      )}
+    </li>
+  );
+}
 
 function StepProgress({ current, total }: { current: number; total: number }) {
   const t = useTranslations("onboarding");
@@ -412,13 +557,7 @@ function StepProgress({ current, total }: { current: number; total: number }) {
   );
 }
 
-function Heading({
-  title,
-  subtitle,
-}: {
-  title: string;
-  subtitle: string;
-}) {
+function Heading({ title, subtitle }: { title: string; subtitle: string }) {
   return (
     <div className="space-y-1.5">
       <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
@@ -427,13 +566,16 @@ function Heading({
   );
 }
 
-function BackLink({
-  label,
-  onClick,
-}: {
-  label: string;
-  onClick: () => void;
-}) {
+function SectionHeading({ title, note }: { title: string; note: string }) {
+  return (
+    <div className="space-y-1">
+      <h2 className="text-base font-semibold">{title}</h2>
+      <p className="text-xs text-muted-foreground">{note}</p>
+    </div>
+  );
+}
+
+function BackLink({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <button
       type="button"

@@ -250,12 +250,6 @@
   "onboarding": {
     "stepLabel": "ステップ {current} / {total}",
     "back": "戻る",
-    "step1": {
-      "title": "どんな自分に切り替えますか？",
-      "subtitle": "まずは1つに集中しましょう。あとからいつでも変えられます。",
-      "next": "次へ",
-      "note": "どの数字も科学研究にもとづいて計算します"
-    },
     "kpi": {
       "health_lifespan": {
         "headline": "長く健康でいられる自分へ",
@@ -301,9 +295,15 @@
       "cut_digital_distraction": "デジタルの誘惑を断つ",
       "keep_learning": "学び続ける"
     },
-    "step2": {
-      "title": "あなたの数字で計算します",
-      "subtitle": "選んだKPIをあなた用に計算するために使います。",
+    "intro": {
+      "title": "あなたの毎日の習慣は、一生でどれだけの差を生む？",
+      "subtitle": "いくつかの質問に答えるだけ。今のあなたに、習慣が一生でどれだけのインパクトを生むかを診断します。",
+      "cta": "診断を始める",
+      "note": "どの数字も科学研究にもとづいて計算します"
+    },
+    "profile": {
+      "title": "あなたのことを教えてください",
+      "subtitle": "一生のインパクトをあなた用に計算するために使います。",
       "age": "年齢",
       "gender": "性別",
       "country": "国",
@@ -316,22 +316,48 @@
       "incomeNote": "未入力の場合は、年齢・性別・国の平均年収を使って計算します",
       "next": "次へ"
     },
-    "step3": {
-      "title": "「{copy}」に効く習慣",
-      "subtitle": "続けやすいものを1つ以上選んでください。あとから追加・削除できます。",
+    "habits": {
+      "title": "あなたの習慣を教えてください",
+      "subtitle": "続けやすいものを選びましょう。あとから追加・削除できます。",
+      "establishedHeading": "もう習慣になっているもの",
+      "establishedNote": "選ぶと「習慣化済み」になり、これまで積み上げてきたぶんを計算します。",
+      "activeHeading": "これから始めたいもの",
+      "activeNote": "1つ以上選ぶと診断できます。",
+      "sinceLabel": "いつから？",
+      "sinceUnit": "年前",
       "effectPerTime": "1回ごとに {effect}",
       "effectReduction": "{kpiName} −{value}{unit}",
       "effectGain": "{kpiName} +{value}{unit}",
-      "start": "この習慣ではじめる"
+      "cta": "診断する"
     },
-    "step4": {
+    "calculating": {
+      "title": "あなたの一生を計算しています…",
+      "phase1": "これまで積み上げてきたぶんを集計中…",
+      "phase2": "研究データと照合中…",
+      "phase3": "これから積み上がるぶんを計算中…"
+    },
+    "result": {
+      "title": "あなたの一生のインパクト",
+      "pastHeading": "あなたはもう、これだけ積んできました",
+      "futureHeading": "続ければ、これだけ積み上がります",
+      "estimatedLabel": "推定",
+      "valueGain": "+{value}{unit}",
+      "valueReduction": "−{value}{unit}",
+      "unitYear": "年",
+      "unitYen": "円",
+      "futureNote": "未来のぶんは「今日の1回」を一生続けたときの差です。",
+      "cta": "この内容ではじめる",
+      "footnote": "計算の前提（年齢・性別・国・年収）は設定からいつでも見直せます"
+    },
+    "done": {
       "title": "準備ができました",
-      "body": "今日の1回から、あなたの「{kpiName}」が積み上がっていきます。",
-      "currentValueLabel": "現在値",
-      "habitsLabel": "選んだ習慣",
-      "start": "はじめる",
-      "writeError": "保存に失敗しました。もう一度お試しください。",
-      "starting": "準備中..."
-    }
+      "body": "今日の1回から、あなたのインパクトが積み上がっていきます。",
+      "establishedLabel": "習慣化済み",
+      "activeLabel": "これから始める",
+      "establishedBadge": "習慣化済み",
+      "cta": "はじめる"
+    },
+    "writeError": "保存に失敗しました。もう一度お試しください。",
+    "starting": "準備中..."
   }
 }
