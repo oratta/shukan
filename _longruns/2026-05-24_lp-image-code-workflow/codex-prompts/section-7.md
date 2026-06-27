@@ -42,7 +42,7 @@ Color palette: Deep Indigo `#2B4162` + warm cream `#F8F9FA` + warm wood tone. Ed
 - A large opening quotation mark `"` (editorial serif italic, muted family color, oversized).
 - Large quote (editorial serif, 2-3 lines):
   ```
-  ストリークを守るためではなく、
+  連続日数を守るためではなく、
   自分の生活に意味があるかで
   習慣を選べた。
   ```

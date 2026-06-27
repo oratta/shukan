@@ -49,7 +49,7 @@ Color palette: Deep Indigo `#2B4162` + warm cream `#F8F9FA` + warm wood tone. Ed
 1. `メールアドレス *` — text input field
 2. `使いたい環境（複数可） *` — 2x2 grid of checkboxes labeled `Web (PC)` / `Web (Mobile)` / `iOS (Mobile)` / `Android (Mobile)`
 3. `使っている類似アプリ` (任意) — text input, placeholder `Habitify / Streaks / 何も使ってない 等`
-4. `困っている理由 / 足りないポイント` (任意) — textarea, placeholder `ストリークが切れると無に帰す感じ 等`
+4. `困っている理由 / 足りないポイント` (任意) — textarea, placeholder `連続日数が切れると無に帰す感じ 等`
 5. `困りごとが解消されるなら月いくらまで払えますか` (任意) — 6 radio pills: `¥0` / `¥300` / `¥500` / `¥1,000` / `¥2,000` / `¥3,000+`
 6. `どんなふうに自分を変えたいですか` (任意) — textarea, placeholder `もっと落ち着いて判断できる人になりたい 等`
 7. Full-width primary button (Deep Indigo solid background, white text): `先行体験に登録する`

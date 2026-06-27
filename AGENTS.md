@@ -1,6 +1,6 @@
-# CLAUDE.md — Smitch (shukan-app)
+# AGENTS.md — Smitch (shukan-app)
 
-このリポジトリで Claude Code が作業する際の **プロジェクト常時参照ドキュメント**。
+このリポジトリで Codex が作業する際の **プロジェクト常時参照ドキュメント**。
 新しい session を開始したら本ファイルと `docs/design/DESIGN.md` を最初に読むこと。
 
 ---
@@ -51,7 +51,7 @@ LP / アプリのコピーや設計判断は **以下のコンセプトコアに
 
 1. **Codex CLI (gpt-image-2)** で reference 16 枚 + Smitch Style Block を渡して section 画像を生成
 2. ユーザーが variants から 1 つ curate → `public/landing/<section>.png`
-3. **Claude Code (frontend-design plugin + shadcn skill)** で section ごとに React component を実装
+3. **Codex (frontend-design plugin + shadcn skill)** で section ごとに React component を実装
 4. `src/app/marketing/page.tsx` で統合 (change-H のみが触る)
 
 ### Codex 呼び出しラッパ
@@ -71,7 +71,7 @@ bash scripts/check-design-md-sync.sh
 ## Hard Rules (LP image-to-code)
 
 リサーチドキュメント §3.3 ベース + Smitch 確定値。**enforceable** rule (aspirational ではない)。
-本ルールは Codex 画像プロンプトと Claude Code の実装プロンプトに **毎回 append される前提**。
+本ルールは Codex 画像プロンプトと Codex の実装プロンプトに **毎回 append される前提**。
 
 ### Stack rules
 
@@ -135,7 +135,7 @@ bash scripts/check-design-md-sync.sh
 ### コミット粒度
 
 - 細かい単位 (1 機能 / 1 修正 / 1 ステップ) でコミット
-- メッセージ末尾に `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>`
+- メッセージ末尾に `Co-Authored-By: Codex Opus 4.7 (1M context) <noreply@anthropic.com>`
 - main / master への直接 push は **明示承認なしには NG**
 
 ---
