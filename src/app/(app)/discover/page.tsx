@@ -8,7 +8,7 @@ import { formatCurrency, formatHealthMinutes, calculateAnnualImpact } from '@/li
 import { EvidenceArticleSheet } from '@/components/habits/evidence-article-sheet';
 import { HabitForm } from '@/components/habits/habit-form';
 import { useHabits } from '@/hooks/useHabits';
-import type { Habit } from '@/types/habit';
+import type { HabitInsertInput } from '@/types/habit';
 import type { ArticleId } from '@/types/impact';
 
 /** Unsplash hero image URLs per article category */
@@ -136,7 +136,7 @@ export default function DiscoverPage() {
 
   const handleFormSubmit = useCallback(
     (
-      data: Omit<Habit, 'id' | 'createdAt' | 'archived' | 'sortOrder'>,
+      data: HabitInsertInput,
       copingSteps?: { title: string; sortOrder: number }[],
       initialEvidences?: { articleId: string; weight: number }[]
     ) => {

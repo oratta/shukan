@@ -16,7 +16,7 @@ import { shouldShowToday, getHabitsWithStats, getTodayString, getYesterdayUnrevi
 import { getArticle } from '@/data/impact-articles';
 import { useAuth } from '@/components/auth-provider';
 import { upsertDailyReflection } from '@/lib/supabase/habits';
-import type { Habit } from '@/types/habit';
+import type { Habit, HabitInsertInput } from '@/types/habit';
 
 export default function DashboardPage() {
   const t = useTranslations();
@@ -118,7 +118,7 @@ export default function DashboardPage() {
 
   const handleSubmit = useCallback(
     (
-      data: Omit<Habit, 'id' | 'createdAt' | 'archived' | 'sortOrder'>,
+      data: HabitInsertInput,
       copingSteps?: { title: string; sortOrder: number }[],
       initialEvidences?: { articleId: string; weight: number }[]
     ) => {

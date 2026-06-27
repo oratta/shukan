@@ -35,7 +35,7 @@ import {
 import { cn } from '@/lib/utils';
 import { getArticle } from '@/data/impact-articles';
 import { EvidencePicker } from '@/components/habits/evidence-picker';
-import type { Habit } from '@/types/habit';
+import type { Habit, HabitInsertInput } from '@/types/habit';
 import type { ArticleId } from '@/types/impact';
 
 import { ICON_OPTIONS } from '@/lib/icon-registry';
@@ -51,7 +51,7 @@ interface HabitFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (
-    data: Omit<Habit, 'id' | 'createdAt' | 'archived' | 'sortOrder'>,
+    data: HabitInsertInput,
     copingSteps?: { title: string; sortOrder: number }[],
     initialEvidences?: EvidenceEntry[]
   ) => void;

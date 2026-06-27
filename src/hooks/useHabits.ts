@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import type { Habit, HabitCompletion, HabitWithStats, CopingStep, UrgeLog } from '@/types/habit';
+import type { Habit, HabitInsertInput, HabitCompletion, HabitWithStats, CopingStep, UrgeLog } from '@/types/habit';
 import { useAuth } from '@/components/auth-provider';
 import { getTodayString, getHabitsWithStats } from '@/lib/habits';
 import { getArticle } from '@/data/impact-articles';
@@ -81,7 +81,7 @@ export function useHabits() {
 
   const addHabit = useCallback(
     async (
-      habit: Omit<Habit, 'id' | 'createdAt' | 'archived' | 'sortOrder'>,
+      habit: HabitInsertInput,
       copingSteps?: { title: string; sortOrder: number }[],
       initialEvidences?: { articleId: string; weight: number }[]
     ) => {

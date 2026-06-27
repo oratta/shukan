@@ -4,7 +4,7 @@
 // ロジックを分離する（decisions.md D-C2）。これにより node 環境の Vitest で
 // クリック→state 遷移・バリデーション・書き込み順序を単体検証できる（D-C1）。
 
-import type { Habit } from '@/types/habit';
+import type { HabitInsertInput } from '@/types/habit';
 import type { KpiKey } from '@/data/kpi/catalog';
 import { getKpi } from '@/data/kpi/catalog';
 import { getHabitPreset, getPresetsForKpi, type HabitPreset } from '@/data/habit-presets';
@@ -174,7 +174,7 @@ export function presetPerTimeEffectValue(
  */
 export function buildHabitFromPreset(
   presetId: string
-): Omit<Habit, 'id' | 'createdAt' | 'archived' | 'sortOrder'> | null {
+): HabitInsertInput | null {
   const preset = getHabitPreset(presetId);
   if (!preset) return null;
 

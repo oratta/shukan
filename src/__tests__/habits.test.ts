@@ -45,6 +45,7 @@ function makeHabit(overrides: Partial<Habit> & { id: string }): Habit {
     archived: false,
     evidences: [],
     sortOrder: 0,
+    status: 'active',
     ...overrides,
   };
 }

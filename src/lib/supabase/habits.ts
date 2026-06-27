@@ -1,9 +1,9 @@
-import type { Habit, HabitCompletion, CopingStep, UrgeLog, DailyReflection } from '@/types/habit';
+import type { Habit, HabitInsertInput, HabitCompletion, CopingStep, UrgeLog, DailyReflection } from '@/types/habit';
 import type { HabitEvidence } from '@/types/impact';
 import { isValidArticleId } from '@/types/impact';
 import { createClient } from './client';
 
-interface HabitRow {
+export interface HabitRow {
   id: string;
   user_id: string;
   name: string;
@@ -18,6 +18,26 @@ interface HabitRow {
   created_at: string;
   archived: boolean;
   impact_article_id: string | null;
+  sort_order: number;
+  status: 'active' | 'established';
+  established_since: string | null;
+}
+
+/** insert 用の snake_case 行型（id/created_at/archived は DB 割り当て）。 */
+export interface HabitInsertRow {
+  user_id: string;
+  name: string;
+  description: string | null;
+  life_significance: string | null;
+  icon: string;
+  frequency: 'everyday' | 'weekday' | 'custom' | 'weekly';
+  custom_days: number[] | null;
+  type: string;
+  daily_target: number;
+  weekly_target: number | null;
+  impact_article_id: string | null;
+  status: 'active' | 'established';
+  established_since: string | null;
   sort_order: number;
 }
 
@@ -76,7 +96,7 @@ function toHabitEvidence(row: HabitEvidenceRow): HabitEvidence {
   };
 }
 
-function toHabit(row: HabitRow, evidenceRows?: HabitEvidenceRow[]): Habit {
+export function toHabit(row: HabitRow, evidenceRows?: HabitEvidenceRow[]): Habit {
   return {
     id: row.id,
     name: row.name,
@@ -93,6 +113,37 @@ function toHabit(row: HabitRow, evidenceRows?: HabitEvidenceRow[]): Habit {
     impactArticleId: isValidArticleId(row.impact_article_id) ? row.impact_article_id : undefined,
     evidences: evidenceRows ? evidenceRows.map(toHabitEvidence) : [],
     sortOrder: row.sort_order ?? 0,
+    // 未マイグレーション行 / select 漏れで undefined が来ても 'active' にフォールバックし
+    // コンシューマに undefined を漏らさない。
+    status: (row.status as 'active' | 'established') ?? 'active',
+    establishedSince: row.established_since ?? undefined,
+  };
+}
+
+/**
+ * HabitInsertInput を insert 用 snake_case 行に変換する純粋関数。
+ * status は未指定なら 'active'、established_since は未指定なら null にフォールバックする。
+ */
+export function buildHabitInsertRow(
+  userId: string,
+  habit: HabitInsertInput,
+  sortOrder: number
+): HabitInsertRow {
+  return {
+    user_id: userId,
+    name: habit.name,
+    description: habit.description || null,
+    life_significance: habit.lifeSignificance || null,
+    icon: habit.icon,
+    frequency: habit.frequency,
+    custom_days: habit.customDays || null,
+    type: habit.type || 'positive',
+    daily_target: habit.dailyTarget ?? 1,
+    weekly_target: habit.weeklyTarget ?? 1,
+    impact_article_id: habit.impactArticleId ?? null,
+    status: habit.status ?? 'active',
+    established_since: habit.establishedSince ?? null,
+    sort_order: sortOrder,
   };
 }
 
@@ -169,7 +220,7 @@ export async function fetchCompletions(days: number = 90): Promise<HabitCompleti
 
 export async function insertHabit(
   userId: string,
-  habit: Omit<Habit, 'id' | 'createdAt' | 'archived' | 'sortOrder'>
+  habit: HabitInsertInput
 ): Promise<Habit> {
   const supabase = createClient();
 
@@ -185,20 +236,7 @@ export async function insertHabit(
 
   const { data, error } = await supabase
     .from('habits')
-    .insert({
-      user_id: userId,
-      name: habit.name,
-      description: habit.description || null,
-      life_significance: habit.lifeSignificance || null,
-      icon: habit.icon,
-      frequency: habit.frequency,
-      custom_days: habit.customDays || null,
-      type: habit.type || 'positive',
-      daily_target: habit.dailyTarget ?? 1,
-      weekly_target: habit.weeklyTarget ?? 1,
-      impact_article_id: habit.impactArticleId ?? null,
-      sort_order: nextSortOrder,
-    })
+    .insert(buildHabitInsertRow(userId, habit, nextSortOrder))
     .select()
     .single();
 
@@ -223,6 +261,8 @@ export async function updateHabitById(
   if (updates.weeklyTarget !== undefined) row.weekly_target = updates.weeklyTarget ?? 1;
   if (updates.archived !== undefined) row.archived = updates.archived;
   if (updates.impactArticleId !== undefined) row.impact_article_id = updates.impactArticleId ?? null;
+  if (updates.status !== undefined) row.status = updates.status;
+  if (updates.establishedSince !== undefined) row.established_since = updates.establishedSince || null;
 
   const { error } = await supabase.from('habits').update(row).eq('id', id);
   if (error) throw error;
