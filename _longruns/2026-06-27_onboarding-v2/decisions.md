@@ -61,6 +61,27 @@ builder 自律デフォルト可能だが、ドリフト防止のため APPROVE 
   insertHabit は内部で buildHabitInsertRow を使う。テストは input→insert row→（DB割当列補完）→toHabit の往復で検証。
 - 根拠: DB モック不要でマッピングの正しさを固定でき、回帰に強い。
 
+## 2026-06-27 change-B: lifetime-impact-calc 実装の設計判断
+
+### D-B1: 計算 API の入力はプリセットID + established_since（Habit オブジェクトではない）
+- 問題: 合算計算の入力を「保存済み Habit[]」にするか「選択中のプリセットID群」にするか。
+- 決定: `computeLifetimeImpact({ activePresetIds, establishedHabits:{presetId,establishedSince}[], profile, now? })`。
+  per-time 効果は plan 指定どおり `presetPerTimeEffectValue(presetId, kpi)` で引く。onboarding [4] は
+  保存前（プリセット選択状態）に結果を見せるため、Habit 保存に依存しないプリセットID入力が自然。
+- 根拠: plan「建材は presetPerTimeEffectValue」。保存前計算でき、change-C が選択状態をそのまま渡せる。
+
+### D-B2: elapsedYears は小数（整数 floor しない）／ユリウス年で算出
+- 問題: 経過年を整数年に丸めるか小数のままにするか。整数 floor だと established 半年は past=0 になり過小。
+- 決定: `elapsedYearsSince = max(0, (now - establishedSince) / (365.25日))` の小数を採用。未来日/不正日付は 0。
+  health は ×365、money は ×240 を小数経過年に乗じる（未来 horizon と対称）。
+- 根拠: 「もう積んできた」を過小評価しないため小数が適切。境界（未来日/0年/長期）は D7 のとおりユニット固定。
+
+### D-B3: 推定フラグは結果トップレベルの pastIsEstimated（established 有無）
+- 問題: 「推定」明示用フラグを per-KPI に持つか結果単位で持つか。
+- 決定: `LifetimeImpactResult.pastIsEstimated = establishedHabits.length > 0`。過去ブロックは [4] で一括表示の
+  単位（既存習慣ありのみ表示）なので結果単位フラグで十分（YAGNI）。
+- 根拠: 可逆かつ最小。UI（change-C）は過去ブロック全体の「推定」表示にこのフラグを使える。
+
 ### D-A3: `supabase db push` は実行保留（既存の履歴乖離のため）
 - 問題: dev（xhqddzdpcpvxpprxykct）への `db push --dry-run` で「Remote migration versions not found in
   local migrations directory」エラー。remote に 20260612000000 / 20260612000100 / 20260612000200 が存在するが
