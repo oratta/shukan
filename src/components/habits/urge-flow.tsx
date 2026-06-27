@@ -44,6 +44,7 @@ export function UrgeFlow({
   const todayCount = habit.todayUrgeCount ?? 0;
   const initializedRef = useRef(false);
 
+  // モーダル open 時に 1 回だけ state を初期化する意図的パターン（ref ガード付き）。
   useEffect(() => {
     if (open && !initializedRef.current) {
       initializedRef.current = true;

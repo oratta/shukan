@@ -38,6 +38,7 @@ export function VsTemptationModal({
   const todayCount = habit?.todayUrgeCount ?? 0;
   const dailyTarget = habit?.dailyTarget ?? 1;
 
+  // モーダル open 時に 1 回だけ state を初期化する意図的パターン（ref ガード付き）。
   useEffect(() => {
     if (open && !initializedRef.current) {
       initializedRef.current = true;

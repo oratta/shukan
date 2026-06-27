@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '22'
+
+# デプロイフロー:
+# - Preview (PR): deploy-preview.yml が Ready for review で実行
+# - Staging (main push): deploy-staging.yml が自動実行
+# - Production: deploy-production.yml を workflow_dispatch で手動実行
+# このワークフローはチェック(lint + typecheck + test + actionlint)を担当
+#
+# トリガー設計（oak-casino と同じ Draft + Ready for review 方式）:
+# - push (main): マージ後の最終 CI
+# - pull_request: Draft 中は job 側 `draft == false` ガードで skip し、
+#   「Ready for review」ボタン（ready_for_review）で発火する
+# - workflow_dispatch: 手動トリガー
+
+jobs:
+  actionlint:
+    name: Actionlint
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run actionlint
+        uses: docker://rhysd/actionlint:latest
+        with:
+          args: -color
+
+  lint-and-typecheck:
+    name: Lint & Type Check & Test
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: TypeScript type check (via Next.js build)
+        run: npx next build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
+      - name: Run unit tests (Vitest)
+        run: npm run test:run

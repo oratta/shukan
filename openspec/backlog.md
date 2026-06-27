@@ -34,3 +34,6 @@
 - ~~セキュリティヘッダー追加~~ → X-Frame-Options, X-Content-Type-Options 等
 - ~~`src/lib/storage.ts` 削除~~ → 既に不在
 - ~~LoginPage Suspense修正~~
+
+## PWA manifest screenshots（将来改善）
+- DevTools Manifest の "Richer PWA Install UI" 警告解消のため、`form_factor: wide`（PC用）+ モバイル用のスクリーンショット画像を制作し `src/app/manifest.ts` の `screenshots` に追加する。installability 自体には不要だがインストールダイアログの見栄えが向上する（2026-06-23 PWA run で先送り）

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import { X, HeartPulse, Wallet, TrendingUp } from 'lucide-react';
 import {
@@ -34,16 +34,9 @@ export function ImpactArticleSheet({
   const t = useTranslations('impact');
   const timeUnits = { min: t('minuteUnit'), hour: t('hourUnit'), day: t('dayUnit') };
 
-  const article = useMemo(
-    // eslint-disable-next-line react-hooks/preserve-manual-memoization -- getArticle is a pure static lookup; memo deps are intentional
-    () => (habit?.impactArticleId ? getArticle(habit.impactArticleId) : undefined),
-    [habit?.impactArticleId]
-  );
+  const article = habit?.impactArticleId ? getArticle(habit.impactArticleId) : undefined;
 
-  const renderedBody = useMemo(
-    () => (article ? renderArticle(article) : ''),
-    [article]
-  );
+  const renderedBody = article ? renderArticle(article) : '';
 
   if (!habit || !article) return null;
 

@@ -14,7 +14,7 @@ export default function TermsPage() {
         </div>
 
         <h1 className="mb-2 text-3xl font-bold tracking-tight">利用規約</h1>
-        <p className="mb-8 text-sm text-muted-foreground">最終更新日：2026年3月26日</p>
+        <p className="mb-8 text-sm text-muted-foreground">最終更新日：2026年6月12日</p>
 
         <div className="prose prose-sm dark:prose-invert max-w-none space-y-8 text-foreground">
 
@@ -26,9 +26,9 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">2. サービスの内容</h2>
+            <h2 className="mb-3 text-lg font-semibold">2. サービスの内容と料金</h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
-              Smitch は、科学的根拠（エビデンス）に基づいた習慣トラッキングおよびライフパス構築を支援するアプリケーションです。本サービスは現在、無償で提供されています。将来的にサービス内容や料金体系が変更される場合があります。
+              Smitch は、科学的根拠（エビデンス）に基づいた習慣トラッキングおよびライフパス構築を支援するアプリケーションです。本サービスには、無料でご利用いただける範囲と、月額・年額のサブスクリプションおよび Lifetime（買い切り）の有料プランがあります。有料プランには無料トライアル期間を設ける場合があります。料金・支払時期・無料トライアルから有料への移行時期・解約条件等の取引条件の詳細は、<a href="/tokushoho" className="underline underline-offset-2 hover:text-foreground">特定商取引法に基づく表記</a>に記載しています。将来的にサービス内容や料金体系が変更される場合があります。
             </p>
           </section>
 
@@ -135,7 +135,7 @@ export default function TermsPage() {
           <section>
             <h2 className="mb-3 text-lg font-semibold">8. 責任の制限</h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
-              法令上許容される最大限の範囲において、本サービスの利用に起因するいかなる損害（直接・間接・偶発・特別・派生的損害を含む）についても、運営者は責任を負いません。本サービスは無償で提供されており、ユーザーはこれを理解した上でご利用ください。
+              法令上許容される最大限の範囲において、本サービスの利用に起因するいかなる損害（直接・間接・偶発・特別・派生的損害を含む）についても、運営者は責任を負いません。有料プランに関する運営者の責任は、法令で認められる範囲において、当該損害が発生した時点で当該ユーザーが直近に支払った料金の額を上限とします。
             </p>
           </section>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { HabitList } from '@/components/habits/habit-list';
 import { HabitForm } from '@/components/habits/habit-form';
@@ -15,12 +15,17 @@ import { useHabits } from '@/hooks/useHabits';
 import { shouldShowToday, getHabitsWithStats, getTodayString, getYesterdayUnreviewedHabits } from '@/lib/habits';
 import { getArticle } from '@/data/impact-articles';
 import { useAuth } from '@/components/auth-provider';
+import { useSubscription } from '@/hooks/useSubscription';
+import { shouldBlockCreateHabit } from '@/lib/billing/create-habit-gate';
 import { upsertDailyReflection } from '@/lib/supabase/habits';
+import { InstallBanner } from '@/components/pwa/install-banner';
+import { isCompletionTransition, type DayStatus as PwaDayStatus } from '@/lib/pwa/completion';
 import type { Habit, HabitInsertInput } from '@/types/habit';
 
 export default function DashboardPage() {
   const t = useTranslations();
   const { user } = useAuth();
+  const { subscription } = useSubscription();
   const {
     habits,
     completions,
@@ -54,18 +59,47 @@ export default function DashboardPage() {
     return getHabitsWithStats(filtered, completions, urgeLogs, copingStepsMap, getArticle);
   }, [habits, completions, urgeLogs, copingStepsMap]);
 
+  // --- PWA install banner trigger ---------------------------------------
+  // Detect the moment a habit transitions into a completed state (this session
+  // only). We snapshot each habit's today-status across renders; on the first
+  // render (no snapshot yet) nothing fires, so reload/revisit with
+  // completedCount > 0 never shows the banner. justCompleted lives in React
+  // state only (never persisted) → reload always resets to false.
+  const prevStatusMapRef = useRef<Map<string, PwaDayStatus> | null>(null);
+  const [justCompleted, setJustCompleted] = useState(false);
+
+  useEffect(() => {
+    const nextMap = new Map<string, PwaDayStatus>();
+    for (const h of todayHabits) {
+      nextMap.set(h.id, (h.recentDays?.[0]?.status ?? 'none') as PwaDayStatus);
+    }
+    const prevMap = prevStatusMapRef.current;
+    // Skip the very first render: no transition can be observed yet.
+    if (prevMap) {
+      for (const [id, next] of nextMap) {
+        if (isCompletionTransition(prevMap.get(id), next)) {
+          // Intentional: this effect's sole purpose is to detect a status
+          // transition across renders (impossible to derive synchronously) and
+          // flip the trigger flag. Behaviour is core to the PWA banner spec.
+          // eslint-disable-next-line react-hooks/set-state-in-effect
+          setJustCompleted(true);
+          break;
+        }
+      }
+    }
+    prevStatusMapRef.current = nextMap;
+  }, [todayHabits]);
+
   // Compute yesterday's date client-side only to avoid SSR timezone mismatch
   // (Vercel SSR runs in UTC, but user is in JST — causes 1-day offset between 00:00-08:59 JST)
-  const [yesterdayDate, setYesterdayDate] = useState('');
-  useEffect(() => {
+  const [yesterdayDate] = useState(() => {
     const d = new Date();
     d.setDate(d.getDate() - 1);
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot init of derived date on mount
-    setYesterdayDate(`${year}-${month}-${day}`);
-  }, []);
+    return `${year}-${month}-${day}`;
+  });
 
   const yesterdayUnreviewed = useMemo(
     () => yesterdayDate ? getYesterdayUnreviewedHabits(habits, completions, yesterdayDate) : [],
@@ -102,9 +136,16 @@ export default function DashboardPage() {
   );
 
   const handleAdd = useCallback(() => {
+    // Gate the `create_habit` action behind entitlement (change-A S24). Entitled
+    // users and active-trial users keep the original UX (the form opens); when the
+    // gate applies, route to the billing/confirmation flow instead of opening it.
+    if (shouldBlockCreateHabit(subscription)) {
+      window.location.href = '/account?upgrade=1';
+      return;
+    }
     setEditingHabit(null);
     setFormOpen(true);
-  }, []);
+  }, [subscription]);
 
   const handleEdit = useCallback(
     (id: string) => {
@@ -300,6 +341,15 @@ export default function DashboardPage() {
         onNoteChange={updateNote}
         onSaveReflection={handleSaveReflection}
       />
+
+      {/* PWA install banner: non-modal, pinned above the BottomNav (h-16).
+          Shown only on the render right after a habit completes. */}
+      <div className="fixed inset-x-0 bottom-16 z-30 mx-auto w-full max-w-2xl px-4 pb-2 md:bottom-2">
+        <InstallBanner
+          justCompleted={justCompleted}
+          onDismiss={() => setJustCompleted(false)}
+        />
+      </div>
     </div>
   );
 }
