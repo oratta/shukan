@@ -1,0 +1,78 @@
+# HANDOFF: オンボーディング [2] インタラクティブ再設計（v3）
+
+このワークツリー（`onboarding-v2-interactive`）で**新セッション**が次の作業を続行するための引き継ぎ。
+親（`onboarding-data-setup`）の v2 実装＋実ブラウザ/DB 検証は完了済み。本ブランチはその HEAD（`b1bd333`）から分岐。
+
+## 「続きを」で再開する手順
+1. このワークツリーで新セッションを開始（cwd = このディレクトリ）。
+2. 本 HANDOFF.md を読む。
+3. 下記「未確定の設計判断」を**ユーザーと確定**してから `/lr:p`（longrun:plan）でプラン化 → `/lr:e` で実装。
+   - ※ユーザーは AskUserQuestion より自由記述の議論を好む。選択肢の押し付けでなく対話で詰める。
+
+## セットアップ状態（このワークツリー）
+- ブランチ: `onboarding-v2-interactive`（base: `onboarding-data-setup` @ b1bd333、v2 全成果を継承）
+- `.env.local` / `.env` は親からコピー済み、`npm install` 済み。
+- **dev サーバーは親が 3000 を使用中**。この子では別ポート（3001 等）で `npm run dev` する。
+- dev Supabase: `xhqddzdpcpvxpprxykct`（Management API は `.env.local` の `SUPABASE_ACCESS_TOKEN` で利用可）。
+
+## 親で完了済み（v3 の土台＝既存実装）
+- 6画面ウィザード [0]イントロ [1]プロフィール [2]習慣選択(established/active 2分類) [3]計算中 [4]二段構え結果 [5]完了。
+- 計算 API `src/lib/lifetime-impact.ts`: KPI4軸ごと `{past, future}`。過去/未来 horizon を KPI 種別で対称化
+  （health_lifespan/positive_mood = elapsedYears×365、cost_saving/earning = elapsedWorkingYears×240）。pastIsEstimated フラグ。
+- `src/lib/onboarding.ts`: WizardState / toggleEstablished / toggleActive（プリセット相互排他）/ runOnboardingWrite
+  （user_profiles upsert・trackedKpis=全4軸 / habits を established(status+established_since)・active で insert）/
+  yearsAgoToEstablishedSince / buildLifetimeImpactInput。
+- `src/data/habit-presets.ts`: 17プリセット。`primaryKpis` で KPI 分類済み。`name` がDB保存名（アプリ全体で使用）。
+- DB: habits に `status`('active'|'established')・`established_since`(date) 列追加済み（dev に適用済み）。
+  user_profiles: birth_year / gender / country / annual_income / currency / tracked_kpis(ARRAY)。
+- 直近の親コミット: width均等化(b1bd333) / 年収=万円単位(f77d521) / [2]既存プリセットB側disabled(178dc53) など。
+
+## プリセットの KPI 分類（4カテゴリ＝4ボックスの素）
+- health_lifespan(4): タバコをやめる / 毎日の有酸素運動 / しっかり眠る / 体にいい食事
+- cost_saving(5): 体に悪いものを減らす / 毎日の節約 / 衝動買いをやめる / 自炊する / お酒をやめる
+- positive_mood(4): 毎日の瞑想 / 感謝と書く習慣 / 自然の中で過ごす / ヨガ・ストレッチ
+- earning(4): 集中して働く / 朝を整える / デジタルの誘惑を断つ / 学び続ける
+
+## v3 でやりたいこと（ユーザーのブレインダンプより）
+発端: 「習慣の言葉が具体的でなく、自分がその習慣を身につけているか判断できない」「ボックス幅が文字数で変わる(→親で修正済)」。
+そこから [2] の再設計に発展。要素は5つ:
+
+1. **Evidence と Habit の役割分担**（ユーザーの整理。要・最終確認）:
+   - 選択リストと**文言は Habit（行動の形・継続性）**で表現する。研究プロトコル（例「週2回ファスティング」）は書かない。
+     週1でも50%でも「その習慣を持っている」と言える、という思想。→ これが当初の「文言を具体化」への答え。
+   - **効果の大きさは Evidence 由来 per-time** のまま（presetPerTimeEffectValue）。
+   - **研究条件との乖離は達成率(%) という1係数に畳む**（頻度・難易度をラベルに持ち込まない）。
+2. **タップで4KPIがその場で動くライブプレビュー**: ホーム画面（実行→4KPIへのインパクト表示）と同じ体感を [2] に。
+   習慣をタップ→数字が伸びる、もう一度タップ→アンセレクトで数字が戻る。
+   「このアプリは週ごとに4KPIがエビデンスベースでどう変わるかを理解させる仕組み」だと体で伝える狙い。
+3. **カテゴリ4ボックスで「選んで次へ」の送り**: 1画面スクロール地獄をやめ、KPIカテゴリごとに分割。
+   1つずつ「この習慣ある/ない」を噛みしめてもらう前進感。
+4. **達成率3段階**: established で「いつから（何年前）」入力の後に、
+   「完璧に習慣化(=100%) / ほとんど(=70%) / たまに(=30%)」をタップ選択。内部係数として処理。
+5. **オンボ後のモニタリング**: 100%未満の習慣も通常の習慣として追加し、達成率をモニタリングできるようにする。
+
+## 未確定の設計判断（プラン化前にユーザーと確定すること）
+- **判断1 (Evidence/Habit 役割分担)**: 上記1の方向（文言=Habitの形・数字=Evidence・ギャップ=達成率%）で確定して良いか最終確認。
+- **判断2 (ライブプレビューと[4]の関係)**: [2]に数字が動くプレビューを入れると [4] の役割が変わる。
+  (a) [2]=選びながら数字が動く体験、[4]=過去+未来の二段構えサマリーに純化、 (b) [4]を[2]に統合して廃止。どちらか。
+- **判断3 (established の未来寄与)**: established を達成率付きで登録し「100%を目指して継続」するなら計算モデルが変わる。
+  (a) 全習慣が未来に寄与（過去=これまでの実績、未来=全習慣を100%でやり切る伸びしろ。established も未来対象＝以前の「過去/未来排他」を見直す）、
+  (b) 現状維持（過去=establishedのみ・未来=activeのみ排他、達成率は過去累積の係数だけに使う）。
+  ※ (a) は親 v2 で reviewer が BLOCKER 指摘した「未来に established の継続分を含めない」を意図的に見直す判断になる。
+- **判断4 (達成率の保存とモデル)**: 達成率(%)をどこに持つか。
+  - established の過去計算: past = per-time × 過去horizon × 達成率%。
+  - 通常習慣として継続モニタリングする場合、habits に目標頻度/達成率の概念が必要か（データモデル追加の要否）。
+  - 既存 habit_completions（実行履歴）から実績達成率を出す既存機構との整合。
+
+## 制約・ルール（厳守）
+- **造語禁止**。あの4つは「KPI」とだけ呼ぶ。新概念名を勝手に作らない（ユーザーの強い指摘）。
+- 文言の確定版参照元: `docs/context/onboarding-screens-v2.md`（※docs/context は Obsidian へのシンボリックリンク）。
+- KPI名・トーンは v1/v2 の確定語彙を踏襲。
+- DB列追加は後方互換。マイグレーション作成後は自分で `supabase db push`（dev）。
+- en/ja 両ロケール。messages のキーパリティを保つ。
+
+## 検証の勘所（親での実績）
+- 実ブラウザ検証は claude-in-chrome で可能だが、MCP の合成 left_click が一部ボタンで React onClick に届かないことがある
+  → `javascript_tool` で対象 button の `.click()` を呼ぶと確実。native select は React 互換 setter+change イベントで設定。
+- オンボーディングは user_profiles 行があると `/onboarding` がホームへリダイレクト（`src/app/onboarding/layout.tsx`）。
+  再テストは user_profiles 行を削除してリセット（habits も消すなら完全リセット）。Management API でクエリ/削除可。
