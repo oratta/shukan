@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>オンボーディング[2] v3 プロト — 段階タップ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0b0f14;            /* 画面外の余白 */
+    --card:#ffffff;
+    --ink:#0d1b2a;
+    --muted:#6b7785;
+    --line:#eef1f4;
+    --accent:#0fb5a6;        /* ティール（健康の躍動感） */
+    --accent-ink:#0a7d72;
+    --health:#ef5d7a;
+    --mood:#f5a524;
+    --cost:#22a06b;
+    --earn:#3b82f6;
+    --shadow:0 18px 50px -22px rgba(13,27,42,.45);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;height:100%;}
+  body{
+    font-family:"Noto Sans JP",system-ui,sans-serif;
+    background:radial-gradient(120% 80% at 50% -10%, #16202b 0%, var(--bg) 55%);
+    display:flex;align-items:center;justify-content:center;min-height:100dvh;color:var(--ink);
+    padding:24px;
+  }
+  /* 端末フレーム */
+  .phone{
+    width:100%;max-width:412px;height:860px;max-height:92dvh;
+    background:var(--card);border-radius:40px;overflow:hidden;position:relative;
+    box-shadow:var(--shadow);display:flex;flex-direction:column;
+  }
+
+  /* ヘッダ */
+  header{padding:18px 20px 8px;display:flex;align-items:center;gap:12px;}
+  .back{
+    width:40px;height:40px;border-radius:14px;border:1px solid var(--line);background:#fff;
+    display:grid;place-items:center;cursor:pointer;color:var(--muted);flex:none;
+    transition:transform .15s ease, opacity .2s ease;
+  }
+  .back:active{transform:scale(.92);}
+  .back[disabled]{opacity:.35;pointer-events:none;}
+  .progress{flex:1;}
+  .progress .meta{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:500;}
+  .bar{height:6px;border-radius:99px;background:var(--line);overflow:hidden;}
+  .bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#36d1c4);border-radius:99px;width:0;transition:width .5s cubic-bezier(.22,1,.36,1);}
+
+  /* KPIストリップ */
+  .kpis{padding:8px 16px 4px;}
+  .kpis .lead{font-size:11px;color:var(--muted);font-weight:500;letter-spacing:.02em;padding:0 4px 8px;}
+  .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .kpi{
+    border:1px solid var(--line);border-radius:18px;padding:12px 13px;background:#fff;position:relative;overflow:hidden;
+    transition:transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s ease;
+  }
+  .kpi .top{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+  .kpi .dot{width:9px;height:9px;border-radius:99px;flex:none;}
+  .kpi .label{font-size:11px;color:var(--muted);font-weight:500;line-height:1.2;}
+  .kpi .val{font-size:20px;font-weight:900;line-height:1;letter-spacing:-.02em;}
+  .kpi .val .u{font-size:11px;font-weight:700;color:var(--muted);margin-left:3px;}
+  .kpi .split{font-size:10px;color:var(--muted);font-weight:500;margin-top:5px;line-height:1.3;}
+  .kpi .split b{font-weight:700;color:#9aa6b2;}
+  .kpi.bump{transform:translateY(-3px);box-shadow:0 12px 24px -14px rgba(13,27,42,.4);}
+  .kpi .flash{position:absolute;inset:0;background:currentColor;opacity:0;}
+  .kpi.bump .flash{animation:fl .6s ease;}
+  @keyframes fl{0%{opacity:.10}100%{opacity:0}}
+
+  /* 質問ステージ */
+  .stage{flex:1;position:relative;overflow:hidden;}
+  .slide{
+    position:absolute;inset:0;padding:14px 22px 28px;display:block;
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
+  }
+  .slide.enter{animation:enter .52s cubic-bezier(.22,1,.36,1) both;}
+  .slide.leave{animation:leave .42s cubic-bezier(.55,0,.45,1) both;}
+  @keyframes enter{
+    0%{opacity:0;transform:translateY(26px) scale(.97);filter:blur(6px);}
+    100%{opacity:1;transform:none;filter:blur(0);}
+  }
+  @keyframes leave{
+    0%{opacity:1;transform:none;filter:blur(0);}
+    100%{opacity:0;transform:translateY(-22px) scale(.98);filter:blur(6px);}
+  }
+
+  .hicon{
+    width:74px;height:74px;border-radius:24px;display:grid;place-items:center;margin:8px 0 18px;
+    background:linear-gradient(150deg,#e9fbf8,#d6f6f1);font-size:36px;box-shadow:inset 0 0 0 1px #cdeee8;
+  }
+  .qkicker{font-size:12px;font-weight:700;color:var(--accent-ink);letter-spacing:.06em;margin-bottom:10px;}
+  .qname{font-size:27px;font-weight:900;letter-spacing:-.02em;line-height:1.25;margin:0 0 8px;}
+  .qsub{font-size:14px;color:var(--muted);line-height:1.6;margin:0 0 4px;}
+  .qask{font-size:15px;font-weight:700;margin:18px 0 14px;}
+
+  .levels{display:flex;flex-direction:column;gap:10px;}
+  .lv{
+    display:flex;align-items:center;gap:14px;padding:15px 16px;border-radius:18px;border:1.5px solid var(--line);
+    background:#fff;cursor:pointer;transition:transform .14s ease, border-color .2s ease, background .2s ease;
+    text-align:left;font-family:inherit;
+  }
+  .lv:active{transform:scale(.98);}
+  .lv .txt{flex:1;}
+  .lv .t1{font-size:15px;font-weight:700;}
+  .lv .t2{font-size:12px;color:var(--muted);margin-top:2px;}
+  .lv .pct{font-size:13px;font-weight:800;color:var(--muted);}
+  .lv.sel{border-color:var(--accent);background:#f1fdfb;}
+  .lv.sel .pct{color:var(--accent-ink);}
+
+  /* レベルのドット（絵文字不使用） */
+  .lv .dot2{width:14px;height:14px;border-radius:99px;flex:none;box-shadow:0 0 0 4px rgba(0,0,0,.03);}
+
+  /* この習慣のインパクト（アイコン表示） */
+  .impact{margin:16px 0 4px;border:1px solid var(--line);border-radius:16px;padding:12px 14px;background:#fbfdfd;}
+  .impact .imp-lead{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:9px;}
+  .imp-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;}
+  .ic-cell{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;}
+  .ic-cell .ic{display:grid;place-items:center;}
+  .ic-cell .ic-val{font-size:13px;font-weight:900;letter-spacing:-.02em;color:var(--ink);line-height:1;}
+  .ic-cell .ic-val small{font-size:9px;font-weight:700;color:var(--muted);margin-left:1px;}
+  .ic-cell.dim .ic-val{color:var(--muted);font-weight:700;}
+
+  /* KPIカードのアイコン */
+  .kpi .ic{display:grid;place-items:center;}
+
+  /* 内訳トグル */
+  .breakdown{margin-top:16px;border-top:1px dashed var(--line);padding-top:12px;}
+  .bk-btn{background:none;border:none;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;padding:2px 0;}
+  .bk-body{max-height:0;overflow:hidden;transition:max-height .35s ease;}
+  .bk-body.open{max-height:260px;}
+  .bk-row{display:flex;justify-content:space-between;font-size:12px;padding:7px 0;border-bottom:1px solid var(--line);color:var(--muted);}
+  .bk-row b{color:var(--ink);font-weight:700;}
+  .bk-note{font-size:11px;color:var(--muted);padding-top:8px;line-height:1.5;}
+
+  footer{padding:14px 22px 26px;text-align:center;}
+  .skip{background:none;border:none;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
+
+  .done{position:absolute;inset:0;background:#fff;display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;}
+  .done.show{display:flex;animation:enter .5s ease both;}
+  .done .big{font-size:46px;margin-bottom:14px;}
+  .done h2{font-size:22px;font-weight:900;margin:0 0 8px;}
+  .done p{color:var(--muted);font-size:14px;line-height:1.7;margin:0 0 22px;}
+  .done .restart{padding:12px 22px;border-radius:14px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body>
+<div class="phone">
+  <header>
+    <button class="back" id="back" disabled aria-label="戻る">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="progress">
+      <div class="meta"><span id="stepText">健康のカテゴリ</span><span id="countText">1 / 4</span></div>
+      <div class="bar"><i id="barFill"></i></div>
+    </div>
+  </header>
+
+  <section class="kpis">
+    <div class="lead">身についている習慣が、あなたにもたらすこと（サンプル: 40歳・年収1,500万）</div>
+    <div class="kpi-grid" id="kpiGrid"></div>
+  </section>
+
+  <div class="stage" id="stage"></div>
+
+  <div class="done" id="done">
+    <div class="big">🎉</div>
+    <h2>このカテゴリは完了！</h2>
+    <p id="doneSummary"></p>
+    <button class="restart" onclick="restart()">もう一度見る</button>
+  </div>
+
+  <footer>
+    <button class="skip" id="skip">この習慣はスキップ →</button>
+  </footer>
+</div>
+
+<script>
+/* ===== 実データ（src/data より）=====
+   base = その習慣を達成率100%でやったときの per-day 効果（束ねエビデンスをウェイトで合算）
+   keys: H=健康寿命(分) M=前向きな気持ち(分) C=出費削減(円) E=稼ぐ能力(円)
+*/
+/* ===== アイコン（絵文字不使用・lucide風SVG）===== */
+const P = {
+  health:'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/>',
+  mood:'<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/>',
+  cost:'<path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2V5z"/><path d="M2 9v1c0 1.1.9 2 2 2h1"/><path d="M16 11h.01"/>',
+  earn:'<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+  history:'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>',
+};
+function svg(name, size){ return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${P[name]}</svg>`; }
+const KICON = {H:'health', M:'mood', C:'cost', E:'earn'};
+
+/* サンプルプロフィール（就業 20-65・寿命 90・年収 1,500万） */
+const PROFILE = { age:40, lifeExp:90, workStart:20, retireAge:65 };
+const REMAIN_LIFE_Y = PROFILE.lifeExp - PROFILE.age;   // 50年（健康寿命=生涯表示に使用）
+const DAYS_Y = 365, WORK_DAYS_Y = 240;
+
+/* KPI ごとに「自然な単位」で見せ、桁のインフレ率を揃える
+   H 健康寿命   = 生涯（残り人生の累計・年）
+   M 前向き     = 1日あたり（分/日）
+   C 出費削減   = 年額（万円/年）
+   E 増える収入 = 年額（万円/年）            */
+const KPI = [
+  {k:'H', name:'健康寿命',       horizon:'life',   color:'var(--health)'},
+  {k:'M', name:'前向きな気持ち', horizon:'perday', color:'var(--mood)'},
+  {k:'C', name:'出費削減',       horizon:'year',   color:'var(--cost)'},
+  {k:'E', name:'増える収入',     horizon:'year',   color:'var(--earn)'},
+];
+const KPIDEF = Object.fromEntries(KPI.map(d=>[d.k,d]));
+
+// base[k]（per-day 効果）と達成率 f から、その KPI の表示用 raw 値を出す
+function kpiRaw(k, baseVal, f){
+  const h = KPIDEF[k].horizon;
+  if(h==='life')   return baseVal * REMAIN_LIFE_Y * DAYS_Y * f; // 分（生涯累計）
+  if(h==='perday') return baseVal * f;                          // 分（1日あたり）
+  return baseVal * WORK_DAYS_Y * f;                             // 円（年額）
+}
+// raw 値を表示単位へ
+function fmt(k, v){
+  const h = KPIDEF[k].horizon;
+  if(h==='life'){ const d=v/1440; return d>=365 ? {n:(d/365).toFixed(1), u:'年'} : {n:Math.round(d).toLocaleString('ja-JP'), u:'日'}; }
+  if(h==='perday') return {n:Math.round(v).toLocaleString('ja-JP'), u:'分/日'};
+  return {n:Math.round(v/10000).toLocaleString('ja-JP'), u:'万円/年'};
+}
+
+const HABITS = [
+  {
+    icon:'🚭', kicker:'健康のカテゴリ',
+    name:'タバコを吸わない', sub:'吸わない生活が続いている状態。',
+    ask:'あなたは今、これが身についていますか？',
+    base:{H:288, M:0, C:1240, E:5690},
+    evid:[ {n:'禁酒・喫煙の研究 (quit_smoking)', w:100} ],
+    note:'単一エビデンス。ウェイト調整は不要。健康288分/日は他より突出して大きい。'
+  },
+  {
+    icon:'🏃', kicker:'健康のカテゴリ',
+    name:'体を動かす', sub:'早歩き・軽いジョギング・階段など、日常的に体を動かす習慣。',
+    ask:'あなたは今、これが身についていますか？',
+    base:{H:21, M:120, C:700, E:2600},
+    evid:[ {n:'有酸素運動 (daily_cardio)', w:100}, {n:'ウォーキング (daily_walking)', w:100} ],
+    note:'⚠️ cardioとwalkingは同じ運動。現状は両方100%の単純合算＝二重計上ぎみ。要ウェイト調整。'
+  },
+  {
+    icon:'😴', kicker:'健康のカテゴリ',
+    name:'しっかり眠る', sub:'毎晩ぐっすり眠れている状態。',
+    ask:'あなたは今、これが身についていますか？',
+    base:{H:20, M:72, C:600, E:3350},
+    evid:[ {n:'7時間睡眠 (sleep_7hours)', w:100}, {n:'寝る前スマホを見ない (no_screens_before_bed)', w:100} ],
+    note:'「寝る前スマホを見ない」は良い睡眠の手段。内包させてウェイトを下げるか、別習慣にするか。'
+  },
+  {
+    icon:'🥗', kicker:'健康のカテゴリ',
+    name:'体にいい食事', sub:'野菜をとり、甘いものや甘い飲み物を控えている。',
+    ask:'あなたは今、これが身についていますか？',
+    base:{H:23, M:0, C:850, E:2000},
+    evid:[ {n:'野菜をとる (eat_vegetables)', w:100}, {n:'水を飲む (drink_water)', w:100}, {n:'砂糖を控える (quit_sugar)', w:100} ],
+    note:'3つ全部やって初めて「体にいい食事」か、どれか1つでもか。ウェイト配分の論点。'
+  },
+];
+
+const LEVELS = [
+  {pct:0,   col:'#c2cad3', t1:'やってない',  t2:'これから始めたい'},
+  {pct:30,  col:'#f5a524', t1:'たまに',      t2:'思い出したときにやる'},
+  {pct:70,  col:'#3cc28a', t1:'だいたい',    t2:'週の半分以上はできている'},
+  {pct:100, col:'#0fb5a6', t1:'完璧に習慣化', t2:'生活の一部になっている'},
+];
+
+let idx = 0;
+// selections[i] = { pct } | null   （未来分のみ。過去は MVP 対象外）
+const selections = new Array(HABITS.length).fill(null);
+let displayed = {H:0,M:0,C:0,E:0}; // 生涯値（past+future）
+
+/* ---- KPI表示構築 ---- */
+const kpiGrid = document.getElementById('kpiGrid');
+KPI.forEach(def=>{
+  const el = document.createElement('div');
+  el.className='kpi'; el.id='kpi-'+def.k; el.style.color=def.color;
+  el.innerHTML = `<span class="flash"></span>
+    <div class="top"><span class="ic" style="color:${def.color}">${svg(KICON[def.k],15)}</span>
+    <span class="label">${def.name}</span></div>
+    <div class="val" style="color:var(--ink)"><span id="num-${def.k}">0</span><span class="u" id="unit-${def.k}"></span></div>`;
+  kpiGrid.appendChild(el);
+});
+
+// この習慣を 100% 続けた場合の生涯ポテンシャル（未来分のみ・達成率100%）
+function habitPotential(h){
+  const o={};
+  for(const k of ['H','M','C','E']) o[k]=kpiRaw(k, h.base[k], 1);
+  return o;
+}
+
+// 残りの人生（未来）のみ集計。過去（いつから）は MVP では扱わない
+function totals(){
+  const total={H:0,M:0,C:0,E:0};
+  HABITS.forEach((h,i)=>{
+    const sel = selections[i];
+    if(!sel || !sel.pct) return;
+    const f = sel.pct/100;
+    for(const k of ['H','M','C','E']) total[k] += kpiRaw(k, h.base[k], f);
+  });
+  return total;
+}
+
+function animateKpis(bumpKeys){
+  const target = totals();
+  const from = {...displayed};
+  const t0 = performance.now(); const dur=600;
+  function step(now){
+    const p = Math.min(1,(now-t0)/dur);
+    const e = 1-Math.pow(1-p,3);
+    for(const k of ['H','M','C','E']){
+      const v = from[k]+(target[k]-from[k])*e;
+      const f = fmt(k,v);
+      document.getElementById('num-'+k).textContent = f.n;
+      document.getElementById('unit-'+k).textContent = f.u;
+    }
+    if(p<1) requestAnimationFrame(step);
+    else displayed=target;
+  }
+  requestAnimationFrame(step);
+  (bumpKeys||[]).forEach(k=>{
+    const el=document.getElementById('kpi-'+k);
+    el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
+    setTimeout(()=>el.classList.remove('bump'),650);
+  });
+}
+
+/* ---- スライド描画 ---- */
+const stage = document.getElementById('stage');
+function render(animateInDir){
+  const h = HABITS[idx];
+  document.getElementById('stepText').textContent = h.kicker;
+  document.getElementById('countText').textContent = `${idx+1} / ${HABITS.length}`;
+  document.getElementById('barFill').style.width = ((idx)/(HABITS.length))*100 + '%';
+  document.getElementById('back').disabled = idx===0;
+
+  const cur = selections[idx];
+  const slide = document.createElement('div');
+  slide.className='slide enter';
+  const pot = habitPotential(h);
+  const potCells = ['H','M','C','E'].map(k=>{
+    const f = fmt(k, pot[k]);
+    const def = KPIDEF[k];
+    const dim = pot[k]<=0;
+    return `<div class="ic-cell ${dim?'dim':''}">
+      <span class="ic" style="color:${dim?'var(--muted)':def.color}">${svg(KICON[k],16)}</span>
+      <span class="ic-val">${dim?'—':('+'+f.n)}<small>${dim?'':f.u}</small></span>
+    </div>`;
+  }).join('');
+
+  slide.innerHTML = `
+    <div class="qkicker">${h.kicker}</div>
+    <h1 class="qname">${h.name}</h1>
+    <p class="qsub">${h.sub}</p>
+    <div class="impact">
+      <div class="imp-lead">この習慣があなたにもたらすこと</div>
+      <div class="imp-grid">${potCells}</div>
+    </div>
+    <div class="qask">${h.ask}</div>
+    <div class="levels">
+      ${LEVELS.map((l)=>`
+        <button class="lv ${cur&&cur.pct===l.pct?'sel':''}" data-pct="${l.pct}">
+          <span class="dot2" style="background:${l.col}"></span>
+          <span class="txt"><div class="t1">${l.t1}</div><div class="t2">${l.t2}</div></span>
+          <span class="pct">${l.pct}%</span>
+        </button>`).join('')}
+    </div>
+    <div class="breakdown">
+      <button class="bk-btn" id="bkBtn">▸ このスコアの内訳（エビデンスとウェイト）</button>
+      <div class="bk-body" id="bkBody">
+        ${h.evid.map(e=>`<div class="bk-row"><span>${e.n}</span><b>weight ${e.w}%</b></div>`).join('')}
+        <div class="bk-note">100%時の素の威力(1日あたり): 健康+${h.base.H}分 / 前向き+${h.base.M}分 / 出費-${h.base.C}円 / 稼ぐ+${h.base.E}円<br>${h.note}</div>
+      </div>
+    </div>`;
+  stage.appendChild(slide);
+
+  slide.querySelectorAll('.lv').forEach(btn=>{
+    btn.addEventListener('click',()=>chooseLevel(parseInt(btn.dataset.pct,10),slide));
+  });
+  const bkBtn = slide.querySelector('#bkBtn'); const bkBody = slide.querySelector('#bkBody');
+  bkBtn.addEventListener('click',()=>{
+    bkBody.classList.toggle('open');
+    bkBtn.textContent = (bkBody.classList.contains('open')?'▾':'▸')+' このスコアの内訳（エビデンスとウェイト）';
+  });
+
+  // 直前のスライドを掃除
+  const slides = stage.querySelectorAll('.slide');
+  if(slides.length>1){ const old=slides[0]; setTimeout(()=>old.remove(),420); }
+}
+
+// レベルタップ: 達成率セット → 未来分KPIを更新 → 余韻 → 次へ（1タップ）
+function chooseLevel(pct, slide){
+  selections[idx]={pct};
+  slide.querySelectorAll('.lv').forEach(b=>b.classList.toggle('sel', parseInt(b.dataset.pct,10)===pct));
+  animateKpis(KPI.map(d=>d.k));
+  setTimeout(()=>advance(1), 520);
+}
+
+function advance(dir){
+  const cur = stage.querySelector('.slide:last-child');
+  if(idx+dir>=HABITS.length){ finish(); return; }
+  if(idx+dir<0) return;
+  if(cur){ cur.classList.remove('enter'); cur.classList.add('leave'); }
+  idx+=dir;
+  setTimeout(()=>render(dir),120);
+}
+
+document.getElementById('back').addEventListener('click',()=>{ if(idx>0) advance(-1); });
+document.getElementById('skip').addEventListener('click',()=>{ selections[idx]={pct:0}; advance(1); });
+
+function finish(){
+  document.getElementById('barFill').style.width='100%';
+  const total=totals();
+  const chosen = selections.filter(s=>s&&s.pct>0).length;
+  const fH=fmt('H',total.H), fM=fmt('M',total.M), fC=fmt('C',total.C), fE=fmt('E',total.E);
+  document.getElementById('doneSummary').innerHTML =
+    `${chosen}個の習慣が身についています。<br>この習慣たちが、ここからの人生で 健康+${fH.n}${fH.u}・前向き+${fM.n}${fM.u}・出費-${fC.n}${fC.u}・収入+${fE.n}${fE.u} をもたらします。`;
+  document.getElementById('done').classList.add('show');
+}
+function restart(){
+  idx=0; selections.fill(null); displayed={H:0,M:0,C:0,E:0};
+  document.getElementById('done').classList.remove('show');
+  KPI.forEach(d=>{ document.getElementById('num-'+d.k).textContent='0'; document.getElementById('unit-'+d.k).textContent=''; });
+  stage.innerHTML=''; render(1);
+}
+
+render(1);
+</script>
+</body>
+</html>
