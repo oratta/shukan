@@ -32,18 +32,25 @@
 - **エビデンスは `sleep_7hours` のみ**（`no_screens_before_bed` を外す）。寝る前スマホ断ちは睡眠時間を伸ばす補助手段で sleep に内包。sleep 単独で4KPI全カバー、外して消えるKPIなし。束ね1本＝ウェイト不要。
 - 文言「しっかり眠る」→「**毎日6〜8時間の睡眠をとる**」。
 
+### 🧭 設計原則（最重要・effect-model.md §8 に明文化）
+**非スペシフィックな束ね習慣は、具体的な単独習慣に分解する。** 原則 1習慣＝1エビデンス。
+束ねが残るのは「明確に別経路の効果が積み上がり、かつ1タイトルで自己判定できる」場合のみ。タイトルは研究の数字を軸足にYes/No判定可能に。
+
 ### 習慣④「体にいい食事」＝3つに分割で確定（2026-07-01）
-- 旧 `balanced_eating`（3本束ね）を解体し、1習慣1エビデンスの3つに分割。各タイトルは研究の数字を軸足に：
+- 旧 `balanced_eating`（3本束ね）を解体：
   - `eat_vegetables` →「野菜・果物を1日5皿（約350g）食べる」
-  - `drink_water` →「毎日コップ8杯（約1.5L）の水を飲む」（⚠️記事に量の根拠なし＝通説。フォロー要）
+  - `drink_water` →「毎日コップ8杯（約1.5L）の水を飲む」
   - `quit_sugar` →「砂糖入りの飲み物・お菓子をとらない」
-- 各3つの KPI ボックス配置は実装フェーズで確定。詳細は effect-model.md §8。
+
+### 習慣⑤「体に悪いものを減らす」＝2つに分解で確定（2026-07-01）
+- 旧 `cut_junk` を解体：`quit_junk_food` →「ジャンクフードを食べない」 / `quit_alcohol` →「アルコールを飲まない」。
+- `quit_alcohol` の旧 `cut_junk`／`quit_drinking` 重複は **1習慣に統合**して自然解消（旧 `quit_drinking` は一本化／廃止）。
 
 ### ▶ 次にやること（このセッションの続き）
-**習慣⑤「体に悪いものを減らす」**（`cut_junk` = `quit_junk_food` + `quit_alcohol`）から再開。
-- ⚠️ `quit_alcohol` は `cut_junk` と `quit_drinking`（お酒をやめる）の**両プリセットに重複出現**＝issue #34 の実例。⑤整理時に対応。
-- 以降 cost_saving / positive_mood / earning 系も1つずつ**文言・束ねエビデンス・ウェイト**を確定。
-  `src/data/habit-presets.ts` が現行の束ね定義。各習慣で「同一/内包エビデンスの二重計上」を毎回チェック（→ issue #34）。
+**残る束ねプリセットを上記原則で順に解体/単独化**していく（⑥以降）。effect-model.md §8 ⑥〜 にリスト：
+gratitude_and_journaling / time_in_nature_habit(`daily_walking`含む) / mindful_movement / cook_at_home /
+deep_focus_work / morning_routine / cut_digital_distraction / keep_learning。
+- `src/data/habit-presets.ts` が現行の束ね定義。全習慣の文言確定後、実装フェーズでコードへ一括反映。
 - 別途宿題: per-day 収入値（dailyIncomeGain）が年収1,500万ハードコード由来 → 現実的年収サンプルは要再スケール。
 
 （下記「未確定の設計判断 判断1〜4」は本セッションで大半が解決/方針転換済み。背景として残置。）
