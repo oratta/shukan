@@ -49,9 +49,12 @@
 ### 習慣⑥「感謝と書く習慣」＝`daily_journaling` のみで確定（2026-07-01）
 - `gratitude_practice` を外す（馴染み薄く自己判定・継続ハードル高）。文言「**毎日、感情を吐き出す日記を書く**」。根拠 Smyth 2018（表現的筆記でコルチゾール23%低減）。
 
+### 習慣⑦「自然の中で過ごす」＝`time_in_nature` のみで確定（2026-07-01）
+- `daily_walking` を外す（歩行は②でカバー済み・walkingは②に吸収）。文言「**毎日20分、自然の中で過ごす**」。根拠 White 2019（週120分≒17分/日）。
+
 ### ▶ 次にやること（このセッションの続き）
-**残る束ねプリセットを上記原則で順に解体/単独化**していく（⑦以降）。effect-model.md §8 ⑦〜 にリスト：
-time_in_nature_habit(`daily_walking`含む) / mindful_movement / cook_at_home /
+**残る束ねプリセットを上記原則で順に解体/単独化**していく（⑧以降）。effect-model.md §8 ⑧〜 にリスト：
+mindful_movement / cook_at_home /
 deep_focus_work / morning_routine / cut_digital_distraction / keep_learning。
 - `src/data/habit-presets.ts` が現行の束ね定義。全習慣の文言確定後、実装フェーズでコードへ一括反映。
 - 別途宿題: per-day 収入値（dailyIncomeGain）が年収1,500万ハードコード由来 → 現実的年収サンプルは要再スケール。
