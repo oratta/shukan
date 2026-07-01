@@ -52,10 +52,13 @@
 ### 習慣⑦「自然の中で過ごす」＝`time_in_nature` のみで確定（2026-07-01）
 - `daily_walking` を外す（歩行は②でカバー済み・walkingは②に吸収）。文言「**毎日20分、自然の中で過ごす**」。根拠 White 2019（週120分≒17分/日）。
 
+### 習慣⑧「ヨガ・ストレッチ」＝プリセットごと廃止で確定（2026-07-01）
+- `daily_yoga` / `daily_stretching` とも不採用（該当者が少ない）。positive_mood 系は 瞑想/日記(⑥)/自然(⑦) の3つに。
+
 ### ▶ 次にやること（このセッションの続き）
-**残る束ねプリセットを上記原則で順に解体/単独化**していく（⑧以降）。effect-model.md §8 ⑧〜 にリスト：
-mindful_movement / cook_at_home /
-deep_focus_work / morning_routine / cut_digital_distraction / keep_learning。
+**残る束ね/未レビュープリセットを上記原則で順に確定**（⑨以降）。effect-model.md §8 ⑨〜 にリスト：
+daily_meditation_habit(瞑想・単独) / cook_at_home / deep_focus_work / morning_routine /
+cut_digital_distraction / keep_learning。
 - `src/data/habit-presets.ts` が現行の束ね定義。全習慣の文言確定後、実装フェーズでコードへ一括反映。
 - 別途宿題: per-day 収入値（dailyIncomeGain）が年収1,500万ハードコード由来 → 現実的年収サンプルは要再スケール。
 
