@@ -123,7 +123,7 @@ export default function TermsPage() {
               </li>
               <li className="flex gap-2">
                 <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-muted-foreground" />
-                <span>推定値およびその解説文の一部は、AI（大規模言語モデル）がユーザーの登録情報と研究データをもとに生成しています。AI が生成する内容には、不正確または不完全な情報が含まれる場合があります。</span>
+                <span>推定値およびその解説文の一部は、公表されている研究成果をもとに AI（大規模言語モデル）を利用して作成しています。AI が生成する内容には、不正確または不完全な情報が含まれる場合があります。</span>
               </li>
               <li className="flex gap-2">
                 <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-muted-foreground" />
