@@ -55,7 +55,7 @@ export async function POST(request: Request): Promise<Response> {
     return NextResponse.json({ error: 'Invalid plan' }, { status: 400 });
   }
 
-  const existing = await getSubscriptionForUser(user.id);
+  const existing = await getSubscriptionForUser(user.id, supabase);
   const customerId = await ensureCustomer({
     userId: user.id,
     email: user.email ?? undefined,
