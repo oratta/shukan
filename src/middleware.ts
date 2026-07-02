@@ -1,7 +1,21 @@
 import { createServerClient } from '@supabase/ssr';
+import { get } from '@vercel/edge-config';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
+  // Maintenance mode: Edge Config の maintenance フラグが ON なら全ページを
+  // メンテページへ rewrite（EDGE_CONFIG 未設定環境や到達不能時は素通し）
+  if (process.env.EDGE_CONFIG) {
+    try {
+      const maintenance = await get<boolean>('maintenance');
+      if (maintenance) {
+        return NextResponse.rewrite(new URL('/maintenance', request.url));
+      }
+    } catch {
+      // Edge Config 到達不能時はメンテ扱いにしない
+    }
+  }
+
   const host = request.headers.get('host') ?? '';
   const marketingHosts =
     process.env.NEXT_PUBLIC_MARKETING_HOSTS?.split(',')
