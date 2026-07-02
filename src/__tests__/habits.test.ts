@@ -16,9 +16,9 @@ import type { LifeImpactArticle } from '@/types/impact';
 
 function makeCompletion(habitId: string, date: string, status: string = 'completed'): HabitCompletion {
   return {
-    id: `comp-${date}`,
     habitId,
     date,
+    completedAt: `${date}T00:00:00.000Z`,
     status: status as HabitCompletion['status'],
   };
 }
@@ -45,6 +45,7 @@ function makeHabit(overrides: Partial<Habit> & { id: string }): Habit {
     archived: false,
     evidences: [],
     sortOrder: 0,
+    status: 'active',
     ...overrides,
   };
 }
@@ -307,7 +308,7 @@ describe('getHabitsWithStats - multi-evidence', () => {
     habitName: '禁煙',
     article: { researchBody: '', sources: [] },
     inferences: { health: '', cost: '', income: '', cumulative: '' },
-    calculationParams: { dailyHealthMinutes: 30, dailyCostSaving: 500, dailyIncomeGain: 100 },
+    calculationParams: { dailyHealthMinutes: 30, dailyCostSaving: 500, dailyIncomeGain: 100, dailyPositiveMoodMinutes: 0 },
     confidenceLevel: 'high',
     defaultHabitType: 'quit',
     defaultIcon: 'cigarette-off',
@@ -319,13 +320,15 @@ describe('getHabitsWithStats - multi-evidence', () => {
     const today = getDateString(new Date());
     const habits: Habit[] = [{
       id: 'h1',
-      userId: 'u1',
       name: 'Test',
+      icon: 'target',
       type: 'quit',
       frequency: 'everyday',
+      dailyTarget: 1,
       createdAt: today,
       archived: false,
       sortOrder: 0,
+      status: 'active',
       evidences: [{ id: 'ev1', habitId: 'h1', articleId: 'quit_smoking' as const, weight: 100 }],
     }];
     const completions = [makeCompletion('h1', today)];
@@ -340,13 +343,15 @@ describe('getHabitsWithStats - multi-evidence', () => {
     const today = getDateString(new Date());
     const habits: Habit[] = [{
       id: 'h1',
-      userId: 'u1',
       name: 'Test',
+      icon: 'target',
       type: 'quit',
       frequency: 'everyday',
+      dailyTarget: 1,
       createdAt: today,
       archived: false,
       sortOrder: 0,
+      status: 'active',
       evidences: [],
       impactArticleId: 'quit_smoking' as const,
     }];
@@ -361,13 +366,15 @@ describe('getHabitsWithStats - multi-evidence', () => {
     const today = getDateString(new Date());
     const habits: Habit[] = [{
       id: 'h1',
-      userId: 'u1',
       name: 'Test',
+      icon: 'target',
       type: 'positive',
       frequency: 'everyday',
+      dailyTarget: 1,
       createdAt: today,
       archived: false,
       sortOrder: 0,
+      status: 'active',
       evidences: [],
     }];
 

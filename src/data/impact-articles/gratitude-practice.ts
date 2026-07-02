@@ -45,6 +45,8 @@ export const gratitudePractice: LifeImpactArticle = {
       '感謝の習慣は完全に無料です。間接的な効果として、満足感の向上により物質的消費が減少する傾向があります。研究では感謝を実践する人は衝動購入が少ないと報告されており、1日あたり¥150のコスト削減と推定されます。',
     income:
       '年収1,500万円（日給¥62,500）に対して、ポジティブ感情の向上は職場での対人関係改善と創造性向上に寄与します。Lyubomirsky（2005）は幸福度の高い人の生産性が12%高いと報告しており、感謝による幸福度向上分を控えめに1.5%と見積もると、1日あたり¥700の収入ポテンシャルと推定されます。',
+    positiveMood:
+      '感謝の実践は幸福度を高めます（Emmons & McCullough, 2003 で週次感謝群は幸福度+25%）。何もしないときに前向きでいられる時間（480分/日）を基準に、気分改善を保守的に15%とみなすと、1日あたり約72分（480分×15%）、前向きな気持ちで過ごせる時間が増えると推定されます。',
     cumulative:
       '**1ヶ月続けると**：健康寿命+2.5時間、¥4,500節約、¥21,000の収入増。\n' +
       '**1年続けると**：健康寿命+1.5日、¥5.5万節約、¥25.6万の収入増。\n' +
@@ -56,6 +58,7 @@ export const gratitudePractice: LifeImpactArticle = {
     dailyHealthMinutes: 5,
     dailyCostSaving: 150,
     dailyIncomeGain: 700,
+    dailyPositiveMoodMinutes: 72,
   },
 
   confidenceLevel: 'medium',
@@ -72,6 +75,11 @@ export const gratitudePractice: LifeImpactArticle = {
     income: [
       { label: '幸福度と生産性', value: '幸福度高い人は生産性12%高い（Lyubomirsky, 2005）' },
       { label: '感謝分を1.5%に控えめ適用', formula: '62500 × 1.5% ≈ 938 → 保守的に', result: '700円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: '週次感謝群で幸福度+25%（Emmons & McCullough, 2003）。保守的に15%採用' },
+      { label: '日割り計算', formula: '480分 × 15%', result: '72分/日' },
     ],
   },
 

@@ -73,6 +73,7 @@ export const quitPorn: LifeImpactArticle = {
     dailyHealthMinutes: 7,
     dailyCostSaving: 410,
     dailyIncomeGain: 2740,
+    dailyPositiveMoodMinutes: 0,
   },
 
   confidenceLevel: 'medium',

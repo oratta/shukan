@@ -45,6 +45,8 @@ export const dailyJournaling: LifeImpactArticle = {
       'ノートとペンのコストは月100円程度。一方、ストレス関連の衝動消費や体調不良による出費が減少します。メンタルヘルスの安定により、カウンセリング費用の削減も見込まれ、1日あたり¥100のコスト削減と推定されます。',
     income:
       '年収1,500万円（日給¥62,500）に対して、思考整理によるワーキングメモリの解放と意思決定の質向上を控えめに1.5%と見積もると年間¥22.5万。さらにストレス低減による欠勤減少を加え、1日あたり¥800の収入ポテンシャルと推定されます。',
+    positiveMood:
+      'ポジティブ感情ジャーナリングはメンタルの苦痛を減らし不安・ストレス知覚を下げます（Smyth et al., 2018）。何もしないときに前向きでいられる時間（480分/日）を基準に、気分改善を保守的に12%とみなすと、1日あたり約58分（480分×12%）、前向きな気持ちで過ごせる時間が増えると推定されます。',
     cumulative:
       '**1ヶ月続けると**：健康寿命+2.5時間、¥3,000節約、¥24,000の収入増。\n' +
       '**1年続けると**：健康寿命+1.5日、¥3.7万節約、¥29.2万の収入増。\n' +
@@ -56,6 +58,7 @@ export const dailyJournaling: LifeImpactArticle = {
     dailyHealthMinutes: 5,
     dailyCostSaving: 100,
     dailyIncomeGain: 800,
+    dailyPositiveMoodMinutes: 58,
   },
 
   confidenceLevel: 'medium',
@@ -74,6 +77,11 @@ export const dailyJournaling: LifeImpactArticle = {
       { label: '思考整理効果', value: 'ワーキングメモリ解放による意思決定改善' },
       { label: '生産性1.5%', formula: '62500 × 1.5%', result: '938円/日' },
       { label: '保守的に調整', value: '欠勤減少を含め控えめに', result: '800円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: 'ポジティブ感情ジャーナリングで苦痛減・不安低下（Smyth et al., 2018）。保守的に12%' },
+      { label: '日割り計算', formula: '480分 × 12%', result: '58分/日' },
     ],
   },
 

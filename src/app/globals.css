@@ -180,3 +180,58 @@
     opacity: 0;
   }
 }
+
+/* ───────── オンボーディング [2] 段階タップ診断のトランジション（プロト準拠） ───────── */
+
+/* 習慣カードの入場: 下から blur を解きながら浮かび上がる */
+@keyframes onbSlideEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(26px) scale(0.97);
+    filter: blur(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+/* 習慣カードの退場: 上へ抜けながら blur アウト（余韻の後半で発火） */
+@keyframes onbSlideLeave {
+  0% {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-22px) scale(0.98);
+    filter: blur(6px);
+  }
+}
+
+/* タップ直後に KPI がふわっと浮く（count-up と同時に走る） */
+@keyframes onbKpiBump {
+  0% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-3px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.onb-slide-enter {
+  animation: onbSlideEnter 0.52s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.onb-slide-leave {
+  animation: onbSlideLeave 0.34s cubic-bezier(0.55, 0, 0.45, 1) 0.3s both;
+}
+
+.onb-kpi-bump {
+  animation: onbKpiBump 0.6s ease;
+}

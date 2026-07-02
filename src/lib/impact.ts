@@ -8,6 +8,7 @@ export interface DailyImpact {
   healthMinutes: number;
   costSaving: number;
   incomeGain: number;
+  positiveMoodMinutes: number;
 }
 
 /**
@@ -17,6 +18,7 @@ export interface AnnualImpact {
   healthMinutes: number;
   costSaving: number;
   incomeGain: number;
+  positiveMoodMinutes: number;
 }
 
 const DAYS_PER_YEAR = 365;
@@ -29,6 +31,7 @@ export function calculateAnnualImpact(daily: DailyImpact): AnnualImpact {
     healthMinutes: daily.healthMinutes * DAYS_PER_YEAR,
     costSaving: daily.costSaving * DAYS_PER_YEAR,
     incomeGain: daily.incomeGain * DAYS_PER_YEAR,
+    positiveMoodMinutes: daily.positiveMoodMinutes * DAYS_PER_YEAR,
   };
 }
 
@@ -42,6 +45,7 @@ export function calculateDailyImpact(
   let healthMinutes = 0;
   let costSaving = 0;
   let incomeGain = 0;
+  let positiveMoodMinutes = 0;
   for (const ev of evidences) {
     const article = getArticleFn(ev.articleId);
     if (!article) continue;
@@ -49,8 +53,9 @@ export function calculateDailyImpact(
     healthMinutes += article.calculationParams.dailyHealthMinutes * w;
     costSaving += article.calculationParams.dailyCostSaving * w;
     incomeGain += article.calculationParams.dailyIncomeGain * w;
+    positiveMoodMinutes += article.calculationParams.dailyPositiveMoodMinutes * w;
   }
-  return { healthMinutes, costSaving, incomeGain };
+  return { healthMinutes, costSaving, incomeGain, positiveMoodMinutes };
 }
 
 /**
@@ -71,6 +76,7 @@ export function calculateImpactSavings(
     healthMinutes: completedDays * article.calculationParams.dailyHealthMinutes,
     costSaving: completedDays * article.calculationParams.dailyCostSaving,
     incomeGain: completedDays * article.calculationParams.dailyIncomeGain,
+    positiveMoodMinutes: completedDays * article.calculationParams.dailyPositiveMoodMinutes,
   };
 }
 
@@ -94,6 +100,7 @@ export function calculateMultiEvidenceImpact(
     healthMinutes: completedDays * daily.healthMinutes,
     costSaving: completedDays * daily.costSaving,
     incomeGain: completedDays * daily.incomeGain,
+    positiveMoodMinutes: completedDays * daily.positiveMoodMinutes,
   };
 }
 
@@ -108,6 +115,7 @@ export function calculateTotalSavings(
     healthMinutes: 0,
     costSaving: 0,
     incomeGain: 0,
+    positiveMoodMinutes: 0,
   };
   return habits.reduce((total, habit) => {
     if (!habit.impactSavings) return total;
@@ -116,6 +124,7 @@ export function calculateTotalSavings(
       healthMinutes: total.healthMinutes + habit.impactSavings.healthMinutes,
       costSaving: total.costSaving + habit.impactSavings.costSaving,
       incomeGain: total.incomeGain + habit.impactSavings.incomeGain,
+      positiveMoodMinutes: total.positiveMoodMinutes + habit.impactSavings.positiveMoodMinutes,
     };
   }, initial);
 }

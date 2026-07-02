@@ -10,7 +10,8 @@ const createServerClientMock = vi.fn(() => ({
 }));
 
 vi.mock('@supabase/ssr', () => ({
-  createServerClient: (...args: unknown[]) => createServerClientMock(...args),
+  createServerClient: (...args: unknown[]) =>
+    (createServerClientMock as (...a: unknown[]) => unknown)(...args),
 }));
 
 // Import middleware AFTER mocks
@@ -72,7 +73,7 @@ describe('middleware: marketing host routing', () => {
   describe('S2: dev escape hatch in non-production', () => {
     it('rewrites to /marketing when NODE_ENV != production and ?marketing=1', async () => {
       // vitest by default has NODE_ENV=test
-      process.env.NODE_ENV = 'development';
+      (process.env as { NODE_ENV?: string }).NODE_ENV = 'development';
       // No marketing hosts configured
       const req = makeRequest('http://localhost:3000/?marketing=1', 'localhost:3000');
 
@@ -85,7 +86,7 @@ describe('middleware: marketing host routing', () => {
     });
 
     it('does NOT honor ?marketing=1 in production', async () => {
-      process.env.NODE_ENV = 'production';
+      (process.env as { NODE_ENV?: string }).NODE_ENV = 'production';
       getUserMock.mockResolvedValue({ data: { user: null } });
       const req = makeRequest('https://s-mitch.com/?marketing=1', 's-mitch.com');
 
@@ -132,7 +133,7 @@ describe('middleware: marketing host routing', () => {
 
   describe('S5: localhost without escape hatch behaves as apex', () => {
     it('redirects unauthenticated localhost user to /login when no ?marketing=1', async () => {
-      process.env.NODE_ENV = 'development';
+      (process.env as { NODE_ENV?: string }).NODE_ENV = 'development';
       // No marketing host match
       getUserMock.mockResolvedValue({ data: { user: null } });
       const req = makeRequest('http://localhost:3000/', 'localhost:3000');
@@ -187,7 +188,7 @@ describe('middleware: marketing page renders standalone layout (S8)', () => {
     expect(typeof mod.default).toBe('function');
   });
 
-  it('marketing page renders Hero placeholder, CTA to login, and footer links', async () => {
+  it('marketing page renders tagline and footer links', async () => {
     const { default: MarketingPage } = await import('@/app/marketing/page');
     // Server Component returns JSX synchronously; render to a tree object
     const tree = (MarketingPage as () => unknown)();
@@ -215,10 +216,8 @@ describe('middleware: marketing page renders standalone layout (S8)', () => {
 
     const joinedText = texts.join(' ');
     expect(joinedText).toContain('Switch your path');
-    // CTA href should target /login (apex)
-    const loginHref = hrefs.find((h) => h.endsWith('/login'));
-    expect(loginHref).toBeTruthy();
-    // Footer links
+    // LP 刷新（PR #33 以降）で /login CTA は廃止され、CTA はウェイトリストフォームになった。
+    // ページ直下から辿れる確定要素はフッター（Privacy / Terms / コピーライト）のみを検証する。
     expect(hrefs).toContain('/privacy');
     expect(hrefs).toContain('/terms');
     expect(joinedText).toContain('Genetta');

@@ -30,6 +30,7 @@ const mockArticleQuitSmoking: LifeImpactArticle = {
     dailyHealthMinutes: 30,
     dailyCostSaving: 550,
     dailyIncomeGain: 200,
+    dailyPositiveMoodMinutes: 0, // 未設定（quit_smoking は positiveMood 未設定）
   },
   confidenceLevel: 'high',
   defaultHabitType: 'quit',
@@ -53,6 +54,7 @@ const mockArticleDailyCardio: LifeImpactArticle = {
     dailyHealthMinutes: 45,
     dailyCostSaving: 300,
     dailyIncomeGain: 500,
+    dailyPositiveMoodMinutes: 60, // 設定あり（前向きな気持ちの時間 60分/日）
   },
   confidenceLevel: 'high',
   defaultHabitType: 'positive',
@@ -78,9 +80,9 @@ function makeEvidence(articleId: string, weight: number): HabitEvidence {
 
 function makeCompletion(habitId: string, date: string, status: string = 'completed'): HabitCompletion {
   return {
-    id: `comp-${date}`,
     habitId,
     date,
+    completedAt: `${date}T00:00:00.000Z`,
     status: status as HabitCompletion['status'],
   };
 }
@@ -95,6 +97,7 @@ describe('calculateDailyImpact', () => {
       healthMinutes: 30,
       costSaving: 550,
       incomeGain: 200,
+      positiveMoodMinutes: 0,
     });
   });
 
@@ -105,7 +108,29 @@ describe('calculateDailyImpact', () => {
       healthMinutes: 15,
       costSaving: 275,
       incomeGain: 100,
+      positiveMoodMinutes: 0,
     });
+  });
+
+  // A-S1: 4KPI（positiveMoodMinutes 含む）の重み付き合算
+  it('positiveMoodMinutes も重み付きで合算される（A-S1）', () => {
+    const evidences = [
+      makeEvidence('daily_cardio', 100), // positiveMood 60 → 60
+    ];
+    const result = calculateDailyImpact(evidences, mockGetArticle);
+    expect(result.positiveMoodMinutes).toBe(60);
+
+    const half = calculateDailyImpact([makeEvidence('daily_cardio', 50)], mockGetArticle);
+    expect(half.positiveMoodMinutes).toBe(30); // 60 * 0.5
+  });
+
+  it('0=未設定記事と設定済み記事の混在で positiveMoodMinutes が正しく合算される（A-S5前提）', () => {
+    const evidences = [
+      makeEvidence('quit_smoking', 100), // positiveMood 0
+      makeEvidence('daily_cardio', 100), // positiveMood 60
+    ];
+    const result = calculateDailyImpact(evidences, mockGetArticle);
+    expect(result.positiveMoodMinutes).toBe(60); // 0 + 60
   });
 
   it('複数エビデンスの重み付き合算', () => {
@@ -121,7 +146,7 @@ describe('calculateDailyImpact', () => {
 
   it('エビデンス0件の場合、全て0', () => {
     const result = calculateDailyImpact([], mockGetArticle);
-    expect(result).toEqual({ healthMinutes: 0, costSaving: 0, incomeGain: 0 });
+    expect(result).toEqual({ healthMinutes: 0, costSaving: 0, incomeGain: 0, positiveMoodMinutes: 0 });
   });
 
   it('存在しないarticleIdはスキップされる', () => {
@@ -134,6 +159,7 @@ describe('calculateDailyImpact', () => {
       healthMinutes: 30,
       costSaving: 550,
       incomeGain: 200,
+      positiveMoodMinutes: 0,
     });
   });
 });
@@ -150,6 +176,19 @@ describe('calculateImpactSavings', () => {
     expect(result.healthMinutes).toBe(90);   // 3 * 30
     expect(result.costSaving).toBe(1650);    // 3 * 550
     expect(result.incomeGain).toBe(600);     // 3 * 200
+    expect(result.positiveMoodMinutes).toBe(0); // 3 * 0（未設定）
+  });
+
+  // A-S2: 累積に positiveMoodMinutes が含まれ完了日数で加算される
+  it('positiveMoodMinutes が完了日数に応じて累積される（A-S2）', () => {
+    const completions = [
+      makeCompletion('habit-1', '2026-03-01'),
+      makeCompletion('habit-1', '2026-03-02', 'rocket_used'),
+      makeCompletion('habit-1', '2026-03-03', 'failed'), // カウントされない
+    ];
+    const result = calculateImpactSavings('habit-1', completions, mockArticleDailyCardio);
+    expect(result.completedDays).toBe(2); // completed + rocket_used のみ
+    expect(result.positiveMoodMinutes).toBe(120); // 2 * 60
   });
 
   it('rocket_usedもcompletedとしてカウントされる', () => {
@@ -195,14 +234,16 @@ describe('calculateMultiEvidenceImpact', () => {
     expect(result.healthMinutes).toBe(2 * (30 + 22.5)); // 105
     expect(result.costSaving).toBe(2 * (550 + 150));     // 1400
     expect(result.incomeGain).toBe(2 * (200 + 250));     // 900
+    // quit_smoking positiveMood 0 + daily_cardio 60*0.5=30 → daily 30, ×2日 = 60
+    expect(result.positiveMoodMinutes).toBe(2 * (0 + 30)); // 60
   });
 });
 
 describe('calculateTotalSavings', () => {
   it('全習慣のインパクトを合算', () => {
     const habits: HabitWithStats[] = [
-      { impactSavings: { completedDays: 5, healthMinutes: 100, costSaving: 1000, incomeGain: 500 } },
-      { impactSavings: { completedDays: 3, healthMinutes: 60, costSaving: 300, incomeGain: 200 } },
+      { impactSavings: { completedDays: 5, healthMinutes: 100, costSaving: 1000, incomeGain: 500, positiveMoodMinutes: 0 } },
+      { impactSavings: { completedDays: 3, healthMinutes: 60, costSaving: 300, incomeGain: 200, positiveMoodMinutes: 0 } },
     ] as HabitWithStats[];
 
     const result = calculateTotalSavings(habits);
@@ -214,12 +255,33 @@ describe('calculateTotalSavings', () => {
 
   it('impactSavingsがない習慣はスキップ', () => {
     const habits: HabitWithStats[] = [
-      { impactSavings: { completedDays: 5, healthMinutes: 100, costSaving: 1000, incomeGain: 500 } },
+      { impactSavings: { completedDays: 5, healthMinutes: 100, costSaving: 1000, incomeGain: 500, positiveMoodMinutes: 0 } },
       {} as HabitWithStats,  // no impactSavings
     ] as HabitWithStats[];
 
     const result = calculateTotalSavings(habits);
     expect(result.completedDays).toBe(5);
+  });
+
+  // A-S5: positiveMoodMinutes の総和（値あり・なし混在、0=未設定のみの習慣の寄与は0）
+  it('各習慣の positiveMoodMinutes を総和する（値あり・なし混在）（A-S5）', () => {
+    const habits: HabitWithStats[] = [
+      { impactSavings: { completedDays: 5, healthMinutes: 100, costSaving: 1000, incomeGain: 500, positiveMoodMinutes: 300 } },
+      { impactSavings: { completedDays: 3, healthMinutes: 60, costSaving: 300, incomeGain: 200, positiveMoodMinutes: 0 } }, // 未設定のみ
+      { impactSavings: { completedDays: 2, healthMinutes: 40, costSaving: 200, incomeGain: 100, positiveMoodMinutes: 120 } },
+    ] as HabitWithStats[];
+
+    const result = calculateTotalSavings(habits);
+    expect(result.positiveMoodMinutes).toBe(420); // 300 + 0 + 120
+  });
+
+  it('0=未設定記事のみの習慣でも positiveMoodMinutes は 0 でエラーにならない（A-S5）', () => {
+    const habits: HabitWithStats[] = [
+      { impactSavings: { completedDays: 4, healthMinutes: 80, costSaving: 400, incomeGain: 300, positiveMoodMinutes: 0 } },
+    ] as HabitWithStats[];
+
+    const result = calculateTotalSavings(habits);
+    expect(result.positiveMoodMinutes).toBe(0);
   });
 });
 
@@ -243,6 +305,37 @@ describe('renderArticle', () => {
     };
     const result = renderArticle(article);
     expect(result).toContain('{{unknown_key}}');
+  });
+
+  // A-S8: positiveMood を設定しても renderArticle の出力は不変（4プレースホルダーのみ）
+  it('positiveMood を設定しても出力は従来の4プレースホルダー置換のみ（A-S8）', () => {
+    const articleWithMood: LifeImpactArticle = {
+      ...mockArticleQuitSmoking,
+      inferences: {
+        ...mockArticleQuitSmoking.inferences,
+        positiveMood: 'これは前向きな気持ちの推論段落（renderArticle には出ない）',
+      },
+      calculationParams: {
+        ...mockArticleQuitSmoking.calculationParams,
+        dailyPositiveMoodMinutes: 240,
+      },
+      article: {
+        ...mockArticleQuitSmoking.article,
+        // positiveMood 用のプレースホルダーがあっても置換されず残る
+        researchBody:
+          '{{health_inference}}/{{cost_inference}}/{{income_inference}}/{{cumulative}}/{{positive_mood_inference}}',
+      },
+    };
+    const result = renderArticle(articleWithMood);
+    // 既存4プレースホルダーは置換される
+    expect(result).toContain('寿命が10年延びる');
+    expect(result).toContain('年間20万円の節約');
+    expect(result).toContain('生産性が向上する');
+    expect(result).toContain('10年で200万円');
+    // positiveMood の推論段落は挿入されない
+    expect(result).not.toContain('これは前向きな気持ちの推論段落');
+    // positive_mood プレースホルダーは未知キーとしてそのまま残る（出力不変の証拠）
+    expect(result).toContain('{{positive_mood_inference}}');
   });
 });
 
@@ -324,6 +417,9 @@ describe('Daily impact aggregation for DailyImpactSummary', () => {
     expect(totalHealth).toBe(75);   // 30 + 45
     expect(totalCost).toBe(850);    // 550 + 300
     expect(totalIncome).toBe(700);  // 200 + 500
+    // positiveMood: quit_smoking 0 + daily_cardio 60
+    const totalMood = daily1.positiveMoodMinutes + daily2.positiveMoodMinutes;
+    expect(totalMood).toBe(60);
 
     // Earned = only completed habits (simulate habit1 completed, habit2 not)
     const earnedHealth = daily1.healthMinutes;

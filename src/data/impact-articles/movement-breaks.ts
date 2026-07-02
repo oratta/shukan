@@ -75,6 +75,7 @@ export const movementBreaks: LifeImpactArticle = {
     dailyHealthMinutes: 8,
     dailyCostSaving: 350,
     dailyIncomeGain: 1250,
+    dailyPositiveMoodMinutes: 0,
   },
 
   confidenceLevel: 'high',

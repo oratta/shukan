@@ -16,7 +16,32 @@ export interface Habit {
   impactArticleId?: ArticleId; // legacy single-evidence — kept for backward compat
   evidences: HabitEvidence[];
   sortOrder: number;
+  /**
+   * 習慣のライフサイクル状態。
+   *   'active'      … これから積み上げる習慣（既定）
+   *   'established' … 既に身についた（習慣化済み）習慣
+   * 読み出し（toHabit）は常に値を埋める（DB 既定 'active' / フォールバックあり）ため
+   * コンシューマに undefined を漏らさない必須フィールドとする。
+   */
+  status: 'active' | 'established';
+  /** established の習慣が身についた開始日（YYYY-MM-DD）。active では undefined。 */
+  establishedSince?: string;
 }
+
+/**
+ * habit 書き込み（insert）時の入力型。
+ * id/createdAt/archived/sortOrder は DB / サーバ側で割り当てるため除外。
+ * status/establishedSince は省略可能（省略時は active 既定）にして、
+ * 既存の書き込み経路（habit-form / discover 採用）を後方互換に保つ。
+ * established 習慣を保存する経路（onboarding v2）はこのフィールドに値を渡す（change-C）。
+ */
+export type HabitInsertInput = Omit<
+  Habit,
+  'id' | 'createdAt' | 'archived' | 'sortOrder' | 'status' | 'establishedSince'
+> & {
+  status?: 'active' | 'established';
+  establishedSince?: string;
+};
 
 export interface CopingStep {
   id: string;

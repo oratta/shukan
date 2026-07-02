@@ -66,7 +66,7 @@ export function YesterdayReviewSheet({
   // シート open 時に入力 state を一度リセットする意図的パターンのため同期 setState が必要。
   useEffect(() => {
     if (open) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reset local form state when sheet opens
       setMood(undefined);
       setComment('');
       setNoteValues({});

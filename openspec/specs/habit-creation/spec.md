@@ -1,4 +1,9 @@
-## MODIFIED Requirements
+# habit-creation Specification
+
+## Purpose
+TBD - normalized from archived change evidence-marketplace (delta format had leaked into the main spec). Update Purpose after review.
+
+## Requirements
 
 ### Requirement: エビデンス付き習慣作成
 システムは習慣作成時にエビデンスを紐付けて保存できなければならない（MUST）。

@@ -56,6 +56,7 @@ export const noImpulseBuying: LifeImpactArticle = {
     dailyHealthMinutes: 2,
     dailyCostSaving: 700,
     dailyIncomeGain: 500,
+    dailyPositiveMoodMinutes: 0,
   },
 
   confidenceLevel: 'medium',

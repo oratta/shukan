@@ -56,6 +56,7 @@ export const homeCooking: LifeImpactArticle = {
     dailyHealthMinutes: 6,
     dailyCostSaving: 800,
     dailyIncomeGain: 500,
+    dailyPositiveMoodMinutes: 0,
   },
 
   confidenceLevel: 'high',
