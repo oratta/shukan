@@ -102,16 +102,16 @@
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
   .qask{font-size:13.5px;font-weight:700;margin:11px 0 8px;}
 
-  .levels{display:flex;flex-direction:column;gap:7px;}
+  .levels{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
   .lv{
-    display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:14px;border:1.5px solid var(--line);
+    display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:11px 13px;border-radius:14px;border:1.5px solid var(--line);
     background:#fff;cursor:pointer;transition:transform .14s ease, border-color .2s ease, background .2s ease;
     text-align:left;font-family:inherit;
   }
   .lv:active{transform:scale(.98);}
-  .lv .txt{flex:1;}
-  .lv .t1{font-size:14px;font-weight:700;}
-  .lv .t2{font-size:11px;color:var(--muted);margin-top:1px;}
+  .lv-top{display:flex;align-items:center;justify-content:space-between;width:100%;}
+  .lv .t1{font-size:14px;font-weight:700;line-height:1.2;}
+  .lv .t2{font-size:10.5px;color:var(--muted);line-height:1.3;}
   .lv .pct{font-size:13px;font-weight:800;color:var(--muted);}
   .lv.sel{border-color:var(--accent);background:#f1fdfb;}
   .lv.sel .pct{color:var(--accent-ink);}
@@ -522,9 +522,9 @@ function render(animateInDir){
     <div class="levels">
       ${LEVELS.map((l)=>`
         <button class="lv ${cur&&cur.pct===l.pct?'sel':''}" data-pct="${l.pct}">
-          <span class="dot2" style="background:${l.col}"></span>
-          <span class="txt"><div class="t1">${l.t1}</div><div class="t2">${l.t2}</div></span>
-          <span class="pct">${l.pct}%</span>
+          <span class="lv-top"><span class="dot2" style="background:${l.col}"></span><span class="pct">${l.pct}%</span></span>
+          <span class="t1">${l.t1}</span>
+          <span class="t2">${l.t2}</span>
         </button>`).join('')}
     </div>`;
   stage.appendChild(slide);
