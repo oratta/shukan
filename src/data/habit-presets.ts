@@ -83,7 +83,7 @@ export const HABIT_PRESETS: readonly HabitPreset[] = [
   },
   {
     id: 'daily_strength_habit',
-    name: '毎日、筋トレをする（自重でOK）',
+    name: '週2〜3回、筋トレをする（自重でOK）',
     defaultHabitType: 'positive',
     icon: 'dumbbell',
     articleIds: ['daily_strength'],
