@@ -115,6 +115,8 @@
   .lv .pct{font-size:13px;font-weight:800;color:var(--muted);}
   .lv.sel{border-color:var(--accent);background:#f1fdfb;}
   .lv.sel .pct{color:var(--accent-ink);}
+  .lv[disabled],.lv.dis{opacity:.4;cursor:not-allowed;pointer-events:none;background:#f6f7f9;}
+  .lv.dis .t2{font-style:italic;}
 
   /* レベルのドット（絵文字不使用） */
   .lv .dot2{width:14px;height:14px;border-radius:99px;flex:none;box-shadow:0 0 0 4px rgba(0,0,0,.03);}
@@ -235,19 +237,11 @@ function fmt(k, v){
 const HABITS = [
   {
     icon:"🫀", kicker:"健康のカテゴリ",
-    name:"タバコを吸わない", sub:"吸わない生活が続いている状態。",
-    ask:"あなたは今、これが身についていますか？",
-    base:{H:288, M:0, C:1240, E:5690},
-    evid:[ {n:"quit_smoking", w:100} ],
-    note:"確定（単一エビデンス）"
-  },
-  {
-    icon:"🫀", kicker:"健康のカテゴリ",
-    name:"少し息が切れるくらいの運動を毎日行う", sub:"少し息が切れるくらいの運動（早歩き・軽いジョギング等）を毎日している状態。",
+    name:"少し息が切れるくらいの運動を毎日15分以上行う", sub:"少し息が切れるくらいの運動（早歩き・軽いジョギング等）を毎日15分以上している状態。",
     ask:"あなたは今、これが身についていますか？",
     base:{H:10, M:72, C:350, E:1500},
     evid:[ {n:"daily_cardio", w:100} ],
-    note:"確定（単一エビデンス）"
+    note:"確定"
   },
   {
     icon:"🫀", kicker:"健康のカテゴリ",
@@ -255,7 +249,7 @@ const HABITS = [
     ask:"あなたは今、これが身についていますか？",
     base:{H:14, M:72, C:400, E:2500},
     evid:[ {n:"sleep_7hours", w:100} ],
-    note:"確定（単一エビデンス）"
+    note:"確定"
   },
   {
     icon:"🫀", kicker:"健康のカテゴリ",
@@ -263,7 +257,7 @@ const HABITS = [
     ask:"あなたは今、これが身についていますか？",
     base:{H:10, M:0, C:300, E:600},
     evid:[ {n:"eat_vegetables", w:100} ],
-    note:"確定（単一エビデンス）"
+    note:"確定"
   },
   {
     icon:"🫀", kicker:"健康のカテゴリ",
@@ -271,23 +265,23 @@ const HABITS = [
     ask:"あなたは今、これが身についていますか？",
     base:{H:6, M:0, C:150, E:500},
     evid:[ {n:"drink_water", w:100} ],
-    note:"確定（単一エビデンス）"
+    note:"確定"
   },
   {
     icon:"🫀", kicker:"健康のカテゴリ",
-    name:"砂糖入りの飲み物・お菓子をとらない", sub:"砂糖入りの飲み物・お菓子をとらない状態。",
+    name:"砂糖を1日25g（ジュース250ml程度）以内に抑える", sub:"砂糖（加糖飲料・お菓子）を1日25g以内に抑えている状態。加糖飲料は250mlで約25g。ゼロでなくてOK・少量なら影響は小さい。",
     ask:"あなたは今、これが身についていますか？",
     base:{H:7, M:0, C:400, E:900},
     evid:[ {n:"quit_sugar", w:100} ],
-    note:"確定（単一エビデンス）"
+    note:"確定"
   },
   {
     icon:"🫀", kicker:"健康のカテゴリ",
-    name:"ジャンクフードを食べない", sub:"ジャンクフードを食べない状態。",
+    name:"ジャンクフード（スナック・カップ麺・ファストフード）を週2回以内にする", sub:"スナック・カップ麺・ファストフード等の超加工食品を週2回以内に抑えている状態。少ないほど良い。",
     ask:"あなたは今、これが身についていますか？",
     base:{H:8, M:0, C:500, E:800},
     evid:[ {n:"quit_junk_food", w:100} ],
-    note:"確定（単一エビデンス）"
+    note:"確定"
   },
   {
     icon:"🫀", kicker:"健康のカテゴリ",
@@ -295,7 +289,7 @@ const HABITS = [
     ask:"あなたは今、これが身についていますか？",
     base:{H:8, M:0, C:200, E:960},
     evid:[ {n:"daily_strength", w:100} ],
-    note:"確定（単一エビデンス）"
+    note:"確定"
   },
   {
     icon:"🫀", kicker:"健康のカテゴリ",
@@ -303,15 +297,24 @@ const HABITS = [
     ask:"あなたは今、これが身についていますか？",
     base:{H:5, M:20, C:20, E:600},
     evid:[ {n:"fermented_food", w:100} ],
-    note:"確定（単一エビデンス）"
+    note:"確定"
+  },
+  {
+    icon:"🫀", kicker:"健康のカテゴリ",
+    name:"タバコを1本も吸わない", sub:"タバコを1本も吸わない状態。1本でも吸うと効果は大きく下がるため、『たまに/だいたい』は選べません。",
+    ask:"あなたは今、これが身についていますか？",
+    base:{H:288, M:0, C:1240, E:5690},
+    dis:[30, 70],
+    evid:[ {n:"quit_smoking", w:100} ],
+    note:"確定"
   },
   {
     icon:"🙂", kicker:"前向きな気持ちのカテゴリ",
-    name:"毎日の瞑想", sub:"毎日、瞑想する時間をとっている状態。",
+    name:"毎日10分以上、瞑想する", sub:"毎日10分以上、瞑想する時間をとっている状態。",
     ask:"あなたは今、これが身についていますか？",
     base:{H:8, M:96, C:250, E:1200},
     evid:[ {n:"daily_meditation", w:100} ],
-    note:"確定（単一エビデンス）"
+    note:"確定"
   },
   {
     icon:"🙂", kicker:"前向きな気持ちのカテゴリ",
@@ -319,7 +322,7 @@ const HABITS = [
     ask:"あなたは今、これが身についていますか？",
     base:{H:5, M:58, C:100, E:800},
     evid:[ {n:"daily_journaling", w:100} ],
-    note:"確定（単一エビデンス）"
+    note:"確定"
   },
   {
     icon:"🙂", kicker:"前向きな気持ちのカテゴリ",
@@ -327,7 +330,7 @@ const HABITS = [
     ask:"あなたは今、これが身についていますか？",
     base:{H:7, M:72, C:200, E:800},
     evid:[ {n:"time_in_nature", w:100} ],
-    note:"確定（単一エビデンス）"
+    note:"確定"
   },
   {
     icon:"🙂", kicker:"前向きな気持ちのカテゴリ",
@@ -335,7 +338,7 @@ const HABITS = [
     ask:"あなたは今、これが身についていますか？",
     base:{H:6, M:55, C:300, E:900},
     evid:[ {n:"social_connection", w:100} ],
-    note:"確定（単一エビデンス）"
+    note:"確定"
   },
   {
     icon:"🙂", kicker:"前向きな気持ちのカテゴリ",
@@ -343,23 +346,23 @@ const HABITS = [
     ask:"あなたは今、これが身についていますか？",
     base:{H:4, M:58, C:100, E:650},
     evid:[ {n:"morning_light", w:100} ],
-    note:"確定（単一エビデンス）"
+    note:"確定"
   },
   {
     icon:"🐷", kicker:"出費削減のカテゴリ",
-    name:"アルコールを飲まない", sub:"アルコールを飲まない状態。",
+    name:"アルコールを週100g（ビール500ml×5本）以内に抑える", sub:"アルコールを週100g（ビール500ml×5本／日本酒5合）以内に抑えている状態。研究では週100g超で余命が縮む。ゼロが最も低リスク。",
     ask:"あなたは今、これが身についていますか？",
     base:{H:8, M:0, C:800, E:1640},
     evid:[ {n:"quit_alcohol", w:100} ],
-    note:"確定（単一エビデンス）"
+    note:"確定"
   }
 ];
 
 const LEVELS = [
-  {pct:0,   col:'#c2cad3', t1:'やってない',  t2:'これから始めたい'},
-  {pct:30,  col:'#f5a524', t1:'たまに',      t2:'思い出したときにやる'},
-  {pct:70,  col:'#3cc28a', t1:'だいたい',    t2:'ほとんどできている'},
   {pct:100, col:'#0fb5a6', t1:'完璧に習慣化', t2:'生活の一部になっている'},
+  {pct:70,  col:'#3cc28a', t1:'だいたい',    t2:'ほとんどできている'},
+  {pct:30,  col:'#f5a524', t1:'たまに',      t2:'思い出したときにやる'},
+  {pct:0,   col:'#c2cad3', t1:'やってない',  t2:'これから始めたい'},
 ];
 
 let idx = 0;
@@ -464,12 +467,14 @@ function render(animateInDir){
     </div>
     <div class="qask">${h.ask}</div>
     <div class="levels">
-      ${LEVELS.map((l)=>`
-        <button class="lv ${cur&&cur.pct===l.pct?'sel':''}" data-pct="${l.pct}">
+      ${LEVELS.map((l)=>{
+        const dis=(h.dis||[]).includes(l.pct);
+        return `
+        <button class="lv ${cur&&cur.pct===l.pct?'sel':''} ${dis?'dis':''}" data-pct="${l.pct}" ${dis?'disabled':''}>
           <span class="lv-top"><span class="dot2" style="background:${l.col}"></span><span class="pct">${l.pct}%</span></span>
           <span class="t1">${l.t1}</span>
-          <span class="t2">${l.t2}</span>
-        </button>`).join('')}
+          <span class="t2">${dis?'この習慣では選べません':l.t2}</span>
+        </button>`;}).join('')}
     </div>`;
   stage.appendChild(slide);
 
