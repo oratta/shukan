@@ -31,7 +31,8 @@
 
 ## 6. 運用セットアップ（マージ後・手動）
 
-- [ ] 6.1 PostHog Cloud (US) でプロジェクト作成、Project API Key 取得
-- [ ] 6.2 Vercel 環境変数 `NEXT_PUBLIC_POSTHOG_KEY` を Production / Preview に設定
-- [ ] 6.3 メインリポの `.env.local` に `NEXT_PUBLIC_POSTHOG_KEY` を追加
-- [ ] 6.4 デプロイ後、PostHog Activity で $pageview と行動イベントの流入を確認
+- [x] 6.1 PostHog Cloud (US) でプロジェクト作成、Project API Key 取得
+- [x] 6.2 Vercel 環境変数 `NEXT_PUBLIC_POSTHOG_KEY` を Production / Preview に設定
+- [x] 6.3 メインリポの `.env.local` に `NEXT_PUBLIC_POSTHOG_KEY` を追加
+- [x] 6.4 ローカル dev サーバーの `/ingest` プロキシ経由で実キーの疎通テスト成功（`proxy_smoke_test` イベント、`{"status":"Ok"}`）
+- [ ] 6.5 マージ・本番デプロイ後、PostHog Activity で $pageview と行動イベントの流入を確認
