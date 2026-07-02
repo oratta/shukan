@@ -63,6 +63,11 @@
   .kpi .dot{width:9px;height:9px;border-radius:99px;flex:none;}
   .kpi .label{font-size:10.5px;color:var(--muted);font-weight:500;line-height:1.2;}
   .kpi .val{font-size:18px;font-weight:900;line-height:1;letter-spacing:-.02em;}
+  /* ラベルと数字を横並び1行に（改行をやめて縦を節約） */
+  .kpi-inline{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .kpi-inline .top{margin-bottom:0;min-width:0;}
+  .kpi-inline .label{white-space:nowrap;}
+  .kpi-inline .val{font-size:16px;flex:none;}
   .kpi .val .u{font-size:11px;font-weight:700;color:var(--muted);margin-left:3px;}
   .kpi .split{font-size:10px;color:var(--muted);font-weight:500;margin-top:5px;line-height:1.3;}
   .kpi .split b{font-weight:700;color:#9aa6b2;}
@@ -97,9 +102,9 @@
     background:linear-gradient(150deg,#e9fbf8,#d6f6f1);font-size:36px;box-shadow:inset 0 0 0 1px #cdeee8;
   }
   .qkicker{font-size:11px;font-weight:700;color:var(--accent-ink);letter-spacing:.06em;margin-bottom:5px;}
-  .qname{font-size:20px;font-weight:900;letter-spacing:-.02em;line-height:1.2;margin:0 0 5px;}
-  .qsub{font-size:12.5px;color:var(--muted);line-height:1.4;margin:0 0 2px;
-    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .qname{font-size:20px;font-weight:900;letter-spacing:-.02em;line-height:1.2;margin:2px 0 8px;}
+  /* 補足文はインパクトの下に置く詳細。タイトルで説明が足りているので控えめに */
+  .qsub{font-size:11.5px;color:var(--muted);line-height:1.5;margin:8px 0 0;}
   .qask{font-size:13.5px;font-weight:700;margin:11px 0 8px;}
 
   .levels{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
@@ -167,7 +172,6 @@
   </header>
 
   <section class="kpis">
-    <div class="lead">身についている習慣が、あなたにもたらすこと（精査済み15習慣・サンプル: 40歳・年収1,500万）</div>
     <div class="kpi-grid" id="kpiGrid"></div>
   </section>
 
@@ -379,6 +383,7 @@ KPI.forEach(def=>{
     <div class="top"><span class="ic" style="color:${def.color}">${svg(KICON[def.k],15)}</span>
     <span class="label">${def.name}</span></div>
     <div class="val" style="color:var(--ink)"><span id="num-${def.k}">0</span><span class="u" id="unit-${def.k}"></span></div>`;
+  el.classList.add('kpi-inline');
   kpiGrid.appendChild(el);
 });
 
@@ -450,13 +455,12 @@ function render(animateInDir){
 
   slide.innerHTML = `
     <div class="qtop">
-      <div class="qkicker">${h.kicker}</div>
       <h1 class="qname">${h.name}</h1>
-      <p class="qsub">${h.sub}</p>
       <div class="impact">
         <div class="imp-lead">この習慣があなたにもたらすこと</div>
         <div class="imp-grid">${potCells}</div>
       </div>
+      <p class="qsub">${h.sub}</p>
       <div class="breakdown">
         <button class="bk-btn" id="bkBtn">▸ このスコアの内訳（エビデンスとウェイト）</button>
         <div class="bk-body" id="bkBody">
