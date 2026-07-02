@@ -104,16 +104,16 @@ describe('toggleEstablished / toggleActive — 相互排他（C-S3）', () => {
   }
 
   it('toggleEstablished で established に追加され、デフォルト年数が入る', () => {
-    const s = toggleEstablished(base(), 'quit_drinking');
-    expect(isPresetEstablished(s, 'quit_drinking')).toBe(true);
-    const sel = s.established.find((e) => e.presetId === 'quit_drinking');
+    const s = toggleEstablished(base(), 'quit_alcohol_habit');
+    expect(isPresetEstablished(s, 'quit_alcohol_habit')).toBe(true);
+    const sel = s.established.find((e) => e.presetId === 'quit_alcohol_habit');
     expect(sel?.yearsAgo).toBe(DEFAULT_ESTABLISHED_YEARS_AGO);
   });
 
   it('再度 toggleEstablished で established から外れる', () => {
-    let s = toggleEstablished(base(), 'quit_drinking');
-    s = toggleEstablished(s, 'quit_drinking');
-    expect(isPresetEstablished(s, 'quit_drinking')).toBe(false);
+    let s = toggleEstablished(base(), 'quit_alcohol_habit');
+    s = toggleEstablished(s, 'quit_alcohol_habit');
+    expect(isPresetEstablished(s, 'quit_alcohol_habit')).toBe(false);
   });
 
   it('active にあるプリセットを established にすると active から外れる（相互排他）', () => {
@@ -144,9 +144,9 @@ describe('toggleEstablished / toggleActive — 相互排他（C-S3）', () => {
 // ───────── C-S5: 「いつから」年数の設定と開始日変換 ─────────
 describe('setEstablishedYearsAgo / yearsAgoToEstablishedSince — C-S5', () => {
   it('setEstablishedYearsAgo で対象プリセットの年数だけ更新する', () => {
-    let s = toggleEstablished(createInitialWizardState(), 'quit_drinking');
-    s = setEstablishedYearsAgo(s, 'quit_drinking', 10);
-    expect(s.established.find((e) => e.presetId === 'quit_drinking')?.yearsAgo).toBe(10);
+    let s = toggleEstablished(createInitialWizardState(), 'quit_alcohol_habit');
+    s = setEstablishedYearsAgo(s, 'quit_alcohol_habit', 10);
+    expect(s.established.find((e) => e.presetId === 'quit_alcohol_habit')?.yearsAgo).toBe(10);
   });
 
   it('yearsAgo=10 は約10年前の YYYY-MM-DD を返す', () => {
@@ -184,8 +184,8 @@ describe('buildLifetimeImpactInput / shouldShowPastBlock — C-S4 / AC#12', () =
     let s = createInitialWizardState();
     s = { ...s, profile: profile() };
     s = toggleActive(s, 'cook_at_home');
-    s = toggleEstablished(s, 'quit_drinking');
-    s = setEstablishedYearsAgo(s, 'quit_drinking', 10);
+    s = toggleEstablished(s, 'quit_alcohol_habit');
+    s = setEstablishedYearsAgo(s, 'quit_alcohol_habit', 10);
     const result = computeLifetimeImpact(buildLifetimeImpactInput(s));
     expect(shouldShowPastBlock(result)).toBe(true);
     expect(result.pastIsEstimated).toBe(true);
@@ -195,12 +195,12 @@ describe('buildLifetimeImpactInput / shouldShowPastBlock — C-S4 / AC#12', () =
     let s = createInitialWizardState();
     s = { ...s, profile: profile() };
     s = toggleActive(s, 'cook_at_home');
-    s = toggleEstablished(s, 'quit_drinking');
-    s = setEstablishedYearsAgo(s, 'quit_drinking', 10);
+    s = toggleEstablished(s, 'quit_alcohol_habit');
+    s = setEstablishedYearsAgo(s, 'quit_alcohol_habit', 10);
     const input = buildLifetimeImpactInput(s);
     expect(input.activePresetIds).toEqual(['cook_at_home']);
     expect(input.establishedHabits).toHaveLength(1);
-    expect(input.establishedHabits[0].presetId).toBe('quit_drinking');
+    expect(input.establishedHabits[0].presetId).toBe('quit_alcohol_habit');
     expect(input.establishedHabits[0].establishedSince).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     expect(input.profile).not.toBeNull();
   });
@@ -252,7 +252,7 @@ describe('buildHabitFromPreset — status / establishedSince（v2）', () => {
   });
 
   it('established 指定で status=established と establishedSince を運ぶ', () => {
-    const h = buildHabitFromPreset('quit_drinking', {
+    const h = buildHabitFromPreset('quit_alcohol_habit', {
       status: 'established',
       establishedSince: '2016-06-27',
     });

@@ -152,9 +152,9 @@ describe('Missing calculationLogic handling', () => {
  * All articles consistency check
  */
 describe('All articles have valid calculationParams', () => {
-  it('all 35 articles should have positive calculationParams', () => {
+  it('all 38 articles should have positive calculationParams', () => {
     const articles = getArticleList();
-    expect(articles.length).toBe(35);
+    expect(articles.length).toBe(38);
 
     for (const { id } of articles) {
       const article = getArticle(id);
@@ -167,12 +167,12 @@ describe('All articles have valid calculationParams', () => {
 });
 
 /**
- * A-S6: 全35記事が dailyPositiveMoodMinutes を持つ（未設定は 0）
+ * A-S6: 全38記事が dailyPositiveMoodMinutes を持つ（未設定は 0）
  */
-describe('All 35 articles have dailyPositiveMoodMinutes (A-S6)', () => {
+describe('All 38 articles have dailyPositiveMoodMinutes (A-S6)', () => {
   it('全記事が number の dailyPositiveMoodMinutes を持ち 0 以上である', () => {
     const articles = getArticleList();
-    expect(articles.length).toBe(35);
+    expect(articles.length).toBe(38);
     for (const { id } of articles) {
       const article = getArticle(id);
       expect(article).toBeDefined();

@@ -142,22 +142,33 @@ export function OnboardingWizard() {
             </Field>
 
             <Field label={t("profile.gender")}>
-              <select
-                value={state.profile.gender ?? ""}
-                onChange={(e) =>
-                  updateProfile({
-                    gender: (e.target.value || null) as OnboardingGender | null,
-                  })
-                }
-                className={inputClass(false)}
-              >
-                <option value="" disabled>
-                  —
-                </option>
-                <option value="male">{t("profile.genderMale")}</option>
-                <option value="female">{t("profile.genderFemale")}</option>
-                <option value="other">{t("profile.genderOther")}</option>
-              </select>
+              <div className="grid grid-cols-3 gap-2">
+                {(["male", "female", "other"] as const).map((g) => {
+                  const selected = state.profile.gender === g;
+                  const label =
+                    g === "male"
+                      ? t("profile.genderMale")
+                      : g === "female"
+                      ? t("profile.genderFemale")
+                      : t("profile.genderOther");
+                  return (
+                    <button
+                      key={g}
+                      type="button"
+                      aria-pressed={selected}
+                      onClick={() => updateProfile({ gender: g as OnboardingGender })}
+                      className={cn(
+                        "rounded-xl border px-3 py-3 text-sm font-medium transition-colors",
+                        selected
+                          ? "border-primary bg-primary/5 text-primary ring-2 ring-primary/30"
+                          : "border-border bg-card text-foreground hover:border-primary/40"
+                      )}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
             </Field>
 
             <Field label={t("profile.country")}>
