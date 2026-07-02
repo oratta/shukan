@@ -48,14 +48,6 @@ const RATE_LEVEL_KEY: Record<number, "full" | "most" | "sometimes" | "none"> = {
   0: "none",
 };
 
-// 達成率 → レベルのドット色（プロト準拠のトーン）。
-const RATE_DOT_CLASS: Record<number, string> = {
-  1: "bg-primary",
-  0.7: "bg-emerald-500",
-  0.3: "bg-amber-500",
-  0: "bg-muted-foreground/40",
-};
-
 const V3_PRESETS = onboardingV3Presets();
 const TOTAL_HABITS = V3_PRESETS.length;
 
@@ -329,14 +321,13 @@ export function OnboardingWizard() {
                       : "border-border bg-card hover:border-primary/40"
                   )}
                 >
-                  <span className="flex w-full items-center justify-between">
-                    <span className={cn("size-3 rounded-full", RATE_DOT_CLASS[rate])} aria-hidden />
+                  <span className="flex w-full items-center justify-between gap-2">
+                    <span className="text-sm font-bold leading-tight">
+                      {t(`habits.levels.${levelKey}.label`)}
+                    </span>
                     <span className="text-xs font-bold text-muted-foreground tabular-nums">
                       {Math.round(rate * 100)}%
                     </span>
-                  </span>
-                  <span className="text-sm font-bold leading-tight">
-                    {t(`habits.levels.${levelKey}.label`)}
                   </span>
                   <span className="text-[11px] leading-tight text-muted-foreground">
                     {t(`habits.levels.${levelKey}.desc`)}
