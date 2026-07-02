@@ -187,14 +187,15 @@ describe('middleware: marketing page renders standalone layout (S8)', () => {
     expect(typeof mod.default).toBe('function');
   });
 
-  it('marketing page renders Hero placeholder, CTA to login, and footer links', async () => {
+  it('marketing page renders LP sections and footer links', async () => {
     const { default: MarketingPage } = await import('@/app/marketing/page');
     // Server Component returns JSX synchronously; render to a tree object
     const tree = (MarketingPage as () => unknown)();
 
-    // Collect text and hrefs by walking the React element tree
+    // Collect text, hrefs, and component names by walking the React element tree
     const texts: string[] = [];
     const hrefs: string[] = [];
+    const componentNames: string[] = [];
     const visit = (node: unknown): void => {
       if (node === null || node === undefined || node === false) return;
       if (typeof node === 'string' || typeof node === 'number') {
@@ -206,7 +207,13 @@ describe('middleware: marketing page renders standalone layout (S8)', () => {
         return;
       }
       if (typeof node === 'object') {
-        const el = node as { props?: { children?: unknown; href?: string } };
+        const el = node as {
+          type?: unknown;
+          props?: { children?: unknown; href?: string };
+        };
+        if (typeof el.type === 'function' && el.type.name) {
+          componentNames.push(el.type.name);
+        }
         if (el.props?.href) hrefs.push(el.props.href);
         if (el.props?.children !== undefined) visit(el.props.children);
       }
@@ -215,9 +222,9 @@ describe('middleware: marketing page renders standalone layout (S8)', () => {
 
     const joinedText = texts.join(' ');
     expect(joinedText).toContain('Switch your path');
-    // CTA href should target /login (apex)
-    const loginHref = hrefs.find((h) => h.endsWith('/login'));
-    expect(loginHref).toBeTruthy();
+    // LP conversion 後の CTA は waitlist 方式（Hero + CtaWaitlistForm セクション）
+    expect(componentNames).toContain('Hero');
+    expect(componentNames).toContain('CtaWaitlistForm');
     // Footer links
     expect(hrefs).toContain('/privacy');
     expect(hrefs).toContain('/terms');
