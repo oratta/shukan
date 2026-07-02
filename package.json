@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "vitest",
     "test:run": "vitest run",
+    "check:migrations": "node scripts/check-migration-numbers.mjs",
     "stripe:setup": "tsx scripts/stripe-setup.ts"
   },
   "dependencies": {
