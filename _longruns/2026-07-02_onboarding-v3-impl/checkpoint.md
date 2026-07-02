@@ -37,4 +37,19 @@
     3. writeError が汎用文言のみ（エラー種別の区別なし）
     4. AC#1: openspec/changes/ に per-change の proposal/tasks が未作成（Build Contract レビューで代替）
     5. AC#14: 実ブラウザ E2E（[0]→[5]→ホーム通し + DB 書き込み確認）が未実施（残タスク）
-- [ ] 残課題対応 / Feedback Tier 確認
+- [x] 残課題対応（ユーザー承認「連打ガード修正＋E2E まで自律実行」）
+  - 連打ガード: WizardState.advancing + 純粋関数（tapHabitRate / completeHabitAdvance / backInHabits）
+    で実装、ユニットテスト10本追加（コミット `4281b70`。RTL/jsdom はコードベース規約により不採用 —
+    decisions.md D-C-2）。gates: 653 tests / tsc 0 / lint 0 errors / build 成功
+  - AC#14 実ブラウザ E2E: **PASS**（2026-07-02、localhost:3000 = 本 worktree の dev サーバー）
+    - [0]→[1]（40歳・男性・日本・年収空）→[2] 15習慣（運動=70%・タバコ=100%・他=0%）→[3]→[4]→[5]→ホーム 完走
+    - [2]: タップで即遷移・ライブ4KPI加算（75日=107×0.7 等）・戻る＋再選択維持・
+      **連打3クリックでも1画面しか進まない（ガード実地確認）**・タバコ二択 UI・8.4年（年表記切替）
+    - [4]: 未来のみ単一表示・新単位（+8.6年 / +50分/日 / +36万円/年 / +162万円/年）・「増える収入」表示
+    - [5]: 登録対象は運動（active）とタバコ（習慣化済みバッジ）の2件のみ
+    - DB（Supabase dev）: habits = タバコ status='established'・established_since=null /
+      運動 status='active'、0%の13習慣は未作成。user_profiles = birth_year 1986・male・JP・
+      annual_income null・tracked_kpis 全4KPI。habit_evidences = weight 100 × 2件（quit_smoking / daily_cardio）
+  - 未対応（非ブロッカー・後送り）: writeError の汎用文言（エラー種別の区別なし）/
+    AC#1 の per-change OpenSpec proposal 未作成（Build Contract レビューで代替）
+- [ ] Feedback Tier 確認（/lr:f）→ アーカイブ（/lr:a）
