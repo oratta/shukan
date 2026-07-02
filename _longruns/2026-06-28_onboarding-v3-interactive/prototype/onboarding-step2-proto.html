@@ -165,7 +165,7 @@
   </header>
 
   <section class="kpis">
-    <div class="lead">身についている習慣が、あなたにもたらすこと（確定22習慣・サンプル: 40歳・年収1,500万）</div>
+    <div class="lead">身についている習慣が、あなたにもたらすこと（精査済み15習慣・サンプル: 40歳・年収1,500万）</div>
     <div class="kpi-grid" id="kpiGrid"></div>
   </section>
 
@@ -291,7 +291,7 @@ const HABITS = [
   },
   {
     icon:"🫀", kicker:"健康のカテゴリ",
-    name:"毎日、筋トレをする（自重でOK）", sub:"毎日、筋トレ（自重でOK）をしている状態。",
+    name:"週2〜3回、筋トレをする（自重でOK）", sub:"週2〜3回、筋トレ（自重でOK）をしている状態。※筋肉は回復が要るため毎日でなく週2〜3回で効果が出る。",
     ask:"あなたは今、これが身についていますか？",
     base:{H:8, M:0, C:200, E:960},
     evid:[ {n:"daily_strength", w:100} ],
@@ -352,69 +352,13 @@ const HABITS = [
     base:{H:8, M:0, C:800, E:1640},
     evid:[ {n:"quit_alcohol", w:100} ],
     note:"確定（単一エビデンス）"
-  },
-  {
-    icon:"🐷", kicker:"出費削減のカテゴリ",
-    name:"毎日の節約", sub:"毎日、意識して節約している状態。",
-    ask:"あなたは今、これが身についていますか？",
-    base:{H:3, M:0, C:1000, E:800},
-    evid:[ {n:"daily_saving", w:100} ],
-    note:"未レビュー（cost/earning・束ねのまま）: daily_saving"
-  },
-  {
-    icon:"🐷", kicker:"出費削減のカテゴリ",
-    name:"衝動買いをやめる", sub:"衝動買いをやめている状態。",
-    ask:"あなたは今、これが身についていますか？",
-    base:{H:2, M:0, C:700, E:500},
-    evid:[ {n:"no_impulse_buying", w:100} ],
-    note:"未レビュー（cost/earning・束ねのまま）: no_impulse_buying"
-  },
-  {
-    icon:"🐷", kicker:"出費削減のカテゴリ",
-    name:"自炊する", sub:"外食・中食に頼らず自炊している状態。",
-    ask:"あなたは今、これが身についていますか？",
-    base:{H:13, M:0, C:1150, E:1300},
-    evid:[ {n:"home_cooking", w:100}, {n:"intermittent_fasting", w:100} ],
-    note:"未レビュー（cost/earning・束ねのまま）: home_cooking + intermittent_fasting"
-  },
-  {
-    icon:"📈", kicker:"増える収入のカテゴリ",
-    name:"集中して働く", sub:"集中して働けている状態。",
-    ask:"あなたは今、これが身についていますか？",
-    base:{H:7, M:0, C:500, E:5000},
-    evid:[ {n:"deep_work", w:100}, {n:"pomodoro_technique", w:100} ],
-    note:"未レビュー（cost/earning・束ねのまま）: deep_work + pomodoro_technique"
-  },
-  {
-    icon:"📈", kicker:"増える収入のカテゴリ",
-    name:"朝を整える", sub:"朝の時間を整えている状態。",
-    ask:"あなたは今、これが身についていますか？",
-    base:{H:14, M:0, C:850, E:4090},
-    evid:[ {n:"morning_planning", w:100}, {n:"wake_early", w:100}, {n:"morning_tidying", w:100} ],
-    note:"未レビュー（cost/earning・束ねのまま）: morning_planning + wake_early + morning_tidying"
-  },
-  {
-    icon:"📈", kicker:"増える収入のカテゴリ",
-    name:"デジタルの誘惑を断つ", sub:"SNS・動画などデジタルの誘惑を断てている状態。",
-    ask:"あなたは今、これが身についていますか？",
-    base:{H:10, M:72, C:500, E:6090},
-    evid:[ {n:"no_youtube", w:100}, {n:"quit_social_media", w:100} ],
-    note:"未レビュー（cost/earning・束ねのまま）: no_youtube + quit_social_media"
-  },
-  {
-    icon:"📈", kicker:"増える収入のカテゴリ",
-    name:"学び続ける", sub:"読書・語学など学びを続けている状態。",
-    ask:"あなたは今、これが身についていますか？",
-    base:{H:14, M:0, C:300, E:3300},
-    evid:[ {n:"daily_reading", w:100}, {n:"learn_language", w:100} ],
-    note:"未レビュー（cost/earning・束ねのまま）: daily_reading + learn_language"
   }
 ];
 
 const LEVELS = [
   {pct:0,   col:'#c2cad3', t1:'やってない',  t2:'これから始めたい'},
   {pct:30,  col:'#f5a524', t1:'たまに',      t2:'思い出したときにやる'},
-  {pct:70,  col:'#3cc28a', t1:'だいたい',    t2:'週の半分以上はできている'},
+  {pct:70,  col:'#3cc28a', t1:'だいたい',    t2:'ほとんどできている'},
   {pct:100, col:'#0fb5a6', t1:'完璧に習慣化', t2:'生活の一部になっている'},
 ];
 
