@@ -4,6 +4,21 @@ import { withSentryConfig } from '@sentry/nextjs';
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig = {
+  // PostHog ingestion is proxied through our own domain so ad-blockers
+  // don't drop events (issue #17)
+  skipTrailingSlashRedirect: true,
+  async rewrites() {
+    return [
+      {
+        source: '/ingest/static/:path*',
+        destination: 'https://us-assets.i.posthog.com/static/:path*',
+      },
+      {
+        source: '/ingest/:path*',
+        destination: 'https://us.i.posthog.com/:path*',
+      },
+    ];
+  },
   async headers() {
     return [
       {

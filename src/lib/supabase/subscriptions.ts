@@ -7,6 +7,7 @@
  * (service role, server-only).
  */
 
+import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Plan } from '@/lib/billing/config';
 import type { SubscriptionState, SubscriptionStatus } from '@/lib/billing/entitlement';
 import { createClient } from './client';
@@ -49,11 +50,16 @@ export function rowToSubscription(row: SubscriptionRow): SubscriptionRecord {
  * Reads the current user's subscription row. With RLS, the anon/authenticated
  * client can only see the caller's own row, so no explicit user filter is needed
  * for security — we still pass `user_id` for an unambiguous single-row read.
+ *
+ * Server callers (route handlers) MUST pass their cookie-bound server client —
+ * the default browser client has no auth session on the server, so RLS would
+ * silently return zero rows.
  */
 export async function getSubscriptionForUser(
-  userId: string
+  userId: string,
+  client?: SupabaseClient
 ): Promise<SubscriptionRecord | null> {
-  const supabase = createClient();
+  const supabase = client ?? createClient();
   const { data, error } = await supabase
     .from('subscriptions')
     .select('*')

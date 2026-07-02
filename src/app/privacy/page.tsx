@@ -14,7 +14,7 @@ export default function PrivacyPage() {
         </div>
 
         <h1 className="mb-2 text-3xl font-bold tracking-tight">プライバシーポリシー</h1>
-        <p className="mb-8 text-sm text-muted-foreground">最終更新日：2026年6月12日</p>
+        <p className="mb-8 text-sm text-muted-foreground">最終更新日：2026年7月2日</p>
 
         <div className="prose prose-sm dark:prose-invert max-w-none space-y-8 text-foreground">
 
@@ -102,40 +102,71 @@ export default function PrivacyPage() {
           <section>
             <h2 className="mb-3 text-lg font-semibold">4. データの保存と管理</h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
-              すべてのデータは、<strong className="text-foreground">Supabase</strong>（PostgreSQL データベース、東京リージョン）に保存されます。データは行レベルセキュリティ（RLS）により保護されており、ご自身のデータには本人のみがアクセスできます。サービスは Vercel 上でホストされています。第三者へのデータ販売・提供は一切行いません。
+              すべてのデータは、<strong className="text-foreground">Supabase</strong>（PostgreSQL データベース、東京リージョン）に保存されます。データは行レベルセキュリティ（RLS）により保護されており、ご自身のデータには本人のみがアクセスできます。サービスは Vercel, Inc.（米国）が提供するインフラ上でホストされています。
             </p>
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">5. 決済処理の委託（Stripe について）</h2>
+            <h2 className="mb-3 text-lg font-semibold">5. 第三者への提供</h2>
+            <p className="mb-2 text-sm leading-relaxed text-muted-foreground">
+              ユーザーの個人情報を第三者に販売することはありません。また、次の場合を除き、本人の同意なく第三者に提供することもありません。
+            </p>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li className="flex gap-2">
+                <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-muted-foreground" />
+                <span>法令に基づく場合</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-muted-foreground" />
+                <span>本サービスの運営に必要な業務を委託する場合に、委託先（決済代行、インフラ提供、サービス運営の受託者等）に対して、業務の遂行に必要な範囲で提供する場合</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-muted-foreground" />
+                <span>事業譲渡・合併その他の事業承継に伴って個人情報が提供される場合</span>
+              </li>
+            </ul>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              委託先には、Stripe, Inc. や Vercel, Inc. など米国に所在する事業者が含まれます。外国にある第三者への提供に該当する場合は、個人情報保護法の定めに従い適切に取り扱います。
+            </p>
+          </section>
+
+          <section>
+            <h2 className="mb-3 text-lg font-semibold">6. 決済処理の委託（Stripe について）</h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
-              有料プランの決済処理は、決済代行サービス <strong className="text-foreground">Stripe, Inc.</strong> に委託しています。クレジットカード番号・有効期限・セキュリティコード等のカード情報は Stripe が直接取得・処理し、当社のサーバーには保存されません。当社が Stripe に送信・連携するのは、決済に必要な範囲の情報（メールアドレス、申し込みプラン、サブスクリプションの状態等）に限られます。Stripe における個人情報の取り扱いについては、Stripe のプライバシーポリシー（<a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">stripe.com/privacy</a>）をご確認ください。取引条件の詳細は<a href="/tokushoho" className="underline underline-offset-2 hover:text-foreground">特定商取引法に基づく表記</a>をご覧ください。
+              有料プランの決済処理は、決済代行サービス <strong className="text-foreground">Stripe, Inc.</strong>（米国に所在する事業者）に委託しています。クレジットカード番号・有効期限・セキュリティコード等のカード情報は Stripe が直接取得・処理し、当社のサーバーには保存されません。当社が Stripe に送信・連携するのは、決済に必要な範囲の情報（メールアドレス、申し込みプラン、サブスクリプションの状態等）に限られます。Stripe における個人情報の取り扱いについては、Stripe のプライバシーポリシー（<a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">stripe.com/privacy</a>）をご確認ください。取引条件の詳細は<a href="/tokushoho" className="underline underline-offset-2 hover:text-foreground">特定商取引法に基づく表記</a>をご覧ください。
             </p>
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">6. Google OAuth について</h2>
+            <h2 className="mb-3 text-lg font-semibold">7. Google OAuth について</h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
               本サービスは Google OAuth 2.0 を利用した認証を採用しています。Google のプライバシーポリシー（<a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">policies.google.com/privacy</a>）が適用されます。本サービスが Google から取得するのは、お名前・メールアドレス・プロフィール画像 URL のみです。Google の連絡先、カレンダー、その他のデータへはアクセスしません。
             </p>
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">7. Cookie の使用</h2>
+            <h2 className="mb-3 text-lg font-semibold">8. AI（大規模言語モデル）の利用について</h2>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              本サービスは、習慣が健康・支出・収入等に及ぼす影響の推定値やその解説文の生成に、AI（大規模言語モデル）を利用することがあります。この処理において、ユーザーの情報が AI モデルの学習に利用されることはありません。
+            </p>
+          </section>
+
+          <section>
+            <h2 className="mb-3 text-lg font-semibold">9. Cookie の使用</h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
               本サービスでは、以下の目的で Cookie を使用します。ログインセッションの維持（認証トークンの保持）および表示言語の設定保持（<code className="rounded bg-muted px-1 py-0.5 text-xs">locale</code> Cookie）。広告目的の Cookie や第三者トラッキング Cookie は使用していません。
             </p>
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">8. データの保持期間</h2>
+            <h2 className="mb-3 text-lg font-semibold">10. データの保持期間</h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
               アカウントおよび関連するすべてのデータは、アカウントが有効である間保持されます。アカウント削除をご希望の場合は、下記お問い合わせ先までご連絡ください。削除依頼を受領後、30日以内にすべてのデータを削除します。
             </p>
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">9. ユーザーの権利</h2>
+            <h2 className="mb-3 text-lg font-semibold">11. ユーザーの権利</h2>
             <p className="mb-2 text-sm leading-relaxed text-muted-foreground">
               ユーザーは以下の権利を有します。
             </p>
@@ -156,28 +187,28 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">10. セキュリティ</h2>
+            <h2 className="mb-3 text-lg font-semibold">12. セキュリティ</h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
               データの保護のため、通信の HTTPS 暗号化、データベースの行レベルセキュリティ（RLS）、およびセキュアな認証トークン管理を実施しています。ただし、インターネット上での完全なセキュリティを保証することはできません。
             </p>
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">11. 未成年者について</h2>
+            <h2 className="mb-3 text-lg font-semibold">13. 未成年者について</h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
               本サービスは13歳未満のお子様を対象としていません。13歳未満のお子様の個人情報を意図的に収集することはありません。
             </p>
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">12. ポリシーの変更</h2>
+            <h2 className="mb-3 text-lg font-semibold">14. ポリシーの変更</h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
               本ポリシーは必要に応じて更新されることがあります。重要な変更がある場合は、アプリ内またはメールにてお知らせします。変更後も本サービスをご利用いただいた場合、改訂後のポリシーに同意いただいたものとみなします。
             </p>
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">13. お問い合わせ</h2>
+            <h2 className="mb-3 text-lg font-semibold">15. お問い合わせ</h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
               プライバシーに関するご質問・ご要望は以下までご連絡ください。
             </p>
