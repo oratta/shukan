@@ -20,7 +20,7 @@ export async function POST(_request: Request): Promise<Response> {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const subscription = await getSubscriptionForUser(user.id);
+  const subscription = await getSubscriptionForUser(user.id, supabase);
   if (!subscription?.stripeCustomerId) {
     return NextResponse.json(
       { error: 'No billing profile exists for this account yet.' },
