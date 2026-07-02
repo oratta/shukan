@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/client';
+import { identifyUser, resetAnalytics } from '@/lib/analytics';
 
 interface AuthContextType {
   user: User | null;
@@ -24,12 +25,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user);
       setLoading(false);
+      if (user) identifyUser(user.id);
     });
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
+      // Tie analytics to the opaque user UUID only (anonymous measurement)
+      if (session?.user) {
+        identifyUser(session.user.id);
+      } else if (event === 'SIGNED_OUT') {
+        resetAnalytics();
+      }
     });
 
     return () => subscription.unsubscribe();
