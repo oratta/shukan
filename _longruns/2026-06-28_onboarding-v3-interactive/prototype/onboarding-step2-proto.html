@@ -38,7 +38,7 @@
   }
 
   /* ヘッダ */
-  header{padding:18px 20px 8px;display:flex;align-items:center;gap:12px;}
+  header{padding:12px 18px 6px;display:flex;align-items:center;gap:12px;}
   .back{
     width:40px;height:40px;border-radius:14px;border:1px solid var(--line);background:#fff;
     display:grid;place-items:center;cursor:pointer;color:var(--muted);flex:none;
@@ -52,17 +52,17 @@
   .bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#36d1c4);border-radius:99px;width:0;transition:width .5s cubic-bezier(.22,1,.36,1);}
 
   /* KPIストリップ */
-  .kpis{padding:8px 16px 4px;}
-  .kpis .lead{font-size:11px;color:var(--muted);font-weight:500;letter-spacing:.02em;padding:0 4px 8px;}
-  .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .kpis{padding:6px 16px 2px;}
+  .kpis .lead{font-size:10.5px;color:var(--muted);font-weight:500;letter-spacing:.01em;padding:0 4px 6px;line-height:1.3;}
+  .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
   .kpi{
-    border:1px solid var(--line);border-radius:18px;padding:12px 13px;background:#fff;position:relative;overflow:hidden;
+    border:1px solid var(--line);border-radius:14px;padding:8px 11px;background:#fff;position:relative;overflow:hidden;
     transition:transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s ease;
   }
-  .kpi .top{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+  .kpi .top{display:flex;align-items:center;gap:7px;margin-bottom:3px;}
   .kpi .dot{width:9px;height:9px;border-radius:99px;flex:none;}
-  .kpi .label{font-size:11px;color:var(--muted);font-weight:500;line-height:1.2;}
-  .kpi .val{font-size:20px;font-weight:900;line-height:1;letter-spacing:-.02em;}
+  .kpi .label{font-size:10.5px;color:var(--muted);font-weight:500;line-height:1.2;}
+  .kpi .val{font-size:18px;font-weight:900;line-height:1;letter-spacing:-.02em;}
   .kpi .val .u{font-size:11px;font-weight:700;color:var(--muted);margin-left:3px;}
   .kpi .split{font-size:10px;color:var(--muted);font-weight:500;margin-top:5px;line-height:1.3;}
   .kpi .split b{font-weight:700;color:#9aa6b2;}
@@ -74,9 +74,13 @@
   /* 質問ステージ */
   .stage{flex:1;position:relative;overflow:hidden;}
   .slide{
-    position:absolute;inset:0;padding:14px 22px 28px;display:block;
-    overflow-y:auto;-webkit-overflow-scrolling:touch;
+    position:absolute;inset:0;padding:10px 20px 14px;
+    display:flex;flex-direction:column;overflow:hidden;
   }
+  /* 上部（習慣名・説明・インパクト・内訳）だけを必要時スクロール。質問と4段階タップは常に最下部に固定 */
+  .qtop{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .qask{flex:none;}
+  .levels{flex:none;}
   .slide.enter{animation:enter .52s cubic-bezier(.22,1,.36,1) both;}
   .slide.leave{animation:leave .42s cubic-bezier(.55,0,.45,1) both;}
   @keyframes enter{
@@ -92,21 +96,22 @@
     width:74px;height:74px;border-radius:24px;display:grid;place-items:center;margin:8px 0 18px;
     background:linear-gradient(150deg,#e9fbf8,#d6f6f1);font-size:36px;box-shadow:inset 0 0 0 1px #cdeee8;
   }
-  .qkicker{font-size:12px;font-weight:700;color:var(--accent-ink);letter-spacing:.06em;margin-bottom:10px;}
-  .qname{font-size:27px;font-weight:900;letter-spacing:-.02em;line-height:1.25;margin:0 0 8px;}
-  .qsub{font-size:14px;color:var(--muted);line-height:1.6;margin:0 0 4px;}
-  .qask{font-size:15px;font-weight:700;margin:18px 0 14px;}
+  .qkicker{font-size:11px;font-weight:700;color:var(--accent-ink);letter-spacing:.06em;margin-bottom:5px;}
+  .qname{font-size:20px;font-weight:900;letter-spacing:-.02em;line-height:1.2;margin:0 0 5px;}
+  .qsub{font-size:12.5px;color:var(--muted);line-height:1.4;margin:0 0 2px;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .qask{font-size:13.5px;font-weight:700;margin:11px 0 8px;}
 
-  .levels{display:flex;flex-direction:column;gap:10px;}
+  .levels{display:flex;flex-direction:column;gap:7px;}
   .lv{
-    display:flex;align-items:center;gap:14px;padding:15px 16px;border-radius:18px;border:1.5px solid var(--line);
+    display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:14px;border:1.5px solid var(--line);
     background:#fff;cursor:pointer;transition:transform .14s ease, border-color .2s ease, background .2s ease;
     text-align:left;font-family:inherit;
   }
   .lv:active{transform:scale(.98);}
   .lv .txt{flex:1;}
-  .lv .t1{font-size:15px;font-weight:700;}
-  .lv .t2{font-size:12px;color:var(--muted);margin-top:2px;}
+  .lv .t1{font-size:14px;font-weight:700;}
+  .lv .t2{font-size:11px;color:var(--muted);margin-top:1px;}
   .lv .pct{font-size:13px;font-weight:800;color:var(--muted);}
   .lv.sel{border-color:var(--accent);background:#f1fdfb;}
   .lv.sel .pct{color:var(--accent-ink);}
@@ -115,8 +120,8 @@
   .lv .dot2{width:14px;height:14px;border-radius:99px;flex:none;box-shadow:0 0 0 4px rgba(0,0,0,.03);}
 
   /* この習慣のインパクト（アイコン表示） */
-  .impact{margin:16px 0 4px;border:1px solid var(--line);border-radius:16px;padding:12px 14px;background:#fbfdfd;}
-  .impact .imp-lead{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:9px;}
+  .impact{margin:10px 0 2px;border:1px solid var(--line);border-radius:13px;padding:9px 12px;background:#fbfdfd;}
+  .impact .imp-lead{font-size:10.5px;color:var(--muted);font-weight:600;margin-bottom:6px;}
   .imp-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;}
   .ic-cell{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;}
   .ic-cell .ic{display:grid;place-items:center;}
@@ -128,7 +133,7 @@
   .kpi .ic{display:grid;place-items:center;}
 
   /* 内訳トグル */
-  .breakdown{margin-top:16px;border-top:1px dashed var(--line);padding-top:12px;}
+  .breakdown{margin-top:10px;border-top:1px dashed var(--line);padding-top:8px;}
   .bk-btn{background:none;border:none;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;padding:2px 0;}
   .bk-body{max-height:0;overflow:hidden;transition:max-height .35s ease;}
   .bk-body.open{max-height:260px;}
@@ -136,7 +141,7 @@
   .bk-row b{color:var(--ink);font-weight:700;}
   .bk-note{font-size:11px;color:var(--muted);padding-top:8px;line-height:1.5;}
 
-  footer{padding:14px 22px 26px;text-align:center;}
+  footer{padding:10px 22px 16px;text-align:center;}
   .skip{background:none;border:none;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
 
   .done{position:absolute;inset:0;background:#fff;display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;}
@@ -497,12 +502,21 @@ function render(animateInDir){
   }).join('');
 
   slide.innerHTML = `
-    <div class="qkicker">${h.kicker}</div>
-    <h1 class="qname">${h.name}</h1>
-    <p class="qsub">${h.sub}</p>
-    <div class="impact">
-      <div class="imp-lead">この習慣があなたにもたらすこと</div>
-      <div class="imp-grid">${potCells}</div>
+    <div class="qtop">
+      <div class="qkicker">${h.kicker}</div>
+      <h1 class="qname">${h.name}</h1>
+      <p class="qsub">${h.sub}</p>
+      <div class="impact">
+        <div class="imp-lead">この習慣があなたにもたらすこと</div>
+        <div class="imp-grid">${potCells}</div>
+      </div>
+      <div class="breakdown">
+        <button class="bk-btn" id="bkBtn">▸ このスコアの内訳（エビデンスとウェイト）</button>
+        <div class="bk-body" id="bkBody">
+          ${h.evid.map(e=>`<div class="bk-row"><span>${e.n}</span><b>weight ${e.w}%</b></div>`).join('')}
+          <div class="bk-note">100%時の素の威力(1日あたり): 健康+${h.base.H}分 / 前向き+${h.base.M}分 / 出費-${h.base.C}円 / 稼ぐ+${h.base.E}円<br>${h.note}</div>
+        </div>
+      </div>
     </div>
     <div class="qask">${h.ask}</div>
     <div class="levels">
@@ -512,13 +526,6 @@ function render(animateInDir){
           <span class="txt"><div class="t1">${l.t1}</div><div class="t2">${l.t2}</div></span>
           <span class="pct">${l.pct}%</span>
         </button>`).join('')}
-    </div>
-    <div class="breakdown">
-      <button class="bk-btn" id="bkBtn">▸ このスコアの内訳（エビデンスとウェイト）</button>
-      <div class="bk-body" id="bkBody">
-        ${h.evid.map(e=>`<div class="bk-row"><span>${e.n}</span><b>weight ${e.w}%</b></div>`).join('')}
-        <div class="bk-note">100%時の素の威力(1日あたり): 健康+${h.base.H}分 / 前向き+${h.base.M}分 / 出費-${h.base.C}円 / 稼ぐ+${h.base.E}円<br>${h.note}</div>
-      </div>
     </div>`;
   stage.appendChild(slide);
 
