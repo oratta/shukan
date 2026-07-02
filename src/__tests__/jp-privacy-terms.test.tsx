@@ -124,3 +124,35 @@ describe('Terms: estimate / AI-generated content clause', () => {
     expect(joined).toContain('故意または重大な過失');
   });
 });
+
+describe('Terms: minors clause', () => {
+  it('requires legal guardian consent for minors, especially for paid plans', async () => {
+    const acc = await renderPage('terms');
+    const joined = acc.texts.join(' ');
+    expect(joined).toContain('未成年');
+    expect(joined).toContain('法定代理人');
+  });
+});
+
+describe('Privacy: third-party provision and AI clauses', () => {
+  it('lists the standard exceptions instead of a blanket no-provision claim', async () => {
+    const acc = await renderPage('privacy');
+    const joined = acc.texts.join(' ');
+    expect(joined).not.toContain('第三者へのデータ販売・提供は一切行いません');
+    expect(joined).toContain('法令に基づく場合');
+    expect(joined).toContain('事業承継');
+  });
+
+  it('discloses overseas processors (US) for Stripe / Vercel', async () => {
+    const acc = await renderPage('privacy');
+    const joined = acc.texts.join(' ');
+    expect(joined).toContain('米国');
+    expect(joined).toContain('外国にある第三者');
+  });
+
+  it('states user data is not used for AI model training', async () => {
+    const acc = await renderPage('privacy');
+    const joined = acc.texts.join(' ');
+    expect(joined).toContain('学習に利用されることはありません');
+  });
+});

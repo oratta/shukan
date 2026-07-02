@@ -54,14 +54,21 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">4. ユーザーの責任</h2>
+            <h2 className="mb-3 text-lg font-semibold">4. 未成年者のご利用</h2>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              未成年者のユーザーは、親権者その他の法定代理人の同意を得た上で本サービスをご利用ください。特に、有料プランのお申し込みは、必ず法定代理人の同意を得て行ってください。未成年者のユーザーが本サービスを利用した場合、法定代理人の同意を得た上で利用しているものとみなします。
+            </p>
+          </section>
+
+          <section>
+            <h2 className="mb-3 text-lg font-semibold">5. ユーザーの責任</h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
               ユーザーは、本サービスを適切かつ合法的な目的のみに使用することに同意します。本サービスに入力するすべてのデータ（習慣名、メモ、振り返りコメント等）の内容についてはユーザー自身が責任を負います。
             </p>
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">5. 禁止行為</h2>
+            <h2 className="mb-3 text-lg font-semibold">6. 禁止行為</h2>
             <p className="mb-2 text-sm leading-relaxed text-muted-foreground">
               以下の行為を禁止します。
             </p>
@@ -98,14 +105,14 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">6. 知的財産権</h2>
+            <h2 className="mb-3 text-lg font-semibold">7. 知的財産権</h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
               本サービスのデザイン、コード、コンテンツ（エビデンス記事等）に関する知的財産権は、運営者に帰属します。ユーザーが入力したデータ（習慣名、メモ等）の権利はユーザー自身に帰属します。ユーザーは、本サービスの提供に必要な範囲で、入力データを利用することを運営者に許諾するものとします。
             </p>
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">7. 推定値・AI が生成する情報について</h2>
+            <h2 className="mb-3 text-lg font-semibold">8. 推定値・AI が生成する情報について</h2>
             <p className="mb-2 text-sm leading-relaxed text-muted-foreground">
               本サービスは、公表されている学術研究や統計データをもとに、習慣が健康寿命・支出・収入等に及ぼす影響を数値として推定し、表示します（以下「推定値」）。推定値について、ユーザーは以下の点に同意するものとします。
             </p>
@@ -128,14 +135,14 @@ export default function TermsPage() {
               </li>
             </ul>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              推定値に関して運営者が負う損害賠償責任は、第9条（責任の制限）に定めるとおりとします。
+              推定値に関して運営者が負う損害賠償責任は、第10条（責任の制限）に定めるとおりとします。
             </p>
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">8. 免責事項</h2>
+            <h2 className="mb-3 text-lg font-semibold">9. 免責事項</h2>
             <p className="mb-2 text-sm leading-relaxed text-muted-foreground">
-              本サービスは現状のまま提供されます。運営者は、以下の事項について保証しません。これらに起因してユーザーに損害が生じた場合の運営者の賠償責任は、第9条（責任の制限）の定めに従います。
+              本サービスは現状のまま提供されます。運営者は、以下の事項について保証しません。これらに起因してユーザーに損害が生じた場合の運営者の賠償責任は、第10条（責任の制限）の定めに従います。
             </p>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="flex gap-2">
@@ -161,35 +168,35 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">9. 責任の制限</h2>
+            <h2 className="mb-3 text-lg font-semibold">10. 責任の制限</h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
               本サービスの利用に関して運営者がユーザーに対して損害賠償責任を負う場合、運営者に故意または重大な過失があるときを除き、運営者は、通常生ずべき直接の損害の範囲でのみ責任を負い、特別な事情から生じた損害、逸失利益、間接損害については責任を負いません。有料プランに関する運営者の賠償責任の上限は、運営者に故意または重大な過失があるときを除き、当該損害が発生した時点で当該ユーザーが直近に支払った料金の額とします。
             </p>
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">10. サービスの変更・終了</h2>
+            <h2 className="mb-3 text-lg font-semibold">11. サービスの変更・終了</h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
               運営者は、事前の通知なく本サービスの内容を変更、一時停止、または終了する権利を有します。サービス終了の際は、可能な限り事前にお知らせします。
             </p>
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">11. 規約の変更</h2>
+            <h2 className="mb-3 text-lg font-semibold">12. 規約の変更</h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
               本規約は必要に応じて更新されることがあります。重要な変更がある場合は、アプリ内またはメールにてお知らせします。変更後も本サービスをご利用いただいた場合、改訂後の規約に同意いただいたものとみなします。
             </p>
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">12. 準拠法・管轄裁判所</h2>
+            <h2 className="mb-3 text-lg font-semibold">13. 準拠法・管轄裁判所</h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
               本規約は日本法に準拠します。本規約または本サービスに関する紛争については、東京地方裁判所を第一審の専属的合意管轄裁判所とします。
             </p>
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">13. お問い合わせ</h2>
+            <h2 className="mb-3 text-lg font-semibold">14. お問い合わせ</h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
               本規約に関するご質問は以下までご連絡ください。
             </p>
