@@ -3,6 +3,13 @@
 このワークツリー（`onboarding-v2-interactive`）で**新セッション**が次の作業を続行するための引き継ぎ。
 親（`onboarding-data-setup`）の v2 実装＋実ブラウザ/DB 検証は完了済み。本ブランチはその HEAD（`b1bd333`）から分岐。
 
+## 🟢 実装反映済み（2026-07-01）— オンボ確定習慣をコードに載せた
+- 確定した health＋mood 習慣＋新規3本（社会的つながり/朝日/発酵食品）＋筋トレを実装。プリセットは確定22本（cost/earning 未レビュー分は残置）。
+- 新規記事3本 `impact-articles/{social-connection,morning-light,fermented-food}.ts`。lint/tsc/test(634)/build 全green。仕様は `IMPL-SPEC.md`。
+- オンボ習慣数: health 12 / mood 6 / cost 4 / earning 5（複数KPI所属あり）。
+- **次アクション**: ユーザーが実機で「この量で十分か」を確認 → 足りなければ追加、十分ならオンボ表示は確定。
+  cost/earning 系の束ね解体は「オンボに出す習慣」判断が済んでから（このセッションのスコープ外）。
+
 ## 🔴 最新状態（2026-06-30 更新）— まずここを読む
 
 このセッションで [2] の**効果モデルと UI 方向が大きく確定**した。詳細仕様は必読:
