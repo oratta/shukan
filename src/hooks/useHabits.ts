@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Habit, HabitInsertInput, HabitCompletion, HabitWithStats, CopingStep, UrgeLog } from '@/types/habit';
 import { useAuth } from '@/components/auth-provider';
+import { track } from '@/lib/analytics';
 import { getTodayString, getHabitsWithStats } from '@/lib/habits';
 import { getArticle } from '@/data/impact-articles';
 import {
@@ -96,6 +97,11 @@ export function useHabits() {
         newHabit.evidences = evs;
       }
       setHabits((prev) => [...prev, newHabit]);
+      track('habit_created', {
+        habit_type: newHabit.type,
+        coping_steps_count: copingSteps?.length ?? 0,
+        evidence_count: initialEvidences?.length ?? 0,
+      });
       return newHabit;
     },
     [user]
@@ -109,6 +115,11 @@ export function useHabits() {
       newEvidences?: { articleId: string; weight: number }[]
     ) => {
       await updateHabitById(id, updates);
+      if (updates.archived === true) {
+        track('habit_archived', { habit_id: id });
+      } else {
+        track('habit_updated', { habit_id: id });
+      }
       // Exclude evidences from optimistic update — evidences are managed via dedicated CRUD
       const { evidences: _ignored, ...safeUpdates } = updates;
       setHabits((prev) =>
@@ -131,6 +142,7 @@ export function useHabits() {
   const deleteHabit = useCallback(
     async (id: string) => {
       await deleteHabitById(id);
+      track('habit_deleted', { habit_id: id });
       setHabits((prev) => prev.filter((h) => h.id !== id));
       setCompletions((prev) => prev.filter((c) => c.habitId !== id));
       setUrgeLogs((prev) => prev.filter((l) => l.habitId !== id));
@@ -159,6 +171,11 @@ export function useHabits() {
             return [...filtered, updated];
           });
         }
+        track('habit_status_set', {
+          habit_id: habitId,
+          status,
+          is_today: date === getTodayString(),
+        });
       } catch (err) {
         console.error('setDayStatus failed:', err);
       }
@@ -175,6 +192,7 @@ export function useHabits() {
         const filtered = prev.filter((c) => !(c.habitId === habitId && c.date === today));
         return [...filtered, updated];
       });
+      track('quit_daily_done', { habit_id: habitId });
     },
     [user]
   );
@@ -184,6 +202,7 @@ export function useHabits() {
     const today = getTodayString();
     const log = await insertUrgeLog(user.id, habitId, today);
     setUrgeLogs((prev) => [...prev, log]);
+    track('urge_flow_started', { habit_id: habitId });
     return log;
   }, [user]);
 
@@ -192,6 +211,12 @@ export function useHabits() {
     if (!log) return;
     const newSteps = [...log.completedSteps, stepId];
     await updateUrgeLog(logId, newSteps, allDone);
+    if (allDone) {
+      track('urge_flow_completed', {
+        habit_id: log.habitId,
+        steps_count: newSteps.length,
+      });
+    }
     setUrgeLogs((prev) =>
       prev.map((l) => l.id === logId ? { ...l, completedSteps: newSteps, allCompleted: allDone } : l)
     );
@@ -205,6 +230,7 @@ export function useHabits() {
         const filtered = prev.filter((c) => !(c.habitId === habitId && c.date === date));
         return [...filtered, updated];
       });
+      track('rocket_used', { habit_id: habitId });
     },
     [user]
   );

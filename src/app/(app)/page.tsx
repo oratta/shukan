@@ -18,6 +18,7 @@ import { useAuth } from '@/components/auth-provider';
 import { useSubscription } from '@/hooks/useSubscription';
 import { shouldBlockCreateHabit } from '@/lib/billing/create-habit-gate';
 import { upsertDailyReflection } from '@/lib/supabase/habits';
+import { track } from '@/lib/analytics';
 import { InstallBanner } from '@/components/pwa/install-banner';
 import { isCompletionTransition, type DayStatus as PwaDayStatus } from '@/lib/pwa/completion';
 import type { Habit, HabitInsertInput } from '@/types/habit';
@@ -111,6 +112,10 @@ export default function DashboardPage() {
       if (!user) return;
       if (mood !== undefined || comment.trim()) {
         await upsertDailyReflection(user.id, yesterdayDate, { mood, comment });
+        track('reflection_saved', {
+          mood: mood ?? null,
+          has_comment: !!comment.trim(),
+        });
       }
     },
     [user, yesterdayDate]

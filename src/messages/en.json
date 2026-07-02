@@ -469,7 +469,7 @@
     "trialHeading": "3. Free trial converting to paid",
     "trialBody": "After your {days}-day free trial ends, the plan converts to paid automatically and the first charge ({price}) is made. If you cancel during the trial, you are not charged.",
     "cancelHeading": "4. Cancellation",
-    "cancelBody": "You can cancel anytime via the Stripe Customer Portal from the billing settings. Cancellations are accepted up until the next renewal date. There is no cancellation penalty or fee.",
+    "cancelBody": "You can cancel anytime via the Stripe Customer Portal from the billing settings. After you cancel, you will not be charged again, and you keep full access until the end of your current billing period. There is no cancellation penalty or fee.",
     "lifetimeHeading": "Payment details (one-time)",
     "lifetimeBody": "This plan is a one-time payment. It is not a subscription, so there is no auto-renewal or recurring charge.",
     "lifetimePriceLabel": "Amount",
@@ -485,7 +485,7 @@
     "noSubscription": "You don't have an active paid plan.",
     "manageButton": "Manage billing & cancellation",
     "portalDescription": "Use the Stripe Customer Portal to change your payment method or cancel.",
-    "cancelAnytime": "Cancel anytime. You can complete cancellation yourself via the Customer Portal above, with no cancellation penalty or fee.",
+    "cancelAnytime": "Cancel anytime. You can complete cancellation yourself via the Customer Portal above, with no cancellation penalty or fee. After you cancel, you keep full access until the end of your current billing period.",
     "tokushohoLinkText": "See the Commercial Transaction Act Disclosure for full transaction terms.",
     "tokushohoLink": "Commercial Transaction Act Disclosure"
   },
