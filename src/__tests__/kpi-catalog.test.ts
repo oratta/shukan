@@ -69,14 +69,17 @@ describe('KPI catalog (A-S9)', () => {
 });
 
 /**
- * A-S10: 習慣プリセット（各KPI 3〜5個・参照妥当性）
+ * A-S10: 習慣プリセット（各KPI 3個以上・参照妥当性）
+ *
+ * オンボーディング v3 確定リストで health_lifespan / positive_mood の
+ * プリセットを拡充したため、旧「各 KPI 3〜5 個」の上限（5）は撤廃。
+ * 各 KPI に最低 3 個という下限のみを不変条件として維持する。
  */
 describe('Habit presets (A-S10)', () => {
-  it('各 KPI に primaryKpis を含むプリセットが 3〜5 個ある', () => {
+  it('各 KPI に primaryKpis を含むプリセットが 3 個以上ある', () => {
     for (const key of KPI_KEYS) {
       const presets = getPresetsForKpi(key);
       expect(presets.length).toBeGreaterThanOrEqual(3);
-      expect(presets.length).toBeLessThanOrEqual(5);
     }
   });
 
