@@ -188,7 +188,7 @@ describe('middleware: marketing page renders standalone layout (S8)', () => {
     expect(typeof mod.default).toBe('function');
   });
 
-  it('marketing page renders Hero placeholder, CTA to login, and footer links', async () => {
+  it('marketing page renders tagline and footer links', async () => {
     const { default: MarketingPage } = await import('@/app/marketing/page');
     // Server Component returns JSX synchronously; render to a tree object
     const tree = (MarketingPage as () => unknown)();
@@ -216,10 +216,8 @@ describe('middleware: marketing page renders standalone layout (S8)', () => {
 
     const joinedText = texts.join(' ');
     expect(joinedText).toContain('Switch your path');
-    // CTA href should target /login (apex)
-    const loginHref = hrefs.find((h) => h.endsWith('/login'));
-    expect(loginHref).toBeTruthy();
-    // Footer links
+    // LP 刷新（PR #33 以降）で /login CTA は廃止され、CTA はウェイトリストフォームになった。
+    // ページ直下から辿れる確定要素はフッター（Privacy / Terms / コピーライト）のみを検証する。
     expect(hrefs).toContain('/privacy');
     expect(hrefs).toContain('/terms');
     expect(joinedText).toContain('Genetta');
