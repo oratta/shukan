@@ -102,7 +102,7 @@ describe('ja 確定文言（[4] 結果・未来のみ）', () => {
     expect(str(s.lead).length).toBeGreaterThan(0);
     expect(str(s.value)).toContain('{value}');
     expect(str(s.value)).toContain('{unit}');
-    expect(str(s.cta)).toBe('この内容ではじめる');
+    expect(str(s.cta)).toBe('習慣を選びに進む');
   });
 
   it('過去/未来二段構えの廃止キーが残っていない', () => {
@@ -113,15 +113,42 @@ describe('ja 確定文言（[4] 結果・未来のみ）', () => {
   });
 });
 
-// ───────── [5] 完了 確定文言 ─────────
-describe('ja 確定文言（[5] 完了）', () => {
-  it('タイトル・本文・習慣ラベル・バッジ・CTA', () => {
-    const s = obj(onbJa.done);
-    expect(str(s.title)).toBe('準備ができました');
-    expect(str(s.body)).toBe('今日の1回から、あなたのインパクトが積み上がっていきます。');
-    expect(str(s.habitsLabel)).toBe('これから積み上がる習慣');
-    expect(str(s.establishedBadge)).toBe('習慣化済み');
-    expect(str(s.cta)).toBe('はじめる');
+// ───────── [5] KPI選択 確定文言 ─────────
+describe('ja 確定文言（[5] KPI選択）', () => {
+  it('タイトル・リード・4KPIぶんの説明が存在し非空', () => {
+    const s = obj(onbJa.kpiSelect);
+    expect(str(s.title)).toBe('あなたの人生で、何を充実させたいですか？');
+    expect(str(s.lead).length).toBeGreaterThan(0);
+    for (const def of KPI_CATALOG) {
+      expect(str(obj(s[def.key]).desc).length, `kpiSelect.${def.key}.desc`).toBeGreaterThan(0);
+    }
+  });
+
+  it('健康寿命の説明は「寿命との違い」がわかる文になっている', () => {
+    const desc = str(obj(obj(onbJa.kpiSelect).health_lifespan).desc);
+    expect(desc).toContain('寿命そのものではなく');
+    expect(desc).toContain('元気');
+  });
+});
+
+// ───────── [6] 習慣選択 確定文言 ─────────
+describe('ja 確定文言（[6] 習慣選択）', () => {
+  it('タイトル・リード（{kpi}補間）・現状%（{percent}補間）・CTA・注記・空表示', () => {
+    const s = obj(onbJa.habitSelect);
+    expect(str(s.title)).toBe('取り組む習慣を選びましょう');
+    expect(str(s.lead)).toContain('{kpi}');
+    expect(str(s.current)).toContain('{percent}');
+    expect(str(s.cta)).toBe('スタート');
+    expect(str(s.note).length).toBeGreaterThan(0);
+    expect(str(s.empty).length).toBeGreaterThan(0);
+  });
+});
+
+// ───────── 旧 [5] 完了画面の廃止キーが残っていない ─────────
+describe('旧 done.* キーの削除（完了フロー刷新）', () => {
+  it('ja/en とも done 名前空間が存在しない', () => {
+    expect(onbJa.done).toBeUndefined();
+    expect(onbEn.done).toBeUndefined();
   });
 });
 

@@ -17,7 +17,8 @@ import {
   buildDiagnosisSelections,
   buildHabitFromPreset,
   presetPerTimeEffectValue,
-  rateToHabitStatus,
+  chooseFocusKpi,
+  toggleChosenPreset,
   createInitialWizardState,
   profileInputToUserProfile,
   type OnboardingProfileInput,
@@ -121,11 +122,13 @@ describe('15習慣の articleId 重複なし — AC#13', () => {
 
 // ───────── C-S16: 初期状態（途中離脱は最初[0]からやり直し） ─────────
 describe('createInitialWizardState — v3', () => {
-  it('step=0、rates は空、habitIndex=0、国=JP のみ既定', () => {
+  it('step=0、rates は空、habitIndex=0、KPI・チェックは未選択、国=JP のみ既定', () => {
     const s = createInitialWizardState();
     expect(s.step).toBe(0);
     expect(s.rates).toEqual({});
     expect(s.habitIndex).toBe(0);
+    expect(s.focusKpi).toBeNull();
+    expect(s.chosenPresetIds).toEqual([]);
     expect(s.profile.country).toBe('JP');
     expect(s.profile.age).toBeNull();
     expect(s.profile.gender).toBeNull();
@@ -297,17 +300,31 @@ describe('buildDiagnosisSelections', () => {
   });
 });
 
-// ───────── rateToHabitStatus（達成率→status 自動変換・AC#10） ─────────
-describe('rateToHabitStatus — AC#10', () => {
-  it('100% は established', () => {
-    expect(rateToHabitStatus(1)).toBe('established');
+// ───────── [5] KPI選択 / [6] 習慣選択（完了フロー刷新・2026-07-02） ─────────
+describe('chooseFocusKpi / toggleChosenPreset', () => {
+  it('KPI を選ぶと focusKpi が入り [6] へ進む', () => {
+    const s = chooseFocusKpi({ ...createInitialWizardState(), step: 5 }, 'health_lifespan');
+    expect(s.focusKpi).toBe('health_lifespan');
+    expect(s.step).toBe(6);
+    expect(s.chosenPresetIds).toEqual([]);
   });
-  it('70% / 30% は active', () => {
-    expect(rateToHabitStatus(0.7)).toBe('active');
-    expect(rateToHabitStatus(0.3)).toBe('active');
+
+  it('KPI を選び直すとチェック済み習慣はリセットされる（候補が変わるため）', () => {
+    let s = chooseFocusKpi({ ...createInitialWizardState(), step: 5 }, 'health_lifespan');
+    s = toggleChosenPreset(s, 'daily_cardio_habit');
+    expect(s.chosenPresetIds).toEqual(['daily_cardio_habit']);
+    s = chooseFocusKpi({ ...s, step: 5 }, 'earning');
+    expect(s.focusKpi).toBe('earning');
+    expect(s.chosenPresetIds).toEqual([]);
   });
-  it('0% は null（登録しない）', () => {
-    expect(rateToHabitStatus(0)).toBeNull();
+
+  it('toggleChosenPreset はチェックのオン/オフを切り替える', () => {
+    let s = createInitialWizardState();
+    s = toggleChosenPreset(s, 'solid_sleep');
+    s = toggleChosenPreset(s, 'daily_cardio_habit');
+    expect(s.chosenPresetIds).toEqual(['solid_sleep', 'daily_cardio_habit']);
+    s = toggleChosenPreset(s, 'solid_sleep');
+    expect(s.chosenPresetIds).toEqual(['daily_cardio_habit']);
   });
 });
 
@@ -343,9 +360,9 @@ describe('presetPerTimeEffectValue', () => {
   });
 });
 
-// ───────── プリセット→Habit 変換（status 配線・established_since は書かない） ─────────
-describe('buildHabitFromPreset — status（v3）', () => {
-  it('オプション無指定は status 省略（active 既定・後方互換）', () => {
+// ───────── プリセット→Habit 変換（常に active 既定・established_since は書かない） ─────────
+describe('buildHabitFromPreset', () => {
+  it('status は常に省略（active 既定）・established_since も書かない', () => {
     const h = buildHabitFromPreset('daily_cardio_habit');
     expect(h).toBeTruthy();
     expect(h!.type).toBe('positive');
@@ -354,12 +371,6 @@ describe('buildHabitFromPreset — status（v3）', () => {
     expect(h!.status).toBeUndefined();
     expect(h!.establishedSince).toBeUndefined();
     expect(h!.name).toBe('少し息が切れるくらいの運動を毎日15分以上行う');
-  });
-
-  it('established 指定で status=established・established_since は付けない（v3 は常に null）', () => {
-    const h = buildHabitFromPreset('quit_alcohol_habit', { status: 'established' });
-    expect(h!.status).toBe('established');
-    expect(h!.establishedSince).toBeUndefined();
   });
 
   it('quit プリセットは type=quit / dailyTarget=3', () => {

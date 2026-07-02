@@ -45,64 +45,44 @@ function input() {
   return {
     userId: 'user-1',
     profile: { age: 42, gender: 'male' as const, country: 'JP', annualIncome: null },
-    // タバコ=完璧(100%→established) / 運動=だいたい(70%→active) / 睡眠=たまに(30%→active)
-    // / 野菜=やってない(0%→登録しない)
-    rates: {
-      quit_smoking_for_health: 1 as const,
-      daily_cardio_habit: 0.7 as const,
-      solid_sleep: 0.3 as const,
-      eat_vegetables_habit: 0 as const,
-    },
+    // [6] でチェックした「取り組む」習慣（チェック順は書き込み順に影響しない）
+    chosenPresetIds: ['quit_smoking_for_health', 'daily_cardio_habit', 'solid_sleep'],
   };
 }
 
-describe('runOnboardingWrite — 達成率→status 自動変換（AC#10）', () => {
+describe('runOnboardingWrite — チェックした習慣を一律 active で登録', () => {
   it('profile → 習慣（15本の表示順）の順で書き込む', async () => {
     await runOnboardingWrite(input());
     expect(callOrder[0]).toBe('profile');
-    // 表示順: daily_cardio(1番目・70%) → solid_sleep(2番目・30%) → quit_smoking(9番目・100%)
-    // 野菜(0%)は登録されない
+    // 表示順: daily_cardio(1番目) → solid_sleep(2番目) → quit_smoking(9番目)。全て active
     expect(callOrder).toEqual([
       'profile',
       'habit:少し息が切れるくらいの運動を毎日15分以上行う:active',
       'evidence:id-少し息が切れるくらいの運動を毎日15分以上行う',
       'habit:毎日6〜8時間の睡眠をとる:active',
       'evidence:id-毎日6〜8時間の睡眠をとる',
-      'habit:タバコを1本も吸わない:established',
+      'habit:タバコを1本も吸わない:active',
       'evidence:id-タバコを1本も吸わない',
     ]);
   });
 
-  it('達成率100% の習慣は status=established・established_since を渡さない（常に null）', async () => {
+  it('全ての習慣で status・established_since を渡さない（active 既定・established 自動変換は廃止）', async () => {
     await runOnboardingWrite(input());
-    const estCall = insertHabitMock.mock.calls.find(
-      (c) => (c[1] as { name: string }).name === 'タバコを1本も吸わない'
-    );
-    expect(estCall).toBeTruthy();
-    const habit = estCall![1] as { status?: string; establishedSince?: string };
-    expect(habit.status).toBe('established');
-    expect(habit.establishedSince).toBeUndefined();
-  });
-
-  it('達成率70%/30% の習慣は status を渡さない（active 既定）', async () => {
-    await runOnboardingWrite(input());
-    for (const name of ['少し息が切れるくらいの運動を毎日15分以上行う', '毎日6〜8時間の睡眠をとる']) {
-      const call = insertHabitMock.mock.calls.find(
-        (c) => (c[1] as { name: string }).name === name
-      );
-      const habit = call![1] as { status?: string; establishedSince?: string };
+    expect(insertHabitMock.mock.calls.length).toBe(3);
+    for (const call of insertHabitMock.mock.calls) {
+      const habit = call[1] as { status?: string; establishedSince?: string };
       expect(habit.status).toBeUndefined();
       expect(habit.establishedSince).toBeUndefined();
     }
   });
 
-  it('達成率0% の習慣は insert されない', async () => {
+  it('チェックしていない習慣は insert されない', async () => {
     await runOnboardingWrite(input());
     const names = insertHabitMock.mock.calls.map((c) => (c[1] as { name: string }).name);
     expect(names).not.toContain('野菜・果物を1日5皿（約350g）食べる');
   });
 
-  it('D5: trackedKpis に全4 KpiKey を保存する', async () => {
+  it('D5: trackedKpis に全4 KpiKey を保存する（[5] の選択は保存しない）', async () => {
     await runOnboardingWrite(input());
     const [userId, payload] = upsertUserProfileMock.mock.calls[0];
     expect(userId).toBe('user-1');
@@ -133,19 +113,16 @@ describe('runOnboardingWrite — 達成率→status 自動変換（AC#10）', ()
   });
 });
 
-// ───────── AC#11: 全習慣 0% でも完了できる（habit 0件・profile のみ） ─────────
-describe('runOnboardingWrite — 全習慣0%（AC#11）', () => {
-  it('rates が空でも profile だけ書ける', async () => {
-    await runOnboardingWrite({ ...input(), rates: {} });
+// ───────── チェック0件でも完了できる（habit 0件・profile のみ） ─────────
+describe('runOnboardingWrite — チェック0件（選ばずに始める）', () => {
+  it('chosenPresetIds が空でも profile だけ書ける', async () => {
+    await runOnboardingWrite({ ...input(), chosenPresetIds: [] });
     expect(upsertUserProfileMock).toHaveBeenCalledTimes(1);
     expect(insertHabitMock).not.toHaveBeenCalled();
   });
 
-  it('全習慣0% でも profile だけ書ける（habit 0件）', async () => {
-    await runOnboardingWrite({
-      ...input(),
-      rates: { quit_smoking_for_health: 0, daily_cardio_habit: 0, solid_sleep: 0 },
-    });
+  it('未知プリセットIDが混ざっても insert されずエラーにもならない', async () => {
+    await runOnboardingWrite({ ...input(), chosenPresetIds: ['___nope___'] });
     expect(upsertUserProfileMock).toHaveBeenCalledTimes(1);
     expect(insertHabitMock).not.toHaveBeenCalled();
   });

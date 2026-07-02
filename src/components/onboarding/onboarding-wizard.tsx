@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { ChevronLeft, Loader2 } from "lucide-react";
+import { Check, ChevronLeft, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth-provider";
 import { KPI_CATALOG, type KpiKey } from "@/data/kpi/catalog";
@@ -21,8 +21,8 @@ import {
   buildDiagnosisSelections,
   profileInputToUserProfile,
   runOnboardingWrite,
-  rateToHabitStatus,
-  ONBOARDING_V3_PRESET_IDS,
+  chooseFocusKpi,
+  toggleChosenPreset,
   OnboardingWriteError,
   type WizardState,
   type OnboardingGender,
@@ -30,10 +30,10 @@ import {
 import {
   computeDiagnosisV3,
   habitPotentialV3,
+  rankPresetsByGrowth,
   type AchievementRate,
   type DiagnosisV3Result,
 } from "@/lib/diagnosis-v3";
-import { getHabitPreset } from "@/data/habit-presets";
 
 // [0]イントロ 〜 [5]完了 の6画面。進捗バーは入力ステップ [1][2] のみを数える。
 const FORM_STEPS = 2; // [1] プロフィール / [2] 段階タップ診断
@@ -100,6 +100,7 @@ export function OnboardingWizard() {
 
   const goBackInHabits = () => setState(backInHabits);
 
+  // [6] スタート: チェックした習慣（一律 active）＋ profile を書き込んでホームへ。
   const handleStart = async () => {
     if (!user) return;
     setWriting(true);
@@ -108,12 +109,12 @@ export function OnboardingWizard() {
       const completed = await runOnboardingWrite({
         userId: user.id,
         profile: state.profile,
-        rates: state.rates,
+        chosenPresetIds: state.chosenPresetIds,
         completedPresetIds: completedPresetIdsRef.current,
       });
       completedPresetIdsRef.current = completed;
       setWriting(false);
-      setStep(5);
+      router.push("/");
     } catch (error) {
       if (error instanceof OnboardingWriteError) {
         completedPresetIdsRef.current = error.succeededPresetIds;
@@ -124,6 +125,13 @@ export function OnboardingWizard() {
   };
 
   const currentPreset = V3_PRESETS[state.habitIndex];
+
+  // [6] 選んだ KPI への伸びしろ順トップ5（100% と効果なしは除外）。
+  const growthCandidates = useMemo(
+    () =>
+      state.focusKpi ? rankPresetsByGrowth(state.focusKpi, state.rates, calcProfile) : [],
+    [state.focusKpi, state.rates, calcProfile]
+  );
 
   return (
     <div className="space-y-8">
@@ -380,6 +388,103 @@ export function OnboardingWizard() {
             </ul>
           </div>
 
+          <PrimaryButton onClick={() => setStep(5)}>{t("result.cta")}</PrimaryButton>
+          <p className="text-center text-xs text-muted-foreground">
+            {t("result.footnote")}
+          </p>
+        </section>
+      )}
+
+      {/* ───────── [5] KPI選択（人生で何を充実させたいか・1つ選ぶ） ───────── */}
+      {state.step === 5 && (
+        <section className="space-y-5">
+          <BackLink label={t("back")} onClick={() => setStep(4)} />
+          <Heading title={t("kpiSelect.title")} subtitle={t("kpiSelect.lead")} />
+
+          <ul className="space-y-3">
+            {KPI_CATALOG.map((def) => (
+              <li key={def.key}>
+                <button
+                  type="button"
+                  onClick={() => setState((s) => chooseFocusKpi(s, def.key))}
+                  className="flex w-full items-start gap-3 rounded-2xl border border-border bg-card p-4 text-left transition-all hover:border-primary/40 active:scale-[0.99]"
+                >
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <KpiIcon name={def.icon} className="size-5" />
+                  </span>
+                  <span className="min-w-0 space-y-1">
+                    <span className="block font-bold">{t(`kpi.${def.key}.name`)}</span>
+                    <span className="block text-xs leading-relaxed text-muted-foreground">
+                      {t(`kpiSelect.${def.key}.desc`)}
+                    </span>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* ───────── [6] 習慣選択（伸びしろ順トップ5・現状%・チェックで登録） ───────── */}
+      {state.step === 6 && state.focusKpi && (
+        <section className="space-y-5">
+          <BackLink label={t("back")} onClick={() => setStep(5)} />
+          <Heading
+            title={t("habitSelect.title")}
+            subtitle={t("habitSelect.lead", { kpi: t(`kpi.${state.focusKpi}.name`) })}
+          />
+
+          {growthCandidates.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t("habitSelect.empty")}</p>
+          ) : (
+            <ul className="space-y-2">
+              {growthCandidates.map(({ presetId, rate, growth }) => {
+                const chosen = state.chosenPresetIds.includes(presetId);
+                return (
+                  <li key={presetId}>
+                    <button
+                      type="button"
+                      aria-pressed={chosen}
+                      onClick={() => setState((s) => toggleChosenPreset(s, presetId))}
+                      className={cn(
+                        "flex w-full items-center gap-3 rounded-2xl border p-4 text-left transition-all active:scale-[0.99]",
+                        chosen
+                          ? "border-primary bg-primary/5 ring-2 ring-primary/30"
+                          : "border-border bg-card hover:border-primary/40"
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "flex size-5 shrink-0 items-center justify-center rounded-md border",
+                          chosen
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-muted-foreground/40"
+                        )}
+                        aria-hidden
+                      >
+                        {chosen && <Check className="size-3.5" />}
+                      </span>
+                      <span className="min-w-0 flex-1 space-y-0.5">
+                        <span className="block text-sm font-bold leading-snug">
+                          {t(`preset.${presetId}`)}
+                        </span>
+                        <span className="block text-xs text-muted-foreground">
+                          {t("habitSelect.current", { percent: Math.round(rate * 100) })}
+                        </span>
+                      </span>
+                      <span className="shrink-0 text-sm font-bold tabular-nums text-primary">
+                        +{growth.display}
+                        <span className="ml-0.5 text-[10px] font-semibold text-muted-foreground">
+                          {growth.unit}
+                        </span>
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+
           {writeError && (
             <div
               role="alert"
@@ -390,22 +495,9 @@ export function OnboardingWizard() {
           )}
 
           <PrimaryButton disabled={writing} onClick={handleStart}>
-            {writing ? t("starting") : t("result.cta")}
+            {writing ? t("starting") : t("habitSelect.cta")}
           </PrimaryButton>
-          <p className="text-center text-xs text-muted-foreground">
-            {t("result.footnote")}
-          </p>
-        </section>
-      )}
-
-      {/* ───────── [5] 完了 ───────── */}
-      {state.step === 5 && (
-        <section className="space-y-6">
-          <Heading title={t("done.title")} subtitle={t("done.body")} />
-
-          <RegisteredHabits state={state} t={t} />
-
-          <PrimaryButton onClick={() => router.push("/")}>{t("done.cta")}</PrimaryButton>
+          <p className="text-center text-xs text-muted-foreground">{t("habitSelect.note")}</p>
         </section>
       )}
     </div>
@@ -456,68 +548,6 @@ function HabitImpactBox({
         })}
       </div>
     </div>
-  );
-}
-
-// ───────── 完了画面: 登録される習慣（達成率>0） ─────────
-
-function RegisteredHabits({
-  state,
-  t,
-}: {
-  state: WizardState;
-  t: ReturnType<typeof useTranslations>;
-}) {
-  const registered = ONBOARDING_V3_PRESET_IDS.map((id) => {
-    const rate = state.rates[id];
-    const status = rate === undefined ? null : rateToHabitStatus(rate);
-    return status ? { id, status } : null;
-  }).filter((x): x is { id: string; status: "active" | "established" } => x !== null);
-
-  if (registered.length === 0) {
-    return <p className="text-sm text-muted-foreground">{t("done.emptyNote")}</p>;
-  }
-
-  return (
-    <div className="space-y-2">
-      <p className="text-sm font-medium text-muted-foreground">{t("done.habitsLabel")}</p>
-      <ul className="space-y-2">
-        {registered.map(({ id, status }) => (
-          <HabitRow
-            key={id}
-            presetId={id}
-            label={t(`preset.${id}`)}
-            badge={status === "established" ? t("done.establishedBadge") : undefined}
-          />
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function HabitRow({
-  presetId,
-  label,
-  badge,
-}: {
-  presetId: string;
-  label: string;
-  badge?: string;
-}) {
-  const preset = getHabitPreset(presetId);
-  if (!preset) return null;
-  return (
-    <li className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3">
-      <span className="flex size-8 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-        <KpiIcon name={preset.icon} className="size-4" />
-      </span>
-      <span className="flex-1 font-medium">{label}</span>
-      {badge && (
-        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
-          {badge}
-        </span>
-      )}
-    </li>
   );
 }
 

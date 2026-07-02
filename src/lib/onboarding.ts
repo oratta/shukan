@@ -4,15 +4,16 @@
 // ロジックを分離する。これにより node 環境の Vitest で state 遷移・バリデーション・
 // 達成率記録・書き込み変換を単体検証できる。
 //
-// v3 の要点（plan.md change-C）:
-//   - 画面は [0]イントロ [1]プロフィール [2]段階タップ診断 [3]計算中 [4]結果 [5]完了 の6つ。
+// v3 の要点（plan.md change-C + 完了フロー刷新・ユーザーフィードバック 2026-07-02）:
+//   - 画面は [0]イントロ [1]プロフィール [2]段階タップ診断 [3]計算中 [4]結果
+//     [5]KPI選択 [6]習慣選択 の7つ。
 //   - [2] は精査済み15習慣のみを 1画面1習慣・4択（0/0.3/0.7/1）で提示し、達成率を記録する。
 //   - 達成率は DB に永続化しない（イメージ喚起用の UI・plan スコープ確定）。WizardState 内のみ。
-//   - 完了時は達成率→status を自動変換して保存する:
-//       1.0 → status='established'（established_since=null）
-//       0.3 / 0.7 → status='active'
-//       0 → 登録しない
-//   - trackedKpis は完了時に全 KpiKey を保存（v2 と同じ D5）。
+//   - [5] で「人生で何を充実させたいか」を 4KPI から1つ選び、[6] でその KPI に
+//     伸びしろ（未達成分 × インパクト）の大きい習慣トップ5から取り組むものをチェックする。
+//     達成率→status の自動変換は廃止し、チェックした習慣だけを一律 status='active' で登録する
+//     （習慣化済み扱いは日々の実行ログの実績から。100% の習慣は伸びしろゼロのため候補に出さない）。
+//   - trackedKpis は完了時に全 KpiKey を保存（v2 と同じ D5。[5] の選択は候補絞り込み専用の UI）。
 //   - 過去累積（established_since ベース）・セクションA/B・「いつから」入力は v3 で廃止。
 
 import type { HabitInsertInput } from '@/types/habit';
@@ -35,8 +36,8 @@ export interface OnboardingProfileInput {
   annualIncome: number | null;
 }
 
-/** 画面ステップ（[0]イントロ 〜 [5]完了）。 */
-export type OnboardingStep = 0 | 1 | 2 | 3 | 4 | 5;
+/** 画面ステップ（[0]イントロ 〜 [4]結果 → [5]KPI選択 → [6]習慣選択）。 */
+export type OnboardingStep = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 export interface WizardState {
   step: OnboardingStep;
@@ -47,6 +48,10 @@ export interface WizardState {
   habitIndex: number;
   /** [2] タップ後の余韻（次の習慣へ遷移中）。true の間はタップ・戻るを受け付けない（連打スキップ防止）。 */
   advancing: boolean;
+  /** [5] で選んだ「充実させたい」KPI。候補絞り込み専用（DB には保存しない）。 */
+  focusKpi: KpiKey | null;
+  /** [6] でチェックした「取り組む」プリセットID。登録は一律 status='active'。 */
+  chosenPresetIds: string[];
 }
 
 // バリデーション定数
@@ -62,6 +67,8 @@ export function createInitialWizardState(): WizardState {
     rates: {},
     habitIndex: 0,
     advancing: false,
+    focusKpi: null,
+    chosenPresetIds: [],
   };
 }
 
@@ -226,6 +233,24 @@ export function backInHabits(state: WizardState): WizardState {
   return { ...state, habitIndex: state.habitIndex - 1 };
 }
 
+// ───────── [5] KPI選択 / [6] 習慣選択 ─────────
+
+/**
+ * [5] 「充実させたい」KPI を選んで [6] 習慣選択へ進む。
+ * KPI を選び直したら（同じ KPI の再選択を含め）候補が変わるため、チェック済み習慣はリセットする。
+ */
+export function chooseFocusKpi(state: WizardState, kpi: KpiKey): WizardState {
+  return { ...state, focusKpi: kpi, chosenPresetIds: [], step: 6 };
+}
+
+/** [6] 取り組む習慣のチェックをトグルする。 */
+export function toggleChosenPreset(state: WizardState, presetId: string): WizardState {
+  const chosen = state.chosenPresetIds.includes(presetId)
+    ? state.chosenPresetIds.filter((id) => id !== presetId)
+    : [...state.chosenPresetIds, presetId];
+  return { ...state, chosenPresetIds: chosen };
+}
+
 /**
  * 現在の回答から診断入力（selections）を組み立てる。
  * v3 の15習慣のうち達成率が記録済みのものだけを含める（未回答は集計しない）。
@@ -306,18 +331,15 @@ export function presetPerTimeEffectValue(presetId: string, kpi: KpiKey): PresetE
   return { kpi, value: rounded, isReduction: kpi === 'cost_saving' };
 }
 
-// ───────── [4]→[5] 完了時の書き込み ─────────
+// ───────── [6]→完了時の書き込み ─────────
 
 /**
  * プリセットから Habit（insert 入力）を組み立てる。
  * 必須フィールドは既存 Discover の習慣採用フロー（habit-form.tsx）と同じ既定値で補う。
- * status='established' のときは established_since を書かない（v3 は常に null＝過去累積を持たない）。
- * 未知プリセットは null。
+ * status は常に省略（='active' 既定）。チェックした習慣は「これから取り組む」もので、
+ * 習慣化済み（established）の判定は日々の実行ログの実績が担う。未知プリセットは null。
  */
-export function buildHabitFromPreset(
-  presetId: string,
-  opts?: { status?: 'active' | 'established' }
-): HabitInsertInput | null {
+export function buildHabitFromPreset(presetId: string): HabitInsertInput | null {
   const preset = getHabitPreset(presetId);
   if (!preset) return null;
 
@@ -333,29 +355,14 @@ export function buildHabitFromPreset(
     weeklyTarget: undefined,
     impactArticleId: undefined,
     evidences: [],
-    // status を省略すると 'active' 既定（後方互換）。established のときのみ値を渡す。
-    // established_since は v3 では常に null（渡さない）。
-    ...(opts?.status ? { status: opts.status } : {}),
   };
-}
-
-/**
- * 達成率から habit の status を導く（v3 の書き込み規則）。
- *   1.0 → 'established'（established_since=null）
- *   0.3 / 0.7 → 'active'
- *   0 → null（登録しない）
- */
-export function rateToHabitStatus(rate: AchievementRate): 'active' | 'established' | null {
-  if (rate === 1) return 'established';
-  if (rate === 0) return null;
-  return 'active';
 }
 
 export interface OnboardingWriteInput {
   userId: string;
   profile: OnboardingProfileInput;
-  /** presetId → 達成率。0 は登録しない・1 は established・0.3/0.7 は active。 */
-  rates: Record<string, AchievementRate>;
+  /** [6] でチェックした「取り組む」プリセットID。全て status='active' で登録する。 */
+  chosenPresetIds: readonly string[];
   /**
    * 既に書き込み済みのプリセットID集合（部分失敗→再試行時に重複 insert を避ける・D-C3）。
    * 省略時は空集合（初回書き込み）。
@@ -366,9 +373,9 @@ export interface OnboardingWriteInput {
 /**
  * 完了時の一括書き込み:
  *   1. upsert user_profiles（tracked_kpis=全 KpiKey・D5。冪等＝再試行安全）
- *   2. 達成率>0 の習慣を ONBOARDING_V3_PRESET_IDS 順に insert（rate=1→established / 0.3・0.7→active）→ evidences
+ *   2. チェック済みの習慣を ONBOARDING_V3_PRESET_IDS 順に insert（一律 active）→ evidences
  * いずれかが失敗したら、それまでに成功した presetId 集合を例外に載せて throw する（C-S14・D-C3）。
- * 全習慣 0%（登録対象なし）でも profile だけ書ける（AC#11）。
+ * チェック 0 件でも profile だけ書ける（選ばずに始められる）。
  *
  * @returns 今回 + これまでに書き込みが成功したプリセットID集合
  */
@@ -377,6 +384,7 @@ export async function runOnboardingWrite(input: OnboardingWriteInput): Promise<S
     input.profile.age !== null ? new Date().getFullYear() - input.profile.age : null;
 
   const completed = new Set<string>(input.completedPresetIds ?? []);
+  const chosen = new Set(input.chosenPresetIds);
 
   try {
     // 1. profile（冪等 upsert・trackedKpis=全4軸）
@@ -389,15 +397,11 @@ export async function runOnboardingWrite(input: OnboardingWriteInput): Promise<S
       trackedKpis: [...KPI_KEYS],
     });
 
-    // 2. 達成率>0 の習慣（15本の表示順で走査）
+    // 2. チェック済みの習慣（15本の表示順で走査・一律 active）
     for (const presetId of ONBOARDING_V3_PRESET_IDS) {
-      const status = rateToHabitStatus(input.rates[presetId] ?? 0);
-      if (status === null) continue; // 0% は登録しない
+      if (!chosen.has(presetId)) continue;
       if (completed.has(presetId)) continue;
-      // active は status を省略（既定・後方互換）。established のときのみ明示する。
-      await writeHabit(input.userId, presetId, completed, {
-        status: status === 'established' ? 'established' : undefined,
-      });
+      await writeHabit(input.userId, presetId, completed);
     }
 
     return completed;
@@ -410,10 +414,9 @@ export async function runOnboardingWrite(input: OnboardingWriteInput): Promise<S
 async function writeHabit(
   userId: string,
   presetId: string,
-  completed: Set<string>,
-  opts?: { status?: 'active' | 'established' }
+  completed: Set<string>
 ): Promise<void> {
-  const habitInput = buildHabitFromPreset(presetId, opts);
+  const habitInput = buildHabitFromPreset(presetId);
   const preset = getHabitPreset(presetId);
   if (!habitInput || !preset) {
     completed.add(presetId); // 無効プリセットは処理済み扱いで再試行ループに残さない

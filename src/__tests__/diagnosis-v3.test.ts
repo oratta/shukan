@@ -8,6 +8,7 @@ import {
   formatKpiValue,
   computeDiagnosisV3,
   habitPotentialV3,
+  rankPresetsByGrowth,
   type AchievementRate,
 } from '@/lib/diagnosis-v3';
 import { WORKING_DAYS_PER_YEAR, type DerivedProfileValues } from '@/lib/profile';
@@ -193,6 +194,51 @@ describe('habitPotentialV3（習慣単体の生涯ポテンシャル・達成率
     });
     expect(potential.byKpi).toEqual(viaCompute.byKpi);
     expect(potential.byKpi.earning.display).toBe('137');
+  });
+});
+
+// ───────── [6] 習慣選択: 伸びしろランキング ─────────
+describe('rankPresetsByGrowth（伸びしろ = (1-達成率) × 100%ポテンシャル）', () => {
+  it('達成率100% の習慣は候補から除外される', () => {
+    const ranked = rankPresetsByGrowth('health_lifespan', { quit_smoking_for_health: 1 }, null);
+    expect(ranked.map((c) => c.presetId)).not.toContain('quit_smoking_for_health');
+  });
+
+  it('その KPI に効果のない習慣は除外される（例: 前向きに効かないタバコ）', () => {
+    // タバコは positive_mood の per-day 効果を持たない（[2] の個別インパクトで "—" 表示）
+    expect(habitPotentialV3('quit_smoking_for_health', null).byKpi.positive_mood.raw).toBe(0);
+    const ranked = rankPresetsByGrowth('positive_mood', {}, null, 15);
+    expect(ranked.map((c) => c.presetId)).not.toContain('quit_smoking_for_health');
+  });
+
+  it('伸びしろの大きい順に並び、既定で最大5件を返す', () => {
+    const ranked = rankPresetsByGrowth('health_lifespan', {}, null);
+    expect(ranked.length).toBe(5);
+    for (let i = 1; i < ranked.length; i++) {
+      expect(ranked[i - 1].growth.raw).toBeGreaterThanOrEqual(ranked[i].growth.raw);
+    }
+  });
+
+  it('全て未回答（0% 扱い）なら伸びしろ = 100%ポテンシャルに一致する', () => {
+    const ranked = rankPresetsByGrowth('earning', {}, null, 1);
+    expect(ranked[0].rate).toBe(0);
+    expect(ranked[0].growth.raw).toBe(
+      habitPotentialV3(ranked[0].presetId, null).byKpi.earning.raw
+    );
+  });
+
+  it('達成率が上がるほど伸びしろが減る（70%達成済みなら残り3割）', () => {
+    const top = rankPresetsByGrowth('health_lifespan', {}, null, 1)[0];
+    const ranked = rankPresetsByGrowth('health_lifespan', { [top.presetId]: 0.7 }, null, 15);
+    const demoted = ranked.find((c) => c.presetId === top.presetId);
+    expect(demoted).toBeTruthy();
+    expect(demoted!.rate).toBe(0.7);
+    expect(demoted!.growth.raw).toBeCloseTo(top.growth.raw * 0.3, 6);
+  });
+
+  it('growth は新表示単位で整形される（earning は万円/年）', () => {
+    const ranked = rankPresetsByGrowth('earning', {}, null, 1);
+    expect(ranked[0].growth.unit).toBe('万円/年');
   });
 });
 

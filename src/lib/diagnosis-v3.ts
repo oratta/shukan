@@ -17,7 +17,7 @@
 
 import type { KpiKey } from '@/data/kpi/catalog';
 import { KPI_KEYS } from '@/data/kpi/catalog';
-import { presetPerTimeEffectValue } from '@/lib/onboarding';
+import { presetPerTimeEffectValue, ONBOARDING_V3_PRESET_IDS } from '@/lib/onboarding';
 import {
   WORKING_DAYS_PER_YEAR,
   resolveDerivedProfileValues,
@@ -161,4 +161,45 @@ export function computeDiagnosisV3(input: DiagnosisV3Input): DiagnosisV3Result {
  */
 export function habitPotentialV3(presetId: string, profile: UserProfile | null): DiagnosisV3Result {
   return computeDiagnosisV3({ selections: [{ presetId, rate: 1 }], profile });
+}
+
+// ───────── [6] 習慣選択: 伸びしろランキング ─────────
+
+/** [6] 習慣選択の候補1件（現状達成率＋選んだ KPI への伸びしろ）。 */
+export interface PresetGrowthCandidate {
+  presetId: string;
+  /** 診断で記録した現状の達成率（未回答は 0 扱い）。 */
+  rate: AchievementRate;
+  /** 選んだ KPI への伸びしろ（未達成分 × ポテンシャル）。新表示単位で整形済み。 */
+  growth: KpiDiagnosisValue;
+}
+
+/**
+ * 選んだ KPI への伸びしろ（(1 - 達成率) × 100%ポテンシャル）が大きい順に候補を返す。
+ *   - 達成率 100% の習慣は伸びしろゼロのため除外する
+ *   - その KPI に効果のない習慣（伸びしろ 0 以下）も除外する
+ *   - 同値は ONBOARDING_V3_PRESET_IDS の表示順を保つ（安定ソート）
+ */
+export function rankPresetsByGrowth(
+  kpi: KpiKey,
+  rates: Record<string, AchievementRate>,
+  profile: UserProfile | null,
+  limit = 5
+): PresetGrowthCandidate[] {
+  const candidates: PresetGrowthCandidate[] = [];
+
+  for (const presetId of ONBOARDING_V3_PRESET_IDS) {
+    const rate = rates[presetId] ?? 0;
+    if (rate === 1) continue; // 伸びしろゼロ
+    const potential = habitPotentialV3(presetId, profile).byKpi[kpi].raw;
+    const growthRaw = (1 - rate) * potential;
+    if (growthRaw <= 0) continue; // この KPI に効果なし
+    candidates.push({
+      presetId,
+      rate,
+      growth: { raw: growthRaw, ...formatKpiValue(kpi, growthRaw) },
+    });
+  }
+
+  return candidates.sort((a, b) => b.growth.raw - a.growth.raw).slice(0, limit);
 }

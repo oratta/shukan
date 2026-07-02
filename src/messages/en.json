@@ -364,16 +364,32 @@
       "title": "Your lifetime impact",
       "lead": "Keep going and you’ll build up this much over the rest of your life",
       "value": "+{value}{unit}",
-      "cta": "Start with this",
+      "cta": "Choose your habits",
       "footnote": "You can review the assumptions (age, gender, country, income) in settings anytime"
     },
-    "done": {
-      "title": "You’re all set",
-      "body": "Starting with today’s one rep, your impact begins to build up.",
-      "habitsLabel": "Habits that will build up from here",
-      "establishedBadge": "Established",
-      "emptyNote": "You can add habits anytime later.",
-      "cta": "Get started"
+    "kpiSelect": {
+      "title": "What do you want more of in your life?",
+      "lead": "Pick the one you most want to grow. We’ll suggest habits that move it.",
+      "health_lifespan": {
+        "desc": "Not just how long you live — how long you stay healthy and free to live on your own terms, without major illness or care. Habits can extend this period."
+      },
+      "positive_mood": {
+        "desc": "The hours of your day spent feeling positive instead of low or irritable. Habits can grow your good-mood time."
+      },
+      "cost_saving": {
+        "desc": "Illness and poor health pile up lifetime costs — treatment, visits, medication. Habits can cut those expenses."
+      },
+      "earning": {
+        "desc": "Stamina and focus drive your work performance and income growth. Habits build the base for earning more."
+      }
+    },
+    "habitSelect": {
+      "title": "Choose habits to work on",
+      "lead": "Ranked by impact on “{kpi}”, with your current level for each.",
+      "current": "Now {percent}%",
+      "empty": "You’ve already built every habit for this area. Go ahead and start.",
+      "note": "You can add or change habits anytime. You can also start without choosing.",
+      "cta": "Start"
     },
     "writeError": "Failed to save. Please try again.",
     "starting": "Setting up..."
