@@ -150,6 +150,12 @@ export function OnboardingWizard() {
     [state.focusKpi, state.rates, calcProfile]
   );
 
+  // [4] 結果に含まれている習慣（達成率>0 で回答したもの・表示順）。
+  const answeredHabits = useMemo(
+    () => buildDiagnosisSelections(state).filter((s) => s.rate > 0),
+    [state]
+  );
+
   return (
     <div className="space-y-8">
       {(state.step === 1 || state.step === 2) && (
@@ -417,6 +423,30 @@ export function OnboardingWizard() {
               })}
             </ul>
           </div>
+
+          {/* 結果に含まれている習慣（達成率>0 で回答したもの） */}
+          {answeredHabits.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-muted-foreground">
+                {t("result.habitsLabel")}
+              </p>
+              <ul className="space-y-2">
+                {answeredHabits.map(({ presetId, rate }) => (
+                  <li
+                    key={presetId}
+                    className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3"
+                  >
+                    <span className="min-w-0 flex-1 text-sm font-medium">
+                      {t(`preset.${presetId}`)}
+                    </span>
+                    <span className="shrink-0 text-xs font-bold text-muted-foreground tabular-nums">
+                      {Math.round(rate * 100)}%
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <PrimaryButton onClick={() => setStep(5)}>{t("result.cta")}</PrimaryButton>
           <p className="text-center text-xs text-muted-foreground">

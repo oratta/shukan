@@ -103,6 +103,7 @@ describe('ja 確定文言（[4] 結果・未来のみ）', () => {
     expect(str(s.value)).toContain('{value}');
     expect(str(s.value)).toContain('{unit}');
     expect(str(s.cta)).toBe('習慣を選びに進む');
+    expect(str(s.habitsLabel)).toBe('身についている習慣');
   });
 
   it('過去/未来二段構えの廃止キーが残っていない', () => {

@@ -365,6 +365,7 @@
       "lead": "Keep going and you’ll build up this much over the rest of your life",
       "value": "+{value}{unit}",
       "cta": "Choose your habits",
+      "habitsLabel": "Habits you already have",
       "footnote": "You can review the assumptions (age, gender, country, income) in settings anytime"
     },
     "kpiSelect": {
