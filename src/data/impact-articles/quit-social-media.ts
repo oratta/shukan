@@ -39,6 +39,8 @@ export const quitSocialMedia: LifeImpactArticle = {
       'SNS経由の衝動購入は年間平均約9万円（米国調査$754を日本の購買力で調整）。さらにSNS関連のサブスク費用や広告に誘発された支出を加味すると、1日あたり¥350のコスト削減と推定されます。',
     income:
       '年収1,500万円（日給¥62,500）に対して、SNS断ちによる集中力回復効果を控えめに3%と見積もると年間¥45万。カリフォルニア大学の研究では、中断後の再集中に平均23分を要するとされ、1日数回のSNSチェックが大きな生産性損失を生みます。1日あたり¥1,400の収入ポテンシャルと推定されます。',
+    positiveMood:
+      'SNSデトックスは不安16.1%・うつ24.8%を改善します（JAMA Network Open, 2025）。何もしないときに前向きでいられる時間（480分/日）を基準に、これらをブレンドした気分改善を保守的に15%とみなすと、1日あたり約72分（480分×15%）、前向きな気持ちで過ごせる時間が増えると推定されます。',
     cumulative:
       '**1ヶ月続けると**：健康寿命+2.5時間、¥10,500節約、¥42,000の収入増。\n' +
       '**1年続けると**：健康寿命+1.5日、¥12.8万節約、¥51.1万の収入増。\n' +
@@ -50,6 +52,7 @@ export const quitSocialMedia: LifeImpactArticle = {
     dailyHealthMinutes: 5,
     dailyCostSaving: 350,
     dailyIncomeGain: 1400,
+    dailyPositiveMoodMinutes: 72,
   },
 
   confidenceLevel: 'medium',
@@ -70,6 +73,11 @@ export const quitSocialMedia: LifeImpactArticle = {
       { label: '控えめに3%適用', formula: '15000000 × 3% ÷ 365', result: '1233円/日' },
       { label: '注意残余の解消', value: '1日数回のSNSチェック排除による追加効果', result: '167円/日' },
       { label: '合計', formula: '1233 + 167', result: '1400円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: '不安16.1%・うつ24.8%改善（JAMA, 2025）。ブレンドして保守的に15%採用' },
+      { label: '日割り計算', formula: '480分 × 15%', result: '72分/日' },
     ],
   },
 

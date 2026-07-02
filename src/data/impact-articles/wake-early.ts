@@ -50,6 +50,7 @@ export const wakeEarly: LifeImpactArticle = {
     dailyHealthMinutes: 5,
     dailyCostSaving: 200,
     dailyIncomeGain: 1000,
+    dailyPositiveMoodMinutes: 0,
   },
 
   confidenceLevel: 'medium',

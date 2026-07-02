@@ -1,0 +1,170 @@
+# Decisions: 2026-06-12_onboarding-kpi
+
+意思決定ログ。各判断には実行したコマンド・出力等のエビデンスを必須で記録する。
+
+---
+
+## D-BC1: Build Contract レビュー結果の取捨選択（2026-06-12）
+
+- **レビュー結果**: APPROVE（BLOCKER 0件、1ラウンド目で通過）
+- **採用した指摘**: 「対象は index.ts 登録の35記事のみ、`LLM/` 配下 md は対象外」を change-A に1行追記
+  - 分類: (a) 事実誤認防止（Setup 調査の「37ファイル」は index.ts と未トラック素材 md を含む数。builder が37記事と誤認するリスクを排除）
+  - エビデンス: reviewer が `src/data/impact-articles/index.ts` の登録数と `ArticleId` union が35件であることを確認済み
+- **反論・不採用**: なし（嗜好レベルの指摘は出なかった。補足3点はすべて plan が既にハンドリング済みであることの確認）
+
+---
+
+## D-SR1: Spec Review 結果の取捨選択（2026-06-12）
+
+- **レビュー結果**: 全3 change APPROVE（BLOCKER 0件、1ラウンド目で通過）
+- **採用**: NOTE-C1（onboarding-flow tasks 4.6 に insertHabit 必須フィールドの既定値方針を追記。builder の独自判断＝既定値の発明リスクを排除）、NOTE-A1（kpi-data-foundation proposal.md の Impact に LifeImpactSavings の定義場所 src/types/impact.ts を明記。事実誤認の修正）
+- **不採用**: NOTE-B1（nationality→country 読み替え）・NOTE-B2（余命表関数の country 引数有無）
+  - 理由: reviewer 自身が「表は日本のみで country 引数は実装上使われない可能性が高く実害は出にくい」「B/C の着手時確認タスク（change-C tasks 1.1、change-B D6）で吸収される設計なので自律実行をブロックしない」と認定。spec 修正は過剰で、plan の「シンプルな方を選ぶ」方針を優先
+- **エビデンス**: reviewer が src/types/impact.ts:138-165 / src/middleware.ts:70-78 / src/lib/supabase/habits.ts:170,506 / src/data/impact-articles/index.ts:38-84 をコードと突き合わせ済み
+
+## D-BUILD1: 直列ビルド（per-change worktree を作らない）（2026-06-12）
+
+- **判断**: change-A→B→C は完全直列依存（plan.md Changes分解: B は A 依存、C は A+B 依存）のため、per-change の git worktree は作らず、現ブランチ `onboarding-data-setup` 上で longrun-builder を順次実行する
+- **理由**: SKILL の worktree 並列化は「依存関係がない change」向け。完全直列チェーンでは並列性ゼロのまま worktree 作成→マージのオーバーヘッドとコンフリクトリスクだけが増える。本リポジトリ自体が既に専用 worktree（~/.superset/worktrees/）である点も考慮
+- **エビデンス**: plan.md L65「依存関係: 独立」(A) / L80「依存関係: change-A」(B) / L97「依存関係: change-A, change-B」(C)。`git branch --show-current` → `onboarding-data-setup`
+- **担保**: 各 builder は change 完了ごとにコミットする（未コミット消失リスクは worktree 削除がないため低いが、コミット粒度は維持）
+
+## D-BUILD2: builder の model 指定（2026-06-12）
+
+- **判断**: メモリの「実装系 subagent は Opus 4.8 で」は、当時のデフォルトより強いモデルを使う意図。現セッションのメインモデルは Fable 5（Opus より上位）のため、model 指定を省略して Fable 5 を継承させる（意図の上位互換）
+
+---
+
+## D-A1: positiveMood 代表記事の確定リストと x%（前向き感情の相対増分）（2026-06-12）
+
+- **判断**: design.md D-3 の固定前提（起床16h=960分・前向き割合50%＝ベースライン480分/日）に基づき、`dailyPositiveMoodMinutes = 480 × x%` で機械的に算出。x% は各記事の researchBody / inferences に既に含まれる「前向き感情・気分・幸福度・うつ/不安改善」の研究記述から保守的に採用（新規研究探索はしない）
+- **確定した代表記事 9件**（D-4 候補10件のうち判断が割れる no_screens_before_bed を 0 のまま除外）:
+
+| 記事 | x%（研究記述） | dailyPositiveMoodMinutes = 480×x% |
+|---|---|---|
+| daily_meditation | 20%（Goyal 2014: 不安・うつ・well-beingに中程度効果、保守採用） | 96 |
+| gratitude_practice | 15%（Emmons&McCullough: 幸福度+25%を保守按分） | 72 |
+| daily_journaling | 12%（Smyth 2018: ポジティブ感情ジャーナリングで苦痛減・不安低下） | 58 |
+| sleep_7hours | 15%（睡眠は気分の主要駆動因。13%死亡リスク・気分改善を保守按分） | 72 |
+| daily_cardio | 15%（運動による気分・抑うつ改善。35%心血管死低減の文脈で保守採用） | 72 |
+| daily_walking | 10%（Schuch 2018: うつ病リスク26%低減を保守按分） | 48 |
+| time_in_nature | 15%（White 2019: 週120分で健康・幸福度が有意に向上） | 72 |
+| quit_social_media | 15%（JAMA 2025: 不安16.1%/うつ24.8%改善のブレンドを保守採用） | 72 |
+| daily_yoga | 12%（コルチゾール低下・ストレス低減） | 58 |
+
+- **0 のまま残した候補**:
+  - no_screens_before_bed: 記事の研究記述は alertness（覚醒度）中心で気分への直接の定量がない → 判断が割れるため 0（D-3 ルール）
+  - cold_shower: 気分は Shevchuk 2008「potential treatment for depression」という仮説段階で定量増分なし → 0
+- **二重計上回避**: dailyHealthMinutes は「寿命延伸の残存余命按分」、dailyPositiveMoodMinutes は「その日のうち前向きでいられる時間の増分」で軸が異なるため、同一研究効果でも別軸として計上してよい（D-3 準拠）。各記事の calculationLogic.positiveMood の CalcStep に前提値（16h=960分・前向き50%=480分ベースライン）と x% を明記
+- **「10記事程度」の充足**: 確定9件。plan/spec は「10記事程度」（厳密10件固定ではない、design.md Open Questions 明記）。機械的に算出できないものを無理に足さない D-3 方針を優先し9件で確定
+- **エビデンス**: 各記事 researchBody / inferences の該当研究記述（上表）を grep で確認済み
+
+---
+
+## D-A2: 既存 UI consumer への positiveMoodMinutes 必須フィールド伝播（2026-06-12）
+
+- **背景**: `DailyImpact` / `AnnualImpact` / `LifeImpactSavings` に positiveMoodMinutes を required で追加したため、`calculateAnnualImpact`/`calculateDailyImpact` を inline オブジェクトで呼ぶ既存 UI が型エラーになった（`npm run build` で検出）。対象6箇所:
+  - src/app/(app)/discover/page.tsx:290
+  - src/components/habits/evidence-article-sheet.tsx:223
+  - src/components/habits/evidence-picker.tsx:174
+  - src/components/habits/evidence-manager-sheet.tsx:59 / :141
+  - src/components/habits/impact-badge.tsx:43（getDailyValues の DailyImpact 返却）
+- **判断**: 各 inline 呼び出しに positiveMoodMinutes を1行追加して型を満たす。値は記事の `calculationParams.dailyPositiveMoodMinutes`（weighted 箇所は ×w）を渡す。discover/page.tsx のみ heroカード表示用の概算で、表示は既存3軸のみのため `positiveMoodMinutes: 0` を明示（データ源が props 3軸のみで positiveMood を持たないため）
+- **既存3軸不変の担保**: これらの UI は healthMinutes/costSaving/incomeGain のみをレンダリングしており、positiveMoodMinutes は計算結果オブジェクトに含まれるだけで画面表示・既存3軸の値は一切変わらない。`npm run test:run` 全PASS（既存テストの期待値無変更）で担保
+- **選択肢の比較**:
+  - (a) 採用: 各呼び出しに1行追加（可逆・最小差分・既存パターン踏襲＝D-8 と整合）
+  - (b) 不採用: DailyImpact のフィールドを optional にして呼び出し側を変えない → config.yaml rules「required で漏れを型検出」「3インターフェースに漏れなく追加」に反する
+  - (c) 不採用: ヘルパー関数で 3軸→4軸 変換を新設 → D-8「新しい抽象化を導入しない」に反する
+- **エビデンス**: `npm run build` → Compiled successfully / 14 routes 生成成功。`npm run test:run` → 12 files / 225 tests PASS
+
+## D-B1: マイグレーション timestamp の衝突回避と直接適用（change-B / 2026-06-12）
+
+- **背景**: 当初 `supabase/migrations/20260612000000_user_profiles.sql` を作成して `supabase db push` を試行したが失敗。
+  - `supabase migration list` の結果、dev プロジェクト（xhqddzdpcpvxpprxykct）の remote 履歴に、このブランチに**存在しない** 3 migration が記録されていた:
+    - `20260612000000` = `add_subscriptions`（タイムスタンプが本 change と衝突）
+    - `20260612000100` = `waitlist`
+    - `20260612000200` = `founding_memberships`
+  - これらは別ブランチ（課金/ウェイトリスト系）で適用済みのもの。`public` スキーマにも `subscriptions` / `waitlist` / `founding_memberships` テーブルが実在する。
+- **決定**:
+  1. ローカル migration を `20260612010000_user_profiles.sql` にリネーム（remote の `...000200` より後・衝突しない timestamp）。
+  2. 別ブランチの 3 migration を本ブランチに `db pull` で取り込むことは**しない**（このブランチの責務外。履歴を汚さない）。
+  3. `supabase db push` は remote 履歴差分により拒否されるため、migration SQL を Supabase Management API（`/v1/projects/{ref}/database/query`、SUPABASE_ACCESS_TOKEN 認証）で**直接適用**し、`supabase_migrations.schema_migrations` に `20260612010000 / user_profiles` 行を手動 insert して履歴整合を取った。
+- **選択肢の比較**:
+  - (a) 採用: API 直接適用 + 履歴行 insert → 別ブランチの migration を取り込まずに dev へ適用でき、可逆（`drop table public.user_profiles` のみで撤回可能・独立テーブル）。
+  - (b) 不採用: `supabase db pull` で remote の 3 migration をローカルに取り込んでから push → 課金系 migration が本ブランチに混入し責務分離が崩れる。
+  - (c) 不採用: タイムスタンプを `000000` のまま `migration repair` → remote の `add_subscriptions` 行を本 change のものと誤認させることになり、履歴が壊れる。
+- **エビデンス（Management API クエリ結果）**:
+  - columns: user_id(uuid,PK) / birth_year(integer,null可) / gender(text,not null,default 'unspecified') / country(text,not null,default 'JP') / annual_income(bigint,null可) / currency(text,not null,default 'JPY') / tracked_kpis(ARRAY,not null,default '{}') / created_at / updated_at（9カラム、派生値カラムなし）
+  - CHECK: `user_profiles_gender_check` = `gender = ANY (ARRAY['male','female','other','unspecified'])`
+  - RLS: `relrowsecurity=true`、policy は select/insert/update の 3 つのみ（delete ポリシーなし＝user_settings 同型）
+
+## D-B2: RLS / CHECK の検証手段（change-B / 2026-06-12）
+
+- **背景**: B-S2（gender CHECK）/ B-S7（RLS 本人限定・delete 拒否）は認証セッション下の実 DB 動作。Management API は `auth.users` 等 auth スキーマへのクエリを 403（code 1010）で拒否するため、実ユーザーを使った live insert/delete テストは API からは不可。
+- **決定**: tasks.md / 指示の「RLS の実DB検証はユニットでは不可のため、マイグレーション SQL の内容検証（ポリシー定義の存在）で代替してよい」に従い、以下 2 層で検証する:
+  1. **live スキーマ検証**（Management API で公開系カタログを参照可能）:
+     - `pg_constraint`: `user_profiles_gender_check = CHECK (gender = ANY (ARRAY['male','female','other','unspecified']))` が存在
+     - `pg_class.relrowsecurity = true`、`pg_policy`: select/insert/update の 3 ポリシーのみ（delete なし）
+  2. **migration-content ユニットテスト**（`src/__tests__/user-profiles-migration.test.ts`）: DDL の CHECK 定義・RLS 有効化・3 ポリシー・delete ポリシー不在・全ポリシーの `auth.uid() = user_id` ガードを文字列レベルで検証。
+- **残作業**: 認証ユーザーでの実 insert/select/update/delete の動作確認（B-S2/B-S7 の「動作確認完了」）は change-C のオンボーディング画面実装時に実際の書き込み経路で確認する（本 change の「テスト実装完了」「ロジック実装完了」は上記で充足）。
+
+---
+
+## D-C1: テスト戦略 — Playwright 未設定のため Vitest（node）で代替（change-C / 2026-06-12）
+
+- **背景**: tasks 2.1 は「Scenario を Playwright E2E に変換」。だが実環境は以下:
+  - `@playwright/test` は devDependency に入っているが **playwright.config.* も e2e ディレクトリも存在しない**（`ls playwright.config.*` → no matches）。
+  - vitest.config.ts は `environment: 'node'`／`exclude: ['**/*.spec.ts']`／`include: ['src/**/*.test.{ts,tsx}']`。**jsdom / happy-dom / Testing Library は未導入**（package.json に testing-library 系なし）。
+  - 既存のコンポーネント/SSR テスト（marketing-page.test.tsx・middleware.test.ts）は DOM ランタイムを使わず「同期 Server Component 出力の tree-walk」または「Supabase を vi.mock したリダイレクト検証」で実装されている。
+- **判断**: 指示の「Playwright が未設定なら Vitest + Testing Library でのコンポーネント/統合テストに代替してよい」に従う。さらに Testing Library も未導入のため、**既存リポジトリのテスト流儀（node 環境・vi.mock・tree-walk・純粋関数抽出）に合わせる**。実ブラウザ操作（クリック→state 遷移→画面遷移）の Scenario は後続 longrun-browser-verifier が verification-guide.md で実施する前提。
+  - 具体:
+    1. **リダイレクト誘導（C-S1〜C-S4, C-S15）**: `src/app/onboarding/layout.tsx` と `src/app/(app)/layout.tsx` を async Server Component として実装し、Supabase（server client）と next/navigation の `redirect` を vi.mock してユニット検証（middleware.test.ts と同流儀）。
+    2. **確定文言（C-S6, C-S8, C-S10, C-S12, C-S17 / en C-S18）**: ja.json / en.json の onboarding 名前空間を直接 import し、キーの存在・確定文言の一字一句一致・ja/en のキー構造一致を検証。
+    3. **画面ロジック（C-S5, C-S7, C-S9, C-S11, C-S16）**: ステップ遷移可否・単一選択・プロフィール入力バリデーション（必須・年齢不正値）・プリセット1つ以上・state リセットを、UI から切り出した純粋関数（`src/lib/onboarding.ts`）として実装しユニット検証。クライアントコンポーネントはこの純粋関数を使うだけにする（ロジックとレンダリングを分離）。
+    4. **完了時書き込み（C-S13, C-S14）**: 書き込みオーケストレーション（profile→habits→evidences の順序・失敗時に再試行可能・プリセット→Habit 変換の既定値）を `src/lib/onboarding.ts` の `runOnboardingWrite()` に切り出し、profiles/habits ライブラリを vi.mock して順序・引数・再試行を検証。
+    5. **プリセットフィルタ（C-S10）の表示効果**: 「1回あたりの効果」フォーマットも純粋関数化して検証。
+- **選択肢比較**:
+  - (a) 採用: 既存流儀（node/vi.mock/純粋関数抽出）。新規依存ゼロ・既存258テストと同一ランナー・ロジックを高速に網羅。可逆（後で Playwright を足せる）。
+  - (b) 不採用: Playwright を新規設定 → ブラウザ起動が必要で本 longrun の自律実行env で不安定。指示も「未設定なら代替してよい」。実ブラウザ確認は browser-verifier の担当。
+  - (c) 不採用: jsdom + Testing Library を導入 → 新規依存追加＋vitest 環境分岐が必要。YAGNI。クリック→state の検証は純粋関数抽出で十分カバーでき、真のブラウザ検証は browser-verifier が担う。
+- **影響**: tasks 2.1 は「Playwright E2E」から「Vitest（node）での同等カバレッジ」に読み替えて実装。tasks 6.3/6.4（実ブラウザ通し確認）は Verify フェーズ（browser-verifier）に委譲し注記を残す。
+
+## D-C2: ロジックとレンダリングの分離（change-C / 2026-06-12）
+
+- **判断**: ウィザードの判断ロジック（遷移可否・バリデーション・フィルタ・書き込み順序・効果フォーマット）を `src/lib/onboarding.ts`（純粋関数＋オーケストレーション）に集約し、`src/app/onboarding/*` のクライアントコンポーネントは state 保持と JSX のみを担う。
+- **理由**: D-C1 のテスト戦略（node 環境でロジックを単体検証）を成立させるため。react-best-practices の「ロジックを副作用から分離」「テスタブルな純粋関数」にも整合。可逆（将来 Playwright を足してもこの分離は無駄にならない）。
+
+## D-C3: 部分失敗→再試行時の habit 重複防止（最小対応・change-C / 2026-06-12）
+
+- **背景**: longrun-verifier の静的検証で修正推奨。`runOnboardingWrite` は profile upsert（user_id PK で冪等）→ 各プリセットを insertHabit。insertHabit は冪等でないため、3プリセット中2件目で失敗→[4]で「はじめる」再押下すると、1件目の habit が再 insert され重複する（design D3 が許容していた「途中まで成功＝profile だけ」よりも実害が大きいケース）。
+- **判断（最小対応）**:
+  - `runOnboardingWrite` は「今回＋これまでに書き込みが成功した presetId 集合」を `Set<string>` で返す。失敗時は専用例外 `OnboardingWriteError` に `succeededPresetIds` を載せて throw する。
+  - 入力に `completedPresetIds?: ReadonlySet<string>` を追加し、その集合に含まれる presetId は habit insert をスキップする（未完了分のみ書き込む）。habit + evidences の両方が成功した時点で「完了」とマークする（evidences まで含めて成功扱い＝中途半端な habit を完了にしない）。
+  - 呼び出し側（onboarding-wizard）は `useRef<Set<string>>` で成功済み集合をレンダーをまたいで保持し、再試行時に `completedPresetIds` として渡す。成功時/失敗時とも ref を最新の成功集合に更新する。
+- **design D3 との関係**: D3 の「非トランザクション・クライアント側から既存ライブラリで順次書き込む」方針は維持する（RPC/トランザクション化はしない）。本対応は「再試行時に冪等性を呼び出し側の成功集合で担保する」だけの最小差分で、新しい抽象化・新テーブル・新 RPC を導入しない。profile upsert の冪等性（D3）はそのまま活かす。
+- **選択肢の比較**:
+  - (a) 採用: 成功済み presetId 集合を呼び出し側 ref で保持し未完了分のみ書く。最小差分・既存ライブラリ流用・可逆。クライアント state で完結。
+  - (b) 不採用: insertHabit を upsert 化（name+user_id で重複排除等）→ DB スキーマ/制約の変更が要り「既存テーブルは変更しない」制約に反する。habit 名重複は正常ケースもあり破壊的。
+  - (c) 不採用: 全体を Server Action / RPC で1トランザクション化 → D3 で「既存コードベースにパターンがなく不採用」と確定済み。スコープ超過。
+- **テスト**: `onboarding-write.test.ts` に2ケース追加 — 「失敗例外に成功 presetId 集合が載る（OnboardingWriteError）」「部分失敗→再試行で成功済みプリセットをスキップし重複 insert しない（再 insert は未完了分の『毎日の節約』のみ）」。
+- **エビデンス**: `npm run test:run` → 19 files / 310 tests PASS。`npx tsc --noEmit` → 9 errors（全てベースラインの既存・change-A/B/C 由来の新規ゼロ。habits.test.ts:310 の calculationParams エラーは dailyPositiveMoodMinutes:0 追加で解消）。`npm run lint` → 9 errors / 35 warnings（ベースライン維持・onboarding ファイルは0問題）。`npm run build` → Compiled successfully。
+- **verification-guide C-S14 との整合**: 「[4]に留まりエラー表示・再押下で再試行」という記述・挙動は不変。重複しなくなるだけで仕様の方向性は変わらない（記述変更不要）。
+
+## D-C4: オンボーディング表示文言の i18n 化（en リグレッション修正・change-C / 2026-06-12）
+
+- **背景**: ブラウザ検証で C-S18（en ロケールで全文言が英語表示）が FAIL。画面[1]の KPI カードは英訳されるが、画面[3]タイトルの KPI コピー・習慣カード名・効果ラベル・画面[4]本文/KPIカードの KPI 名が日本語のまま残っていた。原因は onboarding-wizard.tsx が静的カタログ（`catalog.ts` / `habit-presets.ts` の日本語生文字列）を直接表示していたこと。`en.json` の `kpi.*.headline/name` 翻訳は既に存在するのに未使用だった。
+- **判断（表示は i18n / DB 書き込みは既存流儀を維持）**:
+  1. **表示**は全て next-intl の `t()` 経由に統一する。
+     - 画面[3]タイトル: `copy` を `t(\`kpi.${key}.headline\`)` に。
+     - 画面[3]/[4] の習慣名: `preset.name`（カタログ生文字列）→ `t(\`preset.${preset.id}\`)`。`onboarding.preset.<id>` キーを ja/en に新設（ja は habit-presets.ts の確定名と一字一句同一、en は翻訳）。
+     - 画面[4] 本文/KPIカードの KPI 名: `selectedKpiDef.name` → `t(\`kpi.${key}.name\`)`、単位 `selectedKpiDef.unit` → `t(\`kpi.${key}.unit\`)`（`kpi.<key>.unit` を ja=分/円・en=min/yen で新設）。
+     - 効果ラベル: `presetPerTimeEffect`（日本語ラベルを直接組み立てていた）を `presetPerTimeEffectValue` に置き換え、`{ kpi, value, isReduction } | null` の**ロケール非依存な構造化データ**を返す。UI 側で `step3.effectReduction`/`effectGain`（`{kpiName} ±{value}{unit}` テンプレ）に `t()` を適用してロケールに応じた文言を生成する。
+  2. **DB 書き込み**は変更しない。`buildHabitFromPreset` は従来どおり `preset.name`（日本語の確定名）を habit.name に保存する。
+     - 理由: 既存 Discover 採用フロー（`handleAddFromArticle`）は記事の `habitName`（日本語）を locale 問わずそのまま保存している。habit 名はユーザーデータであり、表示ロケールに依存して保存値が変わると DB 上の表現が不安定になる。既存アプリの流儀（保存は固定の日本語名・表示のみ翻訳）に合わせ、整合性を保つ。将来 habit 名の多言語表示が必要になれば、保存値はキー/正規名のまま表示層で翻訳する方針を踏襲できる。
+- **ja リグレッション防止**: `kpi.<key>.headline/name/description` と確定文言の一致、`kpi.<key>.unit` が分/円、`preset.<id>` が habit-presets.ts の確定名と一致、を `onboarding-messages.test.ts` に追加検証。既存の確定文言テストも無変更で全 PASS。
+- **C-S18 検証の追加**: `onboarding-messages.test.ts` に「画面[3]/[4]の表示に使う i18n キー（kpi headline/name/unit・全プリセット名・効果テンプレ）が en に全て存在し非空・単位に日本語が残らない」検証を追加。`onboarding-logic.test.ts` の `presetPerTimeEffect` テストは `presetPerTimeEffectValue` の構造化検証（返り値に円/分の日本語を含まない）に更新。
+- **選択肢の比較**:
+  - (a) 採用: 表示を t() 化＋効果は構造化データ返却＋DB 書き込みは日本語名維持。en/ja 両対応・既存保存流儀と整合・最小差分。
+  - (b) 不採用: catalog.ts / habit-presets.ts 自体を多言語化（オブジェクトに en フィールドを持たせる）→ 静的カタログ（D2/D10 の静的フロントエンド管理）に i18n 責務を持たせると messages との二重管理になる。next-intl の messages に一本化する既存方針に反する。
+  - (c) 不採用: DB に locale 依存の habit 名を保存 → 既存 Discover 流儀と不整合・保存値がロケールで揺れる。
+- **エビデンス**: `npm run test:run` → 19 files / 319 tests PASS（+9）。`npx tsc --noEmit` → 9 errors（全てベースライン既存・onboarding/i18n 由来の新規ゼロ）。`npm run lint` → 9 errors / 35 warnings（ベースライン維持・onboarding ファイルは0問題）。`npm run build` → Compiled successfully / `/onboarding` ルート生成。

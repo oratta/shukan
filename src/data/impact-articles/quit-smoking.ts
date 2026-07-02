@@ -65,6 +65,7 @@ export const quitSmoking: LifeImpactArticle = {
     dailyHealthMinutes: 288,
     dailyCostSaving: 1240,
     dailyIncomeGain: 5690,
+    dailyPositiveMoodMinutes: 0,
   },
 
   confidenceLevel: 'high',

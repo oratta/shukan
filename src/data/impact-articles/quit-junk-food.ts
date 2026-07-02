@@ -52,6 +52,7 @@ export const quitJunkFood: LifeImpactArticle = {
     dailyHealthMinutes: 8,
     dailyCostSaving: 500,
     dailyIncomeGain: 800,
+    dailyPositiveMoodMinutes: 0,
   },
 
   confidenceLevel: 'medium',

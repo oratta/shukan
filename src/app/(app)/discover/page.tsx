@@ -8,7 +8,7 @@ import { formatCurrency, formatHealthMinutes, calculateAnnualImpact } from '@/li
 import { EvidenceArticleSheet } from '@/components/habits/evidence-article-sheet';
 import { HabitForm } from '@/components/habits/habit-form';
 import { useHabits } from '@/hooks/useHabits';
-import type { Habit } from '@/types/habit';
+import type { HabitInsertInput } from '@/types/habit';
 import type { ArticleId } from '@/types/impact';
 
 /** Unsplash hero image URLs per article category */
@@ -136,7 +136,7 @@ export default function DiscoverPage() {
 
   const handleFormSubmit = useCallback(
     (
-      data: Omit<Habit, 'id' | 'createdAt' | 'archived' | 'sortOrder'>,
+      data: HabitInsertInput,
       copingSteps?: { title: string; sortOrder: number }[],
       initialEvidences?: { articleId: string; weight: number }[]
     ) => {
@@ -291,6 +291,9 @@ function ArticleCard({
             healthMinutes,
             costSaving,
             incomeGain,
+            // positiveMood はこの change では UI 表示しない（既存3軸の表示は不変）。
+            // DailyImpact 型の必須フィールドを満たすため 0 を渡すのみ。
+            positiveMoodMinutes: 0,
           });
           return (
             <div className="text-[11px] text-muted-foreground space-y-0.5 mb-2">

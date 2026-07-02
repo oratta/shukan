@@ -248,6 +248,153 @@
     "delete": "Delete",
     "edit": "Edit"
   },
+  "onboarding": {
+    "stepLabel": "Step {current} / {total}",
+    "back": "Back",
+    "kpi": {
+      "health_lifespan": {
+        "headline": "Toward a self that stays healthy longer",
+        "name": "Healthy lifespan",
+        "unit": "min",
+        "description": "Records how many minutes your habits add to your healthy lifespan"
+      },
+      "positive_mood": {
+        "headline": "Toward a self that spends time feeling positive",
+        "name": "Time feeling positive",
+        "unit": "min",
+        "description": "Records how many minutes of feeling positive you gain"
+      },
+      "cost_saving": {
+        "headline": "Toward a self that never gives up because of money",
+        "name": "Cost saving",
+        "unit": "yen",
+        "description": "Records how much (yen) you can cut from your lifetime spending"
+      },
+      "earning": {
+        "headline": "Toward a self with the power to earn",
+        "name": "Income Growth",
+        "unit": "yen",
+        "description": "Records how much (yen) your lifetime income growth rises"
+      }
+    },
+    "preset": {
+      "quit_smoking_for_health": "Don't smoke a single cigarette",
+      "daily_cardio_habit": "Do 15+ min of slightly-out-of-breath exercise every day",
+      "solid_sleep": "Get 6-8 hours of sleep every day",
+      "eat_vegetables_habit": "Eat 5 servings (about 350g) of vegetables and fruit a day",
+      "drink_water_habit": "Drink 8 glasses (about 1.5L) of water every day",
+      "quit_sugar_habit": "Keep added sugar under 25g/day (about one 250ml soft drink)",
+      "quit_junk_food_habit": "Limit junk food (snacks, instant noodles, fast food) to 2x a week or less",
+      "daily_strength_habit": "Do strength training 2-3 times a week (bodyweight is fine)",
+      "fermented_food_habit": "Eat one fermented food a day (natto, miso, yogurt, etc.)",
+      "daily_meditation_habit": "Meditate 10+ minutes every day",
+      "daily_journaling_habit": "Write a journal to let your feelings out every day",
+      "time_in_nature_habit": "Spend 20 minutes in nature every day",
+      "social_connection_habit": "Have a heart-to-heart conversation every day",
+      "morning_light_habit": "Get 10+ minutes of outdoor light within an hour of waking",
+      "quit_alcohol_habit": "Keep alcohol under 100g/week (about five 500ml beers)",
+      "daily_saving_habit": "Save every day",
+      "stop_impulse_buying": "Stop impulse buying",
+      "cook_at_home": "Cook at home",
+      "deep_focus_work": "Work with focus",
+      "morning_routine": "Set up your mornings",
+      "cut_digital_distraction": "Cut digital distractions",
+      "keep_learning": "Keep learning"
+    },
+    "intro": {
+      "title": "How much difference will your daily habits make over a lifetime?",
+      "subtitle": "Just answer a few questions. We’ll diagnose how much impact your habits create over a lifetime for the you of today.",
+      "cta": "Start the diagnosis",
+      "note": "Every number is calculated based on scientific research"
+    },
+    "profile": {
+      "title": "Tell us about yourself",
+      "subtitle": "We use this to calculate your lifetime impact just for you.",
+      "age": "Age",
+      "gender": "Gender",
+      "country": "Country",
+      "annualIncome": "Annual income",
+      "incomeUnit": "× 10,000 yen",
+      "incomePlaceholder": "e.g. 500",
+      "optional": "Optional",
+      "genderMale": "Male",
+      "genderFemale": "Female",
+      "genderOther": "Prefer not to say",
+      "countryJapan": "Japan",
+      "incomeNote": "If left blank, we calculate using the average income for your age, gender, and country",
+      "next": "Next"
+    },
+    "habits": {
+      "liveLead": "What your established habits bring you",
+      "impactLead": "What this habit brings you over the rest of your life",
+      "ask": "Is this a habit for you right now?",
+      "countLabel": "{current} / {total}",
+      "levelDisabled": "Not selectable for this habit",
+      "levels": {
+        "full": { "label": "Fully a habit", "desc": "It’s part of my life" },
+        "most": { "label": "Mostly", "desc": "I do it most of the time" },
+        "sometimes": { "label": "Sometimes", "desc": "I do it when I remember" },
+        "none": { "label": "Not yet", "desc": "I’d like to start" }
+      }
+    },
+    "habitSub": {
+      "daily_cardio_habit": "You do 15+ minutes of slightly-out-of-breath exercise (brisk walking, light jogging, etc.) every day.",
+      "solid_sleep": "You get 6-8 hours of sleep every day.",
+      "eat_vegetables_habit": "You eat 5 servings (about 350g) of vegetables and fruit a day.",
+      "drink_water_habit": "You drink 8 glasses (about 1.5L) of water every day.",
+      "quit_sugar_habit": "You keep added sugar (sweet drinks, sweets) under 25g a day. One 250ml soft drink is about 25g. It doesn’t have to be zero — small amounts have little effect.",
+      "quit_junk_food_habit": "You keep ultra-processed foods (snacks, instant noodles, fast food) to 2 times a week or less. Less is better.",
+      "daily_strength_habit": "You do strength training (bodyweight is fine) 2-3 times a week. Muscles need recovery, so 2-3 times a week works better than every day.",
+      "fermented_food_habit": "You eat one fermented food a day, such as natto, miso, or yogurt.",
+      "quit_smoking_for_health": "You don’t smoke a single cigarette. Even one cigarette greatly reduces the effect, so “sometimes” and “mostly” can’t be selected.",
+      "daily_meditation_habit": "You take 10+ minutes to meditate every day.",
+      "daily_journaling_habit": "You write a journal to let your feelings out every day.",
+      "time_in_nature_habit": "You spend 20 minutes in nature every day.",
+      "social_connection_habit": "You have a conversation every day where you and someone share how you’re doing and how you feel.",
+      "morning_light_habit": "You get 10+ minutes of outdoor light within an hour of waking every day.",
+      "quit_alcohol_habit": "You keep alcohol under 100g a week (about five 500ml beers / five go of sake). Research links over 100g/week to a shorter lifespan; zero is the lowest risk."
+    },
+    "calculating": {
+      "title": "Calculating your lifetime…",
+      "phase1": "Applying your profile…",
+      "phase2": "Cross-checking with research data…",
+      "phase3": "Calculating the impact on the rest of your life…"
+    },
+    "result": {
+      "title": "Your lifetime impact",
+      "lead": "Keep going and you’ll build up this much over the rest of your life",
+      "value": "+{value}{unit}",
+      "cta": "Choose your habits",
+      "habitsLabel": "Habits you already have",
+      "footnote": "You can review the assumptions (age, gender, country, income) in settings anytime"
+    },
+    "kpiSelect": {
+      "title": "What do you want more of in your life?",
+      "lead": "Pick the one you most want to grow. We’ll suggest habits that move it.",
+      "health_lifespan": {
+        "desc": "Not just how long you live — how long you stay healthy and free to live on your own terms, without major illness or care. Habits can extend this period."
+      },
+      "positive_mood": {
+        "desc": "The hours of your day spent feeling positive instead of low or irritable. Habits can grow your good-mood time."
+      },
+      "cost_saving": {
+        "desc": "Illness and poor health pile up lifetime costs — treatment, visits, medication. Habits can cut those expenses."
+      },
+      "earning": {
+        "desc": "Stamina and focus drive your work performance and income growth. Habits build the base for earning more."
+      }
+    },
+    "habitSelect": {
+      "title": "Choose habits to work on",
+      "lead": "Ranked by impact on “{kpi}”, with your current level for each.",
+      "current": "Now {percent}%",
+      "empty": "You’ve already built every habit for this area. Go ahead and start.",
+      "note": "You can add or change habits anytime. You can also start without choosing.",
+      "cta": "Start"
+    },
+    "writeError": "Failed to save. Please try again.",
+    "starting": "Setting up..."
+  },
   "founding": {
     "hero": {
       "eyebrow": "Founding Members",

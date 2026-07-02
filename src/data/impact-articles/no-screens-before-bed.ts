@@ -51,6 +51,7 @@ export const noScreensBeforeBed: LifeImpactArticle = {
     dailyHealthMinutes: 6,
     dailyCostSaving: 200,
     dailyIncomeGain: 850,
+    dailyPositiveMoodMinutes: 0,
   },
 
   confidenceLevel: 'medium',

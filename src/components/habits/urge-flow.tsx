@@ -48,7 +48,7 @@ export function UrgeFlow({
   useEffect(() => {
     if (open && !initializedRef.current) {
       initializedRef.current = true;
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot reset when flow opens
       setCheckedSteps(new Set());
       setAllDone(false);
       setDailyDone(false);

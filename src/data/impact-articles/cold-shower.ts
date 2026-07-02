@@ -51,6 +51,7 @@ export const coldShower: LifeImpactArticle = {
     dailyHealthMinutes: 4,
     dailyCostSaving: 100,
     dailyIncomeGain: 700,
+    dailyPositiveMoodMinutes: 0,
   },
 
   confidenceLevel: 'medium',

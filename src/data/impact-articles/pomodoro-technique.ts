@@ -76,6 +76,7 @@ export const pomodoroTechnique: LifeImpactArticle = {
     dailyHealthMinutes: 3,
     dailyCostSaving: 300,
     dailyIncomeGain: 2500,
+    dailyPositiveMoodMinutes: 0,
   },
 
   confidenceLevel: 'medium',

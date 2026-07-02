@@ -83,6 +83,7 @@ export const scheduleAdherence: LifeImpactArticle = {
     dailyHealthMinutes: 5,
     dailyCostSaving: 400,
     dailyIncomeGain: 1560,
+    dailyPositiveMoodMinutes: 0,
   },
 
   confidenceLevel: 'medium',

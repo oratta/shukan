@@ -56,6 +56,7 @@ export const drinkWater: LifeImpactArticle = {
     dailyHealthMinutes: 6,
     dailyCostSaving: 150,
     dailyIncomeGain: 500,
+    dailyPositiveMoodMinutes: 0,
   },
 
   confidenceLevel: 'medium',

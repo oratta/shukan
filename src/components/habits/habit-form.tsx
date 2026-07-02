@@ -35,7 +35,7 @@ import {
 import { cn } from '@/lib/utils';
 import { getArticle } from '@/data/impact-articles';
 import { EvidencePicker } from '@/components/habits/evidence-picker';
-import type { Habit } from '@/types/habit';
+import type { Habit, HabitInsertInput } from '@/types/habit';
 import type { ArticleId } from '@/types/impact';
 
 import { ICON_OPTIONS } from '@/lib/icon-registry';
@@ -51,7 +51,7 @@ interface HabitFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (
-    data: Omit<Habit, 'id' | 'createdAt' | 'archived' | 'sortOrder'>,
+    data: HabitInsertInput,
     copingSteps?: { title: string; sortOrder: number }[],
     initialEvidences?: EvidenceEntry[]
   ) => void;
@@ -109,7 +109,7 @@ export function HabitForm({
   // Sync state when initialData/initialCopingSteps change (e.g., editing a different habit).
   // prop 変化時に編集対象を意図的に state へリセットするパターンのため同期 setState が必要。
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sync form fields when editing a different habit
     setName(initialData?.name ?? '');
     setDescription(initialData?.description ?? '');
     setLifeSignificance(initialData?.lifeSignificance ?? '');

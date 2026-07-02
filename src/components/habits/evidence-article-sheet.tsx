@@ -218,12 +218,13 @@ export function EvidenceArticleSheet({
     );
   }
 
-  const { dailyHealthMinutes, dailyCostSaving, dailyIncomeGain } =
+  const { dailyHealthMinutes, dailyCostSaving, dailyIncomeGain, dailyPositiveMoodMinutes } =
     article.calculationParams;
   const annual = calculateAnnualImpact({
     healthMinutes: dailyHealthMinutes,
     costSaving: dailyCostSaving,
     incomeGain: dailyIncomeGain,
+    positiveMoodMinutes: dailyPositiveMoodMinutes,
   });
 
   const confidenceLabel = t(`confidence.${article.confidenceLevel}`);

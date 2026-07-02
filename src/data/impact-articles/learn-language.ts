@@ -56,6 +56,7 @@ export const learnLanguage: LifeImpactArticle = {
     dailyHealthMinutes: 6,
     dailyCostSaving: 200,
     dailyIncomeGain: 1800,
+    dailyPositiveMoodMinutes: 0,
   },
 
   confidenceLevel: 'medium',

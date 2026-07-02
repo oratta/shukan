@@ -44,6 +44,7 @@ function getDailyValues(props: ImpactBadgeProps): DailyImpact | null {
       healthMinutes: p.dailyHealthMinutes,
       costSaving: p.dailyCostSaving,
       incomeGain: p.dailyIncomeGain,
+      positiveMoodMinutes: p.dailyPositiveMoodMinutes,
     };
   }
   return null;

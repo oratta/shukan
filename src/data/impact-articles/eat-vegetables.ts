@@ -56,6 +56,7 @@ export const eatVegetables: LifeImpactArticle = {
     dailyHealthMinutes: 10,
     dailyCostSaving: 300,
     dailyIncomeGain: 600,
+    dailyPositiveMoodMinutes: 0,
   },
 
   confidenceLevel: 'high',
