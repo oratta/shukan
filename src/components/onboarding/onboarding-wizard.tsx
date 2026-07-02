@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { Check, ChevronLeft, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth-provider";
-import { KPI_CATALOG, type KpiKey } from "@/data/kpi/catalog";
+import { KPI_CATALOG, KPI_KEYS, type KpiKey } from "@/data/kpi/catalog";
 import { KpiIcon } from "@/components/onboarding/kpi-icon";
 import {
   createInitialWizardState,
@@ -31,6 +31,7 @@ import {
   computeDiagnosisV3,
   habitPotentialV3,
   rankPresetsByGrowth,
+  formatKpiValue,
   type AchievementRate,
   type DiagnosisV3Result,
 } from "@/lib/diagnosis-v3";
@@ -38,7 +39,9 @@ import {
 // [0]イントロ 〜 [5]完了 の6画面。進捗バーは入力ステップ [1][2] のみを数える。
 const FORM_STEPS = 2; // [1] プロフィール / [2] 段階タップ診断
 const CALCULATING_MS = 2600;
-const HABIT_ADVANCE_MS = 460; // タップ→次の習慣までの余韻
+// タップ→次の習慣までの余韻。KPI count-up（600ms）を見せ、後半でカードが leave して入れ替わる
+// （プロト: 520ms 後に leave 420ms → 新カード enter。ここでは leave を 300ms 遅延で重ねて 640ms で入替）。
+const HABIT_ADVANCE_MS = 640;
 
 // 達成率 → 4択ラベルの i18n キー。
 const RATE_LEVEL_KEY: Record<number, "full" | "most" | "sometimes" | "none"> = {
@@ -76,6 +79,20 @@ export function OnboardingWizard() {
     () => computeDiagnosisV3({ selections: buildDiagnosisSelections(state), profile: calcProfile }),
     [state, calcProfile]
   );
+
+  // 表示はプロト準拠の count-up（600ms・ease-out cubic）でターゲット値へ追従する。
+  const liveShown = useCountUpKpis(liveResult);
+
+  // タップ（達成率の記録）ごとに KPI を bump させる（count-up と同時に浮く演出）。
+  const [bumpTick, setBumpTick] = useState(0);
+  const skipFirstBumpRef = useRef(true);
+  useEffect(() => {
+    if (skipFirstBumpRef.current) {
+      skipFirstBumpRef.current = false;
+      return;
+    }
+    setBumpTick((n) => n + 1);
+  }, [state.rates]);
 
   // [4] 結果（未来のみ・単一表示）。step が 4 のときだけ計算する。
   const result: DiagnosisV3Result | null = useMemo(() => {
@@ -273,9 +290,15 @@ export function OnboardingWizard() {
             <p className="mb-3 text-xs text-muted-foreground">{t("habits.liveLead")}</p>
             <ul className="grid grid-cols-2 gap-x-4 gap-y-3">
               {KPI_CATALOG.map((def) => {
-                const v = liveResult.byKpi[def.key];
+                const v = liveShown[def.key];
                 return (
-                  <li key={def.key} className="flex items-center justify-between gap-2">
+                  <li
+                    key={`${def.key}-${bumpTick}`}
+                    className={cn(
+                      "flex items-center justify-between gap-2",
+                      bumpTick > 0 && "onb-kpi-bump"
+                    )}
+                  >
                     <span className="flex min-w-0 items-center gap-1.5">
                       <KpiIcon name={def.icon} className="size-3.5 shrink-0 text-primary" />
                       <span className="truncate text-[11px] text-muted-foreground">
@@ -294,6 +317,12 @@ export function OnboardingWizard() {
             </ul>
           </div>
 
+          {/* カード部（習慣タイトル〜4択）はスライドとして enter/leave 遷移する。
+              habitIndex を key に再マウントして enter を発火し、余韻中（advancing）は leave する。 */}
+          <div
+            key={state.habitIndex}
+            className={cn("space-y-5", state.advancing ? "onb-slide-leave" : "onb-slide-enter")}
+          >
           {/* 中央: 習慣カード（タイトル・個別インパクト・補足） */}
           <div className="space-y-4">
             <h1 className="text-xl font-bold leading-snug tracking-tight">
@@ -343,6 +372,7 @@ export function OnboardingWizard() {
                 </button>
               );
             })}
+          </div>
           </div>
         </section>
       )}
@@ -502,6 +532,55 @@ export function OnboardingWizard() {
       )}
     </div>
   );
+}
+
+// ───────── 上部4KPIライブの count-up（プロト animateKpis 準拠） ─────────
+
+const KPI_COUNT_UP_MS = 600;
+
+type ShownKpis = Record<KpiKey, { display: string; unit: string }>;
+
+function kpiRaws(result: DiagnosisV3Result): Record<KpiKey, number> {
+  const raws = {} as Record<KpiKey, number>;
+  for (const key of KPI_KEYS) raws[key] = result.byKpi[key].raw;
+  return raws;
+}
+
+function formatKpis(raws: Record<KpiKey, number>): ShownKpis {
+  const shown = {} as ShownKpis;
+  for (const key of KPI_KEYS) shown[key] = formatKpiValue(key, raws[key]);
+  return shown;
+}
+
+/**
+ * ターゲット値（liveResult）の変化を 600ms・ease-out cubic の count-up で表示に追従させる。
+ * 表示単位の切替（日→年など）は formatKpiValue が毎フレームの raw に対して行う。
+ */
+function useCountUpKpis(target: DiagnosisV3Result): ShownKpis {
+  const shownRawsRef = useRef<Record<KpiKey, number>>(kpiRaws(target));
+  const [shown, setShown] = useState<ShownKpis>(() => formatKpis(shownRawsRef.current));
+
+  useEffect(() => {
+    const from = { ...shownRawsRef.current };
+    const to = kpiRaws(target);
+    if (KPI_KEYS.every((key) => from[key] === to[key])) return;
+
+    const t0 = performance.now();
+    let raf = 0;
+    const frame = (now: number) => {
+      const p = Math.min(1, (now - t0) / KPI_COUNT_UP_MS);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const current = {} as Record<KpiKey, number>;
+      for (const key of KPI_KEYS) current[key] = from[key] + (to[key] - from[key]) * eased;
+      shownRawsRef.current = current;
+      setShown(formatKpis(current));
+      if (p < 1) raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+  }, [target]);
+
+  return shown;
 }
 
 // ───────── 個別インパクトボックス（達成率100%・未来分の4KPI） ─────────
