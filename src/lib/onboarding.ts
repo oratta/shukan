@@ -45,6 +45,8 @@ export interface WizardState {
   rates: Record<string, AchievementRate>;
   /** [2] で現在表示中の習慣インデックス（0-based・ONBOARDING_V3_PRESET_IDS 上の位置）。 */
   habitIndex: number;
+  /** [2] タップ後の余韻（次の習慣へ遷移中）。true の間はタップ・戻るを受け付けない（連打スキップ防止）。 */
+  advancing: boolean;
 }
 
 // バリデーション定数
@@ -59,6 +61,7 @@ export function createInitialWizardState(): WizardState {
     profile: { age: null, gender: null, country: 'JP', annualIncome: null },
     rates: {},
     habitIndex: 0,
+    advancing: false,
   };
 }
 
@@ -185,6 +188,42 @@ export function setHabitRate(
 /** 記録済みの達成率を返す（未回答は undefined）。 */
 export function getHabitRate(state: WizardState, presetId: string): AchievementRate | undefined {
   return state.rates[presetId];
+}
+
+/**
+ * [2] 4択タップ: 達成率を記録し、余韻（遷移中）状態に入る。
+ * 遷移中の再タップは習慣の無回答スキップを生むため無視する（状態をそのまま返す）。
+ * 無効な達成率（二択習慣の 30%/70% 等）も記録せず遷移しない。
+ */
+export function tapHabitRate(
+  state: WizardState,
+  presetId: string,
+  rate: AchievementRate
+): WizardState {
+  if (state.advancing) return state;
+  const next = setHabitRate(state, presetId, rate);
+  if (next === state) return state;
+  return { ...next, advancing: true };
+}
+
+/**
+ * [2] 余韻タイマー満了: 次の習慣へ進む（最後の習慣なら [3] 計算中へ）。
+ * 遷移中でないときの呼び出し（連打で余分にスケジュールされたタイマー等）は no-op。
+ * これにより同一 tick の連打でタイマーが複数発火しても二重に進まない。
+ */
+export function completeHabitAdvance(state: WizardState): WizardState {
+  if (!state.advancing) return state;
+  if (state.habitIndex >= ONBOARDING_V3_PRESET_IDS.length - 1) {
+    return { ...state, advancing: false, step: 3 };
+  }
+  return { ...state, advancing: false, habitIndex: state.habitIndex + 1 };
+}
+
+/** [2] 戻る: 前の習慣へ（先頭なら [1] プロフィールへ）。遷移中は無視する。 */
+export function backInHabits(state: WizardState): WizardState {
+  if (state.advancing) return state;
+  if (state.habitIndex <= 0) return { ...state, step: 1 };
+  return { ...state, habitIndex: state.habitIndex - 1 };
 }
 
 /**

@@ -85,3 +85,22 @@ plan.md change-C に従い [2] を段階タップ診断へ全面刷新、[4] を
   evidences weight=100）を onboarding-write.test.ts でアサートする代替検証で担保。実ブラウザ通し確認は残タスク。
 - 完了確認: `npm test`（643 tests all green）/ `npx tsc --noEmit`（0 errors）/ `npm run lint`（0 errors）/
   `npm run build`（成功）全通過。`grep -rn '稼ぐ能力' src/` = 0 件（維持）。
+
+## D-C-2: [2] タップ遷移の連打ガード（verifier finding 対応・2026-07-02）
+Verify PASS 後の残課題（連打で習慣を無回答スキップする恐れ）への対応。修正方式は verifier 提案の
+「コンポーネントローカル isAdvancing フラグ + RTL コンポーネントテスト」ではなく、以下を採用した:
+
+- **`advancing` を WizardState に組み込み、遷移を純粋関数化**: `tapHabitRate`（余韻中の再タップ無視・
+  達成率記録 + advancing=true）/ `completeHabitAdvance`（advancing でなければ no-op → 余分にスケジュール
+  されたタイマーが二重に進めない）/ `backInHabits`（余韻中の戻る無視）を src/lib/onboarding.ts に追加。
+  コンポーネントは setState(純粋関数) を適用するだけ。4択ボタンは `disabled={state.advancing}` も付与
+- **理由1（レース安全）**: コンポーネントローカルのフラグは同一 tick の連打で closure が stale になり
+  タイマーが二重スケジュールされる穴が残る。ガードを state 遷移そのものに持たせると、タイマーが何本
+  発火しても advancing=false 後は no-op になり構造的に安全
+- **理由2（テスト方式はコードベース規約に従う）**: このコードベースは @testing-library / jsdom を
+  意図的に避ける設計（account-billing.test.tsx 等に明記の既存決定。pure reducer + tree-walk 方式）。
+  RTL + jsdom を一度導入したが規約違反と気づきアンインストール（package-lock.json も HEAD 復元）。
+  代わりに純粋関数のユニットテスト 10 本を onboarding-logic.test.ts に追加（連打・二重タイマー・
+  戻る競合・最終習慣→[3]・二択無効値のケースを網羅）
+- 完了確認: `npm test`（653 tests = 643 + 新規10・all green）/ `npx tsc --noEmit` 0 errors /
+  `npm run lint` 0 errors / `npm run build` 成功

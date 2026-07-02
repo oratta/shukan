@@ -25,6 +25,16 @@
 - [x] Step 3: Review workflow 完了（runId: wf_8dc6d6a1-27f）→ **APPROVE**（BLOCKER 0 / NOTE 3:
       ①「稼ぐ能力」コメント3箇所も change-A で更新 ② en 'Earning power'→'Income Growth' の
       name/description/テスト追従 ③ E2E 不能時は書き込みペイロードのユニットテスト代替を残タスク明示）
-- [ ] Step 4: Build → Verify workflow 実行中（runId: wf_8537f458-c13、2026-07-02T05:28:30Z 起動。
-      Build Contract はユーザー承認済み。NOTE 3 件は review-notes.md として builder に申し送り）
-      → 完了後 Feedback Tier 確認
+- [x] Step 4: Build → Verify workflow 完了（runId: wf_8537f458-c13）
+  - Build: 3/3 SUCCESS — change-A `9d97d27`（634 tests）/ change-B `8aba354`（655 tests・新規21）/
+    change-C `2a495f5`（643 tests・新規69。lifetime-impact 旧API・旧テスト削除）
+  - Verify: round 1 で **PASS**（functionality=100 / quality=100 / completeness=83 / ux=78。
+    全ハードしきい値クリア）。stopReason=PASS
+  - 検証ゲート: npm test 643/643 / tsc 0 errors / lint 0 errors / build 成功 / grep '稼ぐ能力' src/ = 0件
+  - 残課題（verifier findings、非ブロッカー）:
+    1. [2] 4択タップの連打ガードなし（setTimeout 460ms 中に連続タップで習慣スキップの恐れ）
+    2. onboarding-wizard.tsx のコンポーネントテストなし（連打不具合は既存テストで検出不能）
+    3. writeError が汎用文言のみ（エラー種別の区別なし）
+    4. AC#1: openspec/changes/ に per-change の proposal/tasks が未作成（Build Contract レビューで代替）
+    5. AC#14: 実ブラウザ E2E（[0]→[5]→ホーム通し + DB 書き込み確認）が未実施（残タスク）
+- [ ] 残課題対応 / Feedback Tier 確認

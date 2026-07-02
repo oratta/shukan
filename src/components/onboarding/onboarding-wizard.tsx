@@ -14,7 +14,9 @@ import {
   validateProfileInput,
   onboardingV3Presets,
   availableAchievementRates,
-  setHabitRate,
+  tapHabitRate,
+  completeHabitAdvance,
+  backInHabits,
   getHabitRate,
   buildDiagnosisSelections,
   profileInputToUserProfile,
@@ -96,23 +98,15 @@ export function OnboardingWizard() {
     return () => clearTimeout(id);
   }, [state.step]);
 
-  // 4択タップ: 達成率記録 → 余韻 → 次の習慣へ（最後なら [3] 計算中へ）
+  // 4択タップ: 達成率記録 → 余韻 → 次の習慣へ（最後なら [3] 計算中へ）。
+  // 連打ガード（advancing）は純粋関数側（tapHabitRate / completeHabitAdvance）が持つため、
+  // 余分にスケジュールされたタイマーは no-op になる。
   const chooseRate = (presetId: string, rate: AchievementRate) => {
-    setState((s) => setHabitRate(s, presetId, rate));
-    window.setTimeout(() => {
-      setState((s) => {
-        if (s.habitIndex >= TOTAL_HABITS - 1) return { ...s, step: 3 };
-        return { ...s, habitIndex: s.habitIndex + 1 };
-      });
-    }, HABIT_ADVANCE_MS);
+    setState((s) => tapHabitRate(s, presetId, rate));
+    window.setTimeout(() => setState(completeHabitAdvance), HABIT_ADVANCE_MS);
   };
 
-  const goBackInHabits = () => {
-    setState((s) => {
-      if (s.habitIndex <= 0) return { ...s, step: 1 };
-      return { ...s, habitIndex: s.habitIndex - 1 };
-    });
-  };
+  const goBackInHabits = () => setState(backInHabits);
 
   const handleStart = async () => {
     if (!user) return;
@@ -326,6 +320,7 @@ export function OnboardingWizard() {
                   key={rate}
                   type="button"
                   aria-pressed={selected}
+                  disabled={state.advancing}
                   onClick={() => chooseRate(currentPreset.id, rate)}
                   className={cn(
                     "flex flex-col items-start gap-1 rounded-2xl border p-3.5 text-left transition-all active:scale-[0.98]",

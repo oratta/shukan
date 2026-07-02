@@ -11,6 +11,9 @@ import {
   isAchievementRateAvailable,
   setHabitRate,
   getHabitRate,
+  tapHabitRate,
+  completeHabitAdvance,
+  backInHabits,
   buildDiagnosisSelections,
   buildHabitFromPreset,
   presetPerTimeEffectValue,
@@ -18,6 +21,7 @@ import {
   createInitialWizardState,
   profileInputToUserProfile,
   type OnboardingProfileInput,
+  type WizardState,
 } from '@/lib/onboarding';
 import { HABIT_PRESETS, getHabitPreset } from '@/data/habit-presets';
 import { KPI_KEYS } from '@/data/kpi/catalog';
@@ -161,6 +165,85 @@ describe('setHabitRate / getHabitRate — AC#6', () => {
     let s = createInitialWizardState();
     s = setHabitRate(s, 'quit_smoking_for_health', 0.3);
     expect(getHabitRate(s, 'quit_smoking_for_health')).toBeUndefined();
+  });
+});
+
+// ───────── AC#6: タップ遷移の連打ガード（tapHabitRate / completeHabitAdvance / backInHabits） ─────────
+describe('tapHabitRate / completeHabitAdvance / backInHabits — 連打ガード', () => {
+  /** [2] で habitIndex 番目の習慣を表示している状態を作る。 */
+  function atHabit(index: number): WizardState {
+    return { ...createInitialWizardState(), step: 2, habitIndex: index };
+  }
+
+  it('タップで達成率を記録し advancing=true（余韻）に入る', () => {
+    const s = tapHabitRate(atHabit(0), ONBOARDING_V3_PRESET_IDS[0], 0.7);
+    expect(getHabitRate(s, ONBOARDING_V3_PRESET_IDS[0])).toBe(0.7);
+    expect(s.advancing).toBe(true);
+    expect(s.habitIndex).toBe(0); // 進むのはタイマー満了（completeHabitAdvance）
+  });
+
+  it('余韻中の再タップは無視される（習慣の無回答スキップを防ぐ）', () => {
+    const first = tapHabitRate(atHabit(0), ONBOARDING_V3_PRESET_IDS[0], 1);
+    const second = tapHabitRate(first, ONBOARDING_V3_PRESET_IDS[0], 0);
+    expect(second).toBe(first); // 状態不変（0 で上書きされない）
+    expect(getHabitRate(second, ONBOARDING_V3_PRESET_IDS[0])).toBe(1);
+  });
+
+  it('completeHabitAdvance で次の習慣へ進み advancing が解除される', () => {
+    const tapped = tapHabitRate(atHabit(0), ONBOARDING_V3_PRESET_IDS[0], 0.3);
+    const s = completeHabitAdvance(tapped);
+    expect(s.habitIndex).toBe(1);
+    expect(s.advancing).toBe(false);
+    expect(s.step).toBe(2);
+  });
+
+  it('余韻中でなければ completeHabitAdvance は no-op（連打で余分に発火したタイマー対策）', () => {
+    const tapped = tapHabitRate(atHabit(0), ONBOARDING_V3_PRESET_IDS[0], 1);
+    const advanced = completeHabitAdvance(tapped);
+    const again = completeHabitAdvance(advanced); // 2本目のタイマー発火を模擬
+    expect(again).toBe(advanced); // 二重に進まない
+    expect(again.habitIndex).toBe(1);
+  });
+
+  it('連打しても習慣は1つずつしか進まない（タップ2回＋タイマー2回発火の通し）', () => {
+    let s = atHabit(0);
+    s = tapHabitRate(s, ONBOARDING_V3_PRESET_IDS[0], 1); // 1回目タップ
+    s = tapHabitRate(s, ONBOARDING_V3_PRESET_IDS[0], 0); // 連打（無視される）
+    s = completeHabitAdvance(s); // 1本目のタイマー
+    s = completeHabitAdvance(s); // 2本目のタイマー（no-op）
+    expect(s.habitIndex).toBe(1);
+    expect(getHabitRate(s, ONBOARDING_V3_PRESET_IDS[0])).toBe(1);
+  });
+
+  it('最後の習慣で completeHabitAdvance すると [3] 計算中へ進む', () => {
+    const last = ONBOARDING_V3_PRESET_IDS.length - 1;
+    const tapped = tapHabitRate(atHabit(last), ONBOARDING_V3_PRESET_IDS[last], 0);
+    const s = completeHabitAdvance(tapped);
+    expect(s.step).toBe(3);
+    expect(s.advancing).toBe(false);
+  });
+
+  it('無効な達成率のタップは記録も遷移もしない（二択習慣の30%）', () => {
+    const s0 = atHabit(0);
+    const s = tapHabitRate(s0, 'quit_smoking_for_health', 0.3);
+    expect(s).toBe(s0);
+    expect(s.advancing).toBe(false);
+  });
+
+  it('backInHabits で前の習慣へ戻り、先頭では [1] プロフィールへ戻る', () => {
+    expect(backInHabits(atHabit(3)).habitIndex).toBe(2);
+    const s = backInHabits(atHabit(0));
+    expect(s.step).toBe(1);
+    expect(s.habitIndex).toBe(0);
+  });
+
+  it('余韻中の backInHabits は無視される（進む/戻るの競合防止）', () => {
+    const tapped = tapHabitRate(atHabit(3), ONBOARDING_V3_PRESET_IDS[3], 0.7);
+    expect(backInHabits(tapped)).toBe(tapped);
+  });
+
+  it('初期状態は advancing=false', () => {
+    expect(createInitialWizardState().advancing).toBe(false);
   });
 });
 
