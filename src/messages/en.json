@@ -319,7 +319,7 @@
       "optional": "Optional",
       "genderMale": "Male",
       "genderFemale": "Female",
-      "genderOther": "Other",
+      "genderOther": "Prefer not to say",
       "countryJapan": "Japan",
       "incomeNote": "If left blank, we calculate using the average income for your age, gender, and country",
       "next": "Next"
