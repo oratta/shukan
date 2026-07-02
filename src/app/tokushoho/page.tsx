@@ -32,7 +32,7 @@ export default function TokushohoPage() {
           {biz.phone}
           <br />
           <span className="text-xs">
-            ※ お問い合わせはメールにて承っております。電話番号はご請求があれば遅滞なく開示いたします。
+            ※ お問い合わせはメールにて承っております。
           </span>
         </>
       ),
@@ -61,6 +61,9 @@ export default function TokushohoPage() {
           </li>
           <li>
             Lifetime（買い切り）：{formatTaxInclusivePrice('lifetime', 'ja')}（一回限りのお支払い）
+          </li>
+          <li>
+            キャンペーン等により、上記価格から割引した価格を適用する場合があります。割引の適用条件および割引後の価格は、お申し込み時の画面に表示します。
           </li>
           <li className="text-xs">
             ※ 上記はすべて税込総額です。表示価格と実際のご請求額は一致します。
@@ -104,7 +107,7 @@ export default function TokushohoPage() {
             定期購入（月額・年額）はいつでも解約できます。アカウント設定画面の「お支払い・解約」から Stripe カスタマーポータルにアクセスし、ご自身で解約手続きを完了できます。解約に際して違約金・解約手数料は一切かかりません。
           </li>
           <li>
-            解約は次回更新日の前までに手続きいただくことで、次回以降の課金を停止します。すでに経過した期間分の代金の返金は、デジタルサービスの性質上、原則として行っておりません。
+            解約手続きが完了すると、次回以降の決済は行われません。解約後も、お支払い済みの現在の契約期間が終了するまでは引き続きサービスをご利用いただけます。すでにお支払いいただいた期間分の代金の返金は、デジタルサービスの性質上、原則として行っておりません。
           </li>
           <li>
             無料トライアル期間中に解約された場合、料金は一切発生しません。
@@ -132,7 +135,7 @@ export default function TokushohoPage() {
         <h1 className="mb-2 text-3xl font-bold tracking-tight">
           特定商取引法に基づく表記
         </h1>
-        <p className="mb-8 text-sm text-muted-foreground">最終更新日：2026年6月12日</p>
+        <p className="mb-8 text-sm text-muted-foreground">最終更新日：2026年7月2日</p>
 
         <div className="prose prose-sm dark:prose-invert max-w-none space-y-8 text-foreground">
           <section>
