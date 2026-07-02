@@ -45,7 +45,7 @@ function input() {
   return {
     userId: 'user-1',
     profile: { age: 42, gender: 'male' as const, country: 'JP', annualIncome: null },
-    established: [{ presetId: 'quit_drinking', establishedSince: '2016-06-27' }],
+    established: [{ presetId: 'quit_alcohol_habit', establishedSince: '2016-06-27' }],
     activePresetIds: ['cook_at_home', 'daily_saving_habit'],
   };
 }
@@ -56,8 +56,8 @@ describe('runOnboardingWrite — C-S1 書き込み順序と内容（v2）', () =
     expect(callOrder[0]).toBe('profile');
     expect(callOrder).toEqual([
       'profile',
-      'habit:お酒をやめる:established',
-      'evidence:id-お酒をやめる',
+      'habit:アルコールを週100g（ビール500ml×5本）以内に抑える:established',
+      'evidence:id-アルコールを週100g（ビール500ml×5本）以内に抑える',
       'habit:自炊する:active',
       'evidence:id-自炊する',
       'habit:毎日の節約:active',
@@ -68,7 +68,7 @@ describe('runOnboardingWrite — C-S1 書き込み順序と内容（v2）', () =
   it('established 習慣は status=established と established_since 付きで insert される（AC#10）', async () => {
     await runOnboardingWrite(input());
     const estCall = insertHabitMock.mock.calls.find(
-      (c) => (c[1] as { name: string }).name === 'お酒をやめる'
+      (c) => (c[1] as { name: string }).name === 'アルコールを週100g（ビール500ml×5本）以内に抑える'
     );
     expect(estCall).toBeTruthy();
     const habit = estCall![1] as { status?: string; establishedSince?: string };
@@ -140,8 +140,8 @@ describe('runOnboardingWrite — C-S14 失敗時の再試行（v2）', () => {
       caught = e as OnboardingWriteError;
     }
     expect(caught).toBeInstanceOf(OnboardingWriteError);
-    // established(quit_drinking) は成功済みとして集合に入る
-    expect([...caught!.succeededPresetIds]).toContain('quit_drinking');
+    // established(quit_alcohol_habit) は成功済みとして集合に入る
+    expect([...caught!.succeededPresetIds]).toContain('quit_alcohol_habit');
   });
 
   it('部分失敗→再試行で重複 insert しない（成功済みプリセットをスキップ）', async () => {
@@ -168,8 +168,8 @@ describe('runOnboardingWrite — C-S14 失敗時の再試行（v2）', () => {
     await runOnboardingWrite({ ...input(), completedPresetIds: succeeded });
 
     const insertedNames = insertHabitMock.mock.calls.map((c) => (c[1] as { name: string }).name);
-    // 成功済み（お酒をやめる）は再 insert されない
-    expect(insertedNames).not.toContain('お酒をやめる');
+    // 成功済み（アルコールを週100g（ビール500ml×5本）以内に抑える）は再 insert されない
+    expect(insertedNames).not.toContain('アルコールを週100g（ビール500ml×5本）以内に抑える');
     expect(insertedNames).toContain('自炊する');
   });
 

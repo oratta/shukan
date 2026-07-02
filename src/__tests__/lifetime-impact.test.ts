@@ -127,7 +127,7 @@ describe('computeLifetimeImpact', () => {
   it('B-S2 / AC#8: KPI4軸それぞれに {past, future} を返す', () => {
     const result = computeLifetimeImpact({
       activePresetIds: ['deep_focus_work'],
-      establishedHabits: [{ presetId: 'quit_drinking', establishedSince: '2016-06-27' }],
+      establishedHabits: [{ presetId: 'quit_alcohol_habit', establishedSince: '2016-06-27' }],
       profile: makeProfile(),
       now: FIXED_NOW,
     });
@@ -192,12 +192,12 @@ describe('computeLifetimeImpact', () => {
 
   it('B-S1 / AC#7: 過去累積は perTime値 × 過去horizon（established_since 由来）', () => {
     const elapsed = elapsedYearsSince('2016-06-27', FIXED_NOW);
-    const eff = presetPerTimeEffectValue('quit_drinking', 'cost_saving');
+    const eff = presetPerTimeEffectValue('quit_alcohol_habit', 'cost_saving');
     expect(eff).not.toBeNull();
     const expected = Math.round(eff!.value * elapsed * WORKING_DAYS_PER_YEAR);
     const result = computeLifetimeImpact({
       activePresetIds: [],
-      establishedHabits: [{ presetId: 'quit_drinking', establishedSince: '2016-06-27' }],
+      establishedHabits: [{ presetId: 'quit_alcohol_habit', establishedSince: '2016-06-27' }],
       profile: makeProfile(),
       now: FIXED_NOW,
     });
@@ -207,7 +207,7 @@ describe('computeLifetimeImpact', () => {
   it('B-S5 / D7: established_since が未来日のとき past=0', () => {
     const result = computeLifetimeImpact({
       activePresetIds: [],
-      establishedHabits: [{ presetId: 'quit_drinking', establishedSince: '2030-01-01' }],
+      establishedHabits: [{ presetId: 'quit_alcohol_habit', establishedSince: '2030-01-01' }],
       profile: makeProfile(),
       now: FIXED_NOW,
     });
@@ -217,7 +217,7 @@ describe('computeLifetimeImpact', () => {
   it('B-S5 / D7: established_since が当日（0年）のとき past≈0', () => {
     const result = computeLifetimeImpact({
       activePresetIds: [],
-      establishedHabits: [{ presetId: 'quit_drinking', establishedSince: '2026-06-27' }],
+      establishedHabits: [{ presetId: 'quit_alcohol_habit', establishedSince: '2026-06-27' }],
       profile: makeProfile(),
       now: FIXED_NOW,
     });
@@ -227,7 +227,7 @@ describe('computeLifetimeImpact', () => {
   it('B-S5 / D7: 極端な長期（50年）は大きな past', () => {
     const result = computeLifetimeImpact({
       activePresetIds: [],
-      establishedHabits: [{ presetId: 'quit_drinking', establishedSince: '1976-06-27' }],
+      establishedHabits: [{ presetId: 'quit_alcohol_habit', establishedSince: '1976-06-27' }],
       profile: makeProfile(),
       now: FIXED_NOW,
     });
@@ -235,7 +235,7 @@ describe('computeLifetimeImpact', () => {
     // 50年 ≒ 10年の約5倍（線形）
     const tenYears = computeLifetimeImpact({
       activePresetIds: [],
-      establishedHabits: [{ presetId: 'quit_drinking', establishedSince: '2016-06-27' }],
+      establishedHabits: [{ presetId: 'quit_alcohol_habit', establishedSince: '2016-06-27' }],
       profile: makeProfile(),
       now: FIXED_NOW,
     });
@@ -245,7 +245,7 @@ describe('computeLifetimeImpact', () => {
   it('AC#7: established 習慣があると pastIsEstimated=true（推定フラグ）', () => {
     const withEstablished = computeLifetimeImpact({
       activePresetIds: ['deep_focus_work'],
-      establishedHabits: [{ presetId: 'quit_drinking', establishedSince: '2016-06-27' }],
+      establishedHabits: [{ presetId: 'quit_alcohol_habit', establishedSince: '2016-06-27' }],
       profile: makeProfile(),
       now: FIXED_NOW,
     });
