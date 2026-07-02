@@ -56,8 +56,8 @@ describe('runOnboardingWrite — C-S1 書き込み順序と内容（v2）', () =
     expect(callOrder[0]).toBe('profile');
     expect(callOrder).toEqual([
       'profile',
-      'habit:アルコールを飲まない:established',
-      'evidence:id-アルコールを飲まない',
+      'habit:アルコールを週100g（ビール500ml×5本）以内に抑える:established',
+      'evidence:id-アルコールを週100g（ビール500ml×5本）以内に抑える',
       'habit:自炊する:active',
       'evidence:id-自炊する',
       'habit:毎日の節約:active',
@@ -68,7 +68,7 @@ describe('runOnboardingWrite — C-S1 書き込み順序と内容（v2）', () =
   it('established 習慣は status=established と established_since 付きで insert される（AC#10）', async () => {
     await runOnboardingWrite(input());
     const estCall = insertHabitMock.mock.calls.find(
-      (c) => (c[1] as { name: string }).name === 'アルコールを飲まない'
+      (c) => (c[1] as { name: string }).name === 'アルコールを週100g（ビール500ml×5本）以内に抑える'
     );
     expect(estCall).toBeTruthy();
     const habit = estCall![1] as { status?: string; establishedSince?: string };
@@ -168,8 +168,8 @@ describe('runOnboardingWrite — C-S14 失敗時の再試行（v2）', () => {
     await runOnboardingWrite({ ...input(), completedPresetIds: succeeded });
 
     const insertedNames = insertHabitMock.mock.calls.map((c) => (c[1] as { name: string }).name);
-    // 成功済み（アルコールを飲まない）は再 insert されない
-    expect(insertedNames).not.toContain('アルコールを飲まない');
+    // 成功済み（アルコールを週100g（ビール500ml×5本）以内に抑える）は再 insert されない
+    expect(insertedNames).not.toContain('アルコールを週100g（ビール500ml×5本）以内に抑える');
     expect(insertedNames).toContain('自炊する');
   });
 

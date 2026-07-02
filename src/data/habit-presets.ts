@@ -27,7 +27,7 @@ export const HABIT_PRESETS: readonly HabitPreset[] = [
   // ───────── health_lifespan（健康寿命）向け ─────────
   {
     id: 'quit_smoking_for_health',
-    name: 'タバコを吸わない',
+    name: 'タバコを1本も吸わない',
     defaultHabitType: 'quit',
     icon: 'cigarette-off',
     articleIds: ['quit_smoking'],
@@ -35,7 +35,7 @@ export const HABIT_PRESETS: readonly HabitPreset[] = [
   },
   {
     id: 'daily_cardio_habit',
-    name: '少し息が切れるくらいの運動を毎日行う',
+    name: '少し息が切れるくらいの運動を毎日15分以上行う',
     defaultHabitType: 'positive',
     icon: 'person-standing',
     articleIds: ['daily_cardio'],
@@ -67,7 +67,7 @@ export const HABIT_PRESETS: readonly HabitPreset[] = [
   },
   {
     id: 'quit_sugar_habit',
-    name: '砂糖入りの飲み物・お菓子をとらない',
+    name: '砂糖を1日25g（ジュース250ml程度）以内に抑える',
     defaultHabitType: 'quit',
     icon: 'candy-off',
     articleIds: ['quit_sugar'],
@@ -75,7 +75,7 @@ export const HABIT_PRESETS: readonly HabitPreset[] = [
   },
   {
     id: 'quit_junk_food_habit',
-    name: 'ジャンクフードを食べない',
+    name: 'ジャンクフード（スナック・カップ麺・ファストフード）を週2回以内にする',
     defaultHabitType: 'quit',
     icon: 'hamburger',
     articleIds: ['quit_junk_food'],
@@ -101,7 +101,7 @@ export const HABIT_PRESETS: readonly HabitPreset[] = [
   // ───────── positive_mood（前向きな気持ちの時間）向け ─────────
   {
     id: 'daily_meditation_habit',
-    name: '毎日の瞑想',
+    name: '毎日10分以上、瞑想する',
     defaultHabitType: 'positive',
     icon: 'brain',
     articleIds: ['daily_meditation'],
@@ -143,7 +143,7 @@ export const HABIT_PRESETS: readonly HabitPreset[] = [
   // ───────── cost_saving（出費削減）向け ─────────
   {
     id: 'quit_alcohol_habit',
-    name: 'アルコールを飲まない',
+    name: 'アルコールを週100g（ビール500ml×5本）以内に抑える',
     defaultHabitType: 'quit',
     icon: 'wine-off',
     articleIds: ['quit_alcohol'],
