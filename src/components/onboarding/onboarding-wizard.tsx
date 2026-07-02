@@ -84,15 +84,8 @@ export function OnboardingWizard() {
   const liveShown = useCountUpKpis(liveResult);
 
   // タップ（達成率の記録）ごとに KPI を bump させる（count-up と同時に浮く演出）。
+  // インクリメントは chooseRate（イベントハンドラ）側で行う（effect 内 setState を避ける）。
   const [bumpTick, setBumpTick] = useState(0);
-  const skipFirstBumpRef = useRef(true);
-  useEffect(() => {
-    if (skipFirstBumpRef.current) {
-      skipFirstBumpRef.current = false;
-      return;
-    }
-    setBumpTick((n) => n + 1);
-  }, [state.rates]);
 
   // [4] 結果（未来のみ・単一表示）。step が 4 のときだけ計算する。
   const result: DiagnosisV3Result | null = useMemo(() => {
@@ -111,6 +104,8 @@ export function OnboardingWizard() {
   // 連打ガード（advancing）は純粋関数側（tapHabitRate / completeHabitAdvance）が持つため、
   // 余分にスケジュールされたタイマーは no-op になる。
   const chooseRate = (presetId: string, rate: AchievementRate) => {
+    // 余韻中（advancing）のタップは純粋関数側で無視されるため bump もさせない。
+    if (!state.advancing) setBumpTick((n) => n + 1);
     setState((s) => tapHabitRate(s, presetId, rate));
     window.setTimeout(() => setState(completeHabitAdvance), HABIT_ADVANCE_MS);
   };
@@ -588,7 +583,7 @@ function formatKpis(raws: Record<KpiKey, number>): ShownKpis {
  */
 function useCountUpKpis(target: DiagnosisV3Result): ShownKpis {
   const shownRawsRef = useRef<Record<KpiKey, number>>(kpiRaws(target));
-  const [shown, setShown] = useState<ShownKpis>(() => formatKpis(shownRawsRef.current));
+  const [shown, setShown] = useState<ShownKpis>(() => formatKpis(kpiRaws(target)));
 
   useEffect(() => {
     const from = { ...shownRawsRef.current };
