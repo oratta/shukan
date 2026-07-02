@@ -466,7 +466,7 @@ function ResultBlock({
   );
 }
 
-/** KPI 値を符号付き・単位付きで表示する。健康寿命/前向きは年、出費削減/稼ぐ能力は円。 */
+/** KPI 値を符号付き・単位付きで表示する。健康寿命/前向きは年、出費削減/増える収入は円。 */
 function formatKpiValue(
   t: ReturnType<typeof useTranslations>,
   kpi: KpiKey,

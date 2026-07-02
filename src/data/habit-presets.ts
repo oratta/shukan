@@ -174,7 +174,7 @@ export const HABIT_PRESETS: readonly HabitPreset[] = [
     primaryKpis: ['cost_saving', 'health_lifespan'],
   },
 
-  // ───────── earning（稼ぐ能力）向け ─────────
+  // ───────── earning（増える収入）向け ─────────
   {
     id: 'deep_focus_work',
     name: '集中して働く',

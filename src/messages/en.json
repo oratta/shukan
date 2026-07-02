@@ -272,9 +272,9 @@
       },
       "earning": {
         "headline": "Toward a self with the power to earn",
-        "name": "Earning power",
+        "name": "Income Growth",
         "unit": "yen",
-        "description": "Records how much (yen) your lifetime earning power rises"
+        "description": "Records how much (yen) your lifetime income growth rises"
       }
     },
     "preset": {

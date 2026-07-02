@@ -45,14 +45,14 @@ describe('KPI catalog (A-S9)', () => {
     expect(k!.description).toBe('生涯の出費をいくら（円）減らせるかを記録します');
   });
 
-  it('earning: 稼ぐ能力 / 円 / 稼ぐ力のある自分へ', () => {
+  it('earning: 増える収入 / 円 / 稼ぐ力のある自分へ', () => {
     const k = getKpi('earning');
     expect(k).toBeDefined();
-    expect(k!.name).toBe('稼ぐ能力');
+    expect(k!.name).toBe('増える収入');
     expect(k!.unit).toBe('円');
     expect(k!.headline).toBe('稼ぐ力のある自分へ');
     expect(k!.kind).toBe('money_in');
-    expect(k!.description).toBe('生涯で稼ぐ能力がいくら（円）上がるかを記録します');
+    expect(k!.description).toBe('生涯で増える収入がいくら（円）上がるかを記録します');
   });
 
   it('全定義に icon がある', () => {

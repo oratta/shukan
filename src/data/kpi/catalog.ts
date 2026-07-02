@@ -58,11 +58,11 @@ export const KPI_CATALOG: readonly KpiDefinition[] = [
   },
   {
     key: 'earning',
-    name: '稼ぐ能力',
+    name: '増える収入',
     unit: '円',
     kind: 'money_in',
     headline: '稼ぐ力のある自分へ',
-    description: '生涯で稼ぐ能力がいくら（円）上がるかを記録します',
+    description: '生涯で増える収入がいくら（円）上がるかを記録します',
     icon: 'trending-up',
   },
 ] as const;
