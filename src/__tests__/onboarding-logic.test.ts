@@ -2,29 +2,38 @@ import { describe, it, expect } from 'vitest';
 import {
   validateProfileInput,
   canAdvanceFromProfile,
-  canAdvanceFromHabits,
   allHabitPresets,
+  onboardingV3Presets,
+  ONBOARDING_V3_PRESET_IDS,
+  ACHIEVEMENT_RATE_DISPLAY_ORDER,
+  BINARY_ACHIEVEMENT_PRESET_IDS,
+  availableAchievementRates,
+  isAchievementRateAvailable,
+  setHabitRate,
+  getHabitRate,
+  buildDiagnosisSelections,
   buildHabitFromPreset,
   presetPerTimeEffectValue,
+  rateToHabitStatus,
   createInitialWizardState,
-  toggleEstablished,
-  toggleActive,
-  setEstablishedYearsAgo,
-  isPresetEstablished,
-  isPresetActive,
-  yearsAgoToEstablishedSince,
   profileInputToUserProfile,
-  buildLifetimeImpactInput,
-  shouldShowPastBlock,
-  DEFAULT_ESTABLISHED_YEARS_AGO,
   type OnboardingProfileInput,
-  type WizardState,
 } from '@/lib/onboarding';
-import { computeLifetimeImpact } from '@/lib/lifetime-impact';
-import { HABIT_PRESETS } from '@/data/habit-presets';
+import { HABIT_PRESETS, getHabitPreset } from '@/data/habit-presets';
 import { KPI_KEYS } from '@/data/kpi/catalog';
 
-// ───────── C-S9: [1] プロフィール 必須・年収任意・不正値制御（v1→v2 変更なし） ─────────
+// 残置7プリセット（v3 診断には出さない）
+const RESIDUAL_PRESET_IDS = [
+  'daily_saving_habit',
+  'stop_impulse_buying',
+  'cook_at_home',
+  'deep_focus_work',
+  'morning_routine',
+  'cut_digital_distraction',
+  'keep_learning',
+];
+
+// ───────── C-S9: [1] プロフィール 必須・年収任意・不正値制御 ─────────
 describe('validateProfileInput / canAdvanceFromProfile', () => {
   function base(): OnboardingProfileInput {
     return { age: 42, gender: 'male', country: 'JP', annualIncome: null };
@@ -62,34 +71,57 @@ describe('validateProfileInput / canAdvanceFromProfile', () => {
   });
 });
 
-// ───────── C-S2: [2] セクションB（active）が1つ以上で診断可能（セクションAは任意） ─────────
-describe('canAdvanceFromHabits — AC#11', () => {
-  it('セクションB が0件では false', () => {
-    expect(canAdvanceFromHabits([])).toBe(false);
+// ───────── AC#5: [2] は精査済み15習慣のみ（残置7プリセットは非表示） ─────────
+describe('ONBOARDING_V3_PRESET_IDS / onboardingV3Presets — AC#5', () => {
+  it('ちょうど15本を提示する', () => {
+    expect(ONBOARDING_V3_PRESET_IDS).toHaveLength(15);
+    expect(onboardingV3Presets()).toHaveLength(15);
   });
-  it('セクションB が1件で true', () => {
-    expect(canAdvanceFromHabits(['cook_at_home'])).toBe(true);
+
+  it('全てのIDが実在するプリセットに解決できる', () => {
+    for (const id of ONBOARDING_V3_PRESET_IDS) {
+      expect(getHabitPreset(id)).toBeTruthy();
+    }
   });
-  it('セクションB が複数でも true', () => {
-    expect(canAdvanceFromHabits(['cook_at_home', 'daily_saving_habit'])).toBe(true);
+
+  it('残置7プリセットは1本も含まれない', () => {
+    for (const id of RESIDUAL_PRESET_IDS) {
+      expect(ONBOARDING_V3_PRESET_IDS).not.toContain(id);
+    }
+    const ids = onboardingV3Presets().map((p) => p.id);
+    for (const id of RESIDUAL_PRESET_IDS) {
+      expect(ids).not.toContain(id);
+    }
+  });
+
+  it('残置7プリセットが定義自体は存在する（カタログを壊していない）', () => {
+    for (const id of RESIDUAL_PRESET_IDS) {
+      expect(getHabitPreset(id)).toBeTruthy();
+    }
+    expect(HABIT_PRESETS.length).toBe(15 + RESIDUAL_PRESET_IDS.length);
+  });
+
+  it('allHabitPresets は v3 の15本を返す（互換名）', () => {
+    expect(allHabitPresets().map((p) => p.id)).toEqual([...ONBOARDING_V3_PRESET_IDS]);
   });
 });
 
-// ───────── D6: [2] 母集団は全プリセットカタログ（KPI 非依存） ─────────
-describe('allHabitPresets — D6', () => {
-  it('全プリセットカタログを返す（KPI で絞り込まない）', () => {
-    expect(allHabitPresets()).toHaveLength(HABIT_PRESETS.length);
-    expect(allHabitPresets().map((p) => p.id)).toEqual(HABIT_PRESETS.map((p) => p.id));
+// ───────── AC#13: 15本の articleIds が互いに重複しない（同一エビデンス二重計上なし） ─────────
+describe('15習慣の articleId 重複なし — AC#13', () => {
+  it('15本が参照する全 articleId に重複がない', () => {
+    const allArticleIds = onboardingV3Presets().flatMap((p) => p.articleIds);
+    const unique = new Set(allArticleIds);
+    expect(unique.size).toBe(allArticleIds.length);
   });
 });
 
 // ───────── C-S16: 初期状態（途中離脱は最初[0]からやり直し） ─────────
-describe('createInitialWizardState — v2', () => {
-  it('step=0、established/active は空、国=JP のみ既定', () => {
+describe('createInitialWizardState — v3', () => {
+  it('step=0、rates は空、habitIndex=0、国=JP のみ既定', () => {
     const s = createInitialWizardState();
     expect(s.step).toBe(0);
-    expect(s.established).toEqual([]);
-    expect(s.activePresetIds).toEqual([]);
+    expect(s.rates).toEqual({});
+    expect(s.habitIndex).toBe(0);
     expect(s.profile.country).toBe('JP');
     expect(s.profile.age).toBeNull();
     expect(s.profile.gender).toBeNull();
@@ -97,112 +129,102 @@ describe('createInitialWizardState — v2', () => {
   });
 });
 
-// ───────── C-S3: セクションA/B の相互排他（D2・二重計上防止） ─────────
-describe('toggleEstablished / toggleActive — 相互排他（C-S3）', () => {
-  function base(): WizardState {
-    return createInitialWizardState();
-  }
-
-  it('toggleEstablished で established に追加され、デフォルト年数が入る', () => {
-    const s = toggleEstablished(base(), 'quit_alcohol_habit');
-    expect(isPresetEstablished(s, 'quit_alcohol_habit')).toBe(true);
-    const sel = s.established.find((e) => e.presetId === 'quit_alcohol_habit');
-    expect(sel?.yearsAgo).toBe(DEFAULT_ESTABLISHED_YEARS_AGO);
+// ───────── AC#6: 4択タップで達成率を記録し、再選択で上書きできる ─────────
+describe('setHabitRate / getHabitRate — AC#6', () => {
+  it('達成率を記録できる', () => {
+    let s = createInitialWizardState();
+    s = setHabitRate(s, 'daily_cardio_habit', 0.7);
+    expect(getHabitRate(s, 'daily_cardio_habit')).toBe(0.7);
   });
 
-  it('再度 toggleEstablished で established から外れる', () => {
-    let s = toggleEstablished(base(), 'quit_alcohol_habit');
-    s = toggleEstablished(s, 'quit_alcohol_habit');
-    expect(isPresetEstablished(s, 'quit_alcohol_habit')).toBe(false);
+  it('再選択で達成率を上書きできる（戻って選び直し）', () => {
+    let s = createInitialWizardState();
+    s = setHabitRate(s, 'daily_cardio_habit', 0.3);
+    s = setHabitRate(s, 'daily_cardio_habit', 1);
+    expect(getHabitRate(s, 'daily_cardio_habit')).toBe(1);
   });
 
-  it('active にあるプリセットを established にすると active から外れる（相互排他）', () => {
-    let s = toggleActive(base(), 'cook_at_home');
-    expect(isPresetActive(s, 'cook_at_home')).toBe(true);
-    s = toggleEstablished(s, 'cook_at_home');
-    expect(isPresetEstablished(s, 'cook_at_home')).toBe(true);
-    expect(isPresetActive(s, 'cook_at_home')).toBe(false);
+  it('未回答は undefined', () => {
+    const s = createInitialWizardState();
+    expect(getHabitRate(s, 'daily_cardio_habit')).toBeUndefined();
   });
 
-  it('established にあるプリセットを active にすると established から外れる（逆も同様）', () => {
-    let s = toggleEstablished(base(), 'cook_at_home');
-    s = toggleActive(s, 'cook_at_home');
-    expect(isPresetActive(s, 'cook_at_home')).toBe(true);
-    expect(isPresetEstablished(s, 'cook_at_home')).toBe(false);
+  it('複数習慣を独立に記録する', () => {
+    let s = createInitialWizardState();
+    s = setHabitRate(s, 'daily_cardio_habit', 1);
+    s = setHabitRate(s, 'solid_sleep', 0.3);
+    expect(getHabitRate(s, 'daily_cardio_habit')).toBe(1);
+    expect(getHabitRate(s, 'solid_sleep')).toBe(0.3);
   });
 
-  it('同一プリセットが established と active の両方に同時に存在しない', () => {
-    let s = base();
-    s = toggleEstablished(s, 'cook_at_home');
-    s = toggleActive(s, 'daily_saving_habit');
-    s = toggleActive(s, 'cook_at_home'); // 競合: established→active へ移動
-    const inBoth = s.established.some((e) => s.activePresetIds.includes(e.presetId));
-    expect(inBoth).toBe(false);
+  it('無効な達成率（二択習慣の30%）は記録されない', () => {
+    let s = createInitialWizardState();
+    s = setHabitRate(s, 'quit_smoking_for_health', 0.3);
+    expect(getHabitRate(s, 'quit_smoking_for_health')).toBeUndefined();
   });
 });
 
-// ───────── C-S5: 「いつから」年数の設定と開始日変換 ─────────
-describe('setEstablishedYearsAgo / yearsAgoToEstablishedSince — C-S5', () => {
-  it('setEstablishedYearsAgo で対象プリセットの年数だけ更新する', () => {
-    let s = toggleEstablished(createInitialWizardState(), 'quit_alcohol_habit');
-    s = setEstablishedYearsAgo(s, 'quit_alcohol_habit', 10);
-    expect(s.established.find((e) => e.presetId === 'quit_alcohol_habit')?.yearsAgo).toBe(10);
+// ───────── 段階タップ4択・二択習慣の無効化 ─────────
+describe('availableAchievementRates — 4択・二択の無効化', () => {
+  it('通常の習慣は 4択すべて（降順 100/70/30/0）', () => {
+    expect(availableAchievementRates('daily_cardio_habit')).toEqual([1, 0.7, 0.3, 0]);
   });
 
-  it('yearsAgo=10 は約10年前の YYYY-MM-DD を返す', () => {
-    const now = new Date('2026-06-27T00:00:00Z');
-    expect(yearsAgoToEstablishedSince(10, now)).toBe('2016-06-27');
+  it('タバコは 100%/0% の二択（30%/70% を無効化）', () => {
+    expect(availableAchievementRates('quit_smoking_for_health')).toEqual([1, 0]);
+    expect(BINARY_ACHIEVEMENT_PRESET_IDS.has('quit_smoking_for_health')).toBe(true);
   });
 
-  it('yearsAgo=0 は当日', () => {
-    const now = new Date('2026-06-27T00:00:00Z');
-    expect(yearsAgoToEstablishedSince(0, now)).toBe('2026-06-27');
+  it('表示順の定数は 100/70/30/0', () => {
+    expect(ACHIEVEMENT_RATE_DISPLAY_ORDER).toEqual([1, 0.7, 0.3, 0]);
   });
 
-  it('負の年数は0年にクランプ（当日）', () => {
-    const now = new Date('2026-06-27T00:00:00Z');
-    expect(yearsAgoToEstablishedSince(-5, now)).toBe('2026-06-27');
+  it('isAchievementRateAvailable: タバコの30%/70%は不可、100%/0%は可', () => {
+    expect(isAchievementRateAvailable('quit_smoking_for_health', 0.3)).toBe(false);
+    expect(isAchievementRateAvailable('quit_smoking_for_health', 0.7)).toBe(false);
+    expect(isAchievementRateAvailable('quit_smoking_for_health', 1)).toBe(true);
+    expect(isAchievementRateAvailable('quit_smoking_for_health', 0)).toBe(true);
+    expect(isAchievementRateAvailable('daily_cardio_habit', 0.3)).toBe(true);
   });
 });
 
-// ───────── C-S4: 結果ブロック表示判定 + 合算入力組み立て ─────────
-describe('buildLifetimeImpactInput / shouldShowPastBlock — C-S4 / AC#12', () => {
-  function profile(): OnboardingProfileInput {
-    return { age: 40, gender: 'male', country: 'JP', annualIncome: 5_000_000 };
-  }
-
-  it('established が0件のとき shouldShowPastBlock=false（過去ブロック非表示）', () => {
+// ───────── buildDiagnosisSelections（回答済みだけを集計対象に） ─────────
+describe('buildDiagnosisSelections', () => {
+  it('回答済みプリセットだけを表示順で返す', () => {
     let s = createInitialWizardState();
-    s = { ...s, profile: profile() };
-    s = toggleActive(s, 'cook_at_home');
-    const result = computeLifetimeImpact(buildLifetimeImpactInput(s));
-    expect(shouldShowPastBlock(result)).toBe(false);
-    expect(result.pastIsEstimated).toBe(false);
+    s = setHabitRate(s, 'solid_sleep', 0.7);
+    s = setHabitRate(s, 'daily_cardio_habit', 1);
+    const sels = buildDiagnosisSelections(s);
+    // 表示順（cardio が先）
+    expect(sels).toEqual([
+      { presetId: 'daily_cardio_habit', rate: 1 },
+      { presetId: 'solid_sleep', rate: 0.7 },
+    ]);
   });
 
-  it('established が1件以上のとき shouldShowPastBlock=true（過去ブロック表示）', () => {
+  it('0% の回答も含める（集計上は0だが「回答済み」）', () => {
     let s = createInitialWizardState();
-    s = { ...s, profile: profile() };
-    s = toggleActive(s, 'cook_at_home');
-    s = toggleEstablished(s, 'quit_alcohol_habit');
-    s = setEstablishedYearsAgo(s, 'quit_alcohol_habit', 10);
-    const result = computeLifetimeImpact(buildLifetimeImpactInput(s));
-    expect(shouldShowPastBlock(result)).toBe(true);
-    expect(result.pastIsEstimated).toBe(true);
+    s = setHabitRate(s, 'daily_cardio_habit', 0);
+    expect(buildDiagnosisSelections(s)).toEqual([{ presetId: 'daily_cardio_habit', rate: 0 }]);
   });
 
-  it('buildLifetimeImpactInput は active を future・established を past 母集団に振り分ける', () => {
-    let s = createInitialWizardState();
-    s = { ...s, profile: profile() };
-    s = toggleActive(s, 'cook_at_home');
-    s = toggleEstablished(s, 'quit_alcohol_habit');
-    s = setEstablishedYearsAgo(s, 'quit_alcohol_habit', 10);
-    const input = buildLifetimeImpactInput(s);
-    expect(input.activePresetIds).toEqual(['cook_at_home']);
-    expect(input.establishedHabits).toHaveLength(1);
-    expect(input.establishedHabits[0].presetId).toBe('quit_alcohol_habit');
-    expect(input.establishedHabits[0].establishedSince).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-    expect(input.profile).not.toBeNull();
+  it('未回答は含めない', () => {
+    const s = createInitialWizardState();
+    expect(buildDiagnosisSelections(s)).toEqual([]);
+  });
+});
+
+// ───────── rateToHabitStatus（達成率→status 自動変換・AC#10） ─────────
+describe('rateToHabitStatus — AC#10', () => {
+  it('100% は established', () => {
+    expect(rateToHabitStatus(1)).toBe('established');
+  });
+  it('70% / 30% は active', () => {
+    expect(rateToHabitStatus(0.7)).toBe('active');
+    expect(rateToHabitStatus(0.3)).toBe('active');
+  });
+  it('0% は null（登録しない）', () => {
+    expect(rateToHabitStatus(0)).toBeNull();
   });
 });
 
@@ -221,10 +243,10 @@ describe('profileInputToUserProfile', () => {
   });
 });
 
-// ───────── C-S10: 1回あたりの効果（v2 でも継続使用・ロケール非依存） ─────────
+// ───────── C-S10: 1回あたりの効果（診断計算の建材・ロケール非依存） ─────────
 describe('presetPerTimeEffectValue', () => {
   it('cost_saving は isReduction=true で正の value', () => {
-    const e = presetPerTimeEffectValue('cook_at_home', 'cost_saving');
+    const e = presetPerTimeEffectValue('quit_alcohol_habit', 'cost_saving');
     expect(e).not.toBeNull();
     expect(e!.value).toBeGreaterThan(0);
     expect(e!.isReduction).toBe(true);
@@ -233,31 +255,28 @@ describe('presetPerTimeEffectValue', () => {
     expect(presetPerTimeEffectValue('___nope___', 'cost_saving')).toBeNull();
   });
   it('返り値に日本語の単位文字列を含まない', () => {
-    const e = presetPerTimeEffectValue('cook_at_home', 'cost_saving');
+    const e = presetPerTimeEffectValue('quit_alcohol_habit', 'cost_saving');
     expect(JSON.stringify(e)).not.toMatch(/[円分]/);
   });
 });
 
-// ───────── C-S13: プリセット→Habit 変換（status/established_since 配線） ─────────
-describe('buildHabitFromPreset — status / establishedSince（v2）', () => {
+// ───────── プリセット→Habit 変換（status 配線・established_since は書かない） ─────────
+describe('buildHabitFromPreset — status（v3）', () => {
   it('オプション無指定は status 省略（active 既定・後方互換）', () => {
-    const h = buildHabitFromPreset('cook_at_home');
+    const h = buildHabitFromPreset('daily_cardio_habit');
     expect(h).toBeTruthy();
     expect(h!.type).toBe('positive');
     expect(h!.frequency).toBe('everyday');
     expect(h!.dailyTarget).toBe(1);
     expect(h!.status).toBeUndefined();
     expect(h!.establishedSince).toBeUndefined();
-    expect(h!.name).toBe('自炊する');
+    expect(h!.name).toBe('少し息が切れるくらいの運動を毎日15分以上行う');
   });
 
-  it('established 指定で status=established と establishedSince を運ぶ', () => {
-    const h = buildHabitFromPreset('quit_alcohol_habit', {
-      status: 'established',
-      establishedSince: '2016-06-27',
-    });
+  it('established 指定で status=established・established_since は付けない（v3 は常に null）', () => {
+    const h = buildHabitFromPreset('quit_alcohol_habit', { status: 'established' });
     expect(h!.status).toBe('established');
-    expect(h!.establishedSince).toBe('2016-06-27');
+    expect(h!.establishedSince).toBeUndefined();
   });
 
   it('quit プリセットは type=quit / dailyTarget=3', () => {

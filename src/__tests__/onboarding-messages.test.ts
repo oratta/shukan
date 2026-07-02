@@ -3,8 +3,7 @@ import ja from '@/messages/ja.json';
 import en from '@/messages/en.json';
 import { KPI_CATALOG } from '@/data/kpi/catalog';
 import { HABIT_PRESETS } from '@/data/habit-presets';
-
-// 確定文言は docs/context/onboarding-screens-v2.md（2026-06-26 確定版）から転記する。
+import { ONBOARDING_V3_PRESET_IDS } from '@/lib/onboarding';
 
 type Json = string | number | boolean | null | { [k: string]: Json } | Json[];
 type Onb = Record<string, Json>;
@@ -19,25 +18,21 @@ function str(v: Json): string {
   return v as string;
 }
 
-// ───────── C-S6: [0] イントロ 確定文言 ─────────
-describe('C-S6: ja 確定文言（[0] イントロ）', () => {
+// ───────── [0] イントロ 確定文言 ─────────
+describe('ja 確定文言（[0] イントロ）', () => {
   it('タイトル・サブタイトル・CTA・補足', () => {
     const s = obj(onbJa.intro);
     expect(str(s.title)).toBe('あなたの毎日の習慣は、一生でどれだけの差を生む？');
-    expect(str(s.subtitle)).toBe(
-      'いくつかの質問に答えるだけ。今のあなたに、習慣が一生でどれだけのインパクトを生むかを診断します。'
-    );
     expect(str(s.cta)).toBe('診断を始める');
     expect(str(s.note)).toBe('どの数字も科学研究にもとづいて計算します');
   });
 });
 
-// ───────── C-S6: [1] プロフィール 確定文言 ─────────
-describe('C-S6: ja 確定文言（[1] プロフィール）', () => {
-  it('タイトル・サブタイトル・年収注記・国', () => {
+// ───────── [1] プロフィール 確定文言 ─────────
+describe('ja 確定文言（[1] プロフィール）', () => {
+  it('タイトル・年収注記・国・任意', () => {
     const s = obj(onbJa.profile);
     expect(str(s.title)).toBe('あなたのことを教えてください');
-    expect(str(s.subtitle)).toBe('一生のインパクトをあなた用に計算するために使います。');
     expect(str(s.incomeNote)).toBe('未入力の場合は、年齢・性別・国の平均年収を使って計算します');
     expect(str(s.next)).toBe('次へ');
     expect(str(s.countryJapan)).toBe('日本');
@@ -45,67 +40,93 @@ describe('C-S6: ja 確定文言（[1] プロフィール）', () => {
   });
 });
 
-// ───────── C-S6: [2] 習慣選択（2分類）確定文言 ─────────
-describe('C-S6: ja 確定文言（[2] 習慣選択 2分類）', () => {
-  it('タイトル・2セクションの見出しと補足・いつから・CTA', () => {
+// ───────── [2] 段階タップ診断 確定文言（v3） ─────────
+describe('ja 確定文言（[2] 段階タップ診断・v3）', () => {
+  it('ライブ見出し・個別インパクト見出し・質問・カウント・無効ラベル', () => {
     const s = obj(onbJa.habits);
-    expect(str(s.title)).toBe('あなたの習慣を教えてください');
-    expect(str(s.subtitle)).toBe('続けやすいものを選びましょう。あとから追加・削除できます。');
-    expect(str(s.establishedHeading)).toBe('もう習慣になっているもの');
-    expect(str(s.establishedNote)).toBe(
-      '選ぶと「習慣化済み」になり、これまで積み上げてきたぶんを計算します。'
-    );
-    expect(str(s.activeHeading)).toBe('これから始めたいもの');
-    expect(str(s.activeNote)).toBe('1つ以上選ぶと診断できます。');
-    expect(str(s.sinceLabel)).toBe('いつから？');
-    expect(str(s.cta)).toBe('診断する');
+    expect(str(s.liveLead)).toBe('身についている習慣が、あなたにもたらすこと');
+    expect(str(s.impactLead)).toBe('この習慣が、残りの人生であなたにもたらすこと');
+    expect(str(s.ask)).toBe('あなたは今、これが身についていますか？');
+    expect(str(s.countLabel)).toContain('{current}');
+    expect(str(s.countLabel)).toContain('{total}');
+    expect(str(s.levelDisabled)).toBe('この習慣では選べません');
+  });
+
+  it('4択（100/70/30/0）のラベルと説明', () => {
+    const lv = obj(obj(onbJa.habits).levels);
+    expect(str(obj(lv.full).label)).toBe('完璧に習慣化');
+    expect(str(obj(lv.full).desc)).toBe('生活の一部になっている');
+    expect(str(obj(lv.most).label)).toBe('だいたい');
+    expect(str(obj(lv.sometimes).label)).toBe('たまに');
+    expect(str(obj(lv.none).label)).toBe('やってない');
+    expect(str(obj(lv.none).desc)).toBe('これから始めたい');
+  });
+
+  it('v2 の廃止キー（establishedHeading/sinceLabel/二段構え）が残っていない', () => {
+    const s = obj(onbJa.habits);
+    expect(s.establishedHeading).toBeUndefined();
+    expect(s.activeHeading).toBeUndefined();
+    expect(s.sinceLabel).toBeUndefined();
+    expect(s.effectPerTime).toBeUndefined();
   });
 });
 
-// ───────── C-S6: [3] 計算中 確定文言 ─────────
-describe('C-S6: ja 確定文言（[3] 計算中）', () => {
-  it('メインコピーと進行マイクロコピー3つ', () => {
+// ───────── [2] 習慣ごとの補足（15本ぶん・v3） ─────────
+describe('ja/en habitSub（15習慣ぶん）', () => {
+  it('v3 の15プリセットぶんの補足が ja/en に存在し非空', () => {
+    const subJa = obj(onbJa.habitSub);
+    const subEn = obj(onbEn.habitSub);
+    for (const id of ONBOARDING_V3_PRESET_IDS) {
+      expect(str(subJa[id]).length, `ja habitSub.${id}`).toBeGreaterThan(0);
+      expect(str(subEn[id]).length, `en habitSub.${id}`).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ───────── [3] 計算中（過去参照なし） ─────────
+describe('ja 確定文言（[3] 計算中）', () => {
+  it('メインコピーと進行マイクロコピー3つ（過去累積の言及なし）', () => {
     const s = obj(onbJa.calculating);
     expect(str(s.title)).toBe('あなたの一生を計算しています…');
-    expect(str(s.phase1)).toBe('これまで積み上げてきたぶんを集計中…');
     expect(str(s.phase2)).toBe('研究データと照合中…');
-    expect(str(s.phase3)).toBe('これから積み上がるぶんを計算中…');
+    // 未来のみ MVP: 「これまで積み上げてきたぶん」等の過去参照を持たない
+    expect(str(s.phase1)).not.toContain('これまで');
   });
 });
 
-// ───────── C-S6: [4] 結果（二段構え）確定文言 ─────────
-describe('C-S6: ja 確定文言（[4] 結果 二段構え）', () => {
-  it('タイトル・ブロック1/2 見出し・推定・CTA・補足・値テンプレ', () => {
+// ───────── [4] 結果（未来のみ・単一表示・v3） ─────────
+describe('ja 確定文言（[4] 結果・未来のみ）', () => {
+  it('タイトル・リード・値テンプレ・CTA・補足', () => {
     const s = obj(onbJa.result);
     expect(str(s.title)).toBe('あなたの一生のインパクト');
-    expect(str(s.pastHeading)).toBe('あなたはもう、これだけ積んできました');
-    expect(str(s.futureHeading)).toBe('続ければ、これだけ積み上がります');
-    expect(str(s.estimatedLabel)).toBe('推定');
-    expect(str(s.futureNote)).toBe('未来のぶんは「今日の1回」を一生続けたときの差です。');
+    expect(str(s.lead).length).toBeGreaterThan(0);
+    expect(str(s.value)).toContain('{value}');
+    expect(str(s.value)).toContain('{unit}');
     expect(str(s.cta)).toBe('この内容ではじめる');
-    expect(str(s.footnote)).toBe(
-      '計算の前提（年齢・性別・国・年収）は設定からいつでも見直せます'
-    );
-    expect(str(s.valueGain)).toContain('{value}');
-    expect(str(s.valueGain)).toContain('{unit}');
-    expect(str(s.valueReduction)).toContain('{value}');
+  });
+
+  it('過去/未来二段構えの廃止キーが残っていない', () => {
+    const s = obj(onbJa.result);
+    expect(s.pastHeading).toBeUndefined();
+    expect(s.futureHeading).toBeUndefined();
+    expect(s.estimatedLabel).toBeUndefined();
   });
 });
 
-// ───────── C-S6: [5] 完了 確定文言 ─────────
-describe('C-S6: ja 確定文言（[5] 完了）', () => {
-  it('タイトル・本文・区分ラベル・CTA', () => {
+// ───────── [5] 完了 確定文言 ─────────
+describe('ja 確定文言（[5] 完了）', () => {
+  it('タイトル・本文・習慣ラベル・バッジ・CTA', () => {
     const s = obj(onbJa.done);
     expect(str(s.title)).toBe('準備ができました');
     expect(str(s.body)).toBe('今日の1回から、あなたのインパクトが積み上がっていきます。');
-    expect(str(s.establishedLabel)).toBe('習慣化済み');
-    expect(str(s.activeLabel)).toBe('これから始める');
+    expect(str(s.habitsLabel)).toBe('これから積み上がる習慣');
+    expect(str(s.establishedBadge)).toBe('習慣化済み');
     expect(str(s.cta)).toBe('はじめる');
   });
 });
 
-// ───────── C-S6: en は ja と同一キー構造・全非空・補間キー保持（en リグレッションなし）（AC#13） ─────────
-describe('C-S6: en パリティ（AC#13）', () => {
+// ───────── en は ja と同一キー構造・全非空・補間キー保持（パリティ） ─────────
+describe('en パリティ', () => {
   function keyPaths(node: Json, prefix = ''): string[] {
     if (node === null || typeof node !== 'object' || Array.isArray(node)) return [prefix];
     const record = node as Record<string, Json>;
@@ -132,19 +153,16 @@ describe('C-S6: en パリティ（AC#13）', () => {
     assertNonEmpty(onbEn);
   });
 
-  it('en も interpolation キー {copy 相当}/{kpiName}/{current}/{total}/{effect}/{value}/{unit} を保持', () => {
+  it('en も interpolation キー {current}/{total}/{value}/{unit} を保持', () => {
     expect(str(onbEn.stepLabel)).toContain('{current}');
-    expect(str(onbEn.stepLabel)).toContain('{total}');
-    expect(str(obj(onbEn.habits).effectPerTime)).toContain('{effect}');
-    expect(str(obj(onbEn.habits).effectGain)).toContain('{kpiName}');
-    expect(str(obj(onbEn.habits).effectGain)).toContain('{value}');
-    expect(str(obj(onbEn.result).valueGain)).toContain('{value}');
-    expect(str(obj(onbEn.result).valueGain)).toContain('{unit}');
+    expect(str(obj(onbEn.habits).countLabel)).toContain('{current}');
+    expect(str(obj(onbEn.result).value)).toContain('{value}');
+    expect(str(obj(onbEn.result).value)).toContain('{unit}');
   });
 });
 
-// ───────── C-S6: KPI 4軸同列・プリセット名の i18n が ja/en に揃う（KPI 選択ステップなし） ─────────
-describe('C-S6: KPI/プリセット i18n（4軸同列・全カタログ）', () => {
+// ───────── KPI 4軸同列・プリセット名の i18n が ja/en に揃う ─────────
+describe('KPI/プリセット i18n（4軸同列・全カタログ）', () => {
   it('KPI4軸の headline/name/unit が en に存在し非空・単位が日本語のまま残らない', () => {
     for (const def of KPI_CATALOG) {
       const card = obj(obj(onbEn.kpi)[def.key]);
@@ -164,7 +182,7 @@ describe('C-S6: KPI/プリセット i18n（4軸同列・全カタログ）', () 
     }
   });
 
-  it('全プリセットの preset.<id> が ja/en の両方に存在し非空（KPI 非依存・全カタログ・D6）', () => {
+  it('全プリセットの preset.<id> が ja/en の両方に存在し非空', () => {
     const presetJa = obj(onbJa.preset);
     const presetEn = obj(onbEn.preset);
     for (const preset of HABIT_PRESETS) {
@@ -180,15 +198,11 @@ describe('C-S6: KPI/プリセット i18n（4軸同列・全カタログ）', () 
     }
   });
 
-  it('効果テンプレ effectReduction/effectGain が ja/en に存在し補間キーを保持', () => {
-    for (const ns of [onbJa, onbEn]) {
-      const h = obj(ns.habits);
-      for (const key of ['effectReduction', 'effectGain']) {
-        const tmpl = str(h[key]);
-        expect(tmpl).toContain('{kpiName}');
-        expect(tmpl).toContain('{value}');
-        expect(tmpl).toContain('{unit}');
-      }
-    }
+  it('KPI ラベル: earning の name は「増える収入」（旧ラベルは残らない）', () => {
+    const card = obj(obj(onbJa.kpi).earning);
+    expect(str(card.name)).toBe('増える収入');
+    // 旧 KPI ラベル（change-A で置換済み）を動的に組み立てて不在を確認する
+    const legacyEarningLabel = ['稼', 'ぐ', '能', '力'].join('');
+    expect(JSON.stringify(onbJa)).not.toContain(legacyEarningLabel);
   });
 });

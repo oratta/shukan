@@ -325,45 +325,54 @@
       "next": "次へ"
     },
     "habits": {
-      "title": "あなたの習慣を教えてください",
-      "subtitle": "続けやすいものを選びましょう。あとから追加・削除できます。",
-      "establishedHeading": "もう習慣になっているもの",
-      "establishedNote": "選ぶと「習慣化済み」になり、これまで積み上げてきたぶんを計算します。",
-      "activeHeading": "これから始めたいもの",
-      "activeNote": "1つ以上選ぶと診断できます。",
-      "sinceLabel": "いつから？",
-      "sinceUnit": "年前",
-      "alreadyEstablished": "「習慣化済み」で選択中です",
-      "effectPerTime": "1回ごとに {effect}",
-      "effectReduction": "{kpiName} −{value}{unit}",
-      "effectGain": "{kpiName} +{value}{unit}",
-      "cta": "診断する"
+      "liveLead": "身についている習慣が、あなたにもたらすこと",
+      "impactLead": "この習慣が、残りの人生であなたにもたらすこと",
+      "ask": "あなたは今、これが身についていますか？",
+      "countLabel": "{current} / {total}",
+      "levelDisabled": "この習慣では選べません",
+      "levels": {
+        "full": { "label": "完璧に習慣化", "desc": "生活の一部になっている" },
+        "most": { "label": "だいたい", "desc": "ほとんどできている" },
+        "sometimes": { "label": "たまに", "desc": "思い出したときにやる" },
+        "none": { "label": "やってない", "desc": "これから始めたい" }
+      }
+    },
+    "habitSub": {
+      "daily_cardio_habit": "少し息が切れるくらいの運動（早歩き・軽いジョギング等）を毎日15分以上している状態。",
+      "solid_sleep": "毎日6〜8時間の睡眠がとれている状態。",
+      "eat_vegetables_habit": "野菜・果物を1日5皿（約350g）食べている状態。",
+      "drink_water_habit": "毎日コップ8杯（約1.5L）の水を飲んでいる状態。",
+      "quit_sugar_habit": "砂糖（加糖飲料・お菓子）を1日25g以内に抑えている状態。加糖飲料は250mlで約25g。ゼロでなくてOK・少量なら影響は小さい。",
+      "quit_junk_food_habit": "スナック・カップ麺・ファストフード等の超加工食品を週2回以内に抑えている状態。少ないほど良い。",
+      "daily_strength_habit": "週2〜3回、筋トレ（自重でOK）をしている状態。筋肉は回復が要るため毎日でなく週2〜3回で効果が出る。",
+      "fermented_food_habit": "納豆・味噌・ヨーグルトなど、発酵食品を毎日1品食べている状態。",
+      "quit_smoking_for_health": "タバコを1本も吸わない状態。1本でも吸うと効果は大きく下がるため、「たまに」「だいたい」は選べません。",
+      "daily_meditation_habit": "毎日10分以上、瞑想する時間をとっている状態。",
+      "daily_journaling_habit": "毎日、感情を吐き出す日記を書いている状態。",
+      "time_in_nature_habit": "毎日20分、自然の中で過ごしている状態。",
+      "social_connection_habit": "毎日、誰かと近況や気持ちを打ち明け合う会話をしている状態。",
+      "morning_light_habit": "毎日、起床後1時間以内に10分以上、外の光を浴びている状態。",
+      "quit_alcohol_habit": "アルコールを週100g（ビール500ml×5本／日本酒5合）以内に抑えている状態。研究では週100g超で余命が縮む。ゼロが最も低リスク。"
     },
     "calculating": {
       "title": "あなたの一生を計算しています…",
-      "phase1": "これまで積み上げてきたぶんを集計中…",
+      "phase1": "あなたのプロフィールを反映中…",
       "phase2": "研究データと照合中…",
-      "phase3": "これから積み上がるぶんを計算中…"
+      "phase3": "これからの人生のインパクトを計算中…"
     },
     "result": {
       "title": "あなたの一生のインパクト",
-      "pastHeading": "あなたはもう、これだけ積んできました",
-      "futureHeading": "続ければ、これだけ積み上がります",
-      "estimatedLabel": "推定",
-      "valueGain": "+{value}{unit}",
-      "valueReduction": "−{value}{unit}",
-      "unitYear": "年",
-      "unitYen": "円",
-      "futureNote": "未来のぶんは「今日の1回」を一生続けたときの差です。",
+      "lead": "続ければ、残りの人生でこれだけ積み上がります",
+      "value": "+{value}{unit}",
       "cta": "この内容ではじめる",
       "footnote": "計算の前提（年齢・性別・国・年収）は設定からいつでも見直せます"
     },
     "done": {
       "title": "準備ができました",
       "body": "今日の1回から、あなたのインパクトが積み上がっていきます。",
-      "establishedLabel": "習慣化済み",
-      "activeLabel": "これから始める",
+      "habitsLabel": "これから積み上がる習慣",
       "establishedBadge": "習慣化済み",
+      "emptyNote": "習慣はあとからいつでも追加できます。",
       "cta": "はじめる"
     },
     "writeError": "保存に失敗しました。もう一度お試しください。",

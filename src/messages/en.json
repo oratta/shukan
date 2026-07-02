@@ -325,45 +325,54 @@
       "next": "Next"
     },
     "habits": {
-      "title": "Tell us about your habits",
-      "subtitle": "Pick ones you can keep up. You can add or remove them later.",
-      "establishedHeading": "Already a habit for you",
-      "establishedNote": "Choosing these marks them as established and calculates what you’ve already built up.",
-      "activeHeading": "Habits you want to start",
-      "activeNote": "Pick one or more to run the diagnosis.",
-      "sinceLabel": "Since when?",
-      "sinceUnit": "years ago",
-      "alreadyEstablished": "Already selected as an established habit",
-      "effectPerTime": "{effect} each time",
-      "effectReduction": "{kpiName} −{value}{unit}",
-      "effectGain": "{kpiName} +{value}{unit}",
-      "cta": "Run the diagnosis"
+      "liveLead": "What your established habits bring you",
+      "impactLead": "What this habit brings you over the rest of your life",
+      "ask": "Is this a habit for you right now?",
+      "countLabel": "{current} / {total}",
+      "levelDisabled": "Not selectable for this habit",
+      "levels": {
+        "full": { "label": "Fully a habit", "desc": "It’s part of my life" },
+        "most": { "label": "Mostly", "desc": "I do it most of the time" },
+        "sometimes": { "label": "Sometimes", "desc": "I do it when I remember" },
+        "none": { "label": "Not yet", "desc": "I’d like to start" }
+      }
+    },
+    "habitSub": {
+      "daily_cardio_habit": "You do 15+ minutes of slightly-out-of-breath exercise (brisk walking, light jogging, etc.) every day.",
+      "solid_sleep": "You get 6-8 hours of sleep every day.",
+      "eat_vegetables_habit": "You eat 5 servings (about 350g) of vegetables and fruit a day.",
+      "drink_water_habit": "You drink 8 glasses (about 1.5L) of water every day.",
+      "quit_sugar_habit": "You keep added sugar (sweet drinks, sweets) under 25g a day. One 250ml soft drink is about 25g. It doesn’t have to be zero — small amounts have little effect.",
+      "quit_junk_food_habit": "You keep ultra-processed foods (snacks, instant noodles, fast food) to 2 times a week or less. Less is better.",
+      "daily_strength_habit": "You do strength training (bodyweight is fine) 2-3 times a week. Muscles need recovery, so 2-3 times a week works better than every day.",
+      "fermented_food_habit": "You eat one fermented food a day, such as natto, miso, or yogurt.",
+      "quit_smoking_for_health": "You don’t smoke a single cigarette. Even one cigarette greatly reduces the effect, so “sometimes” and “mostly” can’t be selected.",
+      "daily_meditation_habit": "You take 10+ minutes to meditate every day.",
+      "daily_journaling_habit": "You write a journal to let your feelings out every day.",
+      "time_in_nature_habit": "You spend 20 minutes in nature every day.",
+      "social_connection_habit": "You have a conversation every day where you and someone share how you’re doing and how you feel.",
+      "morning_light_habit": "You get 10+ minutes of outdoor light within an hour of waking every day.",
+      "quit_alcohol_habit": "You keep alcohol under 100g a week (about five 500ml beers / five go of sake). Research links over 100g/week to a shorter lifespan; zero is the lowest risk."
     },
     "calculating": {
       "title": "Calculating your lifetime…",
-      "phase1": "Adding up what you’ve already built…",
+      "phase1": "Applying your profile…",
       "phase2": "Cross-checking with research data…",
-      "phase3": "Calculating what you’ll build from here…"
+      "phase3": "Calculating the impact on the rest of your life…"
     },
     "result": {
       "title": "Your lifetime impact",
-      "pastHeading": "You’ve already built up this much",
-      "futureHeading": "Keep going and you’ll build up this much",
-      "estimatedLabel": "estimated",
-      "valueGain": "+{value}{unit}",
-      "valueReduction": "−{value}{unit}",
-      "unitYear": "yr",
-      "unitYen": "yen",
-      "futureNote": "The future amount is the difference if you keep today’s one rep for a lifetime.",
+      "lead": "Keep going and you’ll build up this much over the rest of your life",
+      "value": "+{value}{unit}",
       "cta": "Start with this",
       "footnote": "You can review the assumptions (age, gender, country, income) in settings anytime"
     },
     "done": {
       "title": "You’re all set",
       "body": "Starting with today’s one rep, your impact begins to build up.",
-      "establishedLabel": "Established",
-      "activeLabel": "Starting now",
+      "habitsLabel": "Habits that will build up from here",
       "establishedBadge": "Established",
+      "emptyNote": "You can add habits anytime later.",
       "cta": "Get started"
     },
     "writeError": "Failed to save. Please try again.",

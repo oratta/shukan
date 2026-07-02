@@ -45,45 +45,61 @@ function input() {
   return {
     userId: 'user-1',
     profile: { age: 42, gender: 'male' as const, country: 'JP', annualIncome: null },
-    established: [{ presetId: 'quit_alcohol_habit', establishedSince: '2016-06-27' }],
-    activePresetIds: ['cook_at_home', 'daily_saving_habit'],
+    // タバコ=完璧(100%→established) / 運動=だいたい(70%→active) / 睡眠=たまに(30%→active)
+    // / 野菜=やってない(0%→登録しない)
+    rates: {
+      quit_smoking_for_health: 1 as const,
+      daily_cardio_habit: 0.7 as const,
+      solid_sleep: 0.3 as const,
+      eat_vegetables_habit: 0 as const,
+    },
   };
 }
 
-describe('runOnboardingWrite — C-S1 書き込み順序と内容（v2）', () => {
-  it('profile → established habits → active habits の順で書き込む', async () => {
+describe('runOnboardingWrite — 達成率→status 自動変換（AC#10）', () => {
+  it('profile → 習慣（15本の表示順）の順で書き込む', async () => {
     await runOnboardingWrite(input());
     expect(callOrder[0]).toBe('profile');
+    // 表示順: daily_cardio(1番目・70%) → solid_sleep(2番目・30%) → quit_smoking(9番目・100%)
+    // 野菜(0%)は登録されない
     expect(callOrder).toEqual([
       'profile',
-      'habit:アルコールを週100g（ビール500ml×5本）以内に抑える:established',
-      'evidence:id-アルコールを週100g（ビール500ml×5本）以内に抑える',
-      'habit:自炊する:active',
-      'evidence:id-自炊する',
-      'habit:毎日の節約:active',
-      'evidence:id-毎日の節約',
+      'habit:少し息が切れるくらいの運動を毎日15分以上行う:active',
+      'evidence:id-少し息が切れるくらいの運動を毎日15分以上行う',
+      'habit:毎日6〜8時間の睡眠をとる:active',
+      'evidence:id-毎日6〜8時間の睡眠をとる',
+      'habit:タバコを1本も吸わない:established',
+      'evidence:id-タバコを1本も吸わない',
     ]);
   });
 
-  it('established 習慣は status=established と established_since 付きで insert される（AC#10）', async () => {
+  it('達成率100% の習慣は status=established・established_since を渡さない（常に null）', async () => {
     await runOnboardingWrite(input());
     const estCall = insertHabitMock.mock.calls.find(
-      (c) => (c[1] as { name: string }).name === 'アルコールを週100g（ビール500ml×5本）以内に抑える'
+      (c) => (c[1] as { name: string }).name === 'タバコを1本も吸わない'
     );
     expect(estCall).toBeTruthy();
     const habit = estCall![1] as { status?: string; establishedSince?: string };
     expect(habit.status).toBe('established');
-    expect(habit.establishedSince).toBe('2016-06-27');
+    expect(habit.establishedSince).toBeUndefined();
   });
 
-  it('active 習慣は status を渡さない（active 既定・後方互換）', async () => {
+  it('達成率70%/30% の習慣は status を渡さない（active 既定）', async () => {
     await runOnboardingWrite(input());
-    const activeCall = insertHabitMock.mock.calls.find(
-      (c) => (c[1] as { name: string }).name === '自炊する'
-    );
-    const habit = activeCall![1] as { status?: string; establishedSince?: string };
-    expect(habit.status).toBeUndefined();
-    expect(habit.establishedSince).toBeUndefined();
+    for (const name of ['少し息が切れるくらいの運動を毎日15分以上行う', '毎日6〜8時間の睡眠をとる']) {
+      const call = insertHabitMock.mock.calls.find(
+        (c) => (c[1] as { name: string }).name === name
+      );
+      const habit = call![1] as { status?: string; establishedSince?: string };
+      expect(habit.status).toBeUndefined();
+      expect(habit.establishedSince).toBeUndefined();
+    }
+  });
+
+  it('達成率0% の習慣は insert されない', async () => {
+    await runOnboardingWrite(input());
+    const names = insertHabitMock.mock.calls.map((c) => (c[1] as { name: string }).name);
+    expect(names).not.toContain('野菜・果物を1日5皿（約350g）食べる');
   });
 
   it('D5: trackedKpis に全4 KpiKey を保存する', async () => {
@@ -108,25 +124,36 @@ describe('runOnboardingWrite — C-S1 書き込み順序と内容（v2）', () =
 
   it('各 habit に articleIds 分の evidence を weight=100 で書き込む', async () => {
     await runOnboardingWrite(input());
-    const cookCall = replaceHabitEvidencesMock.mock.calls.find((c) => c[0] === 'id-自炊する');
-    expect(cookCall).toBeTruthy();
-    const evidences = cookCall![1] as { articleId: string; weight: number }[];
-    expect(evidences).toEqual([
-      { articleId: 'home_cooking', weight: 100 },
-      { articleId: 'intermittent_fasting', weight: 100 },
-    ]);
-  });
-
-  it('established が空でも active のみ書き込める', async () => {
-    await runOnboardingWrite({ ...input(), established: [] });
-    const names = insertHabitMock.mock.calls.map((c) => (c[1] as { name: string }).name);
-    expect(names).toEqual(['自炊する', '毎日の節約']);
+    const cardioCall = replaceHabitEvidencesMock.mock.calls.find(
+      (c) => c[0] === 'id-少し息が切れるくらいの運動を毎日15分以上行う'
+    );
+    expect(cardioCall).toBeTruthy();
+    const evidences = cardioCall![1] as { articleId: string; weight: number }[];
+    expect(evidences).toEqual([{ articleId: 'daily_cardio', weight: 100 }]);
   });
 });
 
-describe('runOnboardingWrite — C-S14 失敗時の再試行（v2）', () => {
+// ───────── AC#11: 全習慣 0% でも完了できる（habit 0件・profile のみ） ─────────
+describe('runOnboardingWrite — 全習慣0%（AC#11）', () => {
+  it('rates が空でも profile だけ書ける', async () => {
+    await runOnboardingWrite({ ...input(), rates: {} });
+    expect(upsertUserProfileMock).toHaveBeenCalledTimes(1);
+    expect(insertHabitMock).not.toHaveBeenCalled();
+  });
+
+  it('全習慣0% でも profile だけ書ける（habit 0件）', async () => {
+    await runOnboardingWrite({
+      ...input(),
+      rates: { quit_smoking_for_health: 0, daily_cardio_habit: 0, solid_sleep: 0 },
+    });
+    expect(upsertUserProfileMock).toHaveBeenCalledTimes(1);
+    expect(insertHabitMock).not.toHaveBeenCalled();
+  });
+});
+
+describe('runOnboardingWrite — C-S14 失敗時の再試行（v3）', () => {
   it('insert 失敗時は OnboardingWriteError を投げ、成功済み presetId を載せる', async () => {
-    // established は成功・最初の active で失敗
+    // 1本目（運動）成功・2本目（睡眠）で失敗
     insertHabitMock
       .mockImplementationOnce(async (_u: string, habit: { name: string }) => ({ id: `id-${habit.name}` }))
       .mockImplementationOnce(async () => {
@@ -140,8 +167,8 @@ describe('runOnboardingWrite — C-S14 失敗時の再試行（v2）', () => {
       caught = e as OnboardingWriteError;
     }
     expect(caught).toBeInstanceOf(OnboardingWriteError);
-    // established(quit_alcohol_habit) は成功済みとして集合に入る
-    expect([...caught!.succeededPresetIds]).toContain('quit_alcohol_habit');
+    // 運動（daily_cardio_habit）は成功済みとして集合に入る
+    expect([...caught!.succeededPresetIds]).toContain('daily_cardio_habit');
   });
 
   it('部分失敗→再試行で重複 insert しない（成功済みプリセットをスキップ）', async () => {
@@ -168,14 +195,10 @@ describe('runOnboardingWrite — C-S14 失敗時の再試行（v2）', () => {
     await runOnboardingWrite({ ...input(), completedPresetIds: succeeded });
 
     const insertedNames = insertHabitMock.mock.calls.map((c) => (c[1] as { name: string }).name);
-    // 成功済み（アルコールを週100g（ビール500ml×5本）以内に抑える）は再 insert されない
-    expect(insertedNames).not.toContain('アルコールを週100g（ビール500ml×5本）以内に抑える');
-    expect(insertedNames).toContain('自炊する');
-  });
-
-  it('habit / active が空でも profile だけ書ける', async () => {
-    await runOnboardingWrite({ ...input(), established: [], activePresetIds: [] });
-    expect(upsertUserProfileMock).toHaveBeenCalledTimes(1);
-    expect(insertHabitMock).not.toHaveBeenCalled();
+    // 成功済み（運動）は再 insert されない
+    expect(insertedNames).not.toContain('少し息が切れるくらいの運動を毎日15分以上行う');
+    // 残り（睡眠・タバコ）は insert される
+    expect(insertedNames).toContain('毎日6〜8時間の睡眠をとる');
+    expect(insertedNames).toContain('タバコを1本も吸わない');
   });
 });

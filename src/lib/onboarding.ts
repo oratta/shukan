@@ -1,25 +1,29 @@
-// オンボーディング v2「一生インパクト診断」の判断ロジック・完了時書き込み（純粋関数中心）。
+// オンボーディング v3「段階タップ診断」の判断ロジック・完了時書き込み（純粋関数中心）。
 //
 // UI（src/components/onboarding/*）はこのモジュールの関数を使うだけにし、レンダリングと
-// ロジックを分離する（decisions.md D-C2）。これにより node 環境の Vitest で state 遷移・
-// バリデーション・相互排他・書き込み順序を単体検証できる（D-C1 / D-C5）。
+// ロジックを分離する。これにより node 環境の Vitest で state 遷移・バリデーション・
+// 達成率記録・書き込み変換を単体検証できる。
 //
-// v2 の要点（plan.md change-C）:
-//   - 画面は [0]イントロ [1]プロフィール [2]習慣選択(2分類) [3]計算中 [4]結果 [5]完了 の6つ。
-//   - KPI 選択ステップは持たない（[4] は4軸同列）。trackedKpis は完了時に全 KpiKey を保存（D5）。
-//   - [2] のプリセット母集団は全カタログ（KPI 非依存・D6）。
-//   - セクションA（established）/B（active）はプリセット単位で相互排他（D2・二重計上防止）。
-//   - 完了時は established（status='established' + established_since）と active（status='active'）を保存。
+// v3 の要点（plan.md change-C）:
+//   - 画面は [0]イントロ [1]プロフィール [2]段階タップ診断 [3]計算中 [4]結果 [5]完了 の6つ。
+//   - [2] は精査済み15習慣のみを 1画面1習慣・4択（0/0.3/0.7/1）で提示し、達成率を記録する。
+//   - 達成率は DB に永続化しない（イメージ喚起用の UI・plan スコープ確定）。WizardState 内のみ。
+//   - 完了時は達成率→status を自動変換して保存する:
+//       1.0 → status='established'（established_since=null）
+//       0.3 / 0.7 → status='active'
+//       0 → 登録しない
+//   - trackedKpis は完了時に全 KpiKey を保存（v2 と同じ D5）。
+//   - 過去累積（established_since ベース）・セクションA/B・「いつから」入力は v3 で廃止。
 
 import type { HabitInsertInput } from '@/types/habit';
 import type { KpiKey } from '@/data/kpi/catalog';
 import { getKpi, KPI_KEYS } from '@/data/kpi/catalog';
-import { getHabitPreset, HABIT_PRESETS, type HabitPreset } from '@/data/habit-presets';
+import { getHabitPreset, type HabitPreset } from '@/data/habit-presets';
 import { getArticle } from '@/data/impact-articles';
 import type { ProfileGender, UserProfile } from '@/lib/supabase/profiles';
 import { upsertUserProfile } from '@/lib/supabase/profiles';
 import { insertHabit, replaceHabitEvidences } from '@/lib/supabase/habits';
-import type { EstablishedHabitInput, LifetimeImpactInput, LifetimeImpactResult } from '@/lib/lifetime-impact';
+import type { AchievementRate, HabitSelection } from '@/lib/diagnosis-v3';
 
 // 性別の選択肢（DB の CHECK 制約と一致。UI では male/female/other を提示）
 export type OnboardingGender = 'male' | 'female' | 'other';
@@ -34,35 +38,27 @@ export interface OnboardingProfileInput {
 /** 画面ステップ（[0]イントロ 〜 [5]完了）。 */
 export type OnboardingStep = 0 | 1 | 2 | 3 | 4 | 5;
 
-/** セクションA（既に身についた習慣）の1件。yearsAgo は「いつから」（おおよその年数）。 */
-export interface EstablishedSelection {
-  presetId: string;
-  yearsAgo: number;
-}
-
 export interface WizardState {
   step: OnboardingStep;
   profile: OnboardingProfileInput;
-  /** セクションA: 既に習慣になっているもの（established）。 */
-  established: EstablishedSelection[];
-  /** セクションB: これから始めたいもの（active）。 */
-  activePresetIds: string[];
+  /** presetId → 達成率（0/0.3/0.7/1）。未回答のプリセットはキーを持たない。 */
+  rates: Record<string, AchievementRate>;
+  /** [2] で現在表示中の習慣インデックス（0-based・ONBOARDING_V3_PRESET_IDS 上の位置）。 */
+  habitIndex: number;
 }
 
 // バリデーション定数
 export const MIN_AGE = 1;
 export const MAX_AGE = 120;
 export const DEFAULT_CURRENCY = 'JPY';
-/** セクションA でチェックしたときの既定の「いつから」（年）。UI で調整可能。 */
-export const DEFAULT_ESTABLISHED_YEARS_AGO = 1;
 
-/** 初期状態。永続化しないため、リロード/再アクセス時はこの初期状態（[0]）に戻る（C-S16）。 */
+/** 初期状態。永続化しないため、リロード/再アクセス時はこの初期状態（[0]）に戻る。 */
 export function createInitialWizardState(): WizardState {
   return {
     step: 0,
     profile: { age: null, gender: null, country: 'JP', annualIncome: null },
-    established: [],
-    activePresetIds: [],
+    rates: {},
+    habitIndex: 0,
   };
 }
 
@@ -112,84 +108,100 @@ export function canAdvanceFromProfile(input: OnboardingProfileInput): boolean {
   return Object.keys(validateProfileInput(input)).length === 0;
 }
 
-// ───────── [2] 習慣選択（2分類） ─────────
+// ───────── [2] 段階タップ診断（精査済み15習慣） ─────────
 
-/** [2] に提示する全プリセットカタログ（KPI 非依存・D6）。 */
-export function allHabitPresets(): readonly HabitPreset[] {
-  return HABIT_PRESETS;
+/**
+ * オンボーディング [2] に出す精査済み15習慣（明示リスト・表示順）。
+ * 残置7プリセット（daily_saving_habit / stop_impulse_buying / cook_at_home /
+ * deep_focus_work / morning_routine / cut_digital_distraction / keep_learning）は
+ * v3 診断には出さない（この配列に含めないことで保証する）。
+ * 並びはプロト（onboarding-step2-proto.html）に準拠（健康→前向き→出費削減）。
+ */
+export const ONBOARDING_V3_PRESET_IDS: readonly string[] = [
+  'daily_cardio_habit',
+  'solid_sleep',
+  'eat_vegetables_habit',
+  'drink_water_habit',
+  'quit_sugar_habit',
+  'quit_junk_food_habit',
+  'daily_strength_habit',
+  'fermented_food_habit',
+  'quit_smoking_for_health',
+  'daily_meditation_habit',
+  'daily_journaling_habit',
+  'time_in_nature_habit',
+  'social_connection_habit',
+  'morning_light_habit',
+  'quit_alcohol_habit',
+] as const;
+
+/** [2] に提示する15プリセット（HabitPreset）を表示順で返す。未知IDは除外（安全側）。 */
+export function onboardingV3Presets(): HabitPreset[] {
+  return ONBOARDING_V3_PRESET_IDS.map((id) => getHabitPreset(id)).filter(
+    (p): p is HabitPreset => p !== undefined
+  );
 }
 
-/** セクションB（active）が1つ以上選ばれていれば診断できる（セクションA は任意・AC#11 / C-S2）。 */
-export function canAdvanceFromHabits(activePresetIds: string[]): boolean {
-  return activePresetIds.length > 0;
-}
-
-export function isPresetEstablished(state: WizardState, presetId: string): boolean {
-  return state.established.some((e) => e.presetId === presetId);
-}
-
-export function isPresetActive(state: WizardState, presetId: string): boolean {
-  return state.activePresetIds.includes(presetId);
+/** [2] の全プリセット（互換名。v3 では精査済み15本）。 */
+export function allHabitPresets(): HabitPreset[] {
+  return onboardingV3Presets();
 }
 
 /**
- * セクションA（established）のトグル。
- * 追加時は active から外し（相互排他・D2）既定年数を入れる。既にあれば外す。
+ * 達成率の表示順（2×2グリッド最下部固定・降順）。
+ * プロトの LEVELS と同じ「完璧→だいたい→たまに→やってない」。
  */
-export function toggleEstablished(state: WizardState, presetId: string): WizardState {
-  if (isPresetEstablished(state, presetId)) {
-    return { ...state, established: state.established.filter((e) => e.presetId !== presetId) };
-  }
-  return {
-    ...state,
-    established: [...state.established, { presetId, yearsAgo: DEFAULT_ESTABLISHED_YEARS_AGO }],
-    activePresetIds: state.activePresetIds.filter((id) => id !== presetId),
-  };
-}
+export const ACHIEVEMENT_RATE_DISPLAY_ORDER: readonly AchievementRate[] = [1, 0.7, 0.3, 0] as const;
 
 /**
- * セクションB（active）のトグル。
- * 追加時は established から外す（相互排他・D2）。既にあれば外す。
+ * 中間の達成率（30% / 70%）を選べない「全か無か」の習慣。
+ * タバコは1本でも吸うと効果が大きく下がるため 100%(吸わない)/0%(吸う) の二択（effect-model.md §「量・頻度の閾値」）。
  */
-export function toggleActive(state: WizardState, presetId: string): WizardState {
-  if (isPresetActive(state, presetId)) {
-    return { ...state, activePresetIds: state.activePresetIds.filter((id) => id !== presetId) };
-  }
-  return {
-    ...state,
-    activePresetIds: [...state.activePresetIds, presetId],
-    established: state.established.filter((e) => e.presetId !== presetId),
-  };
+export const BINARY_ACHIEVEMENT_PRESET_IDS: ReadonlySet<string> = new Set([
+  'quit_smoking_for_health',
+]);
+
+/** そのプリセットで選べる達成率を表示順で返す。二択習慣は 30%/70% を除外する。 */
+export function availableAchievementRates(presetId: string): AchievementRate[] {
+  if (BINARY_ACHIEVEMENT_PRESET_IDS.has(presetId)) return [1, 0];
+  return [...ACHIEVEMENT_RATE_DISPLAY_ORDER];
 }
 
-/** セクションA の対象プリセットの「いつから」（年数）を更新する。 */
-export function setEstablishedYearsAgo(
+/** そのプリセットで達成率が選べる（無効化されていない）か。 */
+export function isAchievementRateAvailable(presetId: string, rate: AchievementRate): boolean {
+  return availableAchievementRates(presetId).includes(rate);
+}
+
+/** プリセットの達成率を記録する（再選択で上書き）。無効な達成率は無視して状態を返す。 */
+export function setHabitRate(
   state: WizardState,
   presetId: string,
-  yearsAgo: number
+  rate: AchievementRate
 ): WizardState {
-  return {
-    ...state,
-    established: state.established.map((e) =>
-      e.presetId === presetId ? { ...e, yearsAgo } : e
-    ),
-  };
+  if (!isAchievementRateAvailable(presetId, rate)) return state;
+  return { ...state, rates: { ...state.rates, [presetId]: rate } };
+}
+
+/** 記録済みの達成率を返す（未回答は undefined）。 */
+export function getHabitRate(state: WizardState, presetId: string): AchievementRate | undefined {
+  return state.rates[presetId];
 }
 
 /**
- * 「いつから」（おおよその年数）を開始日（YYYY-MM-DD）に変換する。
- * 負値は0年（当日）にクランプ。年数のみの概算なので月日は基準日（now）を踏襲する。
+ * 現在の回答から診断入力（selections）を組み立てる。
+ * v3 の15習慣のうち達成率が記録済みのものだけを含める（未回答は集計しない）。
  */
-export function yearsAgoToEstablishedSince(yearsAgo: number, now: Date = new Date()): string {
-  const years = Math.max(0, Math.floor(yearsAgo));
-  const d = new Date(Date.UTC(now.getUTCFullYear() - years, now.getUTCMonth(), now.getUTCDate()));
-  const y = d.getUTCFullYear();
-  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(d.getUTCDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
+export function buildDiagnosisSelections(state: WizardState): HabitSelection[] {
+  const selections: HabitSelection[] = [];
+  for (const presetId of ONBOARDING_V3_PRESET_IDS) {
+    const rate = state.rates[presetId];
+    if (rate === undefined) continue;
+    selections.push({ presetId, rate });
+  }
+  return selections;
 }
 
-// ───────── [3]→[4] 結果計算 ─────────
+// ───────── 計算入力の変換 ─────────
 
 /** OnboardingProfileInput を計算用 UserProfile に変換する（保存はしない・計算入力専用）。 */
 export function profileInputToUserProfile(input: OnboardingProfileInput): UserProfile {
@@ -207,29 +219,7 @@ export function profileInputToUserProfile(input: OnboardingProfileInput): UserPr
   };
 }
 
-/** ウィザード状態から合算計算（computeLifetimeImpact）の入力を組み立てる。 */
-export function buildLifetimeImpactInput(
-  state: WizardState,
-  now: Date = new Date()
-): LifetimeImpactInput {
-  const establishedHabits: EstablishedHabitInput[] = state.established.map((e) => ({
-    presetId: e.presetId,
-    establishedSince: yearsAgoToEstablishedSince(e.yearsAgo, now),
-  }));
-  return {
-    activePresetIds: state.activePresetIds,
-    establishedHabits,
-    profile: profileInputToUserProfile(state.profile),
-    now,
-  };
-}
-
-/** [4] 過去累積ブロック（ブロック1）を表示するか。既存習慣がある場合のみ（AC#12）。 */
-export function shouldShowPastBlock(result: LifetimeImpactResult): boolean {
-  return result.pastIsEstimated;
-}
-
-// ───────── [3] 1回あたりの効果（プリセットカードの表示） ─────────
+// ───────── 1回あたりの効果（per-day 効果の合算・診断計算の建材） ─────────
 
 /** 「1回あたりの効果」の構造化結果（UI 側で i18n を適用するためロケール非依存で返す）。 */
 export interface PresetEffect {
@@ -241,9 +231,9 @@ export interface PresetEffect {
 }
 
 /**
- * プリセットの「1回あたりの効果」を指定 KPI 軸で算出する（C-S10）。
+ * プリセットの「1回あたりの効果」を指定 KPI 軸で算出する（diagnosis-v3 の建材）。
  * プリセットが参照する記事群の calculationParams を合算する。文言は付けず構造化データで返す。
- * 未知プリセット・効果0は null（UI 非表示判定に使える）。
+ * 未知プリセット・効果0は null。
  */
 export function presetPerTimeEffectValue(presetId: string, kpi: KpiKey): PresetEffect | null {
   const preset = getHabitPreset(presetId);
@@ -282,12 +272,12 @@ export function presetPerTimeEffectValue(presetId: string, kpi: KpiKey): PresetE
 /**
  * プリセットから Habit（insert 入力）を組み立てる。
  * 必須フィールドは既存 Discover の習慣採用フロー（habit-form.tsx）と同じ既定値で補う。
- * established の習慣は opts で status='established' / establishedSince を運ぶ（change-A の配線・C-S1）。
+ * status='established' のときは established_since を書かない（v3 は常に null＝過去累積を持たない）。
  * 未知プリセットは null。
  */
 export function buildHabitFromPreset(
   presetId: string,
-  opts?: { status?: 'active' | 'established'; establishedSince?: string }
+  opts?: { status?: 'active' | 'established' }
 ): HabitInsertInput | null {
   const preset = getHabitPreset(presetId);
   if (!preset) return null;
@@ -305,24 +295,28 @@ export function buildHabitFromPreset(
     impactArticleId: undefined,
     evidences: [],
     // status を省略すると 'active' 既定（後方互換）。established のときのみ値を渡す。
+    // established_since は v3 では常に null（渡さない）。
     ...(opts?.status ? { status: opts.status } : {}),
-    ...(opts?.establishedSince ? { establishedSince: opts.establishedSince } : {}),
   };
 }
 
-/** 書き込み対象の established 習慣（開始日付き）。 */
-export interface OnboardingEstablishedWrite {
-  presetId: string;
-  establishedSince: string;
+/**
+ * 達成率から habit の status を導く（v3 の書き込み規則）。
+ *   1.0 → 'established'（established_since=null）
+ *   0.3 / 0.7 → 'active'
+ *   0 → null（登録しない）
+ */
+export function rateToHabitStatus(rate: AchievementRate): 'active' | 'established' | null {
+  if (rate === 1) return 'established';
+  if (rate === 0) return null;
+  return 'active';
 }
 
 export interface OnboardingWriteInput {
   userId: string;
   profile: OnboardingProfileInput;
-  /** セクションA: established 習慣（status='established' + established_since で保存）。 */
-  established: OnboardingEstablishedWrite[];
-  /** セクションB: active 習慣（status='active' で保存）。 */
-  activePresetIds: string[];
+  /** presetId → 達成率。0 は登録しない・1 は established・0.3/0.7 は active。 */
+  rates: Record<string, AchievementRate>;
   /**
    * 既に書き込み済みのプリセットID集合（部分失敗→再試行時に重複 insert を避ける・D-C3）。
    * 省略時は空集合（初回書き込み）。
@@ -333,9 +327,9 @@ export interface OnboardingWriteInput {
 /**
  * 完了時の一括書き込み:
  *   1. upsert user_profiles（tracked_kpis=全 KpiKey・D5。冪等＝再試行安全）
- *   2. established 習慣を insert（status='established' + established_since）→ evidences
- *   3. active 習慣を insert（status 省略＝active）→ evidences
+ *   2. 達成率>0 の習慣を ONBOARDING_V3_PRESET_IDS 順に insert（rate=1→established / 0.3・0.7→active）→ evidences
  * いずれかが失敗したら、それまでに成功した presetId 集合を例外に載せて throw する（C-S14・D-C3）。
+ * 全習慣 0%（登録対象なし）でも profile だけ書ける（AC#11）。
  *
  * @returns 今回 + これまでに書き込みが成功したプリセットID集合
  */
@@ -356,19 +350,15 @@ export async function runOnboardingWrite(input: OnboardingWriteInput): Promise<S
       trackedKpis: [...KPI_KEYS],
     });
 
-    // 2. established 習慣（過去累積の母集団）
-    for (const { presetId, establishedSince } of input.established) {
+    // 2. 達成率>0 の習慣（15本の表示順で走査）
+    for (const presetId of ONBOARDING_V3_PRESET_IDS) {
+      const status = rateToHabitStatus(input.rates[presetId] ?? 0);
+      if (status === null) continue; // 0% は登録しない
       if (completed.has(presetId)) continue;
+      // active は status を省略（既定・後方互換）。established のときのみ明示する。
       await writeHabit(input.userId, presetId, completed, {
-        status: 'established',
-        establishedSince,
+        status: status === 'established' ? 'established' : undefined,
       });
-    }
-
-    // 3. active 習慣（未来積み上げの母集団）
-    for (const presetId of input.activePresetIds) {
-      if (completed.has(presetId)) continue;
-      await writeHabit(input.userId, presetId, completed);
     }
 
     return completed;
@@ -382,7 +372,7 @@ async function writeHabit(
   userId: string,
   presetId: string,
   completed: Set<string>,
-  opts?: { status?: 'active' | 'established'; establishedSince?: string }
+  opts?: { status?: 'active' | 'established' }
 ): Promise<void> {
   const habitInput = buildHabitFromPreset(presetId, opts);
   const preset = getHabitPreset(presetId);
@@ -414,3 +404,6 @@ export class OnboardingWriteError extends Error {
     this.succeededPresetIds = succeededPresetIds;
   }
 }
+
+// HabitPreset 再エクスポート（互換用）
+export type { HabitPreset };
