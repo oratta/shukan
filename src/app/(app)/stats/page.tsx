@@ -7,6 +7,7 @@ import { HabitIcon } from '@/components/ui/habit-icon';
 import { Card } from '@/components/ui/card';
 import { ProgressRing } from '@/components/habits/progress-ring';
 import { useHabits } from '@/hooks/useHabits';
+import { isDailyTrackedHabit } from '@/lib/habits';
 import { calculateTotalSavings, formatHealthMinutes, formatCurrency } from '@/lib/impact';
 import { useReviewHistory } from '@/hooks/useReviewHistory';
 import { ReviewCalendar } from '@/components/review/ReviewCalendar';
@@ -29,7 +30,9 @@ export default function StatsPage() {
 
   const stats = useMemo(() => {
     const withStats = getStats();
-    const activeHabits = withStats.filter((h) => !h.archived);
+    // 3場面構造: デイリー系指標（完了率・ストリーク）は active（デイリー追跡）習慣のみで集計する。
+    // established（身についた）習慣は生涯効果表示専用のため、統計の分母・ストリークから除外する。
+    const activeHabits = withStats.filter(isDailyTrackedHabit);
 
     const totalCurrentStreak = activeHabits.reduce(
       (sum, h) => sum + h.currentStreak,

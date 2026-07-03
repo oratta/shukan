@@ -307,6 +307,24 @@ export function shouldShowToday(habit: Habit): boolean {
   return !habit.archived;
 }
 
+/**
+ * デイリー系指標（デイリーチェックリスト・完了率・ストリーク・day-status マップ）で
+ * 追跡すべき習慣か。3場面構造では `active` のみをデイリーで追い、`established`（身についた）は
+ * 除外する（生涯効果表示のみに用いる）。archived は常に除外。
+ * 既存コードは habit.status で一切フィルタしていなかったため、本 change が最初の分岐導入者。
+ */
+export function isDailyTrackedHabit(habit: Habit): boolean {
+  return !habit.archived && habit.status !== 'established';
+}
+
+/**
+ * ホーム下部の「身についた習慣」セクションに表示する established 習慣か。
+ * archived は除外。isDailyTrackedHabit とは非 archived 習慣に対して排他。
+ */
+export function isEstablishedHabit(habit: Habit): boolean {
+  return !habit.archived && habit.status === 'established';
+}
+
 export function getEffectiveStatus(day: DayStatus): DayStatus['status'] {
   if (day.status !== 'none') return day.status;
   const today = new Date();

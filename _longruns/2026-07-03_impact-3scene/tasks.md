@@ -30,3 +30,14 @@
 - [x] T3: 4軸目「前向きな気持ちの時間」を対象9箇所に表示（daily-impact-summary / impact-badge / savings-card / stats / discover / impact-article-sheet / evidence-article-sheet / evidence-picker / evidence-manager-sheet。値 > 0 のときのみ描画）
 - [x] T4: 値 0 の26記事に 0 据え置き理由（二重計上回避）のコード内コメントを付与（marker `positiveMood 0:`）
 - [x] T5: 全テストスイート PASS（`npm run test:run` 706件）・型チェック（tsc）・lint・build 確認
+
+## change-4: three-scene-habit-display
+
+- [x] T1: 3場面分類・生涯効果計算の失敗テストを作成（`src/__tests__/three-scene-habit-display.test.ts`）＋ `habits.test.ts` に established 除外ケース追加（受け入れ条件 #10-b）
+- [x] T2: `isDailyTrackedHabit` / `isEstablishedHabit` 純粋述語を `src/lib/habits.ts` に追加（established をデイリー系指標から除外）
+- [x] T3: `computeHabitLifetimeEffect`（習慣の per-day 効果 → 4KPI 生涯値、達成率=1・profile 未設定は既定値フォールバック）を `src/lib/diagnosis-v3.ts` に追加
+- [x] T4: 「身についた習慣」セクション（`EstablishedSection`・チェックボックスなし・生涯効果表示）を新規作成しホーム下部に配置。デイリーチェックリスト・PWA day-status・DailyImpactSummary は active のみ
+- [x] T5: stats ページの完了率平均・ストリーク集計から established を除外
+- [x] T6: 習慣編集フォームに status 手動設定トグル（「完全に身についた」）を追加し `onSubmit` で status を渡す
+- [x] T7: ja/en メッセージに established セクション見出し・生涯効果見出し・フォームトグルのラベルを追加
+- [x] T8: 全テストスイート PASS（`npm run test:run`）・型チェック（tsc）・lint・build 確認

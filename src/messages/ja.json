@@ -97,7 +97,12 @@
     "unreviewedCount": "{count}件未チェック",
     "reviewNotePlaceholder": "メモ（任意）",
     "reviewMoodLabel": "昨日の気分",
-    "reviewCommentPlaceholder": "昨日を振り返って一言..."
+    "reviewCommentPlaceholder": "昨日を振り返って一言...",
+    "establishedToggle": "完全に身についた",
+    "establishedToggleDesc": "もう身についた習慣です。デイリーチェックから外し、残りの人生への効果だけを表示します。",
+    "establishedSectionTitle": "身についた習慣",
+    "establishedSectionDesc": "もう身についた習慣。残りの人生にもたらす効果を表示しています。",
+    "lifetimeEffectHeading": "この習慣が残りの人生であなたにもたらすこと"
   },
   "stats": {
     "title": "統計",

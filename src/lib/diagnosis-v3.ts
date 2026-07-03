@@ -163,6 +163,48 @@ export function habitPotentialV3(presetId: string, profile: UserProfile | null):
   return computeDiagnosisV3({ selections: [{ presetId, rate: 1 }], profile });
 }
 
+/** ユーザー習慣の per-day 効果（エビデンス重み付き合計）。単位は impact.ts の DailyImpact と同一。 */
+export interface HabitPerDayEffect {
+  /** 健康寿命 per-day（分/日）。 */
+  healthMinutes: number;
+  /** 前向きな気持ちの時間 per-day（分/日）。 */
+  positiveMoodMinutes: number;
+  /** 出費削減 per-day（円/日）。 */
+  costSaving: number;
+  /** 増える収入 per-day（円/日）。 */
+  incomeGain: number;
+}
+
+/**
+ * established（身についた）習慣の生涯効果を4KPIで算出する（達成率=1・未来のみ）。
+ * オンボ[4]の「この習慣が、残りの人生であなたにもたらすこと」と同一の horizon/表示単位を用いる。
+ *
+ * 診断オンボ（プリセット由来）と異なり、ユーザー習慣は evidences の per-day 効果を渡す。
+ * per-day 効果は calculateDailyImpact（impact.ts）で算出したものをそのまま受け取る。
+ *
+ * @param perDay  習慣の per-day 効果（達成率100%基準）
+ * @param profile プロフィール（null は V2 既定値にフォールバック＝残り寿命40年。change-5 で個人化）
+ */
+export function computeHabitLifetimeEffect(
+  perDay: HabitPerDayEffect,
+  profile: UserProfile | null = null
+): DiagnosisV3Result {
+  const derived = resolveDerivedProfileValues(profile);
+  const perDayByKpi: Record<KpiKey, number> = {
+    health_lifespan: perDay.healthMinutes,
+    positive_mood: perDay.positiveMoodMinutes,
+    cost_saving: perDay.costSaving,
+    earning: perDay.incomeGain,
+  };
+
+  const byKpi = {} as Record<KpiKey, KpiDiagnosisValue>;
+  for (const kpi of KPI_KEYS) {
+    const raw = kpiRawValue(kpi, perDayByKpi[kpi], 1, derived);
+    byKpi[kpi] = { raw, ...formatKpiValue(kpi, raw) };
+  }
+  return { byKpi };
+}
+
 // ───────── [6] 習慣選択: 伸びしろランキング ─────────
 
 /** [6] 習慣選択の候補1件（現状達成率＋選んだ KPI への伸びしろ）。 */

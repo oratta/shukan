@@ -63,3 +63,23 @@
 - THEN: 値 > 0 の記事（代表12本）は `inferences.positiveMood` と `calculationLogic.positiveMood`（固定前提16h/50%の根拠）を持ち、値 0 の記事は 0 のままにした理由（二重計上回避）をコード内コメントで明記している
 - [x] テスト実装完了
 - [x] ロジック実装完了
+
+## change-4: three-scene-habit-display
+
+### Scenario 4-1: established 習慣がデイリーチェックリストから外れ「身についた習慣」セクションに生涯効果付きで表示される（受け入れ条件 #10）
+- WHEN: status=established の習慣を持つユーザーがホームを表示する
+- THEN: その習慣はデイリーチェックリスト（active のみ）に現れず、ホーム下部の「身についた習慣」セクション（チェックボックスなし）に「この習慣が残りの人生であなたにもたらすこと」の生涯効果（4KPI）付きで表示される
+- [x] テスト実装完了
+- [x] ロジック実装完了
+
+### Scenario 4-2: established 習慣が stats のデイリー完了率の分母・ストリーク計算に含まれない（受け入れ条件 #10-b）
+- WHEN: active と established が混在する状態で stats を表示する / `getHabitsWithStats` の結果を `isDailyTrackedHabit` でフィルタする
+- THEN: established 習慣は完了率平均の分母・ストリーク集計に含まれない（`habits.test.ts` の "established habit exclusion from daily metrics" で固定）
+- [x] テスト実装完了
+- [x] ロジック実装完了
+
+### Scenario 4-3: 習慣編集フォームから status を established に変更でき、ホーム表示が切り替わる（受け入れ条件 #11）
+- WHEN: 習慣編集フォームの「完全に身についた」トグルを ON にして保存する
+- THEN: `onSubmit` に `status: 'established'` が渡り DB に保存され、ホームのデイリーチェックリストから外れて「身についた習慣」セクションへ移動する
+- [x] テスト実装完了
+- [x] ロジック実装完了

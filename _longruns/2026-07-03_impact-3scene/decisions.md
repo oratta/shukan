@@ -39,3 +39,17 @@
 - 選択肢: (a) 常時4軸表示（0 のとき「+0分」を出す）, (b) 値 > 0 のときのみ4軸目を描画。
 - (a) は mood 値を持たない大多数の習慣で「+0分」のノイズが出て情報密度を下げる。(b) は既存の型セマンティクスに従い、mood をエビデンスとして持つ習慣でのみ4軸目が現れる。9箇所すべてで (b)（`> 0` 条件レンダリング）を採用。集計系（daily-impact-summary / savings-card / stats total / evidence-manager 合計）は合算値 > 0 のとき表示。
 - アイコンは lucide `Smile` で4軸目を統一（PartyPopper は perfect 演出で使用済みのため回避）。
+
+## D-change4-1: established 除外は純粋述語 `isDailyTrackedHabit` / `isEstablishedHabit` で一元化
+- plan.md change-4 は「既存コードは habit.status で一切フィルタしていない。この change が最初の分岐導入者。除外方針を habits.test.ts にケース追加して固定」を要求。
+- 選択肢: (a) 各ページ（home / stats）で `h.status !== 'established'` をインライン記述, (b) `shouldShowToday` を established 除外に変更（既存の意味を上書き）, (c) 純粋述語 `isDailyTrackedHabit`（!archived && status!=='established'）と `isEstablishedHabit`（!archived && status==='established'）を lib/habits.ts に追加し全消費点で共有。
+- (a) は分岐が散在しテスト不能、(b) は shouldShowToday の既存セマンティクス（!archived）を破壊し他消費点に波及。(c) は単一の純粋関数でテスト固定でき、home のデイリーリスト・PWA day-status・DailyImpactSummary・yesterday review・stats 集計すべてが同一述語を参照する。→ (c) 採用（YAGNI・テスト容易・非破壊）。shouldShowToday は後方互換のため据え置き。
+
+## D-change4-2: established の生涯効果は per-day 効果を diagnosis-v3 horizon に流し込む（新規計算なし）
+- plan.md change-4 は established セクションに「オンボと同形式」の生涯効果を要求。オンボ診断はプリセット由来（presetPerTimeEffectValue）だが、ユーザー習慣は evidences（articleId）由来で per-day 効果の取得経路が異なる。
+- 選択肢: (a) established 用に専用の生涯計算を新設, (b) 習慣の evidences をプリセットへ逆マッピングして habitPotentialV3 を再利用, (c) evidences の per-day 効果（既存 `calculateDailyImpact`）を diagnosis-v3 の horizon/表示単位ロジック（`kpiRawValue` rate=1 + `formatKpiValue`）へ流す薄い関数 `computeHabitLifetimeEffect` を追加。
+- (a) は horizon/単位の二重定義でオンボと乖離リスク、(b) は evidence→preset の一意な逆写像が存在せず破綻。(c) は表示単位・horizon をオンボ[4]と完全共有し、per-day 取得のみ習慣側（calculateDailyImpact）に委譲する最小差分。→ (c) 採用。profile 引数は default null（V2 既定=残り寿命40年）でフォールバックし、change-5 で個人化を接続する拡張点を残した。
+
+## D-change4-3: status 手動トグルは編集時のみ・自動昇格なし
+- plan.md change-4 rule「established の自動昇格提案・卒業演出を実装しない（手動設定のみ）」。
+- HabitForm は add/edit 兼用だが、新規作成時に「完全に身についた」を出すのは意味的に不自然（達成実績ゼロの習慣を established にするユースケースが薄い）。`initialData` があるとき（=編集時）のみトグルを描画し、onSubmit で `status: established ? 'established' : 'active'` を渡す。updateHabitById は既に status 更新に対応済みのため配線のみ。可逆・YAGNI。

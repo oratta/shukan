@@ -9,10 +9,11 @@ import { HabitDetailModal } from '@/components/habits/habit-detail-modal';
 import { VsTemptationModal } from '@/components/habits/vs-temptation-modal';
 import { EvidenceArticleSheet } from '@/components/habits/evidence-article-sheet';
 import { DailyImpactSummary } from '@/components/habits/daily-impact-summary';
+import { EstablishedSection } from '@/components/habits/established-section';
 import { YesterdayReviewBanner } from '@/components/habits/yesterday-review-banner';
 import { YesterdayReviewSheet } from '@/components/habits/yesterday-review-sheet';
 import { useHabits } from '@/hooks/useHabits';
-import { shouldShowToday, getHabitsWithStats, getTodayString, getYesterdayUnreviewedHabits } from '@/lib/habits';
+import { getHabitsWithStats, getTodayString, getYesterdayUnreviewedHabits, isDailyTrackedHabit, isEstablishedHabit } from '@/lib/habits';
 import { getArticle } from '@/data/impact-articles';
 import { useAuth } from '@/components/auth-provider';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -55,10 +56,18 @@ export default function DashboardPage() {
   const [vsHabitId, setVsHabitId] = useState<string | null>(null);
   const [openArticleId, setOpenArticleId] = useState<string | null>(null);
 
+  // 3場面構造: デイリーチェックリスト・積み上げ表示は active（デイリー追跡）習慣のみ。
+  // established（身についた）習慣はチェックリスト・PWA day-status・DailyImpactSummary から外し、
+  // 下部の「身についた習慣」セクションに生涯効果として表示する。
   const todayHabits = useMemo(() => {
-    const filtered = habits.filter(shouldShowToday);
+    const filtered = habits.filter(isDailyTrackedHabit);
     return getHabitsWithStats(filtered, completions, urgeLogs, copingStepsMap, getArticle);
   }, [habits, completions, urgeLogs, copingStepsMap]);
+
+  const establishedHabits = useMemo(
+    () => habits.filter(isEstablishedHabit),
+    [habits]
+  );
 
   // --- PWA install banner trigger ---------------------------------------
   // Detect the moment a habit transitions into a completed state (this session
@@ -103,7 +112,7 @@ export default function DashboardPage() {
   });
 
   const yesterdayUnreviewed = useMemo(
-    () => yesterdayDate ? getYesterdayUnreviewedHabits(habits, completions, yesterdayDate) : [],
+    () => yesterdayDate ? getYesterdayUnreviewedHabits(habits.filter(isDailyTrackedHabit), completions, yesterdayDate) : [],
     [habits, completions, yesterdayDate]
   );
 
@@ -256,7 +265,7 @@ export default function DashboardPage() {
         <YesterdayReviewBanner
           unreviewedCount={yesterdayUnreviewed.length}
           onOpen={() => {
-            setReviewHabits(habits.filter(h => !h.archived));
+            setReviewHabits(habits.filter(isDailyTrackedHabit));
             setReviewSheetOpen(true);
           }}
         />
@@ -271,6 +280,8 @@ export default function DashboardPage() {
         onReorder={reorderHabits}
         onSkipToday={handleSkipToday}
       />
+
+      <EstablishedSection habits={establishedHabits} />
 
       <HabitForm
         open={formOpen}

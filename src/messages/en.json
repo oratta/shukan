@@ -97,7 +97,12 @@
     "unreviewedCount": "{count} unchecked",
     "reviewNotePlaceholder": "Note (optional)",
     "reviewMoodLabel": "Yesterday's mood",
-    "reviewCommentPlaceholder": "Reflect on yesterday..."
+    "reviewCommentPlaceholder": "Reflect on yesterday...",
+    "establishedToggle": "Fully established",
+    "establishedToggleDesc": "This habit is already part of your life. It's removed from the daily checklist and only its lifetime effect is shown.",
+    "establishedSectionTitle": "Established habits",
+    "establishedSectionDesc": "Habits that are already part of your life. Their effect on the rest of your life is shown here.",
+    "lifetimeEffectHeading": "What this habit brings you for the rest of your life"
   },
   "stats": {
     "title": "Statistics",
