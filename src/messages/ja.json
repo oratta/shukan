@@ -163,8 +163,8 @@
   "impact": {
     "title": "人生インパクト",
     "dailyHealth": "健康寿命",
-    "dailyCost": "コスト削減",
-    "dailyIncome": "収入増加",
+    "dailyCost": "出費削減",
+    "dailyIncome": "増える収入",
     "perDay": "/日",
     "perYear": "/年",
     "minuteUnit": "分",
@@ -183,7 +183,7 @@
     "sources": "出典",
     "yourSavings": "あなたの貯金",
     "todayImpact": "今日のライフインパクト",
-    "fiveDaysImpact": "5 Days Impact",
+    "fiveDaysImpact": "5日間のインパクト",
     "perfect": "パーフェクト！",
     "confidence": {
       "high": "信頼度: 高",
@@ -227,8 +227,8 @@
     "feedbackSubmit": "送信",
     "feedbackThanks": "フィードバックありがとうございます",
     "feedbackHealth": "健康寿命の算出根拠",
-    "feedbackCost": "コスト削減の算出根拠",
-    "feedbackIncome": "収入増加の算出根拠"
+    "feedbackCost": "出費削減の算出根拠",
+    "feedbackIncome": "増える収入の算出根拠"
   },
   "reviewHistory": {
     "title": "振り返り履歴",

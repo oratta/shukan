@@ -19,7 +19,7 @@
   - 効果計算: `src/lib/impact.ts`（v2系）・`src/lib/diagnosis-v3.ts`（達成率パラメータ受け取り済み）
   - プロフィール: `src/lib/profile.ts` の `resolveDerivedProfileValues`（余命・日給）
   - habits.status: `src/types/habit.ts` の `'active' | 'established'`（型・CRUD・マイグレーション実装済み）
-  - 記事データ: `src/data/impact-articles/`（39ファイル）。値の根拠は life-impact-article スキルのエビデンス基準に従う
+  - 記事データ: `src/data/impact-articles/`（記事38ファイル。`index.ts` と `LLM/` サブディレクトリを除く）。値の根拠は life-impact-article スキルのエビデンス基準に従う
   - 既存テスト: `src/__tests__/impact.test.ts` / `diagnosis-v3.test.ts` / `habit-status-crud.test.ts` / `onboarding-messages.test.ts` の形式を踏襲
 - 制約:
   - **造語禁止**。あの4つの指標は「KPI」とだけ呼ぶ。KPI 正式名は「健康寿命」「出費削減」「増える収入」「前向きな気持ちの時間」
@@ -66,7 +66,7 @@
   - "『いつから』入力・過去推定を追加しない"
 
 ### change-3: mood-axis-display
-- **スコープ**: タスク C の4軸目関連。「前向きな気持ちの時間」を `daily-impact-summary.tsx` / `impact-badge.tsx` / `savings-card.tsx` / `stats/page.tsx` / `discover/page.tsx` / 記事シート2種 / `evidence-picker.tsx` / `evidence-manager-sheet.tsx` に表示。全39記事ファイルの `dailyPositiveMoodMinutes` を精査し、固定前提（起床16h・前向き50%・二重計上回避）＋設定済み代表記事パターン踏襲で値入れ（意図的に 0 のままにする記事はコード内コメントで理由を明記。**1記事はフィールド自体が欠落しているため、値入れではなくフィールド追加が必要**）
+- **スコープ**: タスク C の4軸目関連。「前向きな気持ちの時間」を `daily-impact-summary.tsx` / `impact-badge.tsx` / `savings-card.tsx` / `stats/page.tsx` / `discover/page.tsx` / 記事シート2種 / `evidence-picker.tsx` / `evidence-manager-sheet.tsx` に表示。全38記事ファイルの `dailyPositiveMoodMinutes` を精査し、固定前提（起床16h・前向き50%・二重計上回避）＋設定済み代表記事パターン踏襲で値入れ（意図的に 0 のままにする記事はコード内コメントで理由を明記。現状29記事が値0で、値入れ対象はこの29本に集中する。フィールド欠落記事は無い）
 - **使用スキル**: life-impact-article（値のエビデンス基準）
 - **依存関係**: change-2（直列実行。ラベルは change-1 に論理依存）
 - **config.yaml rules**:
@@ -141,7 +141,7 @@ Workflow の `opts.model` に反映する。
 6. [ ] `en.json` の `impact.*` の KPI 英語名が正準の `onboarding.kpi.*.name`（Healthy lifespan / Cost saving / Income Growth）と一致している
 7. [ ] オンボ[4]で、現在の達成率での未来値と達成率100%時の値の両方が表示され、100%時の値は `diagnosis-v3` に達成率=1 を渡した計算結果と一致する
 8. [ ] 「前向きな気持ちの時間」が対象9箇所（daily-impact-summary / impact-badge / savings-card / stats / discover / 記事シート2種 / evidence-picker / evidence-manager-sheet）に4軸目として表示される
-9. [ ] 全39記事の `dailyPositiveMoodMinutes` が精査済み（値 > 0、または 0 のままの理由コメント付き）
+9. [ ] 全38記事の `dailyPositiveMoodMinutes` が精査済み（値 > 0、または 0 のままの理由コメント付き）
 10. [ ] status=established の習慣がホームのデイリーチェックリストに表示されず、「身についた習慣」セクションに生涯効果付きで表示される
 10-b. [ ] established 習慣が stats のデイリー完了率の分母・ストリーク計算に含まれない（`habits.test.ts` にケースあり）
 11. [ ] 習慣編集フォームから status を established に変更すると DB に保存され、ホームの表示が切り替わる

@@ -162,9 +162,9 @@
   },
   "impact": {
     "title": "Life Impact",
-    "dailyHealth": "Health",
-    "dailyCost": "Cost Savings",
-    "dailyIncome": "Income Gain",
+    "dailyHealth": "Healthy lifespan",
+    "dailyCost": "Cost saving",
+    "dailyIncome": "Income Growth",
     "perDay": "/day",
     "perYear": "/year",
     "minuteUnit": "min",
@@ -226,9 +226,9 @@
     "feedbackCommentPlaceholder": "Tell us what seems off...",
     "feedbackSubmit": "Submit",
     "feedbackThanks": "Thank you for your feedback",
-    "feedbackHealth": "Health Lifespan Calculation",
-    "feedbackCost": "Cost Savings Calculation",
-    "feedbackIncome": "Income Gain Calculation"
+    "feedbackHealth": "Healthy lifespan Calculation",
+    "feedbackCost": "Cost saving Calculation",
+    "feedbackIncome": "Income Growth Calculation"
   },
   "reviewHistory": {
     "title": "Review History",
