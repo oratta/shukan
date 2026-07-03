@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { PiggyBank, HeartPulse, Wallet, TrendingUp } from 'lucide-react';
+import { PiggyBank, HeartPulse, Wallet, TrendingUp, Smile } from 'lucide-react';
 import { formatHealthMinutes, formatCurrency } from '@/lib/impact';
 import type { LifeImpactSavings } from '@/types/impact';
 
@@ -27,6 +27,9 @@ export function SavingsCard({ savings }: SavingsCardProps) {
         <span className="flex items-center gap-0.5"><HeartPulse className="size-3" /> {formatHealthMinutes(savings.healthMinutes, timeUnits)}</span>
         <span className="flex items-center gap-0.5"><Wallet className="size-3" /> {formatCurrency(savings.costSaving)}</span>
         <span className="flex items-center gap-0.5"><TrendingUp className="size-3" /> {formatCurrency(savings.incomeGain)}</span>
+        {savings.positiveMoodMinutes > 0 && (
+          <span className="flex items-center gap-0.5" aria-label={t('dailyPositiveMood')}><Smile className="size-3" /> {formatHealthMinutes(savings.positiveMoodMinutes, timeUnits)}</span>
+        )}
       </div>
     </div>
   );

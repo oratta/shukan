@@ -43,3 +43,23 @@
 - THEN: CTA が「習慣を選びに進む」ではなく、次画面[5]の「何を大切にしたいか（KPI 選択）」へ自然に誘導する文言（ja「大切にしたいことを選ぶ」/ en「Choose what matters most」）になっている
 - [x] テスト実装完了
 - [x] ロジック実装完了
+
+## change-3: mood-axis-display
+
+### Scenario 3-1: 4軸目「前向きな気持ちの時間」の impact.* ラベルが正準名で追加されている（change-3 rule）
+- WHEN: ja/en ロケールで `impact.dailyPositiveMood` を参照する
+- THEN: ja=「前向きな気持ちの時間」（`onboarding.kpi.positive_mood.name` と一致）、en=`onboarding.kpi.positive_mood.name`（Time feeling positive）と一致する
+- [x] テスト実装完了
+- [x] ロジック実装完了
+
+### Scenario 3-2: 「前向きな気持ちの時間」が対象9箇所に4軸目として表示される（受け入れ条件 #8）
+- WHEN: daily-impact-summary / impact-badge / savings-card / stats / discover / 記事シート2種（impact-article-sheet・evidence-article-sheet）/ evidence-picker / evidence-manager-sheet を表示する
+- THEN: 各コンポーネントが `impact.dailyPositiveMood` ラベルで4軸目を描画する（値 > 0 のとき。0=未設定は非表示）
+- [x] テスト実装完了
+- [x] ロジック実装完了
+
+### Scenario 3-3: 全38記事の dailyPositiveMoodMinutes が精査済み（受け入れ条件 #9）
+- WHEN: 各記事ファイルの `dailyPositiveMoodMinutes` を参照する
+- THEN: 値 > 0 の記事（代表12本）は `inferences.positiveMood` と `calculationLogic.positiveMood`（固定前提16h/50%の根拠）を持ち、値 0 の記事は 0 のままにした理由（二重計上回避）をコード内コメントで明記している
+- [x] テスト実装完了
+- [x] ロジック実装完了

@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { HeartPulse, Wallet, TrendingUp } from 'lucide-react';
+import { HeartPulse, Wallet, TrendingUp, Smile } from 'lucide-react';
 import { calculateDailyImpact, calculateAnnualImpact, formatHealthMinutes, formatCurrency, type DailyImpact } from '@/lib/impact';
 import { getArticle } from '@/data/impact-articles';
 import type { HabitEvidence, LifeImpactArticle } from '@/types/impact';
@@ -103,6 +103,17 @@ export function ImpactBadge(props: ImpactBadgeProps) {
           {t('dailyIncome')}
         </span>
       </div>
+      {values.positiveMoodMinutes > 0 && (
+        <div className="flex flex-col items-center gap-0.5">
+          <Smile className="size-4 text-success" />
+          <span className="text-sm font-bold text-success">
+            +{formatHealthMinutes(values.positiveMoodMinutes)}
+          </span>
+          <span className="text-[9px] font-medium text-[#9C9B99]">
+            {t('dailyPositiveMood')}
+          </span>
+        </div>
+      )}
       <span className="text-xs font-medium text-[#9C9B99]">{periodLabel}</span>
     </Wrapper>
   );

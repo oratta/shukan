@@ -22,3 +22,11 @@
 - [x] T4: `onboarding-wizard.tsx` [4] 結果画面を「現在ペース vs 全部100%」の対比表示に改修（`fullResult` を追加）
 - [x] T5: `onboarding-messages.test.ts` の cta 期待値を新文言に更新
 - [x] T6: 全テストスイート PASS（`npm run test:run`）・型チェック・build 確認
+
+## change-3: mood-axis-display
+
+- [x] T1: 4軸目表示・ラベル・記事精査の失敗テストを作成（`src/__tests__/mood-axis-display.test.ts`）
+- [x] T2: `impact.dailyPositiveMood` ラベルを ja/en に追加（正準 `onboarding.kpi.positive_mood.name` と一致）
+- [x] T3: 4軸目「前向きな気持ちの時間」を対象9箇所に表示（daily-impact-summary / impact-badge / savings-card / stats / discover / impact-article-sheet / evidence-article-sheet / evidence-picker / evidence-manager-sheet。値 > 0 のときのみ描画）
+- [x] T4: 値 0 の26記事に 0 据え置き理由（二重計上回避）のコード内コメントを付与（marker `positiveMood 0:`）
+- [x] T5: 全テストスイート PASS（`npm run test:run` 706件）・型チェック（tsc）・lint・build 確認

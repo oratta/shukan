@@ -2,7 +2,7 @@
 
 import { type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
-import { X, HeartPulse, Wallet, TrendingUp } from 'lucide-react';
+import { X, HeartPulse, Wallet, TrendingUp, Smile } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -40,7 +40,7 @@ export function ImpactArticleSheet({
 
   if (!habit || !article) return null;
 
-  const { dailyHealthMinutes, dailyCostSaving, dailyIncomeGain } =
+  const { dailyHealthMinutes, dailyCostSaving, dailyIncomeGain, dailyPositiveMoodMinutes } =
     article.calculationParams;
 
   const confidenceLabel = t(`confidence.${article.confidenceLevel}`);
@@ -77,6 +77,12 @@ export function ImpactArticleSheet({
               <span className="flex items-center gap-0.5 text-[10px] text-impact-cost/60"><TrendingUp className="size-3" /> {t('dailyIncome')}</span>
               <span className="text-sm font-semibold text-impact-cost">¥{dailyIncomeGain.toLocaleString()}{t('perDay')}</span>
             </div>
+            {dailyPositiveMoodMinutes > 0 && (
+              <div className="flex flex-col items-start">
+                <span className="flex items-center gap-0.5 text-[10px] text-impact-cost/60"><Smile className="size-3" /> {t('dailyPositiveMood')}</span>
+                <span className="text-sm font-semibold text-impact-cost">+{dailyPositiveMoodMinutes}{t('minuteUnit')}{t('perDay')}</span>
+              </div>
+            )}
           </div>
 
           {/* Confidence badge */}
@@ -128,6 +134,9 @@ export function ImpactArticleSheet({
                 <p className="flex items-center gap-1"><HeartPulse className="size-3.5" /> {t('dailyHealth')}: +{formatHealthMinutes(habit.impactSavings.healthMinutes, timeUnits)}</p>
                 <p className="flex items-center gap-1"><Wallet className="size-3.5" /> {t('dailyCost')}: {formatCurrency(habit.impactSavings.costSaving)}</p>
                 <p className="flex items-center gap-1"><TrendingUp className="size-3.5" /> {t('dailyIncome')}: {formatCurrency(habit.impactSavings.incomeGain)}</p>
+                {habit.impactSavings.positiveMoodMinutes > 0 && (
+                  <p className="flex items-center gap-1"><Smile className="size-3.5" /> {t('dailyPositiveMood')}: +{formatHealthMinutes(habit.impactSavings.positiveMoodMinutes, timeUnits)}</p>
+                )}
                 <p className="text-xs text-success/70">
                   ({habit.impactSavings.completedDays}{t('daysUnit')}{t('accumulated')})
                 </p>

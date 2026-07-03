@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { HeartPulse, Wallet, TrendingUp } from 'lucide-react';
+import { HeartPulse, Wallet, TrendingUp, Smile } from 'lucide-react';
 import { getArticleList } from '@/data/impact-articles';
 import { formatCurrency, formatHealthMinutes, calculateAnnualImpact } from '@/lib/impact';
 import { EvidenceArticleSheet } from '@/components/habits/evidence-article-sheet';
@@ -170,6 +170,8 @@ export default function DiscoverPage() {
                 healthMinutes={article.calculationParams.dailyHealthMinutes}
                 costSaving={article.calculationParams.dailyCostSaving}
                 incomeGain={article.calculationParams.dailyIncomeGain}
+                positiveMoodMinutes={article.calculationParams.dailyPositiveMoodMinutes}
+                positiveMoodLabel={t('impact.dailyPositiveMood')}
                 confidenceLevel={article.confidenceLevel}
                 heroImage={HERO_IMAGES[article.id]}
                 gradient={GRADIENT_MAP[article.id] ?? 'from-gray-400 to-gray-600'}
@@ -198,6 +200,8 @@ export default function DiscoverPage() {
                 healthMinutes={article.calculationParams.dailyHealthMinutes}
                 costSaving={article.calculationParams.dailyCostSaving}
                 incomeGain={article.calculationParams.dailyIncomeGain}
+                positiveMoodMinutes={article.calculationParams.dailyPositiveMoodMinutes}
+                positiveMoodLabel={t('impact.dailyPositiveMood')}
                 confidenceLevel={article.confidenceLevel}
                 heroImage={HERO_IMAGES[article.id]}
                 gradient={GRADIENT_MAP[article.id] ?? 'from-gray-400 to-gray-600'}
@@ -235,6 +239,8 @@ interface ArticleCardProps {
   healthMinutes: number;
   costSaving: number;
   incomeGain: number;
+  positiveMoodMinutes: number;
+  positiveMoodLabel: string;
   confidenceLevel: 'high' | 'medium' | 'low';
   heroImage?: string;
   gradient: string;
@@ -249,6 +255,8 @@ function ArticleCard({
   healthMinutes,
   costSaving,
   incomeGain,
+  positiveMoodMinutes,
+  positiveMoodLabel,
   confidenceLevel,
   heroImage,
   gradient,
@@ -291,9 +299,7 @@ function ArticleCard({
             healthMinutes,
             costSaving,
             incomeGain,
-            // positiveMood はこの change では UI 表示しない（既存3軸の表示は不変）。
-            // DailyImpact 型の必須フィールドを満たすため 0 を渡すのみ。
-            positiveMoodMinutes: 0,
+            positiveMoodMinutes,
           });
           return (
             <div className="text-[11px] text-muted-foreground space-y-0.5 mb-2">
@@ -309,6 +315,13 @@ function ArticleCard({
                 <TrendingUp className="size-3" />
                 <span>{formatCurrency(annual.incomeGain)}{timeUnits.perYear}</span>
               </div>
+              {/* 4軸目: 前向きな気持ちの時間（値がある記事のみ表示） */}
+              {annual.positiveMoodMinutes > 0 && (
+                <div className="flex items-center gap-1" aria-label={positiveMoodLabel}>
+                  <Smile className="size-3" />
+                  <span>+{formatHealthMinutes(annual.positiveMoodMinutes, timeUnits)}{timeUnits.perYear}</span>
+                </div>
+              )}
             </div>
           );
         })()}

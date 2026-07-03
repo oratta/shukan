@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { X, Trash2, Plus, HeartPulse, Wallet, TrendingUp } from 'lucide-react';
+import { X, Trash2, Plus, HeartPulse, Wallet, TrendingUp, Smile } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -54,6 +54,7 @@ export function EvidenceManagerSheet({
     let healthMinutes = 0;
     let costSaving = 0;
     let incomeGain = 0;
+    let positiveMoodMinutes = 0;
     for (const { evidence, article } of resolvedEvidences) {
       const w = evidence.weight / 100;
       const annual = calculateAnnualImpact({
@@ -65,8 +66,9 @@ export function EvidenceManagerSheet({
       healthMinutes += annual.healthMinutes;
       costSaving += annual.costSaving;
       incomeGain += annual.incomeGain;
+      positiveMoodMinutes += annual.positiveMoodMinutes;
     }
-    return { healthMinutes, costSaving, incomeGain };
+    return { healthMinutes, costSaving, incomeGain, positiveMoodMinutes };
   }, [resolvedEvidences]);
 
   const handlePickerSelect = useCallback(
@@ -124,6 +126,11 @@ export function EvidenceManagerSheet({
                 <span className="flex items-center gap-1 text-sm font-bold text-success">
                   <TrendingUp className="size-3.5" /> {formatCurrency(totalAnnualImpact.incomeGain)}
                 </span>
+                {totalAnnualImpact.positiveMoodMinutes > 0 && (
+                  <span className="flex items-center gap-1 text-sm font-bold text-success" aria-label={tImpact('dailyPositiveMood')}>
+                    <Smile className="size-3.5" /> +{formatHealthMinutes(totalAnnualImpact.positiveMoodMinutes)}
+                  </span>
+                )}
               </div>
             </div>
           )}
@@ -169,6 +176,9 @@ export function EvidenceManagerSheet({
                         <span className="flex items-center gap-0.5"><HeartPulse className="size-3" /> +{formatHealthMinutes(annual.healthMinutes)}{tImpact('perYear')}</span>
                         <span className="flex items-center gap-0.5"><Wallet className="size-3" /> {formatCurrency(annual.costSaving)}{tImpact('perYear')}</span>
                         <span className="flex items-center gap-0.5"><TrendingUp className="size-3" /> {formatCurrency(annual.incomeGain)}{tImpact('perYear')}</span>
+                        {annual.positiveMoodMinutes > 0 && (
+                          <span className="flex items-center gap-0.5" aria-label={tImpact('dailyPositiveMood')}><Smile className="size-3" /> +{formatHealthMinutes(annual.positiveMoodMinutes)}{tImpact('perYear')}</span>
+                        )}
                       </div>
 
                       {/* Weight slider */}

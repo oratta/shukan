@@ -56,6 +56,7 @@ export const drinkWater: LifeImpactArticle = {
     dailyHealthMinutes: 6,
     dailyCostSaving: 150,
     dailyIncomeGain: 500,
+    // positiveMood 0: 栄養・代謝面の効果は健康寿命/出費削減で計上済み。前向きな気持ちの時間への独立効果を定量化できないため 0 のままとする。
     dailyPositiveMoodMinutes: 0,
   },
 

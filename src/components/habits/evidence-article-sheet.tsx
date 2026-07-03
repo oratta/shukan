@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
-import { ArrowLeft, HeartPulse, Wallet, TrendingUp, ChevronDown, ThumbsDown, Send } from 'lucide-react';
+import { ArrowLeft, HeartPulse, Wallet, TrendingUp, Smile, ChevronDown, ThumbsDown, Send } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -292,6 +292,11 @@ export function EvidenceArticleSheet({
               <span className="inline-flex items-center gap-1 rounded-full bg-impact-bg px-2.5 py-1 text-xs font-medium text-impact-cost">
                 <TrendingUp className="size-3.5" /> {formatCurrency(annual.incomeGain, false)}{t('perYear')}
               </span>
+              {annual.positiveMoodMinutes > 0 && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-impact-bg px-2.5 py-1 text-xs font-medium text-impact-cost" aria-label={t('dailyPositiveMood')}>
+                  <Smile className="size-3.5" /> +{formatHealthMinutes(annual.positiveMoodMinutes)}{t('perYear')}
+                </span>
+              )}
             </div>
 
             {/* Confidence badge */}
@@ -395,6 +400,21 @@ export function EvidenceArticleSheet({
                         ))}
                       </div>
                     </div>
+
+                    {/* Positive mood (4軸目) — 値がある記事のみ */}
+                    {article.calculationLogic.positiveMood && article.calculationLogic.positiveMood.length > 0 && (
+                      <div>
+                        <h4 className="mb-1.5 text-xs font-medium text-foreground/70">
+                          <Smile className="mr-1 inline size-3.5" />
+                          {t('dailyPositiveMood')}
+                        </h4>
+                        <div className="space-y-1.5">
+                          {article.calculationLogic.positiveMood.map((step, i) => (
+                            <CalcStepRow key={i} step={step} index={i} />
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

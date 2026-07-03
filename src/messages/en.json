@@ -165,6 +165,7 @@
     "dailyHealth": "Healthy lifespan",
     "dailyCost": "Cost saving",
     "dailyIncome": "Income Growth",
+    "dailyPositiveMood": "Time feeling positive",
     "perDay": "/day",
     "perYear": "/year",
     "minuteUnit": "min",
