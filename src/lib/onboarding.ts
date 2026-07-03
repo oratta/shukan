@@ -265,6 +265,15 @@ export function buildDiagnosisSelections(state: WizardState): HabitSelection[] {
   return selections;
 }
 
+/**
+ * [4] 対比表示用: 回答済み習慣を「全部100%身についたら」の達成率=1 で組み立てる。
+ * 新規計算ロジックは持たず、buildDiagnosisSelections の presetId 集合を rate=1 に置換するだけ
+ * （diagnosis-v3 の既存関数に達成率=1 を渡すのと等価。plan.md change-2 スコープ）。
+ */
+export function buildFullPotentialSelections(state: WizardState): HabitSelection[] {
+  return buildDiagnosisSelections(state).map((sel) => ({ ...sel, rate: 1 }));
+}
+
 // ───────── 計算入力の変換 ─────────
 
 /** OnboardingProfileInput を計算用 UserProfile に変換する（保存はしない・計算入力専用）。 */

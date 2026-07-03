@@ -362,9 +362,11 @@
     },
     "result": {
       "title": "Your lifetime impact",
-      "lead": "Keep going and you’ll build up this much over the rest of your life",
+      "lead": "The gap between your current pace and 100% established is your room to grow",
       "value": "+{value}{unit}",
-      "cta": "Choose your habits",
+      "currentLabel": "At your current pace",
+      "fullLabel": "If all 100% established",
+      "cta": "Choose what matters most",
       "habitsLabel": "Habits you already have",
       "footnote": "You can review the assumptions (age, gender, country, income) in settings anytime"
     },

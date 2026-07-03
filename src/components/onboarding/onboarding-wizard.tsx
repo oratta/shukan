@@ -19,6 +19,7 @@ import {
   backInHabits,
   getHabitRate,
   buildDiagnosisSelections,
+  buildFullPotentialSelections,
   profileInputToUserProfile,
   runOnboardingWrite,
   chooseFocusKpi,
@@ -87,10 +88,16 @@ export function OnboardingWizard() {
   // インクリメントは chooseRate（イベントハンドラ）側で行う（effect 内 setState を避ける）。
   const [bumpTick, setBumpTick] = useState(0);
 
-  // [4] 結果（未来のみ・単一表示）。step が 4 のときだけ計算する。
+  // [4] 結果（未来のみ・現在の達成率）。step が 4 のときだけ計算する。
   const result: DiagnosisV3Result | null = useMemo(() => {
     if (state.step < 4) return null;
     return computeDiagnosisV3({ selections: buildDiagnosisSelections(state), profile: calcProfile });
+  }, [state, calcProfile]);
+
+  // [4] 対比: 回答済み習慣が「全部100%身についたら」の未来値（達成率=1 を渡すだけ）。
+  const fullResult: DiagnosisV3Result | null = useMemo(() => {
+    if (state.step < 4) return null;
+    return computeDiagnosisV3({ selections: buildFullPotentialSelections(state), profile: calcProfile });
   }, [state, calcProfile]);
 
   // [3] 計算中アニメーション → 数秒で [4] へ自動遷移
@@ -391,27 +398,39 @@ export function OnboardingWizard() {
         </section>
       )}
 
-      {/* ───────── [4] 結果（未来のみ・単一表示） ───────── */}
-      {state.step === 4 && result && (
+      {/* ───────── [4] 結果（未来のみ・現在ペース vs 全部100%の対比） ───────── */}
+      {state.step === 4 && result && fullResult && (
         <section className="space-y-6">
           <Heading title={t("result.title")} subtitle={t("result.lead")} />
 
           <div className="rounded-2xl border border-border bg-card p-5">
-            <ul className="grid gap-4 sm:grid-cols-2">
+            {/* 対比のカラム見出し（今のペース / 全部100%） */}
+            <div className="mb-3 flex items-center gap-3">
+              <span className="min-w-0 flex-1" aria-hidden />
+              <span className="w-20 shrink-0 text-right text-[10px] font-medium text-muted-foreground sm:w-24">
+                {t("result.currentLabel")}
+              </span>
+              <span className="w-20 shrink-0 text-right text-[10px] font-semibold text-primary sm:w-24">
+                {t("result.fullLabel")}
+              </span>
+            </div>
+            <ul className="space-y-4">
               {KPI_CATALOG.map((def) => {
-                const v = result.byKpi[def.key];
+                const cur = result.byKpi[def.key];
+                const full = fullResult.byKpi[def.key];
                 return (
                   <li key={def.key} className="flex items-center gap-3">
-                    <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                       <KpiIcon name={def.icon} className="size-5" />
                     </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-xs text-muted-foreground">
-                        {t(`kpi.${def.key}.name`)}
-                      </span>
-                      <span className="block text-lg font-bold tabular-nums">
-                        {t("result.value", { value: v.display, unit: v.unit })}
-                      </span>
+                    <span className="min-w-0 flex-1 text-xs text-muted-foreground">
+                      {t(`kpi.${def.key}.name`)}
+                    </span>
+                    <span className="w-20 shrink-0 text-right text-sm font-semibold tabular-nums text-muted-foreground sm:w-24">
+                      {t("result.value", { value: cur.display, unit: cur.unit })}
+                    </span>
+                    <span className="w-20 shrink-0 text-right text-lg font-bold tabular-nums text-primary sm:w-24">
+                      {t("result.value", { value: full.display, unit: full.unit })}
                     </span>
                   </li>
                 );
