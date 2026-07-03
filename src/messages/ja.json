@@ -160,7 +160,8 @@
     "incomeUnit": "万円",
     "trackedKpis": "大切にしたいこと",
     "saveProfile": "保存",
-    "profileSaved": "保存しました"
+    "profileSaved": "保存しました",
+    "profileSaveError": "保存できませんでした。通信状況を確認して、もう一度お試しください。"
   },
   "days": {
     "sun": "日",

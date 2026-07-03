@@ -182,6 +182,16 @@ export default function SettingsPage() {
         </Card>
       )}
 
+      {user && profileLoading && (
+        <Card className="flex items-center justify-center p-8">
+          <div
+            role="status"
+            aria-label={t('common.loading')}
+            className="size-8 animate-spin rounded-full border-2 border-primary border-t-transparent"
+          />
+        </Card>
+      )}
+
       {user && !profileLoading && (
         <ProfileEditor profile={profile} onSave={saveProfile} />
       )}

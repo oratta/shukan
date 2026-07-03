@@ -160,7 +160,8 @@
     "incomeUnit": "10k JPY",
     "trackedKpis": "What matters to you",
     "saveProfile": "Save",
-    "profileSaved": "Saved"
+    "profileSaved": "Saved",
+    "profileSaveError": "Could not save. Check your connection and try again."
   },
   "days": {
     "sun": "Sun",

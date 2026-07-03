@@ -3,6 +3,10 @@
 > Review フェーズの成果物が本 run ディレクトリに未生成だったため、builder が
 > plan.md の受け入れ条件から change 単位の検証 Scenario を起こして追跡する。
 > 各 change の builder が担当 Scenario を進捗に応じて [x] 化する。
+>
+> 2026-07-03: longrun-browser-verifier が claude-in-chrome (Playwright MCP 不可のためフォールバック) で
+> 実ブラウザ操作による動作確認を実施（round 1）。dev アカウント oratta@gmail.com のデータは検証前にバックアップ・
+> 検証後に完全復元済み。各 Scenario の「動作確認完了」欄を追記。
 
 ## change-1: kpi-label-unification
 
@@ -11,24 +15,28 @@
 - THEN: `impact.dailyCost`=「出費削減」、`impact.dailyIncome`=「増える収入」、`evidence.feedbackCost`=「出費削減の算出根拠」、`evidence.feedbackIncome`=「増える収入の算出根拠」であり、旧ラベル「コスト削減」「収入増加」が残存しない
 - [x] テスト実装完了
 - [x] ロジック実装完了
+- [x] 動作確認完了（ホーム画面で ja ロケール表示。「出費削減」「増える収入」を確認、旧ラベル残存なし）
 
 ### Scenario 1-2: ja の impact.fiveDaysImpact が日本語化されている（受け入れ条件 #5）
 - WHEN: ja ロケールで `impact.fiveDaysImpact` を参照する
 - THEN: 英語（ASCII 英字）が残存せず、日本語表記（「5日間のインパクト」）になっている
 - [x] テスト実装完了
 - [x] ロジック実装完了
+- [x] 動作確認完了（ホーム画面「5日間のインパクト」表示を確認）
 
 ### Scenario 1-3: en の impact.* KPI 名が正準 onboarding.kpi.*.name と一致（受け入れ条件 #6）
 - WHEN: en ロケールで `impact.dailyHealth/dailyCost/dailyIncome` を参照する
 - THEN: それぞれ `onboarding.kpi.health_lifespan.name`（Healthy lifespan）/ `cost_saving.name`（Cost saving）/ `earning.name`（Income Growth）と一致し、旧名（Health / Cost Savings / Income Gain）が残存しない
 - [x] テスト実装完了
 - [x] ロジック実装完了
+- [x] 動作確認完了（ホーム画面 en ロケールで「Healthy lifespan / Cost saving / Income Growth」表示を確認）
 
 ### Scenario 1-4: LP の alt テキストが正準 4 KPI 名で統一されている
 - WHEN: `Process.tsx` / `Detail.tsx` の iPhone スクショ alt を参照する
 - THEN: 旧軸名（生涯コスト / 可処分時間 / 集中時間）が残存せず、4 つの正式 KPI 名（健康寿命 / 出費削減 / 増える収入 / 前向きな気持ちの時間）で記述されている
 - [x] テスト実装完了
 - [x] ロジック実装完了
+- [x] 動作確認完了（`?marketing=1` でLP表示を確認。alt文言はソース確認: 旧軸名残存なし、正準4 KPI名で統一）
 
 ## change-2: onboarding-future-contrast
 
@@ -37,12 +45,14 @@
 - THEN: 各 KPI について「今のペースなら」（現在の達成率）と「全部100%身についたら」（達成率=1）の2値が対比表示され、後者は `computeDiagnosisV3` に達成率=1 の selections を渡した計算結果（`buildFullPotentialSelections`）と一致する
 - [x] テスト実装完了
 - [x] ロジック実装完了
+- [x] 動作確認完了（dev アカウントの habits/user_profiles を一時削除してオンボを最初から実施。[4]画面で「今のベースなら」列と「全部100%身についたら」列が4 KPI（健康寿命/前向きな気持ちの時間/出費削減/増える収入）で対比表示されることを確認。検証後データは完全復元）
 
 ### Scenario 2-2: [4]→[5] の導線文言が KPI 選択（重視したいこと）へ誘導する（タスク B）
 - WHEN: オンボ[4]の CTA を参照する
 - THEN: CTA が「習慣を選びに進む」ではなく、次画面[5]の「何を大切にしたいか（KPI 選択）」へ自然に誘導する文言（ja「大切にしたいことを選ぶ」/ en「Choose what matters most」）になっている
 - [x] テスト実装完了
 - [x] ロジック実装完了
+- [x] 動作確認完了（[4]画面末尾のCTAボタンが「大切にしたいことを選ぶ」であることを確認。クリックで[5]KPI選択画面へ遷移することも確認）
 
 ## change-3: mood-axis-display
 
@@ -51,18 +61,21 @@
 - THEN: ja=「前向きな気持ちの時間」（`onboarding.kpi.positive_mood.name` と一致）、en=`onboarding.kpi.positive_mood.name`（Time feeling positive）と一致する
 - [x] テスト実装完了
 - [x] ロジック実装完了
+- [x] 動作確認完了（ホーム「あなたが大切にしていること」/オンボ[5]で「前向きな気持ちの時間」表示を確認）
 
 ### Scenario 3-2: 「前向きな気持ちの時間」が対象9箇所に4軸目として表示される（受け入れ条件 #8）
 - WHEN: daily-impact-summary / impact-badge / savings-card / stats / discover / 記事シート2種（impact-article-sheet・evidence-article-sheet）/ evidence-picker / evidence-manager-sheet を表示する
 - THEN: 各コンポーネントが `impact.dailyPositiveMood` ラベルで4軸目を描画する（値 > 0 のとき。0=未設定は非表示）
 - [x] テスト実装完了
 - [x] ロジック実装完了
+- [x] 動作確認完了（discover カード「毎日有酸素運動」と記事シート、stats 集計カードで mood > 0 の4軸目表示を実ブラウザで確認。残り箇所は grep でラベル参照を確認: daily-impact-summary.tsx / impact-badge.tsx / savings-card.tsx / evidence-picker.tsx / evidence-manager-sheet.tsx / impact-article-sheet.tsx 全て `impact.dailyPositiveMood` 参照あり）
 
 ### Scenario 3-3: 全38記事の dailyPositiveMoodMinutes が精査済み（受け入れ条件 #9）
 - WHEN: 各記事ファイルの `dailyPositiveMoodMinutes` を参照する
 - THEN: 値 > 0 の記事（代表12本）は `inferences.positiveMood` と `calculationLogic.positiveMood`（固定前提16h/50%の根拠）を持ち、値 0 の記事は 0 のままにした理由（二重計上回避）をコード内コメントで明記している
 - [x] テスト実装完了
 - [x] ロジック実装完了
+- [x] 動作確認完了（38記事全ファイルに `dailyPositiveMoodMinutes` フィールドが存在し、値0の全記事に `positiveMood 0:` 理由コメントが付与されていることをスクリプトで確認）
 
 ## change-4: three-scene-habit-display
 
@@ -71,18 +84,21 @@
 - THEN: その習慣はデイリーチェックリスト（active のみ）に現れず、ホーム下部の「身についた習慣」セクション（チェックボックスなし）に「この習慣が残りの人生であなたにもたらすこと」の生涯効果（4KPI）付きで表示される
 - [x] テスト実装完了
 - [x] ロジック実装完了
+- [x] 動作確認完了（習慣編集フォームで「野菜・果物を1日5皿食べる」を established に変更・保存 → デイリーチェックリストから消え「身についた習慣」セクションに健康寿命/出費削減/増える収入付きで表示されることを確認）
 
 ### Scenario 4-2: established 習慣が stats のデイリー完了率の分母・ストリーク計算に含まれない（受け入れ条件 #10-b）
 - WHEN: active と established が混在する状態で stats を表示する / `getHabitsWithStats` の結果を `isDailyTrackedHabit` でフィルタする
 - THEN: established 習慣は完了率平均の分母・ストリーク集計に含まれない（`habits.test.ts` の "established habit exclusion from daily metrics" で固定）
 - [x] テスト実装完了
 - [x] ロジック実装完了
+- [x] 動作確認完了（上記 established 化後に /stats を表示。「習慣ごと」の一覧に established 化した野菜・果物の習慣が表示されず active 習慣のみになることを確認）
 
 ### Scenario 4-3: 習慣編集フォームから status を established に変更でき、ホーム表示が切り替わる（受け入れ条件 #11）
 - WHEN: 習慣編集フォームの「完全に身についた」トグルを ON にして保存する
 - THEN: `onSubmit` に `status: 'established'` が渡り DB に保存され、ホームのデイリーチェックリストから外れて「身についた習慣」セクションへ移動する
 - [x] テスト実装完了
 - [x] ロジック実装完了
+- [x] 動作確認完了（Scenario 4-1 と同一操作で確認。トグルON→保存→ホーム即時反映を確認）
 
 ## change-5: profile-app-connection
 
@@ -91,15 +107,18 @@
 - THEN: `resolveTrackedKpiDefinitions` が tracked_kpis を KPI カタログ順の定義に解決し（不正キー除外・未設定は全4 KPI フォールバック）、`TrackedKpisCard` がホーム上部にその KPI 名を描画する
 - [x] テスト実装完了
 - [x] ロジック実装完了
+- [x] 動作確認完了（ホーム上部「あなたが大切にしていること」カードに tracked_kpis の4 KPI が表示されることを確認。オンボ完了直後の新規状態でも同様に表示されることを確認）
 
 ### Scenario 5-2: 設定画面でプロフィールを編集・保存でき user_profiles に反映される（受け入れ条件 #13）
 - WHEN: 設定画面のプロフィール編集で生年・性別・収入・KPI 選択を変更し保存する
 - THEN: `validateProfileSettingsInput` で妥当性を確認し、`buildUserProfileInput` が upsert 入力（country=JP / currency=JPY）を組み立て、`useProfile.save` → `upsertUserProfile` で `user_profiles` に反映される（update RLS ポリシーは既存 migration に存在）
 - [x] テスト実装完了
 - [x] ロジック実装完了
+- [x] 動作確認完了（設定画面で年収を1000→1200万円に変更し保存 →「保存しました」フィードバック表示 → ページリロード後も1200が保持されることを確認。検証後は1000に復元）
 
 ### Scenario 5-3: established の生涯効果が resolveDerivedProfileValues で個人化される（受け入れ条件 #14）
 - WHEN: プロフィールを持つ／持たないユーザーがホームの「身についた習慣」セクションを表示する
 - THEN: ホームが `useProfile` の profile を `EstablishedSection` に渡し、`computeHabitLifetimeEffect(perDay, profile)` が余命（remainingLifeExpectancy）で health_lifespan を個人化する。プロフィール未設定時は V2 既定値（残り寿命40年）でフォールバックしエラーにしない
 - [x] テスト実装完了
 - [x] ロジック実装完了
+- [x] 動作確認完了（birth_year=1984 のプロフィールで established 化した習慣の生涯効果が「健康寿命 107日」等、個人化された値で表示されることを確認）

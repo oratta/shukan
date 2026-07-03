@@ -77,3 +77,13 @@
 ## D-change5-5: update RLS ポリシーは既存 migration に存在（追加マイグレーション不要）
 - plan.md change-5 rule「設定画面からの user_profiles UPDATE 前に update RLS ポリシーの存在を確認する」。
 - `supabase/migrations/20260612010000_user_profiles.sql` に "Users can update own profile"（for update / using auth.uid()=user_id / with check 同）が既に定義済み。オンボ書き込み実績どおり存在。→ マイグレーション追加不要。テストで migration に `for update` が含まれることを固定した。
+
+## D-change5-6: プロフィール保存の失敗ハンドリングと読み込み中インジケータ（Verify round1 静的FAIL 修正）
+- 課題: (1) useProfile.save の re-throw を ProfileEditor.handleSave が catch しておらず、ネットワークエラー/RLS 拒否時に unhandled rejection となりユーザーへ失敗が伝わらない。(2) settings ページは profileLoading 中に ProfileEditor を非表示にするだけで可視インジケータが無く「編集欄が無い」ように見え、後から急に現れる。
+- 選択肢比較:
+  - A) useProfile.save 内で catch して null 返却 → UI 側で成否判定できず、成功と失敗を区別できない。却下（可観測性が下がる）。
+  - B) ProfileEditor.handleSave に try/catch を追加し saveError state で settings.profileSaveError を表示 → 保存 UI と同じ場所でユーザーに失敗を可視化でき、二重送信ガード（saving）も維持。採用（UI 層でエラー表示するのが責務として自然）。
+  - C) トースト/グローバル通知基盤を新設 → YAGNI。既存にトースト基盤なし。却下。
+- ローディング: 既存の共通スピナー（size-8 animate-spin rounded-full border-2 border-primary border-t-transparent、home/stats/ReviewCalendar と同一）を Card 内に配置。role="status" + aria-label=common.loading でアクセシビリティ確保。
+- メッセージ: settings.profileSaveError を ja/en に追加（成功時 profileSaved と対）。
+- TDD: profile-app-connection.test.ts に 4 テスト追加（catch 配線 / profileSaveError 配線 / profileLoading→animate-spin / profileSaveError キー存在）。RED 4件→実装→GREEN。全 753 テスト PASS、lint 0 error、tsc clean、build 成功。

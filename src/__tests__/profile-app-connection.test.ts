@@ -210,6 +210,23 @@ describe('ProfileEditor が保存経路を配線している (Scenario 5-2)', ()
   });
 });
 
+describe('ProfileEditor が保存失敗をハンドリングする (完成度)', () => {
+  const src = readSource('src/components/settings/profile-editor.tsx');
+  it('保存失敗を catch する（unhandled rejection を防ぐ）', () => {
+    expect(src).toContain('catch');
+  });
+  it('失敗時にエラーメッセージ profileSaveError を表示する', () => {
+    expect(src).toContain('profileSaveError');
+  });
+});
+
+describe('設定画面がプロフィール読み込み中にインジケータを表示する (完成度)', () => {
+  const settings = readSource('src/app/(app)/settings/page.tsx');
+  it('profileLoading 中にローディング表示（スピナー）を出す', () => {
+    expect(settings).toMatch(/profileLoading[\s\S]*animate-spin/);
+  });
+});
+
 describe('useProfile フックが Supabase 経路を配線している (Scenario 5-2)', () => {
   const src = readSource('src/hooks/useProfile.ts');
   it('fetchUserProfile で読み出す', () => {
@@ -289,6 +306,7 @@ describe('新規メッセージキーが ja/en に存在する', () => {
       'trackedKpis',
       'saveProfile',
       'profileSaved',
+      'profileSaveError',
     ]) {
       expect(typeof settingsJa[key], `ja settings.${key}`).toBe('string');
       expect(typeof settingsEn[key], `en settings.${key}`).toBe('string');

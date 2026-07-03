@@ -39,12 +39,14 @@ export function ProfileEditor({ profile, onSave }: ProfileEditorProps) {
   );
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState(false);
 
   const errors = validateProfileSettingsInput(input);
   const canSave = canSaveProfileSettings(input);
 
   const patch = (p: Partial<ProfileSettingsInput>) => {
     setSaved(false);
+    setSaveError(false);
     setInput((prev) => ({ ...prev, ...p }));
   };
 
@@ -54,9 +56,15 @@ export function ProfileEditor({ profile, onSave }: ProfileEditorProps) {
   const handleSave = async () => {
     if (!canSave || saving) return;
     setSaving(true);
+    setSaveError(false);
     try {
       await onSave(buildUserProfileInput(input));
       setSaved(true);
+    } catch {
+      // ネットワークエラーや RLS 拒否時。unhandled rejection を防ぎ、
+      // ユーザーに失敗を可視化する（保存済み表示は出さない）。
+      setSaved(false);
+      setSaveError(true);
     } finally {
       setSaving(false);
     }
@@ -174,6 +182,11 @@ export function ProfileEditor({ profile, onSave }: ProfileEditorProps) {
             {t('saveProfile')}
           </Button>
           {saved && <span className="text-xs text-success">{t('profileSaved')}</span>}
+          {saveError && (
+            <span role="alert" className="text-xs text-destructive">
+              {t('profileSaveError')}
+            </span>
+          )}
         </div>
       </div>
     </Card>
