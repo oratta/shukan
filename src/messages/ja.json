@@ -102,7 +102,8 @@
     "establishedToggleDesc": "もう身についた習慣です。デイリーチェックから外し、残りの人生への効果だけを表示します。",
     "establishedSectionTitle": "身についた習慣",
     "establishedSectionDesc": "もう身についた習慣。残りの人生にもたらす効果を表示しています。",
-    "lifetimeEffectHeading": "この習慣が残りの人生であなたにもたらすこと"
+    "lifetimeEffectHeading": "この習慣が残りの人生であなたにもたらすこと",
+    "trackedKpisTitle": "あなたが大切にしていること"
   },
   "stats": {
     "title": "統計",
@@ -147,7 +148,19 @@
     "legal": "法的情報",
     "privacyPolicy": "プライバシーポリシー",
     "termsOfService": "利用規約",
-    "tokushoho": "特定商取引法に基づく表記"
+    "tokushoho": "特定商取引法に基づく表記",
+    "profile": "プロフィール",
+    "profileDescription": "一生のインパクトをあなた用に計算するために使います。",
+    "birthYear": "生年",
+    "gender": "性別",
+    "genderMale": "男性",
+    "genderFemale": "女性",
+    "genderOther": "答えたくない",
+    "annualIncome": "年収",
+    "incomeUnit": "万円",
+    "trackedKpis": "大切にしたいこと",
+    "saveProfile": "保存",
+    "profileSaved": "保存しました"
   },
   "days": {
     "sun": "日",
@@ -337,10 +350,22 @@
       "countLabel": "{current} / {total}",
       "levelDisabled": "この習慣では選べません",
       "levels": {
-        "full": { "label": "完璧に習慣化", "desc": "生活の一部になっている" },
-        "most": { "label": "だいたい", "desc": "ほとんどできている" },
-        "sometimes": { "label": "たまに", "desc": "思い出したときにやる" },
-        "none": { "label": "やってない", "desc": "これから始めたい" }
+        "full": {
+          "label": "完璧に習慣化",
+          "desc": "生活の一部になっている"
+        },
+        "most": {
+          "label": "だいたい",
+          "desc": "ほとんどできている"
+        },
+        "sometimes": {
+          "label": "たまに",
+          "desc": "思い出したときにやる"
+        },
+        "none": {
+          "label": "やってない",
+          "desc": "これから始めたい"
+        }
       }
     },
     "habitSub": {

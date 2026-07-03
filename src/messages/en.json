@@ -102,7 +102,8 @@
     "establishedToggleDesc": "This habit is already part of your life. It's removed from the daily checklist and only its lifetime effect is shown.",
     "establishedSectionTitle": "Established habits",
     "establishedSectionDesc": "Habits that are already part of your life. Their effect on the rest of your life is shown here.",
-    "lifetimeEffectHeading": "What this habit brings you for the rest of your life"
+    "lifetimeEffectHeading": "What this habit brings you for the rest of your life",
+    "trackedKpisTitle": "What matters to you"
   },
   "stats": {
     "title": "Statistics",
@@ -147,7 +148,19 @@
     "legal": "Legal",
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service",
-    "tokushoho": "Commercial Transaction Act Disclosure"
+    "tokushoho": "Commercial Transaction Act Disclosure",
+    "profile": "Profile",
+    "profileDescription": "Used to personalize your lifetime impact estimates.",
+    "birthYear": "Birth year",
+    "gender": "Gender",
+    "genderMale": "Male",
+    "genderFemale": "Female",
+    "genderOther": "Prefer not to say",
+    "annualIncome": "Annual income",
+    "incomeUnit": "10k JPY",
+    "trackedKpis": "What matters to you",
+    "saveProfile": "Save",
+    "profileSaved": "Saved"
   },
   "days": {
     "sun": "Sun",
@@ -337,10 +350,22 @@
       "countLabel": "{current} / {total}",
       "levelDisabled": "Not selectable for this habit",
       "levels": {
-        "full": { "label": "Fully a habit", "desc": "It’s part of my life" },
-        "most": { "label": "Mostly", "desc": "I do it most of the time" },
-        "sometimes": { "label": "Sometimes", "desc": "I do it when I remember" },
-        "none": { "label": "Not yet", "desc": "I’d like to start" }
+        "full": {
+          "label": "Fully a habit",
+          "desc": "It’s part of my life"
+        },
+        "most": {
+          "label": "Mostly",
+          "desc": "I do it most of the time"
+        },
+        "sometimes": {
+          "label": "Sometimes",
+          "desc": "I do it when I remember"
+        },
+        "none": {
+          "label": "Not yet",
+          "desc": "I’d like to start"
+        }
       }
     },
     "habitSub": {

@@ -83,3 +83,23 @@
 - THEN: `onSubmit` に `status: 'established'` が渡り DB に保存され、ホームのデイリーチェックリストから外れて「身についた習慣」セクションへ移動する
 - [x] テスト実装完了
 - [x] ロジック実装完了
+
+## change-5: profile-app-connection
+
+### Scenario 5-1: ホームに tracked_kpis の KPI が表示される（受け入れ条件 #12）
+- WHEN: ユーザーがホームを表示する（プロフィールの tracked_kpis を持つ）
+- THEN: `resolveTrackedKpiDefinitions` が tracked_kpis を KPI カタログ順の定義に解決し（不正キー除外・未設定は全4 KPI フォールバック）、`TrackedKpisCard` がホーム上部にその KPI 名を描画する
+- [x] テスト実装完了
+- [x] ロジック実装完了
+
+### Scenario 5-2: 設定画面でプロフィールを編集・保存でき user_profiles に反映される（受け入れ条件 #13）
+- WHEN: 設定画面のプロフィール編集で生年・性別・収入・KPI 選択を変更し保存する
+- THEN: `validateProfileSettingsInput` で妥当性を確認し、`buildUserProfileInput` が upsert 入力（country=JP / currency=JPY）を組み立て、`useProfile.save` → `upsertUserProfile` で `user_profiles` に反映される（update RLS ポリシーは既存 migration に存在）
+- [x] テスト実装完了
+- [x] ロジック実装完了
+
+### Scenario 5-3: established の生涯効果が resolveDerivedProfileValues で個人化される（受け入れ条件 #14）
+- WHEN: プロフィールを持つ／持たないユーザーがホームの「身についた習慣」セクションを表示する
+- THEN: ホームが `useProfile` の profile を `EstablishedSection` に渡し、`computeHabitLifetimeEffect(perDay, profile)` が余命（remainingLifeExpectancy）で health_lifespan を個人化する。プロフィール未設定時は V2 既定値（残り寿命40年）でフォールバックしエラーにしない
+- [x] テスト実装完了
+- [x] ロジック実装完了

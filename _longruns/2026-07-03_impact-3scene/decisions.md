@@ -53,3 +53,27 @@
 ## D-change4-3: status 手動トグルは編集時のみ・自動昇格なし
 - plan.md change-4 rule「established の自動昇格提案・卒業演出を実装しない（手動設定のみ）」。
 - HabitForm は add/edit 兼用だが、新規作成時に「完全に身についた」を出すのは意味的に不自然（達成実績ゼロの習慣を established にするユースケースが薄い）。`initialData` があるとき（=編集時）のみトグルを描画し、onSubmit で `status: established ? 'established' : 'active'` を渡す。updateHabitById は既に status 更新に対応済みのため配線のみ。可逆・YAGNI。
+
+## D-change5-1: tracked_kpis 未設定は全4 KPI にフォールバック（純粋関数 resolveTrackedKpiDefinitions）
+- plan.md change-5 rule「プロフィール未設定ユーザーには現行のデフォルト値でフォールバックし、エラーにしない」。
+- onboarding は完了時に tracked_kpis へ全4軸を書き込む（onboarding.ts D5）が、未オンボ／行なし／不正キー混入のケースがある。
+- 選択肢: (a) 未設定時は何も表示しない, (b) 未設定時は全4 KPI を表示, (c) 未設定時はエラー表示。
+- (c) はルール違反。(a) はホームの「大切にしていること」が空になり情報価値ゼロ。(b) は「まだ絞り込んでいない＝全部大切」の自然な既定で、KPI カタログ順を保つ純粋関数 `resolveTrackedKpiDefinitions`（不正キー除外＋空/null は全4）に集約しテスト固定。→ (b) 採用（YAGNI・非エラー・テスト容易）。
+
+## D-change5-2: プロフィール読み書きは useProfile フックに集約し、表示/編集コンポーネントは props 受け取り
+- ホーム（tracked_kpis 表示・established 個人化）と設定（編集）の両方が user_profiles を必要とする。
+- 選択肢: (a) 各ページで直接 fetchUserProfile/upsert を呼ぶ, (b) Context Provider を新設, (c) useHabits と同型の useProfile フック（fetch on mount＋save）を追加し、TrackedKpisCard/ProfileEditor は profile/onSave を props で受ける。
+- (a) は読み書きロジックが散在しテスト不能。(b) は Provider 追加が過剰（2画面のみ・YAGNI 違反）。(c) は既存 useHabits パターンと一貫し、コンポーネントは純粋 props で tree-walk/grep テスト可能。→ (c) 採用。ProfileEditor に onSave を注入することで Supabase 依存を画面側に閉じ込め、コンポーネントは表示ロジックのみに。
+
+## D-change5-3: 設定のプロフィール編集は「生年」直接入力（オンボの age 入力とは差異を許容）
+- plan.md change-5 スコープ／AC#13 は「生年・性別・収入・KPI 選択」を明示。オンボ[1]は age 入力→birthYear 変換。
+- 選択肢: (a) オンボと同じ age 入力にする, (b) plan の記述どおり birthYear 直接入力, (c) オンボの inline フィールドを共通コンポーネントに抽出して両者で再利用。
+- (c) は 773 行の wizard から inline フィールドを剥がす破壊的リファクタで、他 change 完了後の低リスク方針に反する。(a) は plan の「生年」記述と乖離。(b) は plan/AC に忠実で、UserProfile.birthYear と直結し変換不要（余計な派生を挟まない）。「オンボ入力 UI のコンポーネント再利用を基本方針」は満たせないが、ボタン選択・万円入力などの入力パターン（見た目・操作トーン）は踏襲した。→ (b) 採用（plan 忠実・可逆・非破壊）。
+
+## D-change5-4: established 個人化は既存 computeHabitLifetimeEffect に profile を渡す配線のみ
+- computeHabitLifetimeEffect は change-4 で既に profile 引数（default null → V2 既定値）を持ち、health_lifespan を remainingLifeExpectancy で個人化する。
+- 新規計算は不要。ホームが useProfile の profile を EstablishedSection→computeHabitLifetimeEffect に流すだけで AC#14 を満たす。cost_saving/earning は per-day×240 日で profile 非依存（現行仕様維持）。プロフィール未設定は resolveDerivedProfileValues(null)=残り寿命40年でフォールバックしエラーにしない。→ 配線のみ・非破壊。
+
+## D-change5-5: update RLS ポリシーは既存 migration に存在（追加マイグレーション不要）
+- plan.md change-5 rule「設定画面からの user_profiles UPDATE 前に update RLS ポリシーの存在を確認する」。
+- `supabase/migrations/20260612010000_user_profiles.sql` に "Users can update own profile"（for update / using auth.uid()=user_id / with check 同）が既に定義済み。オンボ書き込み実績どおり存在。→ マイグレーション追加不要。テストで migration に `for update` が含まれることを固定した。

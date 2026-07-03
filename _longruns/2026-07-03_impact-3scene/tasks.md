@@ -41,3 +41,14 @@
 - [x] T6: 習慣編集フォームに status 手動設定トグル（「完全に身についた」）を追加し `onSubmit` で status を渡す
 - [x] T7: ja/en メッセージに established セクション見出し・生涯効果見出し・フォームトグルのラベルを追加
 - [x] T8: 全テストスイート PASS（`npm run test:run`）・型チェック（tsc）・lint・build 確認
+
+## change-5: profile-app-connection
+
+- [x] T1: プロフィール接続の失敗テストを作成（`src/__tests__/profile-app-connection.test.ts`）
+- [x] T2: `src/lib/profile-settings.ts` 純粋関数（`resolveTrackedKpiDefinitions` / `validateProfileSettingsInput` / `userProfileToSettingsInput` / `buildUserProfileInput` / `toggleTrackedKpi`）を追加。tracked_kpis 未設定は全4 KPI フォールバック
+- [x] T3: `useProfile` フック（`fetchUserProfile` 読み出し＋`upsertUserProfile` 保存）を追加
+- [x] T4: `TrackedKpisCard`（ホーム上部・tracked_kpis 表示）を追加しホームに配置（AC#12）
+- [x] T5: `ProfileEditor`（設定画面・生年/性別/収入/KPI 選択・オンボ入力パターン踏襲）を追加し設定画面に配置（AC#13）
+- [x] T6: ホームから `profile` を `EstablishedSection` に接続し established 生涯効果を個人化（AC#14。未設定は既定値フォールバック）
+- [x] T7: ja/en メッセージに tracked KPIs カード見出し・設定プロフィール編集セクションのラベルを追加
+- [x] T8: 全テストスイート PASS（`npm run test:run`）・型チェック（tsc）・lint・build 確認
