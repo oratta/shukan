@@ -131,3 +131,13 @@
 - メッセージ: discover.createFromScratch / createFromScratchSub / sortLead を ja/en に追加。旧 discover.quit/build は未使用化したが無害のため残置。
 - テスト: discover-page.test.ts を新規追加（F11 4KPIキー＋impact.*ラベル参照／F12 写真オーバーレイ・旧h-28タイル不在／F13 selectedKpi＋sort＋calculationParams[param]／F14 handleCreateFromScratch＋Plus＋createFromScratch／新メッセージキー ja/en）。mood-axis-display.test.ts（discover の dailyPositiveMood 参照）は維持で PASS。全 772 テスト PASS、tsc clean、lint 0 error、build 成功。
 - 未実施: ブラウザ視覚確認は Chrome 選択の対話プロンプトが自律実行をブロックするため見送り。ログイン済みセッションで /discover の目視推奨。
+
+## D-feedback-8: ホームのデイリー習慣カード背景にエビデンス画像の等分割コラージュ（F15）
+- 追加フィードバック（2026-07-03）: デイリーチェックリストの各習慣カード背景に、紐づく evidence 記事画像（Discover と同じソース）を敷く。複数 evidence は等分割コラージュ。
+- **画像ソースの共有**: Discover の HERO_IMAGES を `src/data/evidence-hero-images.ts`（EVIDENCE_HERO_IMAGES＋getEvidenceHeroImage）に切り出し、Discover と HabitCard で共有（URL は byte-identical なので Discover の出力は不変＝純粋リファクタ）。evidence-article-sheet.tsx の別コピー（w=800）は既存挙動維持のため今回は統合せず据え置き。
+- **分割コラージュの実装**: collapsed 行を `relative overflow-hidden` にし、背景に `absolute inset-0 flex` を敷いて各画像を `flex-1 object-cover` で等幅の縦スライスに並べる（2枚=左右50/50、3枚=1/3ずつ、4枚=1/4ずつ）。横長・低背の行に対しては 2×2 グリッドより縦スライスの方が各写真が視認でき破綻しにくいと判断し、全枚数で縦スライスに統一。
+- **上限**: `MAX_COLLAGE_IMAGES = 4`。5枚以上の evidence を持つ習慣は先頭4枚のみ（等分割が細くなり見た目が破綻するため打ち切り、超過分は省略）。
+- **可読性/トーン**: Discover(F12) と同じく `bg-gradient-to-r from-black/80 via-black/60 to-black/45` オーバーレイを重ね、collapsed 行のコンテンツを `relative z-10` の内側 flex に移して前面化。テキストは hasEvidenceBg 時に白系（名前=text-white+drop-shadow・曜日/頻度ラベル=white/70〜80・chevron=white/80・ドラッグハンドル=white/50）へ切替。ステータス円（緑/赤）とチェック完了演出は写真上でも視認でき、完了/スキップの視覚差は保たれる。写真＋黒オーバーレイ＋白文字で light/dark 両テーマ共通に成立（タップ操作性は onClick/z-10 維持で不変）。
+- **フォールバック**: 画像を1枚も持たない習慣（ゼロから作ったカスタム習慣等）は hasEvidenceBg=false で従来の通常カード表示のまま。
+- **established セクションは対象外（自然に）**: EstablishedSection は HabitCard ではなく独自の `<Card>`（HabitIcon ベース）で描画するため、HabitCard への今回の変更は波及せず established は自動的に対象外。デイリーチェックリスト（HabitList→HabitCard）にのみ適用。
+- テスト: evidence-collage.test.ts を新規追加（共有画像の getter／Discover が同一共有モジュールを使う／HabitCard の getEvidenceHeroImage・MAX 4・slice・flex-1 object-cover・from-black オーバーレイ・hasEvidenceBg フォールバック配線）。全 778 テスト PASS、tsc clean、lint 0 error（warning は既存＋コラージュ img の1件増のみ）、build 成功。

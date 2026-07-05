@@ -10,7 +10,12 @@ import { cn } from '@/lib/utils';
 import { getTodayString } from '@/lib/habits';
 import { ImpactBadge } from '@/components/habits/impact-badge';
 import { SavingsCard } from '@/components/habits/savings-card';
+import { getEvidenceHeroImage } from '@/data/evidence-hero-images';
 import type { DayStatus, HabitWithStats } from '@/types/habit';
+
+// F15: デイリー習慣カード背景に敷くエビデンス画像コラージュの最大枚数。
+// 5枚以上ある習慣は先頭4枚のみ（等分割が細くなりすぎて見た目が破綻するため打ち切り）。
+const MAX_COLLAGE_IMAGES = 4;
 
 interface HabitCardProps {
   habit: HabitWithStats;
@@ -263,6 +268,14 @@ export function HabitCard({
 
   const streakPercent = Math.min(Math.round((habit.currentStreak / 30) * 100), 100);
 
+  // F15: 紐づくエビデンス記事の画像を等分割コラージュ背景に使う（画像を持つ記事のみ・最大4枚）。
+  // 画像を1枚も持たない習慣（ゼロから作ったカスタム習慣等）は従来の通常カード表示にフォールバック。
+  const evidenceImages = (habit.evidences ?? [])
+    .map((ev) => getEvidenceHeroImage(ev.articleId))
+    .filter((url): url is string => !!url)
+    .slice(0, MAX_COLLAGE_IMAGES);
+  const hasEvidenceBg = evidenceImages.length > 0;
+
   return (
     <div ref={setNodeRef} style={style} className={cn(isDragging && 'z-50 opacity-80')}>
     <Card className="gap-0 py-0 overflow-hidden transition-all duration-200">
@@ -272,12 +285,39 @@ export function HabitCard({
         tabIndex={0}
         onClick={() => onToggleExpand(habit.id)}
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onToggleExpand(habit.id); }}
-        className="flex cursor-pointer items-center gap-3 p-3 w-full text-left"
+        className="relative w-full cursor-pointer overflow-hidden text-left"
       >
+        {/* F15: エビデンス画像の等分割コラージュ背景（画像を持つ習慣のみ）＋可読性オーバーレイ */}
+        {hasEvidenceBg && (
+          <>
+            <div className="absolute inset-0 flex" aria-hidden>
+              {evidenceImages.map((url, i) => (
+                <img
+                  key={i}
+                  src={url}
+                  alt=""
+                  loading="lazy"
+                  className="h-full min-w-0 flex-1 object-cover"
+                />
+              ))}
+            </div>
+            <div
+              className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/45"
+              aria-hidden
+            />
+          </>
+        )}
+
+        <div className="relative z-10 flex items-center gap-3 p-3">
         {/* Drag handle */}
         <button
           type="button"
-          className="touch-none shrink-0 text-gray-300 hover:text-gray-500 dark:text-gray-600 dark:hover:text-gray-400 cursor-grab active:cursor-grabbing"
+          className={cn(
+            'touch-none shrink-0 cursor-grab active:cursor-grabbing',
+            hasEvidenceBg
+              ? 'text-white/50 hover:text-white/80'
+              : 'text-gray-300 hover:text-gray-500 dark:text-gray-600 dark:hover:text-gray-400'
+          )}
           {...attributes}
           {...listeners}
           onClick={(e) => e.stopPropagation()}
@@ -298,21 +338,28 @@ export function HabitCard({
         {/* Center: Name + frequency label + past day dots */}
         <div className="flex-1 min-w-0 flex flex-col gap-1">
           <div className="flex items-baseline gap-2 min-w-0">
-            <span className={cn('text-[15px] font-medium truncate', isSkipped && 'text-muted-foreground')}>
+            <span
+              className={cn(
+                'text-[15px] font-medium truncate',
+                hasEvidenceBg
+                  ? cn('text-white drop-shadow-sm', isSkipped && 'text-white/50')
+                  : isSkipped && 'text-muted-foreground'
+              )}
+            >
               {habit.name}
             </span>
             {habit.frequency === 'weekly' && (
-              <span className="shrink-0 text-[11px] text-muted-foreground">
+              <span className={cn('shrink-0 text-[11px]', hasEvidenceBg ? 'text-white/80' : 'text-muted-foreground')}>
                 {t('weeklyProgress', { current: habit.weeklyCompletedCount ?? 0, target: habit.weeklyTarget ?? 1 })}
               </span>
             )}
             {habit.frequency === 'weekday' && (
-              <span className="shrink-0 text-[11px] text-muted-foreground">
+              <span className={cn('shrink-0 text-[11px]', hasEvidenceBg ? 'text-white/80' : 'text-muted-foreground')}>
                 {t('weekday')}
               </span>
             )}
             {habit.frequency === 'custom' && habit.customDays && habit.customDays.length > 0 && (
-              <span className="shrink-0 text-[11px] text-muted-foreground">
+              <span className={cn('shrink-0 text-[11px]', hasEvidenceBg ? 'text-white/80' : 'text-muted-foreground')}>
                 {[...habit.customDays].sort((a, b) => a - b).map((d) => dayLabels[d]).join('・')}
               </span>
             )}
@@ -323,7 +370,7 @@ export function HabitCard({
               const dayLabel = new Date(day.date + 'T00:00:00').toLocaleDateString(locale, { weekday: 'narrow' });
               return (
                 <div key={day.date} className="flex flex-col items-center gap-0.5">
-                  <span className="text-[9px] text-muted-foreground leading-none">{dayLabel}</span>
+                  <span className={cn('text-[9px] leading-none', hasEvidenceBg ? 'text-white/70' : 'text-muted-foreground')}>{dayLabel}</span>
                   <DayStatusDot day={day} onTap={() => handleDotTap(day)} />
                 </div>
               );
@@ -332,12 +379,13 @@ export function HabitCard({
         </div>
 
         {/* Right: Chevron */}
-        <div className="shrink-0 text-gray-400">
+        <div className={cn('shrink-0', hasEvidenceBg ? 'text-white/80' : 'text-gray-400')}>
           {isExpanded ? (
             <ChevronUp className="size-5" />
           ) : (
             <ChevronDown className="size-5" />
           )}
+        </div>
         </div>
       </div>
 
