@@ -158,3 +158,21 @@
 - **完了状態の表現**: 従来どおり緑のチェック丸（StatusIndicator の `bg-success`＋白チェック＋祝福アニメ）を完了インジケータとして残置。競合していた緑の枠（ImpactBadge/SavingsCard/Card border）を除いたことで、写真の上でチェック丸が完了サインとして自然に立つ。スクリム濃度を完了で可変にする案は検討したが、展開コンテンツの可読性を優先し均一スクリムを維持（チェック丸で表現）。
 - 対象外: EstablishedSection は独自 Card（HabitCard 非使用）のため不変。習慣詳細モーダルの ImpactBadge/SavingsCard は default surface で従来表示。
 - テスト: evidence-collage.test.ts の F15 スクリム判定を `bg-black/NN` に更新し、F17 の describe を追加（背景が Card 直下＝collapsed 行より前／border-0／展開ボディ relative z-10／surface prop 配線／onImage で border-white/20）。全 785 テスト PASS、tsc clean、lint 0 error、build 成功。
+
+## D-feedback-11: 色の意味ルール「緑＝ポジティブ（できたこと・積み上げ）専用」＋展開ビューの1ボックス統合（F18〜F20）
+### 色の意味ルール（今後の改修指針・恒久ルール）
+- **緑（success / `--success` 系）は「できたこと・積み上げ・プラスのポジティブ」の意味に専用**する。この意味を持たない部品に緑を使わない。
+  - 緑を使ってよい例: 完了チェック（StatusIndicator の bg-success）、ストリーク進捗バー、達成/累積の強調、祝福演出。
+  - 緑を使わない例: 詳細ボタン（中立ナビ操作）、スキップボタン（中立操作）、KPI 影響やパネルの単なる枠/地。
+- 中立操作の色は既存パレットの `primary`（スレート系・hue250、緑ではない）／`secondary`／白ガラス（写真上）から選ぶ。ネガティブは destructive（赤）/ amber（スキップ中）。
+- 「押せるものは押せると分かる」: 中立ボタンも塗り or ring で affordance を明示する。
+
+### F18: 展開ビューの3ボックスを1ボックスに統合
+- 課題: 写真背景の上に KPI影響（ImpactBadge）/継続日数（ストリーク）/累積（SavingsCard）の3つのガラス箱が並び、箱の隙間から背景が見えて視線が切れ、認知負荷が高い。
+- 対応: 写真カード（hasEvidenceBg）では3つを**単一のガラスボックス**（`rounded-xl bg-white/10 backdrop-blur-sm p-3`・外周ボーダーなし）に内包し、内部は `space-y-3`＋ごく薄いディバイダ（`h-px bg-white/15`）で区切る。ImpactBadge/SavingsCard に `surface: 'bare'`（自前の箱＝border/地/padding を持たず親ボックスに内包・白文字）variant を追加。ストリークは中身を `streakInner(light)` に切り出して箱なしで内包。写真なしカードは従来どおり個別3箱（default surface）を維持（隙間問題が起きないため・スコープ限定）。
+- 習慣詳細モーダルは default surface（自前の箱）で不変。
+### F19: スキップボタンに中立アクセント＋affordance
+- スキップは中立操作。緑を避け、写真上は白ガラス（`bg-white/15 text-white ring-white/30`）、通常時は `primary` 系のスレート淡色（`bg-primary/10 text-primary ring-primary/20`）＋ ring で押せることを明示。skipped 中は従来の amber を維持。
+### F20: 詳細ボタンの緑を廃止
+- 詳細はポジティブな意味を持たないため `bg-success` を廃止。写真上は白ガラス（`bg-white/90 text-gray-900`）、通常時は `bg-secondary text-secondary-foreground`。押せる見た目は維持。
+- テスト: evidence-collage.test.ts を更新（F17 の surface 判定を bare に）＋ F18/F19/F20 の describe 追加（統合ボックス bg-white/10・h-px ディバイダ・bare／詳細ボタン非 bg-success・中立色／スキップ ring＋中立色・非緑）。全 789 テスト PASS、tsc clean、lint 0 error、build 成功。

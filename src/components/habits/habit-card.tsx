@@ -276,6 +276,31 @@ export function HabitCard({
     .slice(0, MAX_COLLAGE_IMAGES);
   const hasEvidenceBg = evidenceImages.length > 0;
 
+  // 継続日数（ストリーク）の中身（箱なし）。写真ガラス内では light=true で白文字にする。
+  // 緑は「積み上げ＝ポジティブ」の意味を持つ進捗バーにのみ使う（数値・ラベルは中立の白/緑）。
+  const streakInner = (light: boolean) => (
+    <>
+      <div className="flex items-baseline gap-2">
+        <span className={cn('text-2xl font-bold', light ? 'text-white' : 'text-success')}>
+          {habit.currentStreak}
+        </span>
+        <span className={cn('text-sm', light ? 'text-white/70' : 'text-success/70')}>
+          {tStats('days')}
+        </span>
+        <span className={cn('ml-auto text-xs', light ? 'text-white/60' : 'text-success/60')}>
+          {t('streakGoal', { percent: streakPercent })}
+        </span>
+      </div>
+      {/* 進捗バー: 緑＝積み上げ（ポジティブ）の意味で使用 */}
+      <div className={cn('mt-2 h-1.5 rounded-full', light ? 'bg-white/25' : 'bg-white')}>
+        <div
+          className="h-full rounded-full bg-success transition-all duration-300"
+          style={{ width: `${streakPercent}%` }}
+        />
+      </div>
+    </>
+  );
+
   return (
     <div ref={setNodeRef} style={style} className={cn(isDragging && 'z-50 opacity-80')}>
     <Card
@@ -413,58 +438,58 @@ export function HabitCard({
               </div>
             )}
 
-            {/* Impact Badge */}
-            {habit.evidences.length > 0 && (
-              <ImpactBadge
-                evidences={habit.evidences}
-                mode="daily"
-                surface={hasEvidenceBg ? 'onImage' : 'default'}
-              />
-            )}
-
-            {/* Streak card */}
-            <div className={cn('rounded-lg p-3', hasEvidenceBg ? 'bg-white/10 backdrop-blur-sm' : 'bg-success/15')}>
-              <div className="flex items-baseline gap-2">
-                <span className={cn('text-2xl font-bold', hasEvidenceBg ? 'text-white' : 'text-success')}>
-                  {habit.currentStreak}
-                </span>
-                <span className={cn('text-sm', hasEvidenceBg ? 'text-white/70' : 'text-success/70')}>
-                  {tStats('days')}
-                </span>
-                <span className={cn('ml-auto text-xs', hasEvidenceBg ? 'text-white/60' : 'text-success/60')}>
-                  {t('streakGoal', { percent: streakPercent })}
-                </span>
+            {/* F18: 写真カードでは KPI影響・継続日数・累積を「1つのガラスボックス」に内包する。
+                外周ボーダーはなし。区切りはごく薄いディバイダ。隙間から背景が見える状態を解消。
+                写真なしカードは従来どおり個別の箱で表示する。 */}
+            {hasEvidenceBg ? (
+              <div className="space-y-3 rounded-xl bg-white/10 p-3 backdrop-blur-sm">
+                {habit.evidences.length > 0 && (
+                  <ImpactBadge evidences={habit.evidences} mode="daily" surface="bare" />
+                )}
+                {habit.evidences.length > 0 && <div className="h-px bg-white/15" />}
+                <div>{streakInner(true)}</div>
+                {habit.impactSavings && <div className="h-px bg-white/15" />}
+                {habit.impactSavings && (
+                  <SavingsCard savings={habit.impactSavings} surface="bare" />
+                )}
               </div>
-              {/* Progress bar */}
-              <div className={cn('mt-2 h-1.5 rounded-full', hasEvidenceBg ? 'bg-white/25' : 'bg-white')}>
-                <div
-                  className="h-full rounded-full bg-success transition-all duration-300"
-                  style={{ width: `${streakPercent}%` }}
-                />
-              </div>
-            </div>
-
-            {/* Savings Card */}
-            {habit.impactSavings && (
-              <SavingsCard
-                savings={habit.impactSavings}
-                surface={hasEvidenceBg ? 'onImage' : 'default'}
-              />
+            ) : (
+              <>
+                {/* Impact Badge */}
+                {habit.evidences.length > 0 && (
+                  <ImpactBadge evidences={habit.evidences} mode="daily" surface="default" />
+                )}
+                {/* Streak card */}
+                <div className="rounded-lg bg-success/15 p-3">{streakInner(false)}</div>
+                {/* Savings Card */}
+                {habit.impactSavings && (
+                  <SavingsCard savings={habit.impactSavings} surface="default" />
+                )}
+              </>
             )}
 
             {/* Detail + Skip/Unskip buttons */}
             <div className="flex gap-2">
+              {/* F20: 詳細はポジティブな意味を持たないため緑をやめ、中立色に。
+                  写真上は白ガラス、通常時は secondary。押せる affordance は維持。 */}
               <button
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   onOpenDetail(habit.id);
                 }}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-success px-4 py-2.5 text-sm font-medium text-success-foreground transition-colors hover:bg-success/90"
+                className={cn(
+                  'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors',
+                  hasEvidenceBg
+                    ? 'bg-white/90 text-gray-900 hover:bg-white'
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                )}
               >
                 <Maximize2 className="size-4" />
                 {t('detail')}
               </button>
+              {/* F19: スキップは中立操作。緑以外の中立アクセント（primary=スレート/白ガラス）＋
+                  リングで押せる affordance を明示。skipped 中は amber。 */}
               <button
                 type="button"
                 onClick={(e) => {
@@ -472,12 +497,12 @@ export function HabitCard({
                   onSkipToday(habit.id);
                 }}
                 className={cn(
-                  'flex shrink-0 items-center justify-center gap-1 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                  'flex shrink-0 items-center justify-center gap-1 rounded-lg px-3 py-2.5 text-sm font-medium ring-1 transition-colors',
                   isSkipped
-                    ? 'bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-900/50'
+                    ? 'bg-amber-100 text-amber-700 ring-amber-200 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:ring-amber-900/40 dark:hover:bg-amber-900/50'
                     : hasEvidenceBg
-                      ? 'bg-white/15 text-white hover:bg-white/25'
-                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                      ? 'bg-white/15 text-white ring-white/30 hover:bg-white/25'
+                      : 'bg-primary/10 text-primary ring-primary/20 hover:bg-primary/20'
                 )}
               >
                 {isSkipped ? (

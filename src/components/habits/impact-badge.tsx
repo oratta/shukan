@@ -12,8 +12,11 @@ interface ImpactBadgeFromArticleProps {
   mode?: 'daily' | 'annual';
   useMan?: boolean;
   onTap?: () => void;
-  /** 'onImage' は写真背景の上に載せる用（緑ボーダーを廃し白ガラス＋白文字）。既定は 'default'。 */
-  surface?: 'default' | 'onImage';
+  /**
+   * 'default' = 自前の箱（緑地）。'onImage' = 写真上の白ガラス箱。
+   * 'bare' = 箱なし（親のガラスボックスに内包・白文字）。既定は 'default'。
+   */
+  surface?: 'default' | 'onImage' | 'bare';
 }
 
 interface ImpactBadgeFromEvidencesProps {
@@ -21,8 +24,11 @@ interface ImpactBadgeFromEvidencesProps {
   mode?: 'daily' | 'annual';
   useMan?: boolean;
   onTap?: () => void;
-  /** 'onImage' は写真背景の上に載せる用（緑ボーダーを廃し白ガラス＋白文字）。既定は 'default'。 */
-  surface?: 'default' | 'onImage';
+  /**
+   * 'default' = 自前の箱（緑地）。'onImage' = 写真上の白ガラス箱。
+   * 'bare' = 箱なし（親のガラスボックスに内包・白文字）。既定は 'default'。
+   */
+  surface?: 'default' | 'onImage' | 'bare';
 }
 
 interface ImpactBadgeFromValuesProps {
@@ -30,8 +36,11 @@ interface ImpactBadgeFromValuesProps {
   mode?: 'daily' | 'annual';
   useMan?: boolean;
   onTap?: () => void;
-  /** 'onImage' は写真背景の上に載せる用（緑ボーダーを廃し白ガラス＋白文字）。既定は 'default'。 */
-  surface?: 'default' | 'onImage';
+  /**
+   * 'default' = 自前の箱（緑地）。'onImage' = 写真上の白ガラス箱。
+   * 'bare' = 箱なし（親のガラスボックスに内包・白文字）。既定は 'default'。
+   */
+  surface?: 'default' | 'onImage' | 'bare';
 }
 
 type ImpactBadgeProps =
@@ -67,14 +76,19 @@ export function ImpactBadge(props: ImpactBadgeProps) {
   const periodLabel = mode === 'annual' ? t('perYear') : t('perDay');
   const useMan = props.useMan ?? true;
 
-  // 写真背景の上（onImage）では緑ボーダー/緑地をやめ、白ガラス＋白文字で馴染ませる（F17）。
+  // 写真/ガラスの上（onImage・bare）では緑地/緑ボーダーをやめ白文字で馴染ませる（F17/F18）。
+  // bare は自前の箱を持たず、親のガラスボックス（F18: 3コンポーネント統合）に内包する。
   const onImage = props.surface === 'onImage';
-  const wrapperSurface = onImage
-    ? 'border-white/20 bg-white/10 backdrop-blur-sm'
-    : 'border-success/20 bg-success/5';
-  const iconClass = onImage ? 'text-white' : 'text-success';
-  const valueClass = onImage ? 'text-white' : 'text-success';
-  const labelClass = onImage ? 'text-white/70' : 'text-[#9C9B99]';
+  const bare = props.surface === 'bare';
+  const light = onImage || bare;
+  const wrapperChrome = bare
+    ? ''
+    : onImage
+      ? 'rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm px-3.5 py-3'
+      : 'rounded-xl border border-success/20 bg-success/5 px-3.5 py-3';
+  const iconClass = light ? 'text-white' : 'text-success';
+  const valueClass = light ? 'text-white' : 'text-success';
+  const labelClass = light ? 'text-white/70' : 'text-[#9C9B99]';
 
   const Wrapper = props.onTap ? 'button' : 'div';
   const wrapperProps = props.onTap
@@ -91,8 +105,8 @@ export function ImpactBadge(props: ImpactBadgeProps) {
     <Wrapper
       {...wrapperProps}
       className={cn(
-        'flex w-full items-center justify-between rounded-xl border px-3.5 py-3 text-left',
-        wrapperSurface
+        'flex w-full items-center justify-between text-left',
+        wrapperChrome
       )}
     >
       <div className="flex flex-col items-center gap-0.5">

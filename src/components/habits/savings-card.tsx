@@ -8,8 +8,11 @@ import type { LifeImpactSavings } from '@/types/impact';
 
 interface SavingsCardProps {
   savings: LifeImpactSavings;
-  /** 'onImage' は写真背景の上に載せる用（緑ボーダーを廃し白ガラス＋白文字）。既定は 'default'。 */
-  surface?: 'default' | 'onImage';
+  /**
+   * 'default' = 自前の箱（緑地）。'onImage' = 写真上の白ガラス箱。
+   * 'bare' = 箱なし（親のガラスボックスに内包・白文字）。既定は 'default'。
+   */
+  surface?: 'default' | 'onImage' | 'bare';
 }
 
 export function SavingsCard({ savings, surface = 'default' }: SavingsCardProps) {
@@ -19,21 +22,23 @@ export function SavingsCard({ savings, surface = 'default' }: SavingsCardProps) 
   if (savings.completedDays === 0) return null;
 
   const onImage = surface === 'onImage';
+  const bare = surface === 'bare';
+  const light = onImage || bare;
+  const chrome = bare
+    ? ''
+    : onImage
+      ? 'rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm px-3.5 py-2.5'
+      : 'rounded-xl border border-success/20 bg-success/10 px-3.5 py-2.5';
 
   return (
-    <div
-      className={cn(
-        'flex items-center justify-between rounded-xl border px-3.5 py-2.5',
-        onImage ? 'border-white/20 bg-white/10 backdrop-blur-sm' : 'border-success/20 bg-success/10'
-      )}
-    >
+    <div className={cn('flex items-center justify-between', chrome)}>
       <div className="flex items-center gap-1.5">
-        <PiggyBank className={cn('size-4', onImage ? 'text-white' : 'text-success')} />
-        <span className={cn('text-[11px] font-semibold', onImage ? 'text-white' : 'text-success')}>
+        <PiggyBank className={cn('size-4', light ? 'text-white' : 'text-success')} />
+        <span className={cn('text-[11px] font-semibold', light ? 'text-white' : 'text-success')}>
           {t('cumulative')}
         </span>
       </div>
-      <div className={cn('flex items-center gap-2.5 text-[11px] font-medium', onImage ? 'text-white/80' : 'text-[#6D6C6A]')}>
+      <div className={cn('flex items-center gap-2.5 text-[11px] font-medium', light ? 'text-white/80' : 'text-[#6D6C6A]')}>
         <span className="flex items-center gap-0.5"><HeartPulse className="size-3" /> {formatHealthMinutes(savings.healthMinutes, timeUnits)}</span>
         <span className="flex items-center gap-0.5"><Wallet className="size-3" /> {formatCurrency(savings.costSaving)}</span>
         <span className="flex items-center gap-0.5"><TrendingUp className="size-3" /> {formatCurrency(savings.incomeGain)}</span>
