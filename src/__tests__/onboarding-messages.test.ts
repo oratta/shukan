@@ -98,13 +98,15 @@ describe('ja 確定文言（[3] 計算中）', () => {
 describe('ja 確定文言（[4] 結果・未来のみ）', () => {
   it('タイトル・リード・値テンプレ・CTA・補足', () => {
     const s = obj(onbJa.result);
-    expect(str(s.title)).toBe('あなたの一生のインパクト');
+    // F3: 見出しは「習慣がもたらすインパクト」に変更
+    expect(str(s.title)).toBe('あなたの習慣がもたらすインパクト');
     expect(str(s.lead).length).toBeGreaterThan(0);
     expect(str(s.value)).toContain('{value}');
     expect(str(s.value)).toContain('{unit}');
     // change-2: [4]→[5] 導線は KPI選択（何を大切にしたいか）へ誘導する
     expect(str(s.cta)).toBe('大切にしたいことを選ぶ');
-    expect(str(s.currentLabel)).toBe('今のペースなら');
+    // F2: 列ラベルは「身についてない人と比べて」に変更
+    expect(str(s.currentLabel)).toBe('身についてない人と比べて');
     expect(str(s.fullLabel)).toBe('全部100%身についたら');
     expect(str(s.habitsLabel)).toBe('身についている習慣');
   });

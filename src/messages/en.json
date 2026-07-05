@@ -393,14 +393,31 @@
       "phase3": "Calculating the impact on the rest of your life…"
     },
     "result": {
-      "title": "Your lifetime impact",
+      "title": "The impact your habits create",
       "lead": "The gap between your current pace and 100% established is your room to grow",
       "value": "+{value}{unit}",
-      "currentLabel": "At your current pace",
+      "currentLabel": "vs. someone without these habits",
       "fullLabel": "If all 100% established",
       "cta": "Choose what matters most",
       "habitsLabel": "Habits you already have",
-      "footnote": "You can review the assumptions (age, gender, country, income) in settings anytime"
+      "habitEffectLabel": "What this habit brings",
+      "sectionsLead": "See how the habits you chose move each of the four metrics.",
+      "summaryLabel": "The four metrics at a glance",
+      "footnote": "You can review the assumptions (age, gender, country, income) in settings anytime",
+      "kpiSections": {
+        "health_lifespan": {
+          "body": "Advances in medicine keep pushing average lifespan higher. But years added while your body can't move freely don't necessarily add to a fulfilling life. The stretch of time you stay healthy, move freely, and live on your own terms is your \"healthy lifespan.\" Research shows the habits you chose extend this healthy lifespan compared with going without them."
+        },
+        "positive_mood": {
+          "body": "Time spent feeling positive is more than just feeling good. Research links positive emotion with better physical and mental health, work productivity, and stronger relationships. Cutting the hours lost to low mood or irritability, and growing the time you feel good, adds up to more fulfilling days."
+        },
+        "cost_saving": {
+          "body": "Illness and poor health pile up as lifetime costs — treatment, visits, medication. Research shows daily habits can curb these future expenses."
+        },
+        "earning": {
+          "body": "Stamina and focus underpin your work performance and income growth. Research shows that building this base through habits contributes to how much your lifetime income rises."
+        }
+      }
     },
     "kpiSelect": {
       "title": "What do you want more of in your life?",

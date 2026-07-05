@@ -87,3 +87,16 @@
 - ローディング: 既存の共通スピナー（size-8 animate-spin rounded-full border-2 border-primary border-t-transparent、home/stats/ReviewCalendar と同一）を Card 内に配置。role="status" + aria-label=common.loading でアクセシビリティ確保。
 - メッセージ: settings.profileSaveError を ja/en に追加（成功時 profileSaved と対）。
 - TDD: profile-app-connection.test.ts に 4 テスト追加（catch 配線 / profileSaveError 配線 / profileLoading→animate-spin / profileSaveError キー存在）。RED 4件→実装→GREEN。全 753 テスト PASS、lint 0 error、tsc clean、build 成功。
+
+## D-feedback-1: [4]結果は「単一対比カード」から「KPIごとの説明セクション＋まとめ」構成へ（F1〜F4）
+- ユーザーフィードバック（2026-07-03）: [4] は 4KPI を 1 カードの対比テーブルに詰め込んでいたが、(a) 全部100%列の見出しラベル・値の単位が 375px 幅で改行して崩れる（F1）、(b) 各 KPI の重要性（特に健康寿命・前向きな気持ちの時間）が数字だけでは腹落ちしない（F4）。「この画面はこだわりたい」。
+- 採用構成: 見出し（F3 で「あなたの習慣がもたらすインパクト」に変更）→ リード → **KPIごとの独立セクション ×4**（アイコン＋KPI名＋説明文 body＋「身についてない人と比べて / 全部100%身についたら」の2値対比）→ **4KPIまとめ**（縮約対比・F1 の折り返し対策）→ 身についている習慣リスト → CTA。
+- F1 の折り返し対策: 崩れの原因は固定幅列（w-20/w-24）に長い見出し「全部100%身についたら」と「+127万円/年」が収まらず wrap していたこと。まとめは (1) 列見出しを撤去し `currentLabel ／ fullLabel` の凡例 1 行（段落として自然折り返し）に置換、(2) 値は `whitespace-nowrap tabular-nums`、名前は `flex-1 truncate` で可変幅にした。セクション内の 2 値も grid-cols-2 の各セルで `whitespace-nowrap`。375px でラベル11字×11px≒100px が半幅セルに収まる。
+- F2: 列ラベル「今のペースなら」→「身についてない人と比べて」。診断は未来のみ加算モデル（非実践者=0 基準）なので、現在ペース値＝習慣なしと比べた増分であり意味的にも整合する。en は "vs. someone without these habits"。
+- F4 説明文: エビデンス規律に従い数値・過剰断定を body に含めず（証明/必ず を禁止語としてテスト固定）、「研究で示されています」トーンに統一。数字は既存 diagnosis-v3 の result/fullResult 表示値のみ（新規計算なし）。健康寿命・前向きな気持ちの時間を重点説明（前向きは既存 kpiSelect/記事データの支持範囲＝健康・生産性・人間関係との関連に限定）。造語なし（KPI 名はカタログ4語のみ）。
+- 0 値の扱い: cur/full の raw<=0 は「—」表示（+0 のノイズを避ける。D-change3-2 の 0=非表示方針と整合）。セクション自体は教育目的で 4 つとも常時表示。
+
+## D-feedback-2: [4]習慣リストのアイコン・効果値・エビデンス記事（F5/F6）
+- F5: answeredHabits（rate>0）の各行に preset.icon（KpiIcon）＋主要KPI（primaryKpis[0]）の生涯ポテンシャル値（habitPotentialV3 の達成率100%基準・既存関数の再利用、新規計算なし）を表示。KpiIcon の ICON_MAP に不足していたオンボ15習慣のアイコン（dumbbell/salad/glass-water/hamburger/soup/pen-line/message-circle-heart）を追加（未登録は Sparkles にフォールバックしていた）。
+- F6: 行タップで**既存の EvidenceArticleSheet**（アプリ本体の Discover/Home で使用中・articleId を受け取る bottom sheet）を preset.articleIds[0] で開く。新規記事UIは作らない。affordance は ChevronRight＋hover:border-primary/40＋active:scale。ImpactArticleSheet（habit を要求する Dialog）ではなく EvidenceArticleSheet を選択した理由: オンボ時点で habit レコードは未作成で articleId のみ手元にあるため、articleId を直接受ける後者が適合。
+- TDD: onboarding-impact-sections.test.ts を新規追加（kpiSections body の存在/長さ/健康寿命・前向きの枠組み語/過剰断定不在、summaryLabel等の存在、15習慣のアイコン・主要KPI・先頭記事の解決）。onboarding-messages.test.ts の title/currentLabel 期待値を新文言へ更新。全 760 テスト PASS、tsc clean、lint 0 error、build 成功。
