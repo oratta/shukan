@@ -278,37 +278,40 @@ export function HabitCard({
 
   return (
     <div ref={setNodeRef} style={style} className={cn(isDragging && 'z-50 opacity-80')}>
-    <Card className="gap-0 py-0 overflow-hidden transition-all duration-200">
+    <Card
+      className={cn(
+        'gap-0 py-0 overflow-hidden transition-all duration-200',
+        hasEvidenceBg && 'relative border-0'
+      )}
+    >
+      {/* F15/F17: エビデンス画像の等分割コラージュを「カード全体」の背景に敷く（展開時も維持）。
+          可読性スクリムを重ね、緑の枠（Card border）は border-0 で外す。画像を持つ習慣のみ。 */}
+      {hasEvidenceBg && (
+        <>
+          <div className="absolute inset-0 flex" aria-hidden>
+            {evidenceImages.map((url, i) => (
+              <img
+                key={i}
+                src={url}
+                alt=""
+                loading="lazy"
+                className="h-full min-w-0 flex-1 object-cover"
+              />
+            ))}
+          </div>
+          <div className="absolute inset-0 bg-black/60" aria-hidden />
+        </>
+      )}
+
       {/* Collapsed row - always visible */}
       <div
         role="button"
         tabIndex={0}
         onClick={() => onToggleExpand(habit.id)}
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onToggleExpand(habit.id); }}
-        className="relative w-full cursor-pointer overflow-hidden text-left"
+        className="relative z-10 w-full cursor-pointer text-left"
       >
-        {/* F15: エビデンス画像の等分割コラージュ背景（画像を持つ習慣のみ）＋可読性オーバーレイ */}
-        {hasEvidenceBg && (
-          <>
-            <div className="absolute inset-0 flex" aria-hidden>
-              {evidenceImages.map((url, i) => (
-                <img
-                  key={i}
-                  src={url}
-                  alt=""
-                  loading="lazy"
-                  className="h-full min-w-0 flex-1 object-cover"
-                />
-              ))}
-            </div>
-            <div
-              className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/45"
-              aria-hidden
-            />
-          </>
-        )}
-
-        <div className="relative z-10 flex items-center gap-3 p-3">
+        <div className="flex items-center gap-3 p-3">
         {/* Drag handle */}
         <button
           type="button"
@@ -392,7 +395,7 @@ export function HabitCard({
       {/* Expanded body - smooth height transition via grid trick */}
       <div
         className={cn(
-          'grid transition-[grid-template-rows] duration-300 ease-in-out',
+          'relative z-10 grid transition-[grid-template-rows] duration-300 ease-in-out',
           isExpanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
         )}
       >
@@ -401,10 +404,10 @@ export function HabitCard({
             {/* Life Significance */}
             {habit.lifeSignificance && (
               <div>
-                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mb-0.5">
+                <p className={cn('text-[10px] uppercase tracking-wider font-semibold mb-0.5', hasEvidenceBg ? 'text-white/60' : 'text-gray-400')}>
                   {t('lifeSignificance')}
                 </p>
-                <p className="text-sm text-foreground/80">
+                <p className={cn('text-sm', hasEvidenceBg ? 'text-white/90' : 'text-foreground/80')}>
                   {habit.lifeSignificance}
                 </p>
               </div>
@@ -412,24 +415,28 @@ export function HabitCard({
 
             {/* Impact Badge */}
             {habit.evidences.length > 0 && (
-              <ImpactBadge evidences={habit.evidences} mode="daily" />
+              <ImpactBadge
+                evidences={habit.evidences}
+                mode="daily"
+                surface={hasEvidenceBg ? 'onImage' : 'default'}
+              />
             )}
 
             {/* Streak card */}
-            <div className="rounded-lg bg-success/15 p-3">
+            <div className={cn('rounded-lg p-3', hasEvidenceBg ? 'bg-white/10 backdrop-blur-sm' : 'bg-success/15')}>
               <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-success">
+                <span className={cn('text-2xl font-bold', hasEvidenceBg ? 'text-white' : 'text-success')}>
                   {habit.currentStreak}
                 </span>
-                <span className="text-sm text-success/70">
+                <span className={cn('text-sm', hasEvidenceBg ? 'text-white/70' : 'text-success/70')}>
                   {tStats('days')}
                 </span>
-                <span className="ml-auto text-xs text-success/60">
+                <span className={cn('ml-auto text-xs', hasEvidenceBg ? 'text-white/60' : 'text-success/60')}>
                   {t('streakGoal', { percent: streakPercent })}
                 </span>
               </div>
               {/* Progress bar */}
-              <div className="mt-2 h-1.5 rounded-full bg-white">
+              <div className={cn('mt-2 h-1.5 rounded-full', hasEvidenceBg ? 'bg-white/25' : 'bg-white')}>
                 <div
                   className="h-full rounded-full bg-success transition-all duration-300"
                   style={{ width: `${streakPercent}%` }}
@@ -439,7 +446,10 @@ export function HabitCard({
 
             {/* Savings Card */}
             {habit.impactSavings && (
-              <SavingsCard savings={habit.impactSavings} />
+              <SavingsCard
+                savings={habit.impactSavings}
+                surface={hasEvidenceBg ? 'onImage' : 'default'}
+              />
             )}
 
             {/* Detail + Skip/Unskip buttons */}
@@ -465,7 +475,9 @@ export function HabitCard({
                   'flex shrink-0 items-center justify-center gap-1 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                   isSkipped
                     ? 'bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-900/50'
-                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    : hasEvidenceBg
+                      ? 'bg-white/15 text-white hover:bg-white/25'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
                 )}
               >
                 {isSkipped ? (

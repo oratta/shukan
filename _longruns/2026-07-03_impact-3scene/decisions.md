@@ -148,3 +148,13 @@
 - **スコープ判断**: ImpactBadge は共有部品で、ホーム展開（habit-card）と習慣詳細モーダル（habit-detail-modal）の2箇所で使用。どちらもユーザー自身の習慣インパクト表示のため、prop 分岐を足さず ImpactBadge 自体を常時4軸に統一（React ベストプラクティス: 一様であるべき挙動に boolean prop を増やさない）。習慣詳細モーダルにも同じ4軸表示が自然に適用される（同一部品・整合的）。
 - 非対象: DailyImpactSummary は F10 で対応済み。stats / savings-card / 記事シート（evidence/impact article sheet）等の他の表示箇所は現行の「> 0 のみ」を維持（触っていない）。D-change3-2 の invariant は「ユーザー自身の習慣インパクト表示（DailyImpactSummary・ImpactBadge）に限り常時表示」へと F10/F16 で部分的に上書き。
 - テスト: impact.test.ts に F16 の回帰テスト2件追加（impact-badge が dailyPositiveMood を描画／`positiveMoodMinutes > 0` ガードを持たない）。mood-axis-display.test.ts（impact-badge の dailyPositiveMood 参照）は維持で PASS。全 780 テスト PASS、tsc clean、lint 0 error、build 成功。
+
+## D-feedback-10: 習慣カード展開時もコラージュ背景を維持し、緑枠を廃して写真前提にUI調整（F17）
+- 追加フィードバック（2026-07-03）: F15 の背景を展開時も維持／緑の枠を消す／写真前提で展開UIを調整。
+- **背景をカード全体へ**: コラージュ＋スクリムを collapsed 行の内側から `<Card>` 直下（`absolute inset-0`）へ移動。展開してカードが伸びても `inset-0` が全高を覆い、展開ビュー全体が写真の上に載る。collapsed 行・展開ボディはともに `relative z-10` で前面化。
+- **スクリム**: 展開時は縦に長くなるため、方向性グラデーション（from-black 下寄せ）ではなくカード全体を均一に覆う `bg-black/60` フラットスクリムに変更（全高でテキスト可読性を確保）。
+- **緑の枠を廃止**: (1) Card の枠 → hasEvidenceBg 時 `border-0` で除去（写真をカード端まで）。(2) 展開内の緑ボーダー/緑地パネル＝ ImpactBadge（`border-success/20 bg-success/5`）と SavingsCard（`border-success/20 bg-success/10`）に `surface?: 'default'|'onImage'` prop を追加し、onImage で `border-white/20 bg-white/10 backdrop-blur`＋白文字の「白ガラス」に切替。ホーム展開（写真あり）は onImage、習慣詳細モーダル（写真なし）は default のまま不変。
+- **写真前提のUI調整**: 展開の各要素を hasEvidenceBg 時に白系へ—ライフ意義ラベル/本文（white/60・white/90）、ストリークカード（白ガラス地・数値white・トラック white/25・進捗バーは success をアクセントとして維持）、スキップボタン（bg-white/15 text-white。skipped の amber は維持）。詳細ボタンは success の実塗り CTA として可読なので維持。light/dark 両テーマは「写真＋黒スクリム＋白文字」で共通に成立。タップ操作性は onClick/z-10 維持で不変。
+- **完了状態の表現**: 従来どおり緑のチェック丸（StatusIndicator の `bg-success`＋白チェック＋祝福アニメ）を完了インジケータとして残置。競合していた緑の枠（ImpactBadge/SavingsCard/Card border）を除いたことで、写真の上でチェック丸が完了サインとして自然に立つ。スクリム濃度を完了で可変にする案は検討したが、展開コンテンツの可読性を優先し均一スクリムを維持（チェック丸で表現）。
+- 対象外: EstablishedSection は独自 Card（HabitCard 非使用）のため不変。習慣詳細モーダルの ImpactBadge/SavingsCard は default surface で従来表示。
+- テスト: evidence-collage.test.ts の F15 スクリム判定を `bg-black/NN` に更新し、F17 の describe を追加（背景が Card 直下＝collapsed 行より前／border-0／展開ボディ relative z-10／surface prop 配線／onImage で border-white/20）。全 785 テスト PASS、tsc clean、lint 0 error、build 成功。
