@@ -216,6 +216,9 @@
     "quit": "Quit",
     "build": "Build",
     "addHabit": "この習慣を追加",
+    "createFromScratch": "ゼロから習慣をつくる",
+    "createFromScratchSub": "自分の習慣を自由に設計する",
+    "sortLead": "伸ばしたい指標を選ぶと、効果が大きい順に並びます",
     "perDay": "/日",
     "perYear": "/年",
     "confidence": {

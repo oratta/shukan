@@ -216,6 +216,9 @@
     "quit": "Quit",
     "build": "Build",
     "addHabit": "Add this habit",
+    "createFromScratch": "Build a habit from scratch",
+    "createFromScratchSub": "Design your own habit freely",
+    "sortLead": "Pick a metric to grow — habits reorder by their impact on it",
     "perDay": "/day",
     "perYear": "/year",
     "confidence": {

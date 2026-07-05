@@ -121,3 +121,13 @@
 - 非対象: stats / savings-card / impact-badge / 記事シート等の他の表示箇所は「> 0 のみ表示」（D-change3-2）を維持。触っていない。
 - hasImpact ガード（`totalMood > 0` を含む OR）は据え置き。全KPIが0の習慣構成では従来どおりカード自体を非表示。
 - テスト: impact.test.ts に F10 の回帰テスト2件追加（dailyPositiveMood を描画する／`positiveMoodMinutes > 0` ガードを持たない）。全 762 テスト PASS、tsc clean、lint 0 error、build 成功。
+
+## D-feedback-7: Discover を「オンボ中心」に刷新（F11〜F14）
+- 追加フィードバック（2026-07-03）: Discover をオンボ（KPI選択→インパクト順）に寄せて刷新。ユーザーこだわりポイント。
+- **F11（KPI 4軸）**: KPI セレクタ・カードのラベルは `impact.*`（dailyHealth/dailyPositiveMood/dailyCost/dailyIncome）を再利用した。理由: これらの値が既に「健康寿命/前向きな気持ちの時間/出費削減/増える収入」の正式名であり、F11 の「KPI 正式名」要件と mood-axis-display.test.ts（discover が `dailyPositiveMood` ラベルを参照する制約）を同時に満たす。onboarding.kpi.*.name とは別ソースだが同一文字列。アイコンはオンボと同じ KpiIcon（heart-pulse/smile/piggy-bank/trending-up）。
+- **F12（カード刷新）**: 旧 Notion 風タイル（bg-card 白タイル＋h-28画像＋下に本文）を廃止。写真を card 全面（h-44・2カラム）に敷き、`bg-gradient-to-t from-black/85` オーバーレイ＋白文字（習慣名 line-clamp-2＋KPIチップ）を下部に重ねる写真主役デザイン。信頼度は写真上の半透明バッジ。ダークモード: カードは写真＋黒オーバーレイ＋白文字で light/dark 共通に成立（テーマ非依存）。周辺 UI（＋ボタン/KPIピル）は既存トークン（border/bg-card/primary/muted-foreground）で light/dark 両対応。
+- **F13（KPI選択→ソート）**: 上部に KPI ピル4つ（横スクロール・選択時 primary リング）。選択で `sortedArticles` を選んだ KPI の calculationParams（per-day）降順に安定ソート（同値は元順維持）。既定は健康寿命。Quit/Build の2セクション分割は廃止し単一グリッドに統合（オンボの KPI 中心導線に合わせる）。効果0の記事は下位に並ぶが全件表示（カタログ閲覧性を保つ／オンボ[6]のような0除外はしない）。カードのインパクト数値は既存の annual（calculateAnnualImpact＋formatHealthMinutes/formatCurrency）を維持し、チップは値>0のKPIのみ表示・選択中KPIチップを強調（`bg-white/20`）。オンボ[4]とは表示単位が異なる（Discover=年額、オンボ=生涯）ため formatter は据え置き、"トーン"（アイコン＋"+数字"チップ）のみ踏襲。
+- **F14（＋ボタン）**: 最上部に大きな＋ボタン（Plus＋discover.createFromScratch/Sub）。押下で既存 HabitForm を新規作成モード（prefilledEvidences=[]・name 空）で起動。新規フォームは作らず既存コンポーネント再利用。
+- メッセージ: discover.createFromScratch / createFromScratchSub / sortLead を ja/en に追加。旧 discover.quit/build は未使用化したが無害のため残置。
+- テスト: discover-page.test.ts を新規追加（F11 4KPIキー＋impact.*ラベル参照／F12 写真オーバーレイ・旧h-28タイル不在／F13 selectedKpi＋sort＋calculationParams[param]／F14 handleCreateFromScratch＋Plus＋createFromScratch／新メッセージキー ja/en）。mood-axis-display.test.ts（discover の dailyPositiveMood 参照）は維持で PASS。全 772 テスト PASS、tsc clean、lint 0 error、build 成功。
+- 未実施: ブラウザ視覚確認は Chrome 選択の対話プロンプトが自律実行をブロックするため見送り。ログイン済みセッションで /discover の目視推奨。
