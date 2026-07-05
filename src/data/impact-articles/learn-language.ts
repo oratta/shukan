@@ -56,6 +56,7 @@ export const learnLanguage: LifeImpactArticle = {
     dailyHealthMinutes: 6,
     dailyCostSaving: 200,
     dailyIncomeGain: 1800,
+    // positiveMood 0: 生産性・時間創出の効果は増える収入/健康寿命で計上済み。前向きな気持ちの時間への独立した一次エビデンスに乏しく、二重計上回避のため 0 のままとする。
     dailyPositiveMoodMinutes: 0,
   },
 

@@ -1,0 +1,178 @@
+# Decisions: 2026-07-03_impact-3scene
+
+## D-exec-1: Verify フェーズの verifier モデルは sonnet 一本化
+- plan.md のモデル割り当ては change-1 の verifier のみ haiku、change-2〜5 は sonnet。
+- 生成 Workflow の Verify ループは全 change 完了後の一括検証であり、change 単位の verifier 切替点が存在しない（テンプレートの `__VERIFIER_MODEL__` はグローバル 1 値）。
+- 多数派かつ一括検証の内容（UI・ブラウザ検証を含む）に適合する **sonnet** を静的/ブラウザ両 verifier に採用。change-1 の haiku 指定は反映されないが、検証が過剰品質になる方向のズレであり安全側。
+
+## D-exec-2: builder/reviewer は inherit（opts.model 未指定）
+- plan.md の指定どおり。inherit のためセッションモデル（Fable 5）が使われる。plan の理由欄にある「実装系 subagent は Opus」フィードバックは「セッションモデル以上の実装系モデルを使う」意図であり、Fable 5 継承はこれを満たす。
+
+## D-change1-1: en の evidence.feedback* ラベルも正準 KPI 名に統一
+- plan.md change-1 スコープは ja の evidence.feedbackCost/Income を明記するが、en 側は「impact.* と onboarding.kpi.* の統一」としか書いていない。
+- しかし en evidence.feedbackCost/Income/Health は旧名（Cost Savings / Income Gain / Health Lifespan）を含み、KPI ラベルを含む UI 文言である。ルール「旧名・言い換え・造語を残さない」に従い、en evidence.feedback* も正準（Cost saving / Income Growth / Healthy lifespan）に統一した。低リスクかつ一貫性を担保する方向。
+
+## D-change1-2: LP alt テキストは旧軸名を正準 4 KPI 名に置換し、Detail の個別数値は削除
+- Process.tsx / Detail.tsx の alt に旧軸名（生涯コスト / 可処分時間 / 集中時間）が残存していた。これらは現行 4 KPI（健康寿命・出費削減・増える収入・前向きな気持ちの時間）と不一致。
+- 選択肢: (a) 軸名だけ置換し数値は流用, (b) 数値ごと 4 KPI にマッピングして新数値を発明, (c) 軸名を正準 4 KPI に置換し検証できない個別数値は削除。
+- Detail の旧 alt は軸ごとに具体数値（+2.4 年 / -820 万円 / +1,440 時間 / +2.1 時間/日）を持つが、現行 4 KPI へ 1:1 対応せず、増える収入・前向きな気持ちの時間の数値の根拠がない。数値を発明する (b) はエビデンス基準に反する。
+- alt はスクリーンショット画像のアクセシビリティ説明であり「数値カード 4 つ + 上昇トレンドグラフ」で画像の構造は十分伝わる。よって (c) を採用（可逆的・YAGNI・根拠なき数値を置かない）。Process の alt は元々数値なしのため軸名置換のみ。
+
+## D-change2-1: 全部100%対比は buildFullPotentialSelections で達成率=1 を渡すだけ（新規計算なし）
+- plan.md change-2 ルール「新規計算ロジックを作らない。diagnosis-v3 の既存関数に達成率パラメータを渡すだけ」に従う。
+- 選択肢: (a) diagnosis-v3 に専用の「100%ポテンシャル集計」関数を新設, (b) コンポーネント内で inline に selections を rate=1 へ map, (c) onboarding.ts に純粋関数 `buildFullPotentialSelections` を追加し `computeDiagnosisV3` に渡す。
+- (a) は既存 API 増設で過剰（YAGNI 違反）、(b) は TDD 単体テストが書きにくい。回答済み習慣集合の決定は既に `buildDiagnosisSelections` が担うため、その出力を rate=1 に写像する薄い純粋関数 (c) が最小・テスト容易・可逆。→ (c) 採用。
+
+## D-change2-2: [4]→[5] 導線は result.cta を KPI 選択誘導に変更（既存テストも更新）
+- [5] は KPI 選択（何を充実させたいか）だが、旧 cta「習慣を選びに進む」は習慣選択([6])を指し不一致。plan タスク B「[4]→[5] 導線文言調整」に従い ja「大切にしたいことを選ぶ」/ en「Choose what matters most」へ変更。
+- 旧文言を固定していた `onboarding-messages.test.ts` の期待値も本 change で新文言に更新（plan が明示的に変更を要求するため、リグレッションではなく仕様変更）。
+- result.lead も「今のペースと全部100%の差＝伸びしろ」を示す文言に更新（対比表示の意味づけを揃える）。
+
+## D-change3-1: 受け入れ条件 #9 は「値入れ」ではなく「精査＋0据え置き理由の明記」で満たす
+- plan.md change-3 スコープは「29記事に値入れ」と読める記述だが、これは plan 執筆時点（値0が29本）のもの。現状は先行 change（kpi-data-foundation / onboarding-v3）で代表12本に既に値＋算出根拠（inferences.positiveMood・calculationLogic.positiveMood）が入っており、値0は26本。
+- 既存テスト `calculation-logic.test.ts` の A-S7 が「値 > 0 の記事は 9〜12本（『10記事程度』の上限ガード <= 12）」を固定しており、二重計上回避（起床16h×前向き50%=480分/日の共有ベースラインに対し、全習慣が上乗せすると総和が非現実的になる）を design invariant として encode している。
+- 選択肢: (a) 26本すべてに値を入れる（既存テストの <=12 を破り、二重計上invariantに反する）, (b) 上限テストを緩めて値を増やす（先行mergeの design 判断を覆すスコープ拡大・リスク）, (c) 値 > 0 は代表12本に据え置き、値0の26本は「一次mood効果が独立して確立せず、効果は他KPIで計上済み＝二重計上回避」の理由コメントを付けて精査済みとする。
+- 受け入れ条件 #9 は「値 > 0、または 0 のままの理由コメント付き」であり (c) で充足。change-3 ルール「根拠なしに値を置かない」「二重計上回避」にも合致。可逆的・保守的・YAGNI により (c) を採用。marker `positiveMood 0:` を付与し、テストで全0記事に理由コメントがあることを固定した。
+
+## D-change3-2: 4軸目は値 > 0 のときのみ描画（0=未設定は非表示）
+- `dailyPositiveMoodMinutes` の型コメントが「0 = 未設定（UI 非表示判定に使える）」と定義済み。
+- 選択肢: (a) 常時4軸表示（0 のとき「+0分」を出す）, (b) 値 > 0 のときのみ4軸目を描画。
+- (a) は mood 値を持たない大多数の習慣で「+0分」のノイズが出て情報密度を下げる。(b) は既存の型セマンティクスに従い、mood をエビデンスとして持つ習慣でのみ4軸目が現れる。9箇所すべてで (b)（`> 0` 条件レンダリング）を採用。集計系（daily-impact-summary / savings-card / stats total / evidence-manager 合計）は合算値 > 0 のとき表示。
+- アイコンは lucide `Smile` で4軸目を統一（PartyPopper は perfect 演出で使用済みのため回避）。
+
+## D-change4-1: established 除外は純粋述語 `isDailyTrackedHabit` / `isEstablishedHabit` で一元化
+- plan.md change-4 は「既存コードは habit.status で一切フィルタしていない。この change が最初の分岐導入者。除外方針を habits.test.ts にケース追加して固定」を要求。
+- 選択肢: (a) 各ページ（home / stats）で `h.status !== 'established'` をインライン記述, (b) `shouldShowToday` を established 除外に変更（既存の意味を上書き）, (c) 純粋述語 `isDailyTrackedHabit`（!archived && status!=='established'）と `isEstablishedHabit`（!archived && status==='established'）を lib/habits.ts に追加し全消費点で共有。
+- (a) は分岐が散在しテスト不能、(b) は shouldShowToday の既存セマンティクス（!archived）を破壊し他消費点に波及。(c) は単一の純粋関数でテスト固定でき、home のデイリーリスト・PWA day-status・DailyImpactSummary・yesterday review・stats 集計すべてが同一述語を参照する。→ (c) 採用（YAGNI・テスト容易・非破壊）。shouldShowToday は後方互換のため据え置き。
+
+## D-change4-2: established の生涯効果は per-day 効果を diagnosis-v3 horizon に流し込む（新規計算なし）
+- plan.md change-4 は established セクションに「オンボと同形式」の生涯効果を要求。オンボ診断はプリセット由来（presetPerTimeEffectValue）だが、ユーザー習慣は evidences（articleId）由来で per-day 効果の取得経路が異なる。
+- 選択肢: (a) established 用に専用の生涯計算を新設, (b) 習慣の evidences をプリセットへ逆マッピングして habitPotentialV3 を再利用, (c) evidences の per-day 効果（既存 `calculateDailyImpact`）を diagnosis-v3 の horizon/表示単位ロジック（`kpiRawValue` rate=1 + `formatKpiValue`）へ流す薄い関数 `computeHabitLifetimeEffect` を追加。
+- (a) は horizon/単位の二重定義でオンボと乖離リスク、(b) は evidence→preset の一意な逆写像が存在せず破綻。(c) は表示単位・horizon をオンボ[4]と完全共有し、per-day 取得のみ習慣側（calculateDailyImpact）に委譲する最小差分。→ (c) 採用。profile 引数は default null（V2 既定=残り寿命40年）でフォールバックし、change-5 で個人化を接続する拡張点を残した。
+
+## D-change4-3: status 手動トグルは編集時のみ・自動昇格なし
+- plan.md change-4 rule「established の自動昇格提案・卒業演出を実装しない（手動設定のみ）」。
+- HabitForm は add/edit 兼用だが、新規作成時に「完全に身についた」を出すのは意味的に不自然（達成実績ゼロの習慣を established にするユースケースが薄い）。`initialData` があるとき（=編集時）のみトグルを描画し、onSubmit で `status: established ? 'established' : 'active'` を渡す。updateHabitById は既に status 更新に対応済みのため配線のみ。可逆・YAGNI。
+
+## D-change5-1: tracked_kpis 未設定は全4 KPI にフォールバック（純粋関数 resolveTrackedKpiDefinitions）
+- plan.md change-5 rule「プロフィール未設定ユーザーには現行のデフォルト値でフォールバックし、エラーにしない」。
+- onboarding は完了時に tracked_kpis へ全4軸を書き込む（onboarding.ts D5）が、未オンボ／行なし／不正キー混入のケースがある。
+- 選択肢: (a) 未設定時は何も表示しない, (b) 未設定時は全4 KPI を表示, (c) 未設定時はエラー表示。
+- (c) はルール違反。(a) はホームの「大切にしていること」が空になり情報価値ゼロ。(b) は「まだ絞り込んでいない＝全部大切」の自然な既定で、KPI カタログ順を保つ純粋関数 `resolveTrackedKpiDefinitions`（不正キー除外＋空/null は全4）に集約しテスト固定。→ (b) 採用（YAGNI・非エラー・テスト容易）。
+
+## D-change5-2: プロフィール読み書きは useProfile フックに集約し、表示/編集コンポーネントは props 受け取り
+- ホーム（tracked_kpis 表示・established 個人化）と設定（編集）の両方が user_profiles を必要とする。
+- 選択肢: (a) 各ページで直接 fetchUserProfile/upsert を呼ぶ, (b) Context Provider を新設, (c) useHabits と同型の useProfile フック（fetch on mount＋save）を追加し、TrackedKpisCard/ProfileEditor は profile/onSave を props で受ける。
+- (a) は読み書きロジックが散在しテスト不能。(b) は Provider 追加が過剰（2画面のみ・YAGNI 違反）。(c) は既存 useHabits パターンと一貫し、コンポーネントは純粋 props で tree-walk/grep テスト可能。→ (c) 採用。ProfileEditor に onSave を注入することで Supabase 依存を画面側に閉じ込め、コンポーネントは表示ロジックのみに。
+
+## D-change5-3: 設定のプロフィール編集は「生年」直接入力（オンボの age 入力とは差異を許容）
+- plan.md change-5 スコープ／AC#13 は「生年・性別・収入・KPI 選択」を明示。オンボ[1]は age 入力→birthYear 変換。
+- 選択肢: (a) オンボと同じ age 入力にする, (b) plan の記述どおり birthYear 直接入力, (c) オンボの inline フィールドを共通コンポーネントに抽出して両者で再利用。
+- (c) は 773 行の wizard から inline フィールドを剥がす破壊的リファクタで、他 change 完了後の低リスク方針に反する。(a) は plan の「生年」記述と乖離。(b) は plan/AC に忠実で、UserProfile.birthYear と直結し変換不要（余計な派生を挟まない）。「オンボ入力 UI のコンポーネント再利用を基本方針」は満たせないが、ボタン選択・万円入力などの入力パターン（見た目・操作トーン）は踏襲した。→ (b) 採用（plan 忠実・可逆・非破壊）。
+
+## D-change5-4: established 個人化は既存 computeHabitLifetimeEffect に profile を渡す配線のみ
+- computeHabitLifetimeEffect は change-4 で既に profile 引数（default null → V2 既定値）を持ち、health_lifespan を remainingLifeExpectancy で個人化する。
+- 新規計算は不要。ホームが useProfile の profile を EstablishedSection→computeHabitLifetimeEffect に流すだけで AC#14 を満たす。cost_saving/earning は per-day×240 日で profile 非依存（現行仕様維持）。プロフィール未設定は resolveDerivedProfileValues(null)=残り寿命40年でフォールバックしエラーにしない。→ 配線のみ・非破壊。
+
+## D-change5-5: update RLS ポリシーは既存 migration に存在（追加マイグレーション不要）
+- plan.md change-5 rule「設定画面からの user_profiles UPDATE 前に update RLS ポリシーの存在を確認する」。
+- `supabase/migrations/20260612010000_user_profiles.sql` に "Users can update own profile"（for update / using auth.uid()=user_id / with check 同）が既に定義済み。オンボ書き込み実績どおり存在。→ マイグレーション追加不要。テストで migration に `for update` が含まれることを固定した。
+
+## D-change5-6: プロフィール保存の失敗ハンドリングと読み込み中インジケータ（Verify round1 静的FAIL 修正）
+- 課題: (1) useProfile.save の re-throw を ProfileEditor.handleSave が catch しておらず、ネットワークエラー/RLS 拒否時に unhandled rejection となりユーザーへ失敗が伝わらない。(2) settings ページは profileLoading 中に ProfileEditor を非表示にするだけで可視インジケータが無く「編集欄が無い」ように見え、後から急に現れる。
+- 選択肢比較:
+  - A) useProfile.save 内で catch して null 返却 → UI 側で成否判定できず、成功と失敗を区別できない。却下（可観測性が下がる）。
+  - B) ProfileEditor.handleSave に try/catch を追加し saveError state で settings.profileSaveError を表示 → 保存 UI と同じ場所でユーザーに失敗を可視化でき、二重送信ガード（saving）も維持。採用（UI 層でエラー表示するのが責務として自然）。
+  - C) トースト/グローバル通知基盤を新設 → YAGNI。既存にトースト基盤なし。却下。
+- ローディング: 既存の共通スピナー（size-8 animate-spin rounded-full border-2 border-primary border-t-transparent、home/stats/ReviewCalendar と同一）を Card 内に配置。role="status" + aria-label=common.loading でアクセシビリティ確保。
+- メッセージ: settings.profileSaveError を ja/en に追加（成功時 profileSaved と対）。
+- TDD: profile-app-connection.test.ts に 4 テスト追加（catch 配線 / profileSaveError 配線 / profileLoading→animate-spin / profileSaveError キー存在）。RED 4件→実装→GREEN。全 753 テスト PASS、lint 0 error、tsc clean、build 成功。
+
+## D-feedback-1: [4]結果は「単一対比カード」から「KPIごとの説明セクション＋まとめ」構成へ（F1〜F4）
+- ユーザーフィードバック（2026-07-03）: [4] は 4KPI を 1 カードの対比テーブルに詰め込んでいたが、(a) 全部100%列の見出しラベル・値の単位が 375px 幅で改行して崩れる（F1）、(b) 各 KPI の重要性（特に健康寿命・前向きな気持ちの時間）が数字だけでは腹落ちしない（F4）。「この画面はこだわりたい」。
+- 採用構成: 見出し（F3 で「あなたの習慣がもたらすインパクト」に変更）→ リード → **KPIごとの独立セクション ×4**（アイコン＋KPI名＋説明文 body＋「身についてない人と比べて / 全部100%身についたら」の2値対比）→ **4KPIまとめ**（縮約対比・F1 の折り返し対策）→ 身についている習慣リスト → CTA。
+- F1 の折り返し対策: 崩れの原因は固定幅列（w-20/w-24）に長い見出し「全部100%身についたら」と「+127万円/年」が収まらず wrap していたこと。まとめは (1) 列見出しを撤去し `currentLabel ／ fullLabel` の凡例 1 行（段落として自然折り返し）に置換、(2) 値は `whitespace-nowrap tabular-nums`、名前は `flex-1 truncate` で可変幅にした。セクション内の 2 値も grid-cols-2 の各セルで `whitespace-nowrap`。375px でラベル11字×11px≒100px が半幅セルに収まる。
+- F2: 列ラベル「今のペースなら」→「身についてない人と比べて」。診断は未来のみ加算モデル（非実践者=0 基準）なので、現在ペース値＝習慣なしと比べた増分であり意味的にも整合する。en は "vs. someone without these habits"。
+- F4 説明文: エビデンス規律に従い数値・過剰断定を body に含めず（証明/必ず を禁止語としてテスト固定）、「研究で示されています」トーンに統一。数字は既存 diagnosis-v3 の result/fullResult 表示値のみ（新規計算なし）。健康寿命・前向きな気持ちの時間を重点説明（前向きは既存 kpiSelect/記事データの支持範囲＝健康・生産性・人間関係との関連に限定）。造語なし（KPI 名はカタログ4語のみ）。
+- 0 値の扱い: cur/full の raw<=0 は「—」表示（+0 のノイズを避ける。D-change3-2 の 0=非表示方針と整合）。セクション自体は教育目的で 4 つとも常時表示。
+
+## D-feedback-2: [4]習慣リストのアイコン・効果値・エビデンス記事（F5/F6）
+- F5: answeredHabits（rate>0）の各行に preset.icon（KpiIcon）＋主要KPI（primaryKpis[0]）の生涯ポテンシャル値（habitPotentialV3 の達成率100%基準・既存関数の再利用、新規計算なし）を表示。KpiIcon の ICON_MAP に不足していたオンボ15習慣のアイコン（dumbbell/salad/glass-water/hamburger/soup/pen-line/message-circle-heart）を追加（未登録は Sparkles にフォールバックしていた）。
+- F6: 行タップで**既存の EvidenceArticleSheet**（アプリ本体の Discover/Home で使用中・articleId を受け取る bottom sheet）を preset.articleIds[0] で開く。新規記事UIは作らない。affordance は ChevronRight＋hover:border-primary/40＋active:scale。ImpactArticleSheet（habit を要求する Dialog）ではなく EvidenceArticleSheet を選択した理由: オンボ時点で habit レコードは未作成で articleId のみ手元にあるため、articleId を直接受ける後者が適合。
+- TDD: onboarding-impact-sections.test.ts を新規追加（kpiSections body の存在/長さ/健康寿命・前向きの枠組み語/過剰断定不在、summaryLabel等の存在、15習慣のアイコン・主要KPI・先頭記事の解決）。onboarding-messages.test.ts の title/currentLabel 期待値を新文言へ更新。全 760 テスト PASS、tsc clean、lint 0 error、build 成功。
+
+## D-feedback-3: [4]習慣リストの効果値を主要KPI1つ→効果を持つ全KPIのコンパクト表示へ（F7）
+- 追加フィードバック（2026-07-03）: F5 で出した習慣リストの効果値が「主要KPI（primaryKpis[0]）1つ」だけだったが、その習慣が効くKPIすべての数字を見たい。表示スペースは限られるので「KPIアイコン＋'+数字'」の横並びでよい、値0のKPIは出さない。
+- 実装: answeredHabits の各行で habitPotentialV3（既存・達成率100%基準）の byKpi を KPI_CATALOG 順に走査し raw>0 のものだけ {icon, display, unit} を抽出（effects 配列）。行内で flex-wrap の小さなチップ（KpiIcon size-3.5＋`+{display}{unit}`）として横並び表示。新規計算・新規フォーマッタは作らず formatKpiValue 済みの display/unit を再利用。primaryKpis への依存を撤廃（複数KPIに効く習慣＝daily_cardio 等で健康寿命＋前向きが並ぶ）。
+- TDD: onboarding-impact-sections.test.ts に2件追加（複数KPIに効く習慣は raw>0 が2軸以上／効果を持たないKPIは raw=0 で除外可能）。
+
+## D-feedback-4: [4]→[5] CTA を「次へ」に簡素化（F8）
+- 追加フィードバック（2026-07-03）: result.cta「大切にしたいことを選ぶ」→「次へ」（en: "Next"）。onboarding-messages.test.ts の期待値を更新。onboarding-future-contrast.test.ts の「習慣を選びに進む でない・非空」制約は「次へ」で引き続き満たす。全 762 テスト PASS、tsc clean、lint 0 error、build 成功。
+
+## D-feedback-5: AC#12（ホームに tracked_kpis 表示）はユーザー判断で撤回。ホームの TrackedKpisCard を削除（F9）
+- 追加フィードバック（2026-07-03）: change-5 で追加した「あなたが大切にしていること」カード（TrackedKpisCard・user_profiles.tracked_kpis の表示）は「意図がわからない、不要」との判断。
+- **plan.md 受け入れ条件 #12「ホームに user_profiles.tracked_kpis の KPI が表示される」はユーザー判断で撤回**する。ホームでの tracked_kpis 表示は不要。ただし **tracked_kpis の編集機能は設定画面（ProfileEditor）に残置**（AC#13 は維持）。
+- 実装: `src/app/(app)/page.tsx` から TrackedKpisCard の import と描画を削除。`useProfile`/`profile` は EstablishedSection の個人化（D-change5-4）でまだ使うため残置。TrackedKpisCard は他に参照がないためコンポーネント本体（tracked-kpis-card.tsx）を削除。純粋関数 `resolveTrackedKpiDefinitions` は profile-settings.ts（設定保存の正規化）が使い続けるため残置。
+- テスト: profile-app-connection.test.ts の「ホームが TrackedKpisCard を描画する」describe と「TrackedKpisCard は tracked_kpis を描画する」describe（削除ファイルを readSource するため放置すると即失敗）を削除し、「ホームに TrackedKpisCard が残っていない（F9）」＋「useProfile を配線」の回帰テストに置換。resolveTrackedKpiDefinitions の単体テスト（Scenario 5-1）は関数が残るため維持。message キー `habits.trackedKpisTitle` は現状 orphan だが無害のため残置（撤去はスコープ外）。
+
+## D-feedback-6: DailyImpactSummary（今日の Life Impact）は4軸目を常時表示（F10）
+- 追加フィードバック（2026-07-03）: ホームの「今日の Life Impact」に KPI が3つしか出ない。原因は D-change3-2 の「mood 合算値 > 0 のときのみ表示」。
+- 変更: **DailyImpactSummary に限り**、今日ブロック・5日間ブロックの両方で mood 軸（前向きな気持ちの時間）の `positiveMoodMinutes > 0` ガードを撤去し、値0でも「+0分」で他3軸と同じ見た目で常時表示。今日/5日間の見た目を揃えるため両ブロックを変更。
+- 非対象: stats / savings-card / impact-badge / 記事シート等の他の表示箇所は「> 0 のみ表示」（D-change3-2）を維持。触っていない。
+- hasImpact ガード（`totalMood > 0` を含む OR）は据え置き。全KPIが0の習慣構成では従来どおりカード自体を非表示。
+- テスト: impact.test.ts に F10 の回帰テスト2件追加（dailyPositiveMood を描画する／`positiveMoodMinutes > 0` ガードを持たない）。全 762 テスト PASS、tsc clean、lint 0 error、build 成功。
+
+## D-feedback-7: Discover を「オンボ中心」に刷新（F11〜F14）
+- 追加フィードバック（2026-07-03）: Discover をオンボ（KPI選択→インパクト順）に寄せて刷新。ユーザーこだわりポイント。
+- **F11（KPI 4軸）**: KPI セレクタ・カードのラベルは `impact.*`（dailyHealth/dailyPositiveMood/dailyCost/dailyIncome）を再利用した。理由: これらの値が既に「健康寿命/前向きな気持ちの時間/出費削減/増える収入」の正式名であり、F11 の「KPI 正式名」要件と mood-axis-display.test.ts（discover が `dailyPositiveMood` ラベルを参照する制約）を同時に満たす。onboarding.kpi.*.name とは別ソースだが同一文字列。アイコンはオンボと同じ KpiIcon（heart-pulse/smile/piggy-bank/trending-up）。
+- **F12（カード刷新）**: 旧 Notion 風タイル（bg-card 白タイル＋h-28画像＋下に本文）を廃止。写真を card 全面（h-44・2カラム）に敷き、`bg-gradient-to-t from-black/85` オーバーレイ＋白文字（習慣名 line-clamp-2＋KPIチップ）を下部に重ねる写真主役デザイン。信頼度は写真上の半透明バッジ。ダークモード: カードは写真＋黒オーバーレイ＋白文字で light/dark 共通に成立（テーマ非依存）。周辺 UI（＋ボタン/KPIピル）は既存トークン（border/bg-card/primary/muted-foreground）で light/dark 両対応。
+- **F13（KPI選択→ソート）**: 上部に KPI ピル4つ（横スクロール・選択時 primary リング）。選択で `sortedArticles` を選んだ KPI の calculationParams（per-day）降順に安定ソート（同値は元順維持）。既定は健康寿命。Quit/Build の2セクション分割は廃止し単一グリッドに統合（オンボの KPI 中心導線に合わせる）。効果0の記事は下位に並ぶが全件表示（カタログ閲覧性を保つ／オンボ[6]のような0除外はしない）。カードのインパクト数値は既存の annual（calculateAnnualImpact＋formatHealthMinutes/formatCurrency）を維持し、チップは値>0のKPIのみ表示・選択中KPIチップを強調（`bg-white/20`）。オンボ[4]とは表示単位が異なる（Discover=年額、オンボ=生涯）ため formatter は据え置き、"トーン"（アイコン＋"+数字"チップ）のみ踏襲。
+- **F14（＋ボタン）**: 最上部に大きな＋ボタン（Plus＋discover.createFromScratch/Sub）。押下で既存 HabitForm を新規作成モード（prefilledEvidences=[]・name 空）で起動。新規フォームは作らず既存コンポーネント再利用。
+- メッセージ: discover.createFromScratch / createFromScratchSub / sortLead を ja/en に追加。旧 discover.quit/build は未使用化したが無害のため残置。
+- テスト: discover-page.test.ts を新規追加（F11 4KPIキー＋impact.*ラベル参照／F12 写真オーバーレイ・旧h-28タイル不在／F13 selectedKpi＋sort＋calculationParams[param]／F14 handleCreateFromScratch＋Plus＋createFromScratch／新メッセージキー ja/en）。mood-axis-display.test.ts（discover の dailyPositiveMood 参照）は維持で PASS。全 772 テスト PASS、tsc clean、lint 0 error、build 成功。
+- 未実施: ブラウザ視覚確認は Chrome 選択の対話プロンプトが自律実行をブロックするため見送り。ログイン済みセッションで /discover の目視推奨。
+
+## D-feedback-8: ホームのデイリー習慣カード背景にエビデンス画像の等分割コラージュ（F15）
+- 追加フィードバック（2026-07-03）: デイリーチェックリストの各習慣カード背景に、紐づく evidence 記事画像（Discover と同じソース）を敷く。複数 evidence は等分割コラージュ。
+- **画像ソースの共有**: Discover の HERO_IMAGES を `src/data/evidence-hero-images.ts`（EVIDENCE_HERO_IMAGES＋getEvidenceHeroImage）に切り出し、Discover と HabitCard で共有（URL は byte-identical なので Discover の出力は不変＝純粋リファクタ）。evidence-article-sheet.tsx の別コピー（w=800）は既存挙動維持のため今回は統合せず据え置き。
+- **分割コラージュの実装**: collapsed 行を `relative overflow-hidden` にし、背景に `absolute inset-0 flex` を敷いて各画像を `flex-1 object-cover` で等幅の縦スライスに並べる（2枚=左右50/50、3枚=1/3ずつ、4枚=1/4ずつ）。横長・低背の行に対しては 2×2 グリッドより縦スライスの方が各写真が視認でき破綻しにくいと判断し、全枚数で縦スライスに統一。
+- **上限**: `MAX_COLLAGE_IMAGES = 4`。5枚以上の evidence を持つ習慣は先頭4枚のみ（等分割が細くなり見た目が破綻するため打ち切り、超過分は省略）。
+- **可読性/トーン**: Discover(F12) と同じく `bg-gradient-to-r from-black/80 via-black/60 to-black/45` オーバーレイを重ね、collapsed 行のコンテンツを `relative z-10` の内側 flex に移して前面化。テキストは hasEvidenceBg 時に白系（名前=text-white+drop-shadow・曜日/頻度ラベル=white/70〜80・chevron=white/80・ドラッグハンドル=white/50）へ切替。ステータス円（緑/赤）とチェック完了演出は写真上でも視認でき、完了/スキップの視覚差は保たれる。写真＋黒オーバーレイ＋白文字で light/dark 両テーマ共通に成立（タップ操作性は onClick/z-10 維持で不変）。
+- **フォールバック**: 画像を1枚も持たない習慣（ゼロから作ったカスタム習慣等）は hasEvidenceBg=false で従来の通常カード表示のまま。
+- **established セクションは対象外（自然に）**: EstablishedSection は HabitCard ではなく独自の `<Card>`（HabitIcon ベース）で描画するため、HabitCard への今回の変更は波及せず established は自動的に対象外。デイリーチェックリスト（HabitList→HabitCard）にのみ適用。
+- テスト: evidence-collage.test.ts を新規追加（共有画像の getter／Discover が同一共有モジュールを使う／HabitCard の getEvidenceHeroImage・MAX 4・slice・flex-1 object-cover・from-black オーバーレイ・hasEvidenceBg フォールバック配線）。全 778 テスト PASS、tsc clean、lint 0 error（warning は既存＋コラージュ img の1件増のみ）、build 成功。
+
+## D-feedback-9: 習慣インパクト表示（ImpactBadge）も4軸目を常時表示（F16）
+- 追加フィードバック（2026-07-03）: ホームで習慣カードを展開したときのインパクト表示が3軸のまま。F10 と同方針で「前向きな気持ちの時間」を4軸目として値0でも常時表示。
+- 対象コンポーネント: 展開時のインパクトは `ImpactBadge`（habit-card.tsx の展開ボディで `<ImpactBadge evidences mode="daily" />`）。`values.positiveMoodMinutes > 0 &&` ガードを撤去し、他3軸と同じ `flex flex-col` レイアウト・`text-success`・`dailyPositiveMood` ラベルで常時描画（+0分表示可）。
+- **スコープ判断**: ImpactBadge は共有部品で、ホーム展開（habit-card）と習慣詳細モーダル（habit-detail-modal）の2箇所で使用。どちらもユーザー自身の習慣インパクト表示のため、prop 分岐を足さず ImpactBadge 自体を常時4軸に統一（React ベストプラクティス: 一様であるべき挙動に boolean prop を増やさない）。習慣詳細モーダルにも同じ4軸表示が自然に適用される（同一部品・整合的）。
+- 非対象: DailyImpactSummary は F10 で対応済み。stats / savings-card / 記事シート（evidence/impact article sheet）等の他の表示箇所は現行の「> 0 のみ」を維持（触っていない）。D-change3-2 の invariant は「ユーザー自身の習慣インパクト表示（DailyImpactSummary・ImpactBadge）に限り常時表示」へと F10/F16 で部分的に上書き。
+- テスト: impact.test.ts に F16 の回帰テスト2件追加（impact-badge が dailyPositiveMood を描画／`positiveMoodMinutes > 0` ガードを持たない）。mood-axis-display.test.ts（impact-badge の dailyPositiveMood 参照）は維持で PASS。全 780 テスト PASS、tsc clean、lint 0 error、build 成功。
+
+## D-feedback-10: 習慣カード展開時もコラージュ背景を維持し、緑枠を廃して写真前提にUI調整（F17）
+- 追加フィードバック（2026-07-03）: F15 の背景を展開時も維持／緑の枠を消す／写真前提で展開UIを調整。
+- **背景をカード全体へ**: コラージュ＋スクリムを collapsed 行の内側から `<Card>` 直下（`absolute inset-0`）へ移動。展開してカードが伸びても `inset-0` が全高を覆い、展開ビュー全体が写真の上に載る。collapsed 行・展開ボディはともに `relative z-10` で前面化。
+- **スクリム**: 展開時は縦に長くなるため、方向性グラデーション（from-black 下寄せ）ではなくカード全体を均一に覆う `bg-black/60` フラットスクリムに変更（全高でテキスト可読性を確保）。
+- **緑の枠を廃止**: (1) Card の枠 → hasEvidenceBg 時 `border-0` で除去（写真をカード端まで）。(2) 展開内の緑ボーダー/緑地パネル＝ ImpactBadge（`border-success/20 bg-success/5`）と SavingsCard（`border-success/20 bg-success/10`）に `surface?: 'default'|'onImage'` prop を追加し、onImage で `border-white/20 bg-white/10 backdrop-blur`＋白文字の「白ガラス」に切替。ホーム展開（写真あり）は onImage、習慣詳細モーダル（写真なし）は default のまま不変。
+- **写真前提のUI調整**: 展開の各要素を hasEvidenceBg 時に白系へ—ライフ意義ラベル/本文（white/60・white/90）、ストリークカード（白ガラス地・数値white・トラック white/25・進捗バーは success をアクセントとして維持）、スキップボタン（bg-white/15 text-white。skipped の amber は維持）。詳細ボタンは success の実塗り CTA として可読なので維持。light/dark 両テーマは「写真＋黒スクリム＋白文字」で共通に成立。タップ操作性は onClick/z-10 維持で不変。
+- **完了状態の表現**: 従来どおり緑のチェック丸（StatusIndicator の `bg-success`＋白チェック＋祝福アニメ）を完了インジケータとして残置。競合していた緑の枠（ImpactBadge/SavingsCard/Card border）を除いたことで、写真の上でチェック丸が完了サインとして自然に立つ。スクリム濃度を完了で可変にする案は検討したが、展開コンテンツの可読性を優先し均一スクリムを維持（チェック丸で表現）。
+- 対象外: EstablishedSection は独自 Card（HabitCard 非使用）のため不変。習慣詳細モーダルの ImpactBadge/SavingsCard は default surface で従来表示。
+- テスト: evidence-collage.test.ts の F15 スクリム判定を `bg-black/NN` に更新し、F17 の describe を追加（背景が Card 直下＝collapsed 行より前／border-0／展開ボディ relative z-10／surface prop 配線／onImage で border-white/20）。全 785 テスト PASS、tsc clean、lint 0 error、build 成功。
+
+## D-feedback-11: 色の意味ルール「緑＝ポジティブ（できたこと・積み上げ）専用」＋展開ビューの1ボックス統合（F18〜F20）
+### 色の意味ルール（今後の改修指針・恒久ルール）
+- **緑（success / `--success` 系）は「できたこと・積み上げ・プラスのポジティブ」の意味に専用**する。この意味を持たない部品に緑を使わない。
+  - 緑を使ってよい例: 完了チェック（StatusIndicator の bg-success）、ストリーク進捗バー、達成/累積の強調、祝福演出。
+  - 緑を使わない例: 詳細ボタン（中立ナビ操作）、スキップボタン（中立操作）、KPI 影響やパネルの単なる枠/地。
+- 中立操作の色は既存パレットの `primary`（スレート系・hue250、緑ではない）／`secondary`／白ガラス（写真上）から選ぶ。ネガティブは destructive（赤）/ amber（スキップ中）。
+- 「押せるものは押せると分かる」: 中立ボタンも塗り or ring で affordance を明示する。
+
+### F18: 展開ビューの3ボックスを1ボックスに統合
+- 課題: 写真背景の上に KPI影響（ImpactBadge）/継続日数（ストリーク）/累積（SavingsCard）の3つのガラス箱が並び、箱の隙間から背景が見えて視線が切れ、認知負荷が高い。
+- 対応: 写真カード（hasEvidenceBg）では3つを**単一のガラスボックス**（`rounded-xl bg-white/10 backdrop-blur-sm p-3`・外周ボーダーなし）に内包し、内部は `space-y-3`＋ごく薄いディバイダ（`h-px bg-white/15`）で区切る。ImpactBadge/SavingsCard に `surface: 'bare'`（自前の箱＝border/地/padding を持たず親ボックスに内包・白文字）variant を追加。ストリークは中身を `streakInner(light)` に切り出して箱なしで内包。写真なしカードは従来どおり個別3箱（default surface）を維持（隙間問題が起きないため・スコープ限定）。
+- 習慣詳細モーダルは default surface（自前の箱）で不変。
+### F19: スキップボタンに中立アクセント＋affordance
+- スキップは中立操作。緑を避け、写真上は白ガラス（`bg-white/15 text-white ring-white/30`）、通常時は `primary` 系のスレート淡色（`bg-primary/10 text-primary ring-primary/20`）＋ ring で押せることを明示。skipped 中は従来の amber を維持。
+### F20: 詳細ボタンの緑を廃止
+- 詳細はポジティブな意味を持たないため `bg-success` を廃止。写真上は白ガラス（`bg-white/90 text-gray-900`）、通常時は `bg-secondary text-secondary-foreground`。押せる見た目は維持。
+- テスト: evidence-collage.test.ts を更新（F17 の surface 判定を bare に）＋ F18/F19/F20 の describe 追加（統合ボックス bg-white/10・h-px ディバイダ・bare／詳細ボタン非 bg-success・中立色／スキップ ring＋中立色・非緑）。全 789 テスト PASS、tsc clean、lint 0 error、build 成功。

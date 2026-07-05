@@ -1,4 +1,7 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
 import {
   calculateDailyImpact,
   calculateImpactSavings,
@@ -429,5 +432,40 @@ describe('Daily impact aggregation for DailyImpactSummary', () => {
     expect(earnedHealth).toBe(30);
     expect(earnedCost).toBe(550);
     expect(earnedIncome).toBe(200);
+  });
+});
+
+// ───────── F10: DailyImpactSummary は4軸目（前向きな気持ちの時間）を常時表示 ─────────
+describe('DailyImpactSummary の4軸目常時表示（F10）', () => {
+  const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
+  const src = readFileSync(
+    resolve(projectRoot, 'src/components/habits/daily-impact-summary.tsx'),
+    'utf-8'
+  );
+
+  it('前向きな気持ちの時間（dailyPositiveMood）を描画する', () => {
+    expect(src).toContain('dailyPositiveMood');
+  });
+
+  it('positiveMoodMinutes > 0 の表示ガードを持たない（値0でも常時表示）', () => {
+    // 今日・5日間いずれの mood 軸も `... positiveMoodMinutes > 0 &&` で条件描画しない。
+    expect(src).not.toContain('positiveMoodMinutes > 0');
+  });
+});
+
+// ───────── F16: ImpactBadge（習慣カード展開／習慣詳細）も4軸目を常時表示 ─────────
+describe('ImpactBadge の4軸目常時表示（F16）', () => {
+  const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
+  const src = readFileSync(
+    resolve(projectRoot, 'src/components/habits/impact-badge.tsx'),
+    'utf-8'
+  );
+
+  it('前向きな気持ちの時間（dailyPositiveMood）を描画する', () => {
+    expect(src).toContain('dailyPositiveMood');
+  });
+
+  it('positiveMoodMinutes > 0 の表示ガードを持たない（値0でも4軸目を常時表示）', () => {
+    expect(src).not.toContain('positiveMoodMinutes > 0');
   });
 });

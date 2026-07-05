@@ -1,9 +1,10 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { HeartPulse, Wallet, TrendingUp } from 'lucide-react';
+import { HeartPulse, Wallet, TrendingUp, Smile } from 'lucide-react';
 import { calculateDailyImpact, calculateAnnualImpact, formatHealthMinutes, formatCurrency, type DailyImpact } from '@/lib/impact';
 import { getArticle } from '@/data/impact-articles';
+import { cn } from '@/lib/utils';
 import type { HabitEvidence, LifeImpactArticle } from '@/types/impact';
 
 interface ImpactBadgeFromArticleProps {
@@ -11,6 +12,11 @@ interface ImpactBadgeFromArticleProps {
   mode?: 'daily' | 'annual';
   useMan?: boolean;
   onTap?: () => void;
+  /**
+   * 'default' = 自前の箱（緑地）。'onImage' = 写真上の白ガラス箱。
+   * 'bare' = 箱なし（親のガラスボックスに内包・白文字）。既定は 'default'。
+   */
+  surface?: 'default' | 'onImage' | 'bare';
 }
 
 interface ImpactBadgeFromEvidencesProps {
@@ -18,6 +24,11 @@ interface ImpactBadgeFromEvidencesProps {
   mode?: 'daily' | 'annual';
   useMan?: boolean;
   onTap?: () => void;
+  /**
+   * 'default' = 自前の箱（緑地）。'onImage' = 写真上の白ガラス箱。
+   * 'bare' = 箱なし（親のガラスボックスに内包・白文字）。既定は 'default'。
+   */
+  surface?: 'default' | 'onImage' | 'bare';
 }
 
 interface ImpactBadgeFromValuesProps {
@@ -25,6 +36,11 @@ interface ImpactBadgeFromValuesProps {
   mode?: 'daily' | 'annual';
   useMan?: boolean;
   onTap?: () => void;
+  /**
+   * 'default' = 自前の箱（緑地）。'onImage' = 写真上の白ガラス箱。
+   * 'bare' = 箱なし（親のガラスボックスに内包・白文字）。既定は 'default'。
+   */
+  surface?: 'default' | 'onImage' | 'bare';
 }
 
 type ImpactBadgeProps =
@@ -60,6 +76,20 @@ export function ImpactBadge(props: ImpactBadgeProps) {
   const periodLabel = mode === 'annual' ? t('perYear') : t('perDay');
   const useMan = props.useMan ?? true;
 
+  // 写真/ガラスの上（onImage・bare）では緑地/緑ボーダーをやめ白文字で馴染ませる（F17/F18）。
+  // bare は自前の箱を持たず、親のガラスボックス（F18: 3コンポーネント統合）に内包する。
+  const onImage = props.surface === 'onImage';
+  const bare = props.surface === 'bare';
+  const light = onImage || bare;
+  const wrapperChrome = bare
+    ? ''
+    : onImage
+      ? 'rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm px-3.5 py-3'
+      : 'rounded-xl border border-success/20 bg-success/5 px-3.5 py-3';
+  const iconClass = light ? 'text-white' : 'text-success';
+  const valueClass = light ? 'text-white' : 'text-success';
+  const labelClass = light ? 'text-white/70' : 'text-[#9C9B99]';
+
   const Wrapper = props.onTap ? 'button' : 'div';
   const wrapperProps = props.onTap
     ? {
@@ -74,36 +104,50 @@ export function ImpactBadge(props: ImpactBadgeProps) {
   return (
     <Wrapper
       {...wrapperProps}
-      className="flex w-full items-center justify-between rounded-xl border border-success/20 bg-success/5 px-3.5 py-3 text-left"
+      className={cn(
+        'flex w-full items-center justify-between text-left',
+        wrapperChrome
+      )}
     >
       <div className="flex flex-col items-center gap-0.5">
-        <HeartPulse className="size-4 text-success" />
-        <span className="text-sm font-bold text-success">
+        <HeartPulse className={cn('size-4', iconClass)} />
+        <span className={cn('text-sm font-bold', valueClass)}>
           +{formatHealthMinutes(values.healthMinutes)}
         </span>
-        <span className="text-[9px] font-medium text-[#9C9B99]">
+        <span className={cn('text-[9px] font-medium', labelClass)}>
           {t('dailyHealth')}
         </span>
       </div>
       <div className="flex flex-col items-center gap-0.5">
-        <Wallet className="size-4 text-success" />
-        <span className="text-sm font-bold text-success">
+        <Wallet className={cn('size-4', iconClass)} />
+        <span className={cn('text-sm font-bold', valueClass)}>
           {formatCurrency(values.costSaving, useMan)}
         </span>
-        <span className="text-[9px] font-medium text-[#9C9B99]">
+        <span className={cn('text-[9px] font-medium', labelClass)}>
           {t('dailyCost')}
         </span>
       </div>
       <div className="flex flex-col items-center gap-0.5">
-        <TrendingUp className="size-4 text-success" />
-        <span className="text-sm font-bold text-success">
+        <TrendingUp className={cn('size-4', iconClass)} />
+        <span className={cn('text-sm font-bold', valueClass)}>
           {formatCurrency(values.incomeGain, useMan)}
         </span>
-        <span className="text-[9px] font-medium text-[#9C9B99]">
+        <span className={cn('text-[9px] font-medium', labelClass)}>
           {t('dailyIncome')}
         </span>
       </div>
-      <span className="text-xs font-medium text-[#9C9B99]">{periodLabel}</span>
+      {/* 4軸目「前向きな気持ちの時間」: この習慣インパクト表示（ホーム展開／習慣詳細）では
+          値0でも常時表示し他3軸と揃える（F16・F10 と同方針）。 */}
+      <div className="flex flex-col items-center gap-0.5">
+        <Smile className={cn('size-4', iconClass)} />
+        <span className={cn('text-sm font-bold', valueClass)}>
+          +{formatHealthMinutes(values.positiveMoodMinutes)}
+        </span>
+        <span className={cn('text-[9px] font-medium', labelClass)}>
+          {t('dailyPositiveMood')}
+        </span>
+      </div>
+      <span className={cn('text-xs font-medium', labelClass)}>{periodLabel}</span>
     </Wrapper>
   );
 }

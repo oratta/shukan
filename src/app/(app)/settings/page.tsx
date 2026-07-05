@@ -25,6 +25,8 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/components/auth-provider';
 import { createClient } from '@/lib/supabase/client';
 import { BillingPortalCard } from '@/components/billing/billing-portal-card';
+import { ProfileEditor } from '@/components/settings/profile-editor';
+import { useProfile } from '@/hooks/useProfile';
 
 export default function SettingsPage() {
   const t = useTranslations();
@@ -32,6 +34,7 @@ export default function SettingsPage() {
   const locale = useLocale();
   const router = useRouter();
   const { user } = useAuth();
+  const { profile, loading: profileLoading, save: saveProfile } = useProfile();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -177,6 +180,20 @@ export default function SettingsPage() {
             </Button>
           </div>
         </Card>
+      )}
+
+      {user && profileLoading && (
+        <Card className="flex items-center justify-center p-8">
+          <div
+            role="status"
+            aria-label={t('common.loading')}
+            className="size-8 animate-spin rounded-full border-2 border-primary border-t-transparent"
+          />
+        </Card>
+      )}
+
+      {user && !profileLoading && (
+        <ProfileEditor profile={profile} onSave={saveProfile} />
       )}
 
       <Card className="p-4">

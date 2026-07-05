@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { HeartPulse, Wallet, TrendingUp, PartyPopper } from 'lucide-react';
+import { HeartPulse, Wallet, TrendingUp, PartyPopper, Smile } from 'lucide-react';
 import { calculateDailyImpact, formatHealthMinutes, formatCurrency } from '@/lib/impact';
 import { getArticle } from '@/data/impact-articles';
 import { cn } from '@/lib/utils';
@@ -19,12 +19,15 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
     let totalHealth = 0;
     let totalCost = 0;
     let totalIncome = 0;
+    let totalMood = 0;
     let earnedHealth = 0;
     let earnedCost = 0;
     let earnedIncome = 0;
+    let earnedMood = 0;
     let fiveDaysHealth = 0;
     let fiveDaysCost = 0;
     let fiveDaysIncome = 0;
+    let fiveDaysMood = 0;
 
     for (const habit of habits) {
       if (habit.evidences.length === 0) continue;
@@ -35,10 +38,12 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
         totalHealth += daily.healthMinutes;
         totalCost += daily.costSaving;
         totalIncome += daily.incomeGain;
+        totalMood += daily.positiveMoodMinutes;
         if (habit.completedToday) {
           earnedHealth += daily.healthMinutes;
           earnedCost += daily.costSaving;
           earnedIncome += daily.incomeGain;
+          earnedMood += daily.positiveMoodMinutes;
         }
       }
 
@@ -49,20 +54,22 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
       fiveDaysHealth += daily.healthMinutes * completedDays;
       fiveDaysCost += daily.costSaving * completedDays;
       fiveDaysIncome += daily.incomeGain * completedDays;
+      fiveDaysMood += daily.positiveMoodMinutes * completedDays;
     }
 
-    const hasImpactValue = totalHealth > 0 || totalCost > 0 || totalIncome > 0;
+    const hasImpactValue = totalHealth > 0 || totalCost > 0 || totalIncome > 0 || totalMood > 0;
     const isPerfectValue = hasImpactValue &&
       earnedHealth === totalHealth &&
       earnedCost === totalCost &&
-      earnedIncome === totalIncome;
+      earnedIncome === totalIncome &&
+      earnedMood === totalMood;
 
     return {
-      earned: { healthMinutes: earnedHealth, costSaving: earnedCost, incomeGain: earnedIncome },
-      total: { healthMinutes: totalHealth, costSaving: totalCost, incomeGain: totalIncome },
+      earned: { healthMinutes: earnedHealth, costSaving: earnedCost, incomeGain: earnedIncome, positiveMoodMinutes: earnedMood },
+      total: { healthMinutes: totalHealth, costSaving: totalCost, incomeGain: totalIncome, positiveMoodMinutes: totalMood },
       isPerfect: isPerfectValue,
       hasImpact: hasImpactValue,
-      fiveDays: { healthMinutes: fiveDaysHealth, costSaving: fiveDaysCost, incomeGain: fiveDaysIncome },
+      fiveDays: { healthMinutes: fiveDaysHealth, costSaving: fiveDaysCost, incomeGain: fiveDaysIncome, positiveMoodMinutes: fiveDaysMood },
     };
   }, [habits]);
 
@@ -134,6 +141,23 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
           </div>
           <span className="text-[9px] font-medium text-[#9C9B99]">{t('dailyIncome')}</span>
         </div>
+
+        {/* Positive mood (4th axis) — この画面（DailyImpactSummary）に限り値が0でも常時表示（F10）。
+            他の表示箇所（stats/savings-card/impact-badge/記事シート）は「> 0 のみ」を維持する。 */}
+        <div className="flex flex-col">
+          <div className="flex items-center gap-1">
+            <Smile className="size-3.5 text-success" />
+            <span className="text-sm font-bold text-success">
+              +{formatHealthMinutes(earned.positiveMoodMinutes)}
+            </span>
+            {!isPerfect && (
+              <span className="text-xs text-muted-foreground">
+                /{formatHealthMinutes(total.positiveMoodMinutes)}
+              </span>
+            )}
+          </div>
+          <span className="text-[9px] font-medium text-[#9C9B99]">{t('dailyPositiveMood')}</span>
+        </div>
       </div>
 
       {/* 5 Days Impact */}
@@ -168,6 +192,16 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
               </span>
             </div>
             <span className="text-[9px] font-medium text-[#9C9B99]">{t('dailyIncome')}</span>
+          </div>
+          {/* 4th axis — 今日の表示と揃え、値0でも常時表示（F10） */}
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1">
+              <Smile className="size-3.5 text-success" />
+              <span className="text-sm font-bold text-success">
+                +{formatHealthMinutes(fiveDays.positiveMoodMinutes)}
+              </span>
+            </div>
+            <span className="text-[9px] font-medium text-[#9C9B99]">{t('dailyPositiveMood')}</span>
           </div>
         </div>
       </div>

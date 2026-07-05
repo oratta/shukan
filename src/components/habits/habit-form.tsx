@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { Plus, X, Dumbbell, Shield } from 'lucide-react';
+import { Plus, X, Dumbbell, Shield, CheckCircle2 } from 'lucide-react';
 import { HabitIcon } from '@/components/ui/habit-icon';
 import {
   Dialog,
@@ -95,6 +95,10 @@ export function HabitForm({
   const [dailyTarget, setDailyTarget] = useState(
     initialData?.dailyTarget ?? 3
   );
+  // 3場面構造: status の手動設定（established=「完全に身についた」）。自動昇格は行わない。
+  const [established, setEstablished] = useState(
+    initialData?.status === 'established'
+  );
   const [copingSteps, setCopingSteps] = useState<
     { title: string; sortOrder: number }[]
   >(initialCopingSteps ?? [{ title: '', sortOrder: 0 }]);
@@ -119,6 +123,7 @@ export function HabitForm({
     setType(initialData?.type ?? 'positive');
     setWeeklyTarget(initialData?.weeklyTarget ?? 1);
     setDailyTarget(initialData?.dailyTarget ?? 3);
+    setEstablished(initialData?.status === 'established');
     setCopingSteps(initialCopingSteps ?? [{ title: '', sortOrder: 0 }]);
     setEvidences(
       prefilledEvidences ??
@@ -150,6 +155,7 @@ export function HabitForm({
         dailyTarget: type === 'quit' ? dailyTarget : 1,
         impactArticleId: undefined,
         evidences: initialData?.evidences ?? [],
+        status: established ? 'established' : 'active',
       },
       type === 'quit' ? validSteps : undefined,
       evidences.length > 0 ? evidences : undefined
@@ -165,6 +171,7 @@ export function HabitForm({
       setWeeklyTarget(1);
       setType('positive');
       setDailyTarget(3);
+      setEstablished(false);
       setCopingSteps([{ title: '', sortOrder: 0 }]);
       setEvidences([]);
     }
@@ -522,6 +529,38 @@ export function HabitForm({
                 </Select>
               )}
             </div>
+
+            {/* 3場面構造: status 手動設定（established=「完全に身についた」）。編集時のみ表示。 */}
+            {initialData && (
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={established}
+                  aria-label={t('establishedToggle')}
+                  onClick={() => setEstablished((v) => !v)}
+                  className={cn(
+                    'flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-all',
+                    established
+                      ? 'border-success ring-2 ring-success/40 bg-success/5'
+                      : 'hover:bg-accent'
+                  )}
+                >
+                  <CheckCircle2
+                    className={cn(
+                      'size-5 shrink-0',
+                      established ? 'text-success' : 'text-muted-foreground'
+                    )}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-medium">{t('establishedToggle')}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {t('establishedToggleDesc')}
+                    </div>
+                  </div>
+                </button>
+              </div>
+            )}
 
             <DialogFooter className="flex-row">
               {initialData && onDelete && (

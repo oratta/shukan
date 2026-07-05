@@ -24,7 +24,7 @@ const STEPS = [
     n: 4,
     label: 'インパクト',
     src: '/landing/iphone-process-4.png',
-    alt: 'iPhone 画面: インパクト（予測）— 健康寿命 / 生涯コスト / 可処分時間 / 集中時間',
+    alt: 'iPhone 画面: インパクト（予測）— 健康寿命 / 出費削減 / 増える収入 / 前向きな気持ちの時間',
   },
 ];
 

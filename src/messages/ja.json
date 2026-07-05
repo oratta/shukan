@@ -97,7 +97,13 @@
     "unreviewedCount": "{count}件未チェック",
     "reviewNotePlaceholder": "メモ（任意）",
     "reviewMoodLabel": "昨日の気分",
-    "reviewCommentPlaceholder": "昨日を振り返って一言..."
+    "reviewCommentPlaceholder": "昨日を振り返って一言...",
+    "establishedToggle": "完全に身についた",
+    "establishedToggleDesc": "もう身についた習慣です。デイリーチェックから外し、残りの人生への効果だけを表示します。",
+    "establishedSectionTitle": "身についた習慣",
+    "establishedSectionDesc": "もう身についた習慣。残りの人生にもたらす効果を表示しています。",
+    "lifetimeEffectHeading": "この習慣が残りの人生であなたにもたらすこと",
+    "trackedKpisTitle": "あなたが大切にしていること"
   },
   "stats": {
     "title": "統計",
@@ -142,7 +148,20 @@
     "legal": "法的情報",
     "privacyPolicy": "プライバシーポリシー",
     "termsOfService": "利用規約",
-    "tokushoho": "特定商取引法に基づく表記"
+    "tokushoho": "特定商取引法に基づく表記",
+    "profile": "プロフィール",
+    "profileDescription": "一生のインパクトをあなた用に計算するために使います。",
+    "birthYear": "生年",
+    "gender": "性別",
+    "genderMale": "男性",
+    "genderFemale": "女性",
+    "genderOther": "答えたくない",
+    "annualIncome": "年収",
+    "incomeUnit": "万円",
+    "trackedKpis": "大切にしたいこと",
+    "saveProfile": "保存",
+    "profileSaved": "保存しました",
+    "profileSaveError": "保存できませんでした。通信状況を確認して、もう一度お試しください。"
   },
   "days": {
     "sun": "日",
@@ -163,8 +182,9 @@
   "impact": {
     "title": "人生インパクト",
     "dailyHealth": "健康寿命",
-    "dailyCost": "コスト削減",
-    "dailyIncome": "収入増加",
+    "dailyCost": "出費削減",
+    "dailyIncome": "増える収入",
+    "dailyPositiveMood": "前向きな気持ちの時間",
     "perDay": "/日",
     "perYear": "/年",
     "minuteUnit": "分",
@@ -183,7 +203,7 @@
     "sources": "出典",
     "yourSavings": "あなたの貯金",
     "todayImpact": "今日のライフインパクト",
-    "fiveDaysImpact": "5 Days Impact",
+    "fiveDaysImpact": "5日間のインパクト",
     "perfect": "パーフェクト！",
     "confidence": {
       "high": "信頼度: 高",
@@ -196,6 +216,9 @@
     "quit": "Quit",
     "build": "Build",
     "addHabit": "この習慣を追加",
+    "createFromScratch": "ゼロから習慣をつくる",
+    "createFromScratchSub": "自分の習慣を自由に設計する",
+    "sortLead": "伸ばしたい指標を選ぶと、効果が大きい順に並びます",
     "perDay": "/日",
     "perYear": "/年",
     "confidence": {
@@ -227,8 +250,8 @@
     "feedbackSubmit": "送信",
     "feedbackThanks": "フィードバックありがとうございます",
     "feedbackHealth": "健康寿命の算出根拠",
-    "feedbackCost": "コスト削減の算出根拠",
-    "feedbackIncome": "収入増加の算出根拠"
+    "feedbackCost": "出費削減の算出根拠",
+    "feedbackIncome": "増える収入の算出根拠"
   },
   "reviewHistory": {
     "title": "振り返り履歴",
@@ -331,10 +354,22 @@
       "countLabel": "{current} / {total}",
       "levelDisabled": "この習慣では選べません",
       "levels": {
-        "full": { "label": "完璧に習慣化", "desc": "生活の一部になっている" },
-        "most": { "label": "だいたい", "desc": "ほとんどできている" },
-        "sometimes": { "label": "たまに", "desc": "思い出したときにやる" },
-        "none": { "label": "やってない", "desc": "これから始めたい" }
+        "full": {
+          "label": "完璧に習慣化",
+          "desc": "生活の一部になっている"
+        },
+        "most": {
+          "label": "だいたい",
+          "desc": "ほとんどできている"
+        },
+        "sometimes": {
+          "label": "たまに",
+          "desc": "思い出したときにやる"
+        },
+        "none": {
+          "label": "やってない",
+          "desc": "これから始めたい"
+        }
       }
     },
     "habitSub": {
@@ -361,12 +396,31 @@
       "phase3": "これからの人生のインパクトを計算中…"
     },
     "result": {
-      "title": "あなたの一生のインパクト",
-      "lead": "続ければ、残りの人生でこれだけ積み上がります",
+      "title": "あなたの習慣がもたらすインパクト",
+      "lead": "今のペースと、全部100%身についた場合の差が、あなたの伸びしろです",
       "value": "+{value}{unit}",
-      "cta": "習慣を選びに進む",
+      "currentLabel": "身についてない人と比べて",
+      "fullLabel": "全部100%身についたら",
+      "cta": "次へ",
       "habitsLabel": "身についている習慣",
-      "footnote": "計算の前提（年齢・性別・国・年収）は設定からいつでも見直せます"
+      "habitEffectLabel": "この習慣がもたらすこと",
+      "sectionsLead": "選んだ習慣が、4つの指標をどれだけ動かすかを見ていきましょう。",
+      "summaryLabel": "4つの指標のまとめ",
+      "footnote": "計算の前提（年齢・性別・国・年収）は設定からいつでも見直せます",
+      "kpiSections": {
+        "health_lifespan": {
+          "body": "医療の進歩で、平均寿命は延び続けています。けれど、体が思うように動かないまま延びた時間が、そのまま人生の充実につながるとは限りません。健康で自由に動き、自分の人生を全うできる期間が「健康寿命」です。あなたが選んだ習慣は、身についていない場合と比べてこの健康寿命を延ばすことが、研究で示されています。"
+        },
+        "positive_mood": {
+          "body": "前向きな気持ちで過ごせる時間は、ただ気分がいいだけのものではありません。前向きな感情は、心身の健康や仕事の生産性、人間関係の良好さと関連することが研究で示されています。落ち込みやイライラに奪われる時間を減らし、機嫌よく過ごせる時間を増やすことが、毎日の充実につながります。"
+        },
+        "cost_saving": {
+          "body": "病気や不調は、治療費・通院・薬代として一生の出費に積み上がっていきます。日々の習慣は、こうした将来の出費を抑える効果が研究で示されています。"
+        },
+        "earning": {
+          "body": "体力と集中力は、仕事のパフォーマンスと収入の伸びを支えます。習慣で土台を整えることが、生涯で増える収入につながることが研究で示されています。"
+        }
+      }
     },
     "kpiSelect": {
       "title": "あなたの人生で、何を充実させたいですか？",

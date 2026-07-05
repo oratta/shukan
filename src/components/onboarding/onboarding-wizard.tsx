@@ -3,11 +3,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Check, ChevronLeft, Loader2 } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth-provider";
 import { KPI_CATALOG, KPI_KEYS, type KpiKey } from "@/data/kpi/catalog";
 import { KpiIcon } from "@/components/onboarding/kpi-icon";
+import { EvidenceArticleSheet } from "@/components/habits/evidence-article-sheet";
+import { getHabitPreset } from "@/data/habit-presets";
 import {
   createInitialWizardState,
   canAdvanceFromProfile,
@@ -19,6 +21,7 @@ import {
   backInHabits,
   getHabitRate,
   buildDiagnosisSelections,
+  buildFullPotentialSelections,
   profileInputToUserProfile,
   runOnboardingWrite,
   chooseFocusKpi,
@@ -61,6 +64,8 @@ export function OnboardingWizard() {
   const [state, setState] = useState<WizardState>(createInitialWizardState);
   const [writing, setWriting] = useState(false);
   const [writeError, setWriteError] = useState(false);
+  // [4] 習慣リストのタップで開くエビデンス記事シート（アプリ本体と同じ EvidenceArticleSheet）。
+  const [articleSheetId, setArticleSheetId] = useState<string | null>(null);
   // 部分失敗→再試行で habit が重複 insert されないよう、成功済みのプリセットID集合を保持。
   const completedPresetIdsRef = useRef<Set<string>>(new Set());
 
@@ -87,10 +92,16 @@ export function OnboardingWizard() {
   // インクリメントは chooseRate（イベントハンドラ）側で行う（effect 内 setState を避ける）。
   const [bumpTick, setBumpTick] = useState(0);
 
-  // [4] 結果（未来のみ・単一表示）。step が 4 のときだけ計算する。
+  // [4] 結果（未来のみ・現在の達成率）。step が 4 のときだけ計算する。
   const result: DiagnosisV3Result | null = useMemo(() => {
     if (state.step < 4) return null;
     return computeDiagnosisV3({ selections: buildDiagnosisSelections(state), profile: calcProfile });
+  }, [state, calcProfile]);
+
+  // [4] 対比: 回答済み習慣が「全部100%身についたら」の未来値（達成率=1 を渡すだけ）。
+  const fullResult: DiagnosisV3Result | null = useMemo(() => {
+    if (state.step < 4) return null;
+    return computeDiagnosisV3({ selections: buildFullPotentialSelections(state), profile: calcProfile });
   }, [state, calcProfile]);
 
   // [3] 計算中アニメーション → 数秒で [4] へ自動遷移
@@ -146,10 +157,28 @@ export function OnboardingWizard() {
   );
 
   // [4] 結果に含まれている習慣（達成率>0 で回答したもの・表示順）。
-  const answeredHabits = useMemo(
-    () => buildDiagnosisSelections(state).filter((s) => s.rate > 0),
-    [state]
-  );
+  // 各行にアイコン・効果を持つ全KPIの値（達成率100%基準の生涯ポテンシャル・0は除外）・
+  // エビデンス記事ID を付す（F5/F6/F7）。
+  const answeredHabits = useMemo(() => {
+    return buildDiagnosisSelections(state)
+      .filter((s) => s.rate > 0)
+      .map(({ presetId, rate }) => {
+        const preset = getHabitPreset(presetId);
+        const potential = habitPotentialV3(presetId, calcProfile);
+        // KPIカタログ順で、効果値 > 0 の KPI だけを「アイコン＋数字」用に抽出する。
+        const effects = KPI_CATALOG.map((def) => {
+          const v = potential.byKpi[def.key];
+          return { key: def.key, icon: def.icon, display: v.display, unit: v.unit, raw: v.raw };
+        }).filter((e) => e.raw > 0);
+        return {
+          presetId,
+          rate,
+          icon: preset?.icon ?? "sparkles",
+          articleId: preset?.articleIds[0] ?? null,
+          effects,
+        };
+      });
+  }, [state, calcProfile]);
 
   return (
     <div className="space-y-8">
@@ -391,27 +420,90 @@ export function OnboardingWizard() {
         </section>
       )}
 
-      {/* ───────── [4] 結果（未来のみ・単一表示） ───────── */}
-      {state.step === 4 && result && (
+      {/* ───────── [4] 結果（KPIごとの説明セクション＋まとめ＋身についている習慣） ───────── */}
+      {state.step === 4 && result && fullResult && (
         <section className="space-y-6">
           <Heading title={t("result.title")} subtitle={t("result.lead")} />
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {t("result.sectionsLead")}
+          </p>
 
-          <div className="rounded-2xl border border-border bg-card p-5">
-            <ul className="grid gap-4 sm:grid-cols-2">
-              {KPI_CATALOG.map((def) => {
-                const v = result.byKpi[def.key];
-                return (
-                  <li key={def.key} className="flex items-center gap-3">
-                    <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          {/* F4: KPIごとに独立したセクション（アイコン＋名前＋説明文＋数字対比） */}
+          <div className="space-y-4">
+            {KPI_CATALOG.map((def) => {
+              const cur = result.byKpi[def.key];
+              const full = fullResult.byKpi[def.key];
+              return (
+                <section
+                  key={def.key}
+                  className="onb-slide-enter space-y-3 rounded-2xl border border-border bg-card p-5"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                       <KpiIcon name={def.icon} className="size-5" />
                     </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-xs text-muted-foreground">
-                        {t(`kpi.${def.key}.name`)}
-                      </span>
-                      <span className="block text-lg font-bold tabular-nums">
-                        {t("result.value", { value: v.display, unit: v.unit })}
-                      </span>
+                    <h2 className="text-base font-bold tracking-tight">
+                      {t(`kpi.${def.key}.name`)}
+                    </h2>
+                  </div>
+                  <p className="text-[13px] leading-relaxed text-muted-foreground">
+                    {t(`result.kpiSections.${def.key}.body`)}
+                  </p>
+                  {/* 数字対比: 身についてない人と比べて / 全部100%身についたら（折り返さない） */}
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <div className="rounded-xl bg-muted/40 p-3">
+                      <p className="whitespace-nowrap text-[11px] text-muted-foreground">
+                        {t("result.currentLabel")}
+                      </p>
+                      <p className="mt-0.5 whitespace-nowrap text-base font-bold tabular-nums text-foreground">
+                        {cur.raw > 0
+                          ? t("result.value", { value: cur.display, unit: cur.unit })
+                          : "—"}
+                      </p>
+                    </div>
+                    <div className="rounded-xl bg-primary/5 p-3 ring-1 ring-primary/15">
+                      <p className="whitespace-nowrap text-[11px] font-medium text-primary">
+                        {t("result.fullLabel")}
+                      </p>
+                      <p className="mt-0.5 whitespace-nowrap text-lg font-bold tabular-nums text-primary">
+                        {full.raw > 0
+                          ? t("result.value", { value: full.display, unit: full.unit })
+                          : "—"}
+                      </p>
+                    </div>
+                  </div>
+                </section>
+              );
+            })}
+          </div>
+
+          {/* F1: 4KPIまとめ（縮約版・列見出しの折り返しを起こさない対比） */}
+          <div className="rounded-2xl border border-border bg-card p-5">
+            <p className="mb-1 text-sm font-bold">{t("result.summaryLabel")}</p>
+            <p className="mb-3 text-[11px] text-muted-foreground">
+              {t("result.currentLabel")} ／ {t("result.fullLabel")}
+            </p>
+            <ul className="space-y-3">
+              {KPI_CATALOG.map((def) => {
+                const cur = result.byKpi[def.key];
+                const full = fullResult.byKpi[def.key];
+                return (
+                  <li key={def.key} className="flex items-center gap-2.5">
+                    <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                      <KpiIcon name={def.icon} className="size-4" />
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+                      {t(`kpi.${def.key}.name`)}
+                    </span>
+                    <span className="shrink-0 whitespace-nowrap text-xs tabular-nums text-muted-foreground">
+                      {cur.raw > 0
+                        ? t("result.value", { value: cur.display, unit: cur.unit })
+                        : "—"}
+                    </span>
+                    <span className="shrink-0 whitespace-nowrap text-sm font-bold tabular-nums text-primary">
+                      {full.raw > 0
+                        ? t("result.value", { value: full.display, unit: full.unit })
+                        : "—"}
                     </span>
                   </li>
                 );
@@ -419,24 +511,53 @@ export function OnboardingWizard() {
             </ul>
           </div>
 
-          {/* 結果に含まれている習慣（達成率>0 で回答したもの） */}
+          {/* F5/F6: 身についている習慣（アイコン＋主要KPIの効果値＋タップでエビデンス記事） */}
           {answeredHabits.length > 0 && (
             <div className="space-y-2">
               <p className="text-sm font-medium text-muted-foreground">
                 {t("result.habitsLabel")}
               </p>
               <ul className="space-y-2">
-                {answeredHabits.map(({ presetId, rate }) => (
-                  <li
-                    key={presetId}
-                    className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3"
-                  >
-                    <span className="min-w-0 flex-1 text-sm font-medium">
-                      {t(`preset.${presetId}`)}
-                    </span>
-                    <span className="shrink-0 text-xs font-bold text-muted-foreground tabular-nums">
-                      {Math.round(rate * 100)}%
-                    </span>
+                {answeredHabits.map(({ presetId, rate, icon, articleId, effects }) => (
+                  <li key={presetId}>
+                    <button
+                      type="button"
+                      disabled={!articleId}
+                      onClick={() => articleId && setArticleSheetId(articleId)}
+                      className="flex w-full items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 text-left transition-all hover:border-primary/40 active:scale-[0.99] disabled:pointer-events-none"
+                    >
+                      <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                        <KpiIcon name={icon} className="size-5" />
+                      </span>
+                      <span className="min-w-0 flex-1 space-y-1">
+                        <span className="flex items-center gap-2">
+                          <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                            {t(`preset.${presetId}`)}
+                          </span>
+                          <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+                            {Math.round(rate * 100)}%
+                          </span>
+                        </span>
+                        {/* F7: 効果を持つ各KPIの「アイコン＋数字」をコンパクトに横並び（0は除外） */}
+                        {effects.length > 0 && (
+                          <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                            {effects.map((e) => (
+                              <span
+                                key={e.key}
+                                className="flex items-center gap-0.5 whitespace-nowrap text-xs font-semibold tabular-nums text-primary"
+                              >
+                                <KpiIcon name={e.icon} className="size-3.5 shrink-0" />
+                                +{e.display}
+                                <span className="text-[10px] font-medium text-muted-foreground">
+                                  {e.unit}
+                                </span>
+                              </span>
+                            ))}
+                          </span>
+                        )}
+                      </span>
+                      <ChevronRight className="size-4 shrink-0 self-center text-muted-foreground" aria-hidden />
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -555,6 +676,13 @@ export function OnboardingWizard() {
           <p className="text-center text-xs text-muted-foreground">{t("habitSelect.note")}</p>
         </section>
       )}
+
+      {/* [4] 習慣タップで開くエビデンス記事（アプリ本体と同じ記事シート・F6） */}
+      <EvidenceArticleSheet
+        open={articleSheetId !== null}
+        onOpenChange={(open) => !open && setArticleSheetId(null)}
+        articleId={articleSheetId}
+      />
     </div>
   );
 }

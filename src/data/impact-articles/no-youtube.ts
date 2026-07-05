@@ -78,6 +78,7 @@ export const noYoutube: LifeImpactArticle = {
     dailyHealthMinutes: 5,
     dailyCostSaving: 150,
     dailyIncomeGain: 4690,
+    // positiveMood 0: 依存・衝動の抑制による便益は健康寿命/出費削減で計上済み。前向きな気持ちの時間への独立した一次エビデンスが確立していないため、二重計上を避けて 0 のままとする。
     dailyPositiveMoodMinutes: 0,
   },
 

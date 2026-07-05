@@ -2,11 +2,12 @@
 
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { Flame, Trophy, TrendingUp, HeartPulse, Wallet, BarChart3 } from 'lucide-react';
+import { Flame, Trophy, TrendingUp, HeartPulse, Wallet, BarChart3, Smile } from 'lucide-react';
 import { HabitIcon } from '@/components/ui/habit-icon';
 import { Card } from '@/components/ui/card';
 import { ProgressRing } from '@/components/habits/progress-ring';
 import { useHabits } from '@/hooks/useHabits';
+import { isDailyTrackedHabit } from '@/lib/habits';
 import { calculateTotalSavings, formatHealthMinutes, formatCurrency } from '@/lib/impact';
 import { useReviewHistory } from '@/hooks/useReviewHistory';
 import { ReviewCalendar } from '@/components/review/ReviewCalendar';
@@ -29,7 +30,9 @@ export default function StatsPage() {
 
   const stats = useMemo(() => {
     const withStats = getStats();
-    const activeHabits = withStats.filter((h) => !h.archived);
+    // 3場面構造: デイリー系指標（完了率・ストリーク）は active（デイリー追跡）習慣のみで集計する。
+    // established（身についた）習慣は生涯効果表示専用のため、統計の分母・ストリークから除外する。
+    const activeHabits = withStats.filter(isDailyTrackedHabit);
 
     const totalCurrentStreak = activeHabits.reduce(
       (sum, h) => sum + h.currentStreak,
@@ -164,6 +167,17 @@ export default function StatsPage() {
                 {formatCurrency(stats.totalSavings.incomeGain)}
               </div>
             </div>
+            {stats.totalSavings.positiveMoodMinutes > 0 && (
+              <div className="flex items-center justify-between rounded-lg bg-impact-bg px-3 py-2.5">
+                <div>
+                  <div className="text-xs font-medium text-impact-cost">{t('impact.dailyPositiveMood')}</div>
+                  <div className="text-[10px] text-impact-cost/50">{t('impact.allHabitsTotal')}</div>
+                </div>
+                <div className="text-lg font-bold text-impact-cost">
+                  +{formatHealthMinutes(stats.totalSavings.positiveMoodMinutes, { min: t('impact.minuteUnit'), hour: t('impact.hourUnit'), day: t('impact.dayUnit') })}
+                </div>
+              </div>
+            )}
           </div>
         </Card>
 
@@ -186,6 +200,9 @@ export default function StatsPage() {
                     <span className="flex items-center gap-0.5"><HeartPulse className="size-3" /> {formatHealthMinutes(habit.impactSavings!.healthMinutes, { min: t('impact.minuteUnit'), hour: t('impact.hourUnit'), day: t('impact.dayUnit') })}</span>
                     <span className="flex items-center gap-0.5"><Wallet className="size-3" /> {formatCurrency(habit.impactSavings!.costSaving)}</span>
                     <span className="flex items-center gap-0.5"><TrendingUp className="size-3" /> {formatCurrency(habit.impactSavings!.incomeGain)}</span>
+                    {habit.impactSavings!.positiveMoodMinutes > 0 && (
+                      <span className="flex items-center gap-0.5" aria-label={t('impact.dailyPositiveMood')}><Smile className="size-3" /> {formatHealthMinutes(habit.impactSavings!.positiveMoodMinutes, { min: t('impact.minuteUnit'), hour: t('impact.hourUnit'), day: t('impact.dayUnit') })}</span>
+                    )}
                   </div>
                 </Card>
               ))}

@@ -51,6 +51,7 @@ export const coldShower: LifeImpactArticle = {
     dailyHealthMinutes: 4,
     dailyCostSaving: 100,
     dailyIncomeGain: 700,
+    // positiveMood 0: 身体・健康面の効果は健康寿命で計上済み。気分改善の独立した定量エビデンスに乏しく、二重計上回避のため 0 のままとする。
     dailyPositiveMoodMinutes: 0,
   },
 

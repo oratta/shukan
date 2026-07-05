@@ -8,6 +8,8 @@ import {
   isCompletedToday,
   isSkippedToday,
   getRecentDays,
+  isDailyTrackedHabit,
+  isEstablishedHabit,
 } from '@/lib/habits';
 import type { HabitCompletion, Habit } from '@/types/habit';
 import type { LifeImpactArticle } from '@/types/impact';
@@ -684,6 +686,58 @@ describe('getRecentDays - skip support', () => {
     for (let i = 1; i < result.length; i++) {
       expect(result[i].date < result[i - 1].date).toBe(true);
     }
+  });
+});
+
+// ============================================================
+// 3場面構造: established はデイリー系指標から除外する（受け入れ条件 #10-b）
+// ============================================================
+
+describe('established habit exclusion from daily metrics', () => {
+  it('established habits are not daily-tracked; active habits are', () => {
+    const active = makeHabit({ id: 'a', status: 'active' });
+    const established = makeHabit({ id: 'e', status: 'established' });
+    expect(isDailyTrackedHabit(active)).toBe(true);
+    expect(isDailyTrackedHabit(established)).toBe(false);
+    expect(isEstablishedHabit(established)).toBe(true);
+  });
+
+  it('excludes established habits from the completion-rate denominator (avg over active only)', () => {
+    // stats page averages completionRate over daily-tracked habits only.
+    // An established habit must not dilute the average.
+    const withStats = getHabitsWithStats(
+      [
+        makeHabit({ id: 'a', status: 'active' }),
+        makeHabit({ id: 'e', status: 'established' }),
+      ],
+      []
+    );
+    const dailyTracked = withStats.filter(isDailyTrackedHabit);
+    expect(dailyTracked).toHaveLength(1);
+    expect(dailyTracked[0].id).toBe('a');
+  });
+
+  it('excludes established habits from streak aggregation', () => {
+    const today = getDateString(new Date());
+    const yesterday = getDateString(new Date(Date.now() - 86400000));
+    const completions = [
+      makeCompletion('a', today),
+      makeCompletion('a', yesterday),
+      makeCompletion('e', today),
+      makeCompletion('e', yesterday),
+    ];
+    const withStats = getHabitsWithStats(
+      [
+        makeHabit({ id: 'a', status: 'active' }),
+        makeHabit({ id: 'e', status: 'established' }),
+      ],
+      completions
+    );
+    const dailyTracked = withStats.filter(isDailyTrackedHabit);
+    const totalStreak = dailyTracked.reduce((s, h) => s + h.currentStreak, 0);
+    // Only the active habit's streak counts; the established one is excluded.
+    expect(dailyTracked).toHaveLength(1);
+    expect(totalStreak).toBe(withStats.find((h) => h.id === 'a')!.currentStreak);
   });
 });
 

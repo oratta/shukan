@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { X, Search, Check, HeartPulse, Wallet, TrendingUp } from 'lucide-react';
+import { X, Search, Check, HeartPulse, Wallet, TrendingUp, Smile } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -214,6 +214,9 @@ export function EvidencePicker({
                         <span className="flex items-center gap-0.5"><HeartPulse className="size-3" /> +{formatHealthMinutes(annual.healthMinutes)}{tImpact('perYear')}</span>
                         <span className="flex items-center gap-0.5"><Wallet className="size-3" /> {formatCurrency(annual.costSaving)}{tImpact('perYear')}</span>
                         <span className="flex items-center gap-0.5"><TrendingUp className="size-3" /> {formatCurrency(annual.incomeGain)}{tImpact('perYear')}</span>
+                        {annual.positiveMoodMinutes > 0 && (
+                          <span className="flex items-center gap-0.5" aria-label={tImpact('dailyPositiveMood')}><Smile className="size-3" /> +{formatHealthMinutes(annual.positiveMoodMinutes)}{tImpact('perYear')}</span>
+                        )}
                       </div>
                     </div>
 

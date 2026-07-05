@@ -10,7 +10,12 @@ import { cn } from '@/lib/utils';
 import { getTodayString } from '@/lib/habits';
 import { ImpactBadge } from '@/components/habits/impact-badge';
 import { SavingsCard } from '@/components/habits/savings-card';
+import { getEvidenceHeroImage } from '@/data/evidence-hero-images';
 import type { DayStatus, HabitWithStats } from '@/types/habit';
+
+// F15: デイリー習慣カード背景に敷くエビデンス画像コラージュの最大枚数。
+// 5枚以上ある習慣は先頭4枚のみ（等分割が細くなりすぎて見た目が破綻するため打ち切り）。
+const MAX_COLLAGE_IMAGES = 4;
 
 interface HabitCardProps {
   habit: HabitWithStats;
@@ -263,21 +268,84 @@ export function HabitCard({
 
   const streakPercent = Math.min(Math.round((habit.currentStreak / 30) * 100), 100);
 
+  // F15: 紐づくエビデンス記事の画像を等分割コラージュ背景に使う（画像を持つ記事のみ・最大4枚）。
+  // 画像を1枚も持たない習慣（ゼロから作ったカスタム習慣等）は従来の通常カード表示にフォールバック。
+  const evidenceImages = (habit.evidences ?? [])
+    .map((ev) => getEvidenceHeroImage(ev.articleId))
+    .filter((url): url is string => !!url)
+    .slice(0, MAX_COLLAGE_IMAGES);
+  const hasEvidenceBg = evidenceImages.length > 0;
+
+  // 継続日数（ストリーク）の中身（箱なし）。写真ガラス内では light=true で白文字にする。
+  // 緑は「積み上げ＝ポジティブ」の意味を持つ進捗バーにのみ使う（数値・ラベルは中立の白/緑）。
+  const streakInner = (light: boolean) => (
+    <>
+      <div className="flex items-baseline gap-2">
+        <span className={cn('text-2xl font-bold', light ? 'text-white' : 'text-success')}>
+          {habit.currentStreak}
+        </span>
+        <span className={cn('text-sm', light ? 'text-white/70' : 'text-success/70')}>
+          {tStats('days')}
+        </span>
+        <span className={cn('ml-auto text-xs', light ? 'text-white/60' : 'text-success/60')}>
+          {t('streakGoal', { percent: streakPercent })}
+        </span>
+      </div>
+      {/* 進捗バー: 緑＝積み上げ（ポジティブ）の意味で使用 */}
+      <div className={cn('mt-2 h-1.5 rounded-full', light ? 'bg-white/25' : 'bg-white')}>
+        <div
+          className="h-full rounded-full bg-success transition-all duration-300"
+          style={{ width: `${streakPercent}%` }}
+        />
+      </div>
+    </>
+  );
+
   return (
     <div ref={setNodeRef} style={style} className={cn(isDragging && 'z-50 opacity-80')}>
-    <Card className="gap-0 py-0 overflow-hidden transition-all duration-200">
+    <Card
+      className={cn(
+        'gap-0 py-0 overflow-hidden transition-all duration-200',
+        hasEvidenceBg && 'relative border-0'
+      )}
+    >
+      {/* F15/F17: エビデンス画像の等分割コラージュを「カード全体」の背景に敷く（展開時も維持）。
+          可読性スクリムを重ね、緑の枠（Card border）は border-0 で外す。画像を持つ習慣のみ。 */}
+      {hasEvidenceBg && (
+        <>
+          <div className="absolute inset-0 flex" aria-hidden>
+            {evidenceImages.map((url, i) => (
+              <img
+                key={i}
+                src={url}
+                alt=""
+                loading="lazy"
+                className="h-full min-w-0 flex-1 object-cover"
+              />
+            ))}
+          </div>
+          <div className="absolute inset-0 bg-black/60" aria-hidden />
+        </>
+      )}
+
       {/* Collapsed row - always visible */}
       <div
         role="button"
         tabIndex={0}
         onClick={() => onToggleExpand(habit.id)}
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onToggleExpand(habit.id); }}
-        className="flex cursor-pointer items-center gap-3 p-3 w-full text-left"
+        className="relative z-10 w-full cursor-pointer text-left"
       >
+        <div className="flex items-center gap-3 p-3">
         {/* Drag handle */}
         <button
           type="button"
-          className="touch-none shrink-0 text-gray-300 hover:text-gray-500 dark:text-gray-600 dark:hover:text-gray-400 cursor-grab active:cursor-grabbing"
+          className={cn(
+            'touch-none shrink-0 cursor-grab active:cursor-grabbing',
+            hasEvidenceBg
+              ? 'text-white/50 hover:text-white/80'
+              : 'text-gray-300 hover:text-gray-500 dark:text-gray-600 dark:hover:text-gray-400'
+          )}
           {...attributes}
           {...listeners}
           onClick={(e) => e.stopPropagation()}
@@ -298,21 +366,28 @@ export function HabitCard({
         {/* Center: Name + frequency label + past day dots */}
         <div className="flex-1 min-w-0 flex flex-col gap-1">
           <div className="flex items-baseline gap-2 min-w-0">
-            <span className={cn('text-[15px] font-medium truncate', isSkipped && 'text-muted-foreground')}>
+            <span
+              className={cn(
+                'text-[15px] font-medium truncate',
+                hasEvidenceBg
+                  ? cn('text-white drop-shadow-sm', isSkipped && 'text-white/50')
+                  : isSkipped && 'text-muted-foreground'
+              )}
+            >
               {habit.name}
             </span>
             {habit.frequency === 'weekly' && (
-              <span className="shrink-0 text-[11px] text-muted-foreground">
+              <span className={cn('shrink-0 text-[11px]', hasEvidenceBg ? 'text-white/80' : 'text-muted-foreground')}>
                 {t('weeklyProgress', { current: habit.weeklyCompletedCount ?? 0, target: habit.weeklyTarget ?? 1 })}
               </span>
             )}
             {habit.frequency === 'weekday' && (
-              <span className="shrink-0 text-[11px] text-muted-foreground">
+              <span className={cn('shrink-0 text-[11px]', hasEvidenceBg ? 'text-white/80' : 'text-muted-foreground')}>
                 {t('weekday')}
               </span>
             )}
             {habit.frequency === 'custom' && habit.customDays && habit.customDays.length > 0 && (
-              <span className="shrink-0 text-[11px] text-muted-foreground">
+              <span className={cn('shrink-0 text-[11px]', hasEvidenceBg ? 'text-white/80' : 'text-muted-foreground')}>
                 {[...habit.customDays].sort((a, b) => a - b).map((d) => dayLabels[d]).join('・')}
               </span>
             )}
@@ -323,7 +398,7 @@ export function HabitCard({
               const dayLabel = new Date(day.date + 'T00:00:00').toLocaleDateString(locale, { weekday: 'narrow' });
               return (
                 <div key={day.date} className="flex flex-col items-center gap-0.5">
-                  <span className="text-[9px] text-muted-foreground leading-none">{dayLabel}</span>
+                  <span className={cn('text-[9px] leading-none', hasEvidenceBg ? 'text-white/70' : 'text-muted-foreground')}>{dayLabel}</span>
                   <DayStatusDot day={day} onTap={() => handleDotTap(day)} />
                 </div>
               );
@@ -332,19 +407,20 @@ export function HabitCard({
         </div>
 
         {/* Right: Chevron */}
-        <div className="shrink-0 text-gray-400">
+        <div className={cn('shrink-0', hasEvidenceBg ? 'text-white/80' : 'text-gray-400')}>
           {isExpanded ? (
             <ChevronUp className="size-5" />
           ) : (
             <ChevronDown className="size-5" />
           )}
         </div>
+        </div>
       </div>
 
       {/* Expanded body - smooth height transition via grid trick */}
       <div
         className={cn(
-          'grid transition-[grid-template-rows] duration-300 ease-in-out',
+          'relative z-10 grid transition-[grid-template-rows] duration-300 ease-in-out',
           isExpanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
         )}
       >
@@ -353,60 +429,67 @@ export function HabitCard({
             {/* Life Significance */}
             {habit.lifeSignificance && (
               <div>
-                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mb-0.5">
+                <p className={cn('text-[10px] uppercase tracking-wider font-semibold mb-0.5', hasEvidenceBg ? 'text-white/60' : 'text-gray-400')}>
                   {t('lifeSignificance')}
                 </p>
-                <p className="text-sm text-foreground/80">
+                <p className={cn('text-sm', hasEvidenceBg ? 'text-white/90' : 'text-foreground/80')}>
                   {habit.lifeSignificance}
                 </p>
               </div>
             )}
 
-            {/* Impact Badge */}
-            {habit.evidences.length > 0 && (
-              <ImpactBadge evidences={habit.evidences} mode="daily" />
-            )}
-
-            {/* Streak card */}
-            <div className="rounded-lg bg-success/15 p-3">
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-success">
-                  {habit.currentStreak}
-                </span>
-                <span className="text-sm text-success/70">
-                  {tStats('days')}
-                </span>
-                <span className="ml-auto text-xs text-success/60">
-                  {t('streakGoal', { percent: streakPercent })}
-                </span>
+            {/* F18: 写真カードでは KPI影響・継続日数・累積を「1つのガラスボックス」に内包する。
+                外周ボーダーはなし。区切りはごく薄いディバイダ。隙間から背景が見える状態を解消。
+                写真なしカードは従来どおり個別の箱で表示する。 */}
+            {hasEvidenceBg ? (
+              <div className="space-y-3 rounded-xl bg-white/10 p-3 backdrop-blur-sm">
+                {habit.evidences.length > 0 && (
+                  <ImpactBadge evidences={habit.evidences} mode="daily" surface="bare" />
+                )}
+                {habit.evidences.length > 0 && <div className="h-px bg-white/15" />}
+                <div>{streakInner(true)}</div>
+                {habit.impactSavings && <div className="h-px bg-white/15" />}
+                {habit.impactSavings && (
+                  <SavingsCard savings={habit.impactSavings} surface="bare" />
+                )}
               </div>
-              {/* Progress bar */}
-              <div className="mt-2 h-1.5 rounded-full bg-white">
-                <div
-                  className="h-full rounded-full bg-success transition-all duration-300"
-                  style={{ width: `${streakPercent}%` }}
-                />
-              </div>
-            </div>
-
-            {/* Savings Card */}
-            {habit.impactSavings && (
-              <SavingsCard savings={habit.impactSavings} />
+            ) : (
+              <>
+                {/* Impact Badge */}
+                {habit.evidences.length > 0 && (
+                  <ImpactBadge evidences={habit.evidences} mode="daily" surface="default" />
+                )}
+                {/* Streak card */}
+                <div className="rounded-lg bg-success/15 p-3">{streakInner(false)}</div>
+                {/* Savings Card */}
+                {habit.impactSavings && (
+                  <SavingsCard savings={habit.impactSavings} surface="default" />
+                )}
+              </>
             )}
 
             {/* Detail + Skip/Unskip buttons */}
             <div className="flex gap-2">
+              {/* F20: 詳細はポジティブな意味を持たないため緑をやめ、中立色に。
+                  写真上は白ガラス、通常時は secondary。押せる affordance は維持。 */}
               <button
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   onOpenDetail(habit.id);
                 }}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-success px-4 py-2.5 text-sm font-medium text-success-foreground transition-colors hover:bg-success/90"
+                className={cn(
+                  'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors',
+                  hasEvidenceBg
+                    ? 'bg-white/90 text-gray-900 hover:bg-white'
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                )}
               >
                 <Maximize2 className="size-4" />
                 {t('detail')}
               </button>
+              {/* F19: スキップは中立操作。緑以外の中立アクセント（primary=スレート/白ガラス）＋
+                  リングで押せる affordance を明示。skipped 中は amber。 */}
               <button
                 type="button"
                 onClick={(e) => {
@@ -414,10 +497,12 @@ export function HabitCard({
                   onSkipToday(habit.id);
                 }}
                 className={cn(
-                  'flex shrink-0 items-center justify-center gap-1 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                  'flex shrink-0 items-center justify-center gap-1 rounded-lg px-3 py-2.5 text-sm font-medium ring-1 transition-colors',
                   isSkipped
-                    ? 'bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-900/50'
-                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    ? 'bg-amber-100 text-amber-700 ring-amber-200 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:ring-amber-900/40 dark:hover:bg-amber-900/50'
+                    : hasEvidenceBg
+                      ? 'bg-white/15 text-white ring-white/30 hover:bg-white/25'
+                      : 'bg-primary/10 text-primary ring-primary/20 hover:bg-primary/20'
                 )}
               >
                 {isSkipped ? (
