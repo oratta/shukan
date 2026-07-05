@@ -100,3 +100,11 @@
 - F5: answeredHabits（rate>0）の各行に preset.icon（KpiIcon）＋主要KPI（primaryKpis[0]）の生涯ポテンシャル値（habitPotentialV3 の達成率100%基準・既存関数の再利用、新規計算なし）を表示。KpiIcon の ICON_MAP に不足していたオンボ15習慣のアイコン（dumbbell/salad/glass-water/hamburger/soup/pen-line/message-circle-heart）を追加（未登録は Sparkles にフォールバックしていた）。
 - F6: 行タップで**既存の EvidenceArticleSheet**（アプリ本体の Discover/Home で使用中・articleId を受け取る bottom sheet）を preset.articleIds[0] で開く。新規記事UIは作らない。affordance は ChevronRight＋hover:border-primary/40＋active:scale。ImpactArticleSheet（habit を要求する Dialog）ではなく EvidenceArticleSheet を選択した理由: オンボ時点で habit レコードは未作成で articleId のみ手元にあるため、articleId を直接受ける後者が適合。
 - TDD: onboarding-impact-sections.test.ts を新規追加（kpiSections body の存在/長さ/健康寿命・前向きの枠組み語/過剰断定不在、summaryLabel等の存在、15習慣のアイコン・主要KPI・先頭記事の解決）。onboarding-messages.test.ts の title/currentLabel 期待値を新文言へ更新。全 760 テスト PASS、tsc clean、lint 0 error、build 成功。
+
+## D-feedback-3: [4]習慣リストの効果値を主要KPI1つ→効果を持つ全KPIのコンパクト表示へ（F7）
+- 追加フィードバック（2026-07-03）: F5 で出した習慣リストの効果値が「主要KPI（primaryKpis[0]）1つ」だけだったが、その習慣が効くKPIすべての数字を見たい。表示スペースは限られるので「KPIアイコン＋'+数字'」の横並びでよい、値0のKPIは出さない。
+- 実装: answeredHabits の各行で habitPotentialV3（既存・達成率100%基準）の byKpi を KPI_CATALOG 順に走査し raw>0 のものだけ {icon, display, unit} を抽出（effects 配列）。行内で flex-wrap の小さなチップ（KpiIcon size-3.5＋`+{display}{unit}`）として横並び表示。新規計算・新規フォーマッタは作らず formatKpiValue 済みの display/unit を再利用。primaryKpis への依存を撤廃（複数KPIに効く習慣＝daily_cardio 等で健康寿命＋前向きが並ぶ）。
+- TDD: onboarding-impact-sections.test.ts に2件追加（複数KPIに効く習慣は raw>0 が2軸以上／効果を持たないKPIは raw=0 で除外可能）。
+
+## D-feedback-4: [4]→[5] CTA を「次へ」に簡素化（F8）
+- 追加フィードバック（2026-07-03）: result.cta「大切にしたいことを選ぶ」→「次へ」（en: "Next"）。onboarding-messages.test.ts の期待値を更新。onboarding-future-contrast.test.ts の「習慣を選びに進む でない・非空」制約は「次へ」で引き続き満たす。全 762 テスト PASS、tsc clean、lint 0 error、build 成功。

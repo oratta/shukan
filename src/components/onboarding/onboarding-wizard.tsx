@@ -157,24 +157,25 @@ export function OnboardingWizard() {
   );
 
   // [4] 結果に含まれている習慣（達成率>0 で回答したもの・表示順）。
-  // 各行にアイコン・主要KPIの効果値（達成率100%基準の生涯ポテンシャル）・エビデンス記事ID を付す（F5/F6）。
+  // 各行にアイコン・効果を持つ全KPIの値（達成率100%基準の生涯ポテンシャル・0は除外）・
+  // エビデンス記事ID を付す（F5/F6/F7）。
   const answeredHabits = useMemo(() => {
     return buildDiagnosisSelections(state)
       .filter((s) => s.rate > 0)
       .map(({ presetId, rate }) => {
         const preset = getHabitPreset(presetId);
-        const primaryKpi = preset?.primaryKpis[0] ?? null;
-        const effect =
-          primaryKpi != null
-            ? habitPotentialV3(presetId, calcProfile).byKpi[primaryKpi]
-            : null;
+        const potential = habitPotentialV3(presetId, calcProfile);
+        // KPIカタログ順で、効果値 > 0 の KPI だけを「アイコン＋数字」用に抽出する。
+        const effects = KPI_CATALOG.map((def) => {
+          const v = potential.byKpi[def.key];
+          return { key: def.key, icon: def.icon, display: v.display, unit: v.unit, raw: v.raw };
+        }).filter((e) => e.raw > 0);
         return {
           presetId,
           rate,
           icon: preset?.icon ?? "sparkles",
           articleId: preset?.articleIds[0] ?? null,
-          primaryKpi,
-          effect,
+          effects,
         };
       });
   }, [state, calcProfile]);
@@ -517,7 +518,7 @@ export function OnboardingWizard() {
                 {t("result.habitsLabel")}
               </p>
               <ul className="space-y-2">
-                {answeredHabits.map(({ presetId, rate, icon, articleId, effect }) => (
+                {answeredHabits.map(({ presetId, rate, icon, articleId, effects }) => (
                   <li key={presetId}>
                     <button
                       type="button"
@@ -528,23 +529,34 @@ export function OnboardingWizard() {
                       <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                         <KpiIcon name={icon} className="size-5" />
                       </span>
-                      <span className="min-w-0 flex-1 space-y-0.5">
-                        <span className="block truncate text-sm font-medium">
-                          {t(`preset.${presetId}`)}
-                        </span>
-                        <span className="block text-xs tabular-nums text-muted-foreground">
-                          {Math.round(rate * 100)}%
-                        </span>
-                      </span>
-                      {effect && effect.raw > 0 && (
-                        <span className="shrink-0 whitespace-nowrap text-sm font-bold tabular-nums text-primary">
-                          +{effect.display}
-                          <span className="ml-0.5 text-[10px] font-semibold text-muted-foreground">
-                            {effect.unit}
+                      <span className="min-w-0 flex-1 space-y-1">
+                        <span className="flex items-center gap-2">
+                          <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                            {t(`preset.${presetId}`)}
+                          </span>
+                          <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+                            {Math.round(rate * 100)}%
                           </span>
                         </span>
-                      )}
-                      <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+                        {/* F7: 効果を持つ各KPIの「アイコン＋数字」をコンパクトに横並び（0は除外） */}
+                        {effects.length > 0 && (
+                          <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                            {effects.map((e) => (
+                              <span
+                                key={e.key}
+                                className="flex items-center gap-0.5 whitespace-nowrap text-xs font-semibold tabular-nums text-primary"
+                              >
+                                <KpiIcon name={e.icon} className="size-3.5 shrink-0" />
+                                +{e.display}
+                                <span className="text-[10px] font-medium text-muted-foreground">
+                                  {e.unit}
+                                </span>
+                              </span>
+                            ))}
+                          </span>
+                        )}
+                      </span>
+                      <ChevronRight className="size-4 shrink-0 self-center text-muted-foreground" aria-hidden />
                     </button>
                   </li>
                 ))}
