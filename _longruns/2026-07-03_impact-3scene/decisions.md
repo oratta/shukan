@@ -141,3 +141,10 @@
 - **フォールバック**: 画像を1枚も持たない習慣（ゼロから作ったカスタム習慣等）は hasEvidenceBg=false で従来の通常カード表示のまま。
 - **established セクションは対象外（自然に）**: EstablishedSection は HabitCard ではなく独自の `<Card>`（HabitIcon ベース）で描画するため、HabitCard への今回の変更は波及せず established は自動的に対象外。デイリーチェックリスト（HabitList→HabitCard）にのみ適用。
 - テスト: evidence-collage.test.ts を新規追加（共有画像の getter／Discover が同一共有モジュールを使う／HabitCard の getEvidenceHeroImage・MAX 4・slice・flex-1 object-cover・from-black オーバーレイ・hasEvidenceBg フォールバック配線）。全 778 テスト PASS、tsc clean、lint 0 error（warning は既存＋コラージュ img の1件増のみ）、build 成功。
+
+## D-feedback-9: 習慣インパクト表示（ImpactBadge）も4軸目を常時表示（F16）
+- 追加フィードバック（2026-07-03）: ホームで習慣カードを展開したときのインパクト表示が3軸のまま。F10 と同方針で「前向きな気持ちの時間」を4軸目として値0でも常時表示。
+- 対象コンポーネント: 展開時のインパクトは `ImpactBadge`（habit-card.tsx の展開ボディで `<ImpactBadge evidences mode="daily" />`）。`values.positiveMoodMinutes > 0 &&` ガードを撤去し、他3軸と同じ `flex flex-col` レイアウト・`text-success`・`dailyPositiveMood` ラベルで常時描画（+0分表示可）。
+- **スコープ判断**: ImpactBadge は共有部品で、ホーム展開（habit-card）と習慣詳細モーダル（habit-detail-modal）の2箇所で使用。どちらもユーザー自身の習慣インパクト表示のため、prop 分岐を足さず ImpactBadge 自体を常時4軸に統一（React ベストプラクティス: 一様であるべき挙動に boolean prop を増やさない）。習慣詳細モーダルにも同じ4軸表示が自然に適用される（同一部品・整合的）。
+- 非対象: DailyImpactSummary は F10 で対応済み。stats / savings-card / 記事シート（evidence/impact article sheet）等の他の表示箇所は現行の「> 0 のみ」を維持（触っていない）。D-change3-2 の invariant は「ユーザー自身の習慣インパクト表示（DailyImpactSummary・ImpactBadge）に限り常時表示」へと F10/F16 で部分的に上書き。
+- テスト: impact.test.ts に F16 の回帰テスト2件追加（impact-badge が dailyPositiveMood を描画／`positiveMoodMinutes > 0` ガードを持たない）。mood-axis-display.test.ts（impact-badge の dailyPositiveMood 参照）は維持で PASS。全 780 テスト PASS、tsc clean、lint 0 error、build 成功。
