@@ -10,7 +10,6 @@ import { VsTemptationModal } from '@/components/habits/vs-temptation-modal';
 import { EvidenceArticleSheet } from '@/components/habits/evidence-article-sheet';
 import { DailyImpactSummary } from '@/components/habits/daily-impact-summary';
 import { EstablishedSection } from '@/components/habits/established-section';
-import { TrackedKpisCard } from '@/components/habits/tracked-kpis-card';
 import { YesterdayReviewBanner } from '@/components/habits/yesterday-review-banner';
 import { YesterdayReviewSheet } from '@/components/habits/yesterday-review-sheet';
 import { useHabits } from '@/hooks/useHabits';
@@ -261,8 +260,6 @@ export default function DashboardPage() {
           />
         </div>
       )}
-
-      <TrackedKpisCard profile={profile} />
 
       <DailyImpactSummary habits={todayHabits} />
 

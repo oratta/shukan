@@ -142,23 +142,22 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
           <span className="text-[9px] font-medium text-[#9C9B99]">{t('dailyIncome')}</span>
         </div>
 
-        {/* Positive mood (4th axis) — 値がある習慣を含むときのみ表示 */}
-        {total.positiveMoodMinutes > 0 && (
-          <div className="flex flex-col">
-            <div className="flex items-center gap-1">
-              <Smile className="size-3.5 text-success" />
-              <span className="text-sm font-bold text-success">
-                +{formatHealthMinutes(earned.positiveMoodMinutes)}
+        {/* Positive mood (4th axis) — この画面（DailyImpactSummary）に限り値が0でも常時表示（F10）。
+            他の表示箇所（stats/savings-card/impact-badge/記事シート）は「> 0 のみ」を維持する。 */}
+        <div className="flex flex-col">
+          <div className="flex items-center gap-1">
+            <Smile className="size-3.5 text-success" />
+            <span className="text-sm font-bold text-success">
+              +{formatHealthMinutes(earned.positiveMoodMinutes)}
+            </span>
+            {!isPerfect && (
+              <span className="text-xs text-muted-foreground">
+                /{formatHealthMinutes(total.positiveMoodMinutes)}
               </span>
-              {!isPerfect && (
-                <span className="text-xs text-muted-foreground">
-                  /{formatHealthMinutes(total.positiveMoodMinutes)}
-                </span>
-              )}
-            </div>
-            <span className="text-[9px] font-medium text-[#9C9B99]">{t('dailyPositiveMood')}</span>
+            )}
           </div>
-        )}
+          <span className="text-[9px] font-medium text-[#9C9B99]">{t('dailyPositiveMood')}</span>
+        </div>
       </div>
 
       {/* 5 Days Impact */}
@@ -194,17 +193,16 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
             </div>
             <span className="text-[9px] font-medium text-[#9C9B99]">{t('dailyIncome')}</span>
           </div>
-          {fiveDays.positiveMoodMinutes > 0 && (
-            <div className="flex flex-col">
-              <div className="flex items-center gap-1">
-                <Smile className="size-3.5 text-success" />
-                <span className="text-sm font-bold text-success">
-                  +{formatHealthMinutes(fiveDays.positiveMoodMinutes)}
-                </span>
-              </div>
-              <span className="text-[9px] font-medium text-[#9C9B99]">{t('dailyPositiveMood')}</span>
+          {/* 4th axis — 今日の表示と揃え、値0でも常時表示（F10） */}
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1">
+              <Smile className="size-3.5 text-success" />
+              <span className="text-sm font-bold text-success">
+                +{formatHealthMinutes(fiveDays.positiveMoodMinutes)}
+              </span>
             </div>
-          )}
+            <span className="text-[9px] font-medium text-[#9C9B99]">{t('dailyPositiveMood')}</span>
+          </div>
         </div>
       </div>
     </div>

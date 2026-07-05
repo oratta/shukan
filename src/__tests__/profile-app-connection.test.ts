@@ -76,23 +76,15 @@ describe('resolveTrackedKpiDefinitions (Scenario 5-1)', () => {
   });
 });
 
-describe('ホームが TrackedKpisCard と profile を配線している (Scenario 5-1)', () => {
+describe('ホームが profile を配線している (Scenario 5-1)', () => {
   const home = readSource('src/app/(app)/page.tsx');
-  it('TrackedKpisCard をインポートして描画する', () => {
-    expect(home).toContain('TrackedKpisCard');
-  });
   it('useProfile フックで profile を取得する', () => {
     expect(home).toContain('useProfile');
   });
-});
-
-describe('TrackedKpisCard は tracked_kpis を KPI 名で描画する (Scenario 5-1)', () => {
-  const src = readSource('src/components/habits/tracked-kpis-card.tsx');
-  it('resolveTrackedKpiDefinitions で表示 KPI を解決する', () => {
-    expect(src).toContain('resolveTrackedKpiDefinitions');
-  });
-  it('KPI 名は正準 onboarding.kpi.*.name を参照する（造語を作らない）', () => {
-    expect(src).toContain('onboarding.kpi.');
+  // F9（ユーザー判断で AC#12 撤回）: ホームの TrackedKpisCard は削除済み。
+  // tracked_kpis の編集は設定画面（ProfileEditor）に残置。ホームでは表示しない。
+  it('ホームに TrackedKpisCard は残っていない（F9）', () => {
+    expect(home).not.toContain('TrackedKpisCard');
   });
 });
 

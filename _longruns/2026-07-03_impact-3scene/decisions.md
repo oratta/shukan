@@ -108,3 +108,16 @@
 
 ## D-feedback-4: [4]→[5] CTA を「次へ」に簡素化（F8）
 - 追加フィードバック（2026-07-03）: result.cta「大切にしたいことを選ぶ」→「次へ」（en: "Next"）。onboarding-messages.test.ts の期待値を更新。onboarding-future-contrast.test.ts の「習慣を選びに進む でない・非空」制約は「次へ」で引き続き満たす。全 762 テスト PASS、tsc clean、lint 0 error、build 成功。
+
+## D-feedback-5: AC#12（ホームに tracked_kpis 表示）はユーザー判断で撤回。ホームの TrackedKpisCard を削除（F9）
+- 追加フィードバック（2026-07-03）: change-5 で追加した「あなたが大切にしていること」カード（TrackedKpisCard・user_profiles.tracked_kpis の表示）は「意図がわからない、不要」との判断。
+- **plan.md 受け入れ条件 #12「ホームに user_profiles.tracked_kpis の KPI が表示される」はユーザー判断で撤回**する。ホームでの tracked_kpis 表示は不要。ただし **tracked_kpis の編集機能は設定画面（ProfileEditor）に残置**（AC#13 は維持）。
+- 実装: `src/app/(app)/page.tsx` から TrackedKpisCard の import と描画を削除。`useProfile`/`profile` は EstablishedSection の個人化（D-change5-4）でまだ使うため残置。TrackedKpisCard は他に参照がないためコンポーネント本体（tracked-kpis-card.tsx）を削除。純粋関数 `resolveTrackedKpiDefinitions` は profile-settings.ts（設定保存の正規化）が使い続けるため残置。
+- テスト: profile-app-connection.test.ts の「ホームが TrackedKpisCard を描画する」describe と「TrackedKpisCard は tracked_kpis を描画する」describe（削除ファイルを readSource するため放置すると即失敗）を削除し、「ホームに TrackedKpisCard が残っていない（F9）」＋「useProfile を配線」の回帰テストに置換。resolveTrackedKpiDefinitions の単体テスト（Scenario 5-1）は関数が残るため維持。message キー `habits.trackedKpisTitle` は現状 orphan だが無害のため残置（撤去はスコープ外）。
+
+## D-feedback-6: DailyImpactSummary（今日の Life Impact）は4軸目を常時表示（F10）
+- 追加フィードバック（2026-07-03）: ホームの「今日の Life Impact」に KPI が3つしか出ない。原因は D-change3-2 の「mood 合算値 > 0 のときのみ表示」。
+- 変更: **DailyImpactSummary に限り**、今日ブロック・5日間ブロックの両方で mood 軸（前向きな気持ちの時間）の `positiveMoodMinutes > 0` ガードを撤去し、値0でも「+0分」で他3軸と同じ見た目で常時表示。今日/5日間の見た目を揃えるため両ブロックを変更。
+- 非対象: stats / savings-card / impact-badge / 記事シート等の他の表示箇所は「> 0 のみ表示」（D-change3-2）を維持。触っていない。
+- hasImpact ガード（`totalMood > 0` を含む OR）は据え置き。全KPIが0の習慣構成では従来どおりカード自体を非表示。
+- テスト: impact.test.ts に F10 の回帰テスト2件追加（dailyPositiveMood を描画する／`positiveMoodMinutes > 0` ガードを持たない）。全 762 テスト PASS、tsc clean、lint 0 error、build 成功。
