@@ -593,5 +593,22 @@
       "installed": "すでにホーム画面に追加されています。",
       "unsupported": "ホーム画面に追加するには、スマホの Safari または Chrome で Smitch を開いてください。"
     }
+  },
+  "feedback": {
+    "title": "フィードバック",
+    "description": "バグ報告やご要望をお送りください。今後の改善に活用します。",
+    "settingsDescription": "バグ報告・ご要望はこちらから送れます。",
+    "openForm": "フィードバックを送る",
+    "category": {
+      "bug": "バグ報告",
+      "idea": "要望",
+      "other": "その他"
+    },
+    "bodyLabel": "フィードバック本文",
+    "placeholder": "気づいたこと・困っていること・欲しい機能などを自由にお書きください",
+    "submit": "送信",
+    "submitting": "送信中...",
+    "success": "送信しました。ありがとうございます！",
+    "error": "送信に失敗しました。時間をおいて再度お試しください。"
   }
 }

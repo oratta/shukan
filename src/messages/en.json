@@ -593,5 +593,22 @@
       "installed": "Already added to your Home Screen.",
       "unsupported": "Open Smitch in Safari or Chrome on your phone to add it to your Home Screen."
     }
+  },
+  "feedback": {
+    "title": "Feedback",
+    "description": "Send us bug reports and feature requests. We use them to improve the app.",
+    "settingsDescription": "Report bugs or request features here.",
+    "openForm": "Send feedback",
+    "category": {
+      "bug": "Bug report",
+      "idea": "Request",
+      "other": "Other"
+    },
+    "bodyLabel": "Feedback body",
+    "placeholder": "Tell us anything: issues you hit, things that confused you, features you want",
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "success": "Sent. Thank you!",
+    "error": "Failed to send. Please try again later."
   }
 }

@@ -2,8 +2,9 @@
 
 import { useTheme } from 'next-themes';
 import { usePathname } from 'next/navigation';
-import { Sun, Moon, User, Home, Compass, BarChart3, Settings } from 'lucide-react';
+import { Sun, Moon, User, Home, Compass, BarChart3, Settings, MessageSquarePlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { FeedbackDialog } from '@/components/feedback/feedback-dialog';
 import { LocaleSwitcher } from '@/components/locale-switcher';
 import { SmitchLogo } from '@/components/ui/smitch-logo';
 import { useAuth } from '@/components/auth-provider';
@@ -24,7 +25,9 @@ export function Header() {
   const { user } = useAuth();
   const pathname = usePathname();
   const t = useTranslations('nav');
+  const tFeedback = useTranslations('feedback');
   const [mounted, setMounted] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   // next-themes ハイドレーション対策: サーバーでは theme が未確定なので、
   // マウント後にのみテーマ依存 UI を描画する意図的な mounted パターン。
@@ -87,6 +90,18 @@ export function Header() {
               )}
             </Link>
           )}
+          {/* アプリ内フィードバック導線（issue #19）: 全画面から1タップで到達 */}
+          {user && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setFeedbackOpen(true)}
+              aria-label={tFeedback('title')}
+            >
+              <MessageSquarePlus className="size-4" />
+            </Button>
+          )}
+          <FeedbackDialog open={feedbackOpen} onOpenChange={setFeedbackOpen} />
           <LocaleSwitcher />
           {mounted && (
             <Button
