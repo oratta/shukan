@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { getArticle } from '@/data/impact-articles';
+import { EstimateDisclaimer } from '@/components/habits/estimate-disclaimer';
 import { renderArticle, calculateAnnualImpact, formatHealthMinutes, formatCurrency } from '@/lib/impact';
 import type { ArticleId, CalcStep } from '@/types/impact';
 import { submitBadMark, removeBadMark, submitComment, getUserFeedback } from '@/lib/supabase/feedbacks';
@@ -310,6 +311,10 @@ export function EvidenceArticleSheet({
                 {confidenceLabel}
               </span>
             </div>
+
+            {/* 景表法・打消し表示対応（issue #39）: 年間推定値バッジ直下の近接注記。
+                本文の推論段落（V3: LLM 生成）向けに AI 明示も併記する。 */}
+            <EstimateDisclaimer withAiNote className="mt-2" />
           </div>
 
           {/* Article body */}

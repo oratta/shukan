@@ -205,6 +205,8 @@
     "todayImpact": "今日のライフインパクト",
     "fiveDaysImpact": "5日間のインパクト",
     "perfect": "パーフェクト！",
+    "estimateDisclaimer": "数値は研究の集団平均に基づく試算です。個人の結果を保証するものではありません（個人差があります）。",
+    "aiEstimateNote": "本文のあなたへの当てはめ部分は、AIによる推定を含みます。",
     "confidence": {
       "high": "信頼度: 高",
       "medium": "信頼度: 中",

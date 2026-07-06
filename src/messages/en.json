@@ -205,6 +205,8 @@
     "todayImpact": "Today's Life Impact",
     "fiveDaysImpact": "5 Days Impact",
     "perfect": "Perfect!",
+    "estimateDisclaimer": "Figures are estimates based on population averages from research. They do not guarantee individual results (results vary by person).",
+    "aiEstimateNote": "The parts of this article applied to you include AI-generated estimates.",
     "confidence": {
       "high": "Confidence: High",
       "medium": "Confidence: Medium",
