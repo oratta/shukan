@@ -1,0 +1,13 @@
+#!/bin/sh
+# agent-loop policy: 保護ブランチへの直接 push を拒否する
+protected="main master"
+while read local_ref local_sha remote_ref remote_sha; do
+  for b in $protected; do
+    if [ "$remote_ref" = "refs/heads/$b" ]; then
+      echo "pre-push: $b への直接 push は agent-loop ポリシーで禁止されています" >&2
+      echo "pre-push: feature ブランチに push して PR を作成してください" >&2
+      exit 1
+    fi
+  done
+done
+exit 0
