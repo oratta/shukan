@@ -14,6 +14,23 @@ vi.mock('@supabase/ssr', () => ({
     (createServerClientMock as (...a: unknown[]) => unknown)(...args),
 }));
 
+// --- next-intl mock (marketing page/layout are now async Server Components) ---
+// The S8 render test only needs structure + literal footer text, so a key-echoing
+// translator is enough. Full copy is verified in marketing-page.test.tsx.
+vi.mock('next-intl/server', () => {
+  const t = (key: string) => key;
+  t.raw = () => [] as unknown[];
+  return {
+    getTranslations: vi.fn(async () => t),
+    getLocale: vi.fn(async () => 'en'),
+  };
+});
+vi.mock('@/components/locale-switcher', () => ({
+  LocaleSwitcher: function LocaleSwitcher() {
+    return null;
+  },
+}));
+
 // Import middleware AFTER mocks
 import { middleware } from '@/middleware';
 
@@ -190,8 +207,8 @@ describe('middleware: marketing page renders standalone layout (S8)', () => {
 
   it('marketing page renders LP sections and footer links', async () => {
     const { default: MarketingPage } = await import('@/app/marketing/page');
-    // Server Component returns JSX synchronously; render to a tree object
-    const tree = (MarketingPage as () => unknown)();
+    // Async Server Component; await to get the JSX tree object
+    const tree = await (MarketingPage as () => Promise<unknown>)();
 
     // Collect text, hrefs, and component names by walking the React element tree
     const texts: string[] = [];
@@ -223,10 +240,11 @@ describe('middleware: marketing page renders standalone layout (S8)', () => {
 
     const joinedText = texts.join(' ');
     expect(joinedText).toContain('Switch your path');
-    // LP 刷新（PR #33 以降）で /login CTA は廃止され、CTA はウェイトリストフォームになった。
-    // セクションコンポーネントの存在とフッター（Privacy / Terms / コピーライト）を検証する。
+    // LP リニューアル（#53）でセクション構成を刷新。ウェイトリストフォームは廃止し、
+    // CTA は実アプリ / Founding 導線（Cta）に。セクション存在とフッター（Privacy /
+    // Terms / コピーライト）を検証する。
     expect(componentNames).toContain('Hero');
-    expect(componentNames).toContain('CtaWaitlistForm');
+    expect(componentNames).toContain('Cta');
     expect(hrefs).toContain('/privacy');
     expect(hrefs).toContain('/terms');
     expect(joinedText).toContain('Genetta');

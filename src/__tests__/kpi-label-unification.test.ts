@@ -1,7 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { dirname, resolve } from 'node:path';
 import ja from '@/messages/ja.json';
 import en from '@/messages/en.json';
 
@@ -18,11 +15,6 @@ const impactEn = (en as unknown as { impact: Record<string, Json> }).impact;
 const evidenceJa = (ja as unknown as { evidence: Record<string, Json> }).evidence;
 const kpiEn = (en as unknown as { onboarding: { kpi: Record<string, { name: string }> } })
   .onboarding.kpi;
-
-const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
-function readSource(rel: string): string {
-  return readFileSync(resolve(projectRoot, rel), 'utf-8');
-}
 
 describe('ja impact ラベルの正式名統一', () => {
   it('impact.dailyCost は「出費削減」', () => {
@@ -89,24 +81,23 @@ describe('en impact.* の KPI 英語名が正準 onboarding.kpi.*.name と一致
   });
 });
 
-describe('LP alt テキストの KPI 名統一', () => {
+describe('LP ImpactAxes コピーの KPI 名統一', () => {
+  // LP リニューアル（#53）で旧 Process.tsx / Detail.tsx の alt 文言は廃止され、
+  // KPI 名は marketing.impact.axes（ja/en）のコピーに集約された。ここではその
+  // ImpactAxes コピーが正式 KPI 名を使い、旧軸名を残していないことを検証する。
   const oldAxisTokens = ['生涯コスト', '可処分時間', '集中時間'];
   const canonical = ['健康寿命', '出費削減', '増える収入', '前向きな気持ちの時間'];
 
-  it('Process.tsx の alt に旧軸名が残っていない', () => {
-    const src = readSource('src/components/landing/Process.tsx');
-    for (const t of oldAxisTokens) expect(src).not.toContain(t);
+  const marketingJa = (ja as unknown as {
+    marketing: { impact: { axes: Array<{ label: string; desc: string }>; note: string } };
+  }).marketing;
+  const axisLabels = marketingJa.impact.axes.map((a) => a.label);
+  const impactBlob = JSON.stringify(marketingJa.impact);
+
+  it('ImpactAxes の軸ラベルに4つの正式 KPI 名が含まれる', () => {
+    for (const t of canonical) expect(axisLabels).toContain(t);
   });
-  it('Process.tsx の alt に4つの正式 KPI 名が含まれる', () => {
-    const src = readSource('src/components/landing/Process.tsx');
-    for (const t of canonical) expect(src).toContain(t);
-  });
-  it('Detail.tsx の alt に旧軸名が残っていない', () => {
-    const src = readSource('src/components/landing/Detail.tsx');
-    for (const t of oldAxisTokens) expect(src).not.toContain(t);
-  });
-  it('Detail.tsx の alt に4つの正式 KPI 名が含まれる', () => {
-    const src = readSource('src/components/landing/Detail.tsx');
-    for (const t of canonical) expect(src).toContain(t);
+  it('ImpactAxes コピーに旧軸名が残っていない', () => {
+    for (const t of oldAxisTokens) expect(impactBlob).not.toContain(t);
   });
 });

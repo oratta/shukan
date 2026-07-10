@@ -1,5 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import en from '@/messages/en.json';
+import ja from '@/messages/ja.json';
 
+/**
+ * Tree-walking helpers for async Server Component output.
+ * Mirrors src/__tests__/founding-page.test.tsx.
+ */
 type WalkResult = {
   texts: string[];
   hrefs: string[];
@@ -44,94 +50,149 @@ function typeName(type: unknown): string {
   return '';
 }
 
-describe('Smitch marketing landing page', () => {
-  it('assembles the eight image-to-code LP sections in order', async () => {
+// --- Mock next-intl/server getTranslations to read directly from en.json ---
+type Json = Record<string, unknown>;
+function makeT(namespace: string) {
+  const ns = (en as Json)[namespace] as Json;
+  const t = (key: string) => {
+    const parts = key.split('.');
+    let cur: unknown = ns;
+    for (const p of parts) if (cur && typeof cur === 'object') cur = (cur as Json)[p];
+    return typeof cur === 'string' ? cur : key;
+  };
+  t.raw = (key: string) => {
+    const parts = key.split('.');
+    let cur: unknown = ns;
+    for (const p of parts) if (cur && typeof cur === 'object') cur = (cur as Json)[p];
+    return cur;
+  };
+  return t;
+}
+
+vi.mock('next-intl/server', () => ({
+  getTranslations: vi.fn(async (namespace: string) => makeT(namespace)),
+  getLocale: vi.fn(async () => 'en'),
+}));
+
+// Client component: expose a detectable, side-effect-free stand-in.
+vi.mock('@/components/locale-switcher', () => ({
+  LocaleSwitcher: function LocaleSwitcher() {
+    return null;
+  },
+}));
+
+const marketing = (en as Json).marketing as Json;
+
+describe('Smitch marketing landing page — structure', () => {
+  it('assembles the redesigned LP sections in order', async () => {
     const { default: MarketingPage } = await import('@/app/marketing/page');
-    const acc = collect((MarketingPage as () => unknown)());
+    const acc = collect(await (MarketingPage as () => Promise<unknown>)());
 
-    const sectionNames = acc.elements
-      .map((element) => typeName(element.type))
-      .filter((name) =>
-        [
-          'Hero',
-          'Problem',
-          'Process',
-          'Detail',
-          'OutcomeGallery',
-          'SelectionCriterion',
-          'Testimony',
-          'CtaWaitlistForm',
-        ].includes(name)
-      );
-
-    expect(sectionNames).toEqual([
+    const order = [
       'Hero',
       'Problem',
-      'Process',
-      'Detail',
-      'OutcomeGallery',
-      'SelectionCriterion',
-      'Testimony',
-      'CtaWaitlistForm',
-    ]);
+      'HowItWorks',
+      'ImpactAxes',
+      'Difference',
+      'Evidence',
+      'Faq',
+      'Cta',
+    ];
+    const sectionNames = acc.elements
+      .map((element) => typeName(element.type))
+      .filter((name) => order.includes(name));
+
+    expect(sectionNames).toEqual(order);
   });
 
-  it('keeps footer legal links and brand credit visible', async () => {
+  it('keeps footer legal links (incl. tokushoho) and brand credit visible', async () => {
     const { default: MarketingPage } = await import('@/app/marketing/page');
-    const acc = collect((MarketingPage as () => unknown)());
+    const acc = collect(await (MarketingPage as () => Promise<unknown>)());
     const joined = acc.texts.join(' ');
 
     expect(acc.hrefs).toContain('/privacy');
     expect(acc.hrefs).toContain('/terms');
+    expect(acc.hrefs).toContain('/tokushoho');
     expect(joined).toContain('Switch your path.');
     expect(joined).toContain('Genetta Inc.');
   });
+});
 
-  it('renders hero headline, positioning copy, and primary section links', async () => {
+describe('Smitch marketing landing page — sections', () => {
+  it('Hero shows the headline, subtitle, and app + how-it-works CTAs', async () => {
     const { Hero } = await import('@/components/landing/Hero');
-    const acc = collect(Hero());
+    const acc = collect(await Hero());
     const joined = acc.texts.join(' ');
 
-    expect(joined).toContain('人生は、');
-    expect(joined).toContain('続けた日数では');
-    expect(joined).toContain('科学的根拠のある習慣');
-    expect(acc.hrefs).toContain('#waitlist');
-    expect(acc.hrefs).toContain('#process');
+    expect(joined).toContain('Science picks the habits');
+    expect(joined).toContain((marketing.hero as Json).subtitle as string);
+    // Primary CTA points at the running app host (not a coming-soon anchor).
+    expect(acc.hrefs).toContain('https://s-mitch.com');
+    expect(acc.hrefs).toContain('#how');
   });
 
-  it('renders the problem, process, detail, outcome, selection, and testimony section copy', async () => {
-    const [
-      { Problem },
-      { Process },
-      { Detail },
-      { OutcomeGallery },
-      { SelectionCriterion },
-      { Testimony },
-    ] = await Promise.all([
-      import('@/components/landing/Problem'),
-      import('@/components/landing/Process'),
-      import('@/components/landing/Detail'),
-      import('@/components/landing/OutcomeGallery'),
-      import('@/components/landing/SelectionCriterion'),
-      import('@/components/landing/Testimony'),
-    ]);
+  it('ImpactAxes lists the four KPI axes with a 景表法 estimate/disclaimer note', async () => {
+    const { ImpactAxes } = await import('@/components/landing/ImpactAxes');
+    const acc = collect(await ImpactAxes());
+    const joined = acc.texts.join(' ');
 
-    const joined = [
-      Problem(),
-      Process(),
-      Detail(),
-      OutcomeGallery(),
-      SelectionCriterion(),
-      Testimony(),
-    ]
-      .map((tree) => collect(tree).texts.join(' '))
-      .join(' ');
+    const axes = (marketing.impact as Json).axes as Array<{ label: string }>;
+    expect(axes).toHaveLength(4);
+    for (const axis of axes) expect(joined).toContain(axis.label);
+    expect(joined).toContain((marketing.impact as Json).note as string);
+  });
 
-    expect(joined).toContain('習慣アプリに、');
-    expect(joined).toContain('能動的に選び取る');
-    expect(joined).toContain('判断材料');
-    expect(joined).toContain('生活に戻ってくるもの');
-    expect(joined).toContain('問題はそこではない');
-    expect(joined).toContain('ストリークを守るためではなく');
+  it('Difference renders the positioning comparison rows', async () => {
+    const { Difference } = await import('@/components/landing/Difference');
+    const acc = collect(await Difference());
+    const joined = acc.texts.join(' ');
+
+    const rows = (marketing.difference as Json).rows as Array<{ smitch: string }>;
+    expect(rows.length).toBeGreaterThanOrEqual(4);
+    for (const row of rows) expect(joined).toContain(row.smitch);
+  });
+
+  it('Faq renders at least five honest Q/A items', async () => {
+    const { Faq } = await import('@/components/landing/Faq');
+    const acc = collect(await Faq());
+    const joined = acc.texts.join(' ');
+
+    const items = (marketing.faq as Json).items as Array<{ q: string }>;
+    expect(items.length).toBeGreaterThanOrEqual(5);
+    for (const item of items) expect(joined).toContain(item.q);
+  });
+
+  it('Cta drives to the live app and the Founding program, with no fake waitlist form', async () => {
+    const { Cta } = await import('@/components/landing/Cta');
+    const acc = collect(await Cta());
+
+    expect(acc.hrefs).toContain('https://s-mitch.com');
+    expect(acc.hrefs).toContain('https://s-mitch.com/founding');
+    // The removed placeholder waitlist form must not come back.
+    expect(acc.elements.map((e) => typeName(e.type))).not.toContain('form');
+  });
+});
+
+describe('Smitch marketing landing page — ja/en parity (Hero required in both)', () => {
+  const jaM = (ja as Json).marketing as Json;
+  const enM = (en as Json).marketing as Json;
+
+  it('both locales define the marketing namespace with a Hero title', () => {
+    expect(typeof (jaM.hero as Json).title).toBe('string');
+    expect(typeof (enM.hero as Json).title).toBe('string');
+    expect(((jaM.hero as Json).title as string).length).toBeGreaterThan(0);
+    expect(((enM.hero as Json).title as string).length).toBeGreaterThan(0);
+  });
+
+  it('impact axes, faq, and difference rows match in count across locales', () => {
+    expect((jaM.impact as Json).axes).toHaveLength(4);
+    expect((enM.impact as Json).axes).toHaveLength(4);
+    expect(((jaM.faq as Json).items as unknown[]).length).toBeGreaterThanOrEqual(5);
+    expect(((enM.faq as Json).items as unknown[]).length).toBe(
+      ((jaM.faq as Json).items as unknown[]).length
+    );
+    expect(((enM.difference as Json).rows as unknown[]).length).toBe(
+      ((jaM.difference as Json).rows as unknown[]).length
+    );
   });
 });
