@@ -14,6 +14,33 @@ vi.mock('@supabase/ssr', () => ({
     (createServerClientMock as (...a: unknown[]) => unknown)(...args),
 }));
 
+// --- next-intl mock ---
+// The marketing page (S8, below) is an async Server Component that resolves its
+// copy through next-intl. Read the real en catalogue so the assertions below
+// exercise the shipped strings rather than placeholders.
+vi.mock('next-intl/server', async () => {
+  const en = (await import('@/messages/en.json')).default as Record<string, unknown>;
+  const makeT = (namespace: string) => {
+    const ns = en[namespace] as Record<string, unknown>;
+    return (key: string, values?: Record<string, unknown>) => {
+      let cur: unknown = ns;
+      for (const part of key.split('.')) {
+        if (cur && typeof cur === 'object') cur = (cur as Record<string, unknown>)[part];
+      }
+      if (typeof cur !== 'string') return key;
+      if (!values) return cur;
+      return Object.entries(values).reduce(
+        (acc, [name, value]) => acc.replaceAll(`{${name}}`, String(value)),
+        cur
+      );
+    };
+  };
+  return {
+    getTranslations: vi.fn(async (namespace: string) => makeT(namespace)),
+    getLocale: vi.fn(async () => 'en'),
+  };
+});
+
 // Import middleware AFTER mocks
 import { middleware } from '@/middleware';
 
@@ -190,8 +217,8 @@ describe('middleware: marketing page renders standalone layout (S8)', () => {
 
   it('marketing page renders LP sections and footer links', async () => {
     const { default: MarketingPage } = await import('@/app/marketing/page');
-    // Server Component returns JSX synchronously; render to a tree object
-    const tree = (MarketingPage as () => unknown)();
+    // Async Server Component; await it to get the element tree
+    const tree = await (MarketingPage as () => Promise<unknown>)();
 
     // Collect text, hrefs, and component names by walking the React element tree
     const texts: string[] = [];
@@ -223,10 +250,10 @@ describe('middleware: marketing page renders standalone layout (S8)', () => {
 
     const joinedText = texts.join(' ');
     expect(joinedText).toContain('Switch your path');
-    // LP 刷新（PR #33 以降）で /login CTA は廃止され、CTA はウェイトリストフォームになった。
+    // Clarity 版 LP（issue #53）ではコピーが next-intl に移り、CTA は Founding 登録導線になった。
     // セクションコンポーネントの存在とフッター（Privacy / Terms / コピーライト）を検証する。
     expect(componentNames).toContain('Hero');
-    expect(componentNames).toContain('CtaWaitlistForm');
+    expect(componentNames).toContain('Cta');
     expect(hrefs).toContain('/privacy');
     expect(hrefs).toContain('/terms');
     expect(joinedText).toContain('Genetta');

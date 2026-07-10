@@ -1,7 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { dirname, resolve } from 'node:path';
 import ja from '@/messages/ja.json';
 import en from '@/messages/en.json';
 
@@ -18,11 +15,6 @@ const impactEn = (en as unknown as { impact: Record<string, Json> }).impact;
 const evidenceJa = (ja as unknown as { evidence: Record<string, Json> }).evidence;
 const kpiEn = (en as unknown as { onboarding: { kpi: Record<string, { name: string }> } })
   .onboarding.kpi;
-
-const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
-function readSource(rel: string): string {
-  return readFileSync(resolve(projectRoot, rel), 'utf-8');
-}
 
 describe('ja impact ラベルの正式名統一', () => {
   it('impact.dailyCost は「出費削減」', () => {
@@ -89,24 +81,30 @@ describe('en impact.* の KPI 英語名が正準 onboarding.kpi.*.name と一致
   });
 });
 
-describe('LP alt テキストの KPI 名統一', () => {
-  const oldAxisTokens = ['生涯コスト', '可処分時間', '集中時間'];
+// LP のコピーは画像 alt ではなく next-intl の marketing namespace に集約されたので、
+// 検証対象を messages 側に移した（旧 Process.tsx / Detail.tsx は廃止）。
+describe('LP コピー（marketing namespace）の KPI 名統一', () => {
+  const oldAxisTokens = ['生涯コスト', '可処分時間', '集中時間', 'コスト削減', '収入増加'];
   const canonical = ['健康寿命', '出費削減', '増える収入', '前向きな気持ちの時間'];
 
-  it('Process.tsx の alt に旧軸名が残っていない', () => {
-    const src = readSource('src/components/landing/Process.tsx');
-    for (const t of oldAxisTokens) expect(src).not.toContain(t);
+  const marketingJa = JSON.stringify(
+    (ja as unknown as { marketing: Record<string, Json> }).marketing
+  );
+
+  it('marketing コピーに旧軸名が残っていない', () => {
+    for (const t of oldAxisTokens) expect(marketingJa).not.toContain(t);
   });
-  it('Process.tsx の alt に4つの正式 KPI 名が含まれる', () => {
-    const src = readSource('src/components/landing/Process.tsx');
-    for (const t of canonical) expect(src).toContain(t);
+
+  it('marketing コピーに4つの正式 KPI 名が含まれる', () => {
+    for (const t of canonical) expect(marketingJa).toContain(t);
   });
-  it('Detail.tsx の alt に旧軸名が残っていない', () => {
-    const src = readSource('src/components/landing/Detail.tsx');
-    for (const t of oldAxisTokens) expect(src).not.toContain(t);
-  });
-  it('Detail.tsx の alt に4つの正式 KPI 名が含まれる', () => {
-    const src = readSource('src/components/landing/Detail.tsx');
-    for (const t of canonical) expect(src).toContain(t);
+
+  it('marketing.axes.*.name が正式 KPI 名と一致する', () => {
+    const axes = (ja as unknown as { marketing: { axes: Record<string, { name: string }> } })
+      .marketing.axes;
+    expect(axes.health.name).toBe('健康寿命');
+    expect(axes.cost.name).toBe('出費削減');
+    expect(axes.income.name).toBe('増える収入');
+    expect(axes.mood.name).toBe('前向きな気持ちの時間');
   });
 });
