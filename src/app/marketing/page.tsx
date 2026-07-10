@@ -1,38 +1,35 @@
-import { CtaWaitlistForm } from '@/components/landing/CtaWaitlistForm';
-import { Detail } from '@/components/landing/Detail';
-import { Hero } from '@/components/landing/Hero';
-import { OutcomeGallery } from '@/components/landing/OutcomeGallery';
-import { Problem } from '@/components/landing/Problem';
-import { Process } from '@/components/landing/Process';
-import { SelectionCriterion } from '@/components/landing/SelectionCriterion';
-import { Testimony } from '@/components/landing/Testimony';
+import { CallToAction } from '@/components/landing/manifesto/CallToAction';
+import { Declaration } from '@/components/landing/manifesto/Declaration';
+import { Doctrine } from '@/components/landing/manifesto/Doctrine';
+import { Honesty } from '@/components/landing/manifesto/Honesty';
+import { ImpactAxes } from '@/components/landing/manifesto/ImpactAxes';
+import { Indictment } from '@/components/landing/manifesto/Indictment';
+import { Masthead } from '@/components/landing/manifesto/Masthead';
+import { Method } from '@/components/landing/manifesto/Method';
+import { SiteFooter } from '@/components/landing/manifesto/SiteFooter';
+import { Turn } from '@/components/landing/manifesto/Turn';
 
+/**
+ * Manifesto LP — 読み物ではなく宣言文。
+ *
+ * 否定（Indictment）から入って転回（Turn）で反転させ、宣言（Doctrine）→
+ * 尺度（ImpactAxes）→ 手順（Method）で「本当にできること」だけを示し、
+ * 誇大広告をしない宣言（Honesty）で信頼を担保してから CTA に落とす。
+ * 写真・イラストは使わず、タイポグラフィと罫線とベタ塗りだけで構成する。
+ */
 export default function MarketingPage() {
   return (
-    <main lang="ja" className="min-h-screen bg-background text-foreground">
-      <Hero />
-      <Problem />
-      <Process />
-      <Detail />
-      <OutcomeGallery />
-      <SelectionCriterion />
-      <Testimony />
-      <CtaWaitlistForm />
-      <footer className="bg-background border-t border-border">
-        <div className="container max-w-6xl mx-auto px-4 md:px-8 py-8 text-xs text-muted-foreground">
-          <nav className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <span className="font-semibold">Smitch</span>
-            <span className="hidden sm:inline opacity-60">Switch your path.</span>
-            <a href="/privacy" className="ml-auto hover:underline">
-              Privacy
-            </a>
-            <a href="/terms" className="hover:underline">
-              Terms
-            </a>
-            <span>© Genetta Inc.</span>
-          </nav>
-        </div>
-      </footer>
+    <main className="bg-[#0A0A0A]">
+      <Masthead />
+      <Declaration />
+      <Indictment />
+      <Turn />
+      <Doctrine />
+      <ImpactAxes />
+      <Method />
+      <Honesty />
+      <CallToAction />
+      <SiteFooter />
     </main>
   );
 }

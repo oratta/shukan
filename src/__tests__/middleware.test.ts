@@ -188,47 +188,36 @@ describe('middleware: marketing page renders standalone layout (S8)', () => {
     expect(typeof mod.default).toBe('function');
   });
 
-  it('marketing page renders LP sections and footer links', async () => {
+  it('marketing page renders the standalone LP section stack', async () => {
     const { default: MarketingPage } = await import('@/app/marketing/page');
     // Server Component returns JSX synchronously; render to a tree object
     const tree = (MarketingPage as () => unknown)();
 
-    // Collect text, hrefs, and component names by walking the React element tree
-    const texts: string[] = [];
-    const hrefs: string[] = [];
+    // Collect component names by walking the React element tree
     const componentNames: string[] = [];
     const visit = (node: unknown): void => {
       if (node === null || node === undefined || node === false) return;
-      if (typeof node === 'string' || typeof node === 'number') {
-        texts.push(String(node));
-        return;
-      }
+      if (typeof node === 'string' || typeof node === 'number') return;
       if (Array.isArray(node)) {
         node.forEach(visit);
         return;
       }
       if (typeof node === 'object') {
-        const el = node as {
-          type?: unknown;
-          props?: { children?: unknown; href?: string };
-        };
+        const el = node as { type?: unknown; props?: { children?: unknown } };
         if (typeof el.type === 'function' && el.type.name) {
           componentNames.push(el.type.name);
         }
-        if (el.props?.href) hrefs.push(el.props.href);
         if (el.props?.children !== undefined) visit(el.props.children);
       }
     };
     visit(tree);
 
-    const joinedText = texts.join(' ');
-    expect(joinedText).toContain('Switch your path');
-    // LP 刷新（PR #33 以降）で /login CTA は廃止され、CTA はウェイトリストフォームになった。
-    // セクションコンポーネントの存在とフッター（Privacy / Terms / コピーライト）を検証する。
-    expect(componentNames).toContain('Hero');
-    expect(componentNames).toContain('CtaWaitlistForm');
-    expect(hrefs).toContain('/privacy');
-    expect(hrefs).toContain('/terms');
-    expect(joinedText).toContain('Genetta');
+    // Manifesto LP ではコピーもフッターのリンクも各セクション（async Server
+    // Component）の内側にあるので、ページ直下からはコンポーネント名しか見えない。
+    // 文言とリンク先の検証は src/__tests__/marketing-page.test.tsx が担当する。
+    expect(componentNames).toContain('Masthead');
+    expect(componentNames).toContain('Declaration');
+    expect(componentNames).toContain('CallToAction');
+    expect(componentNames).toContain('SiteFooter');
   });
 });
