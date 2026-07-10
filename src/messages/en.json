@@ -1,4 +1,135 @@
 {
+  "marketing": {
+    "meta": {
+      "brand": "Smitch",
+      "tagline": "Switch your path."
+    },
+    "hero": {
+      "eyebrow": "Evidence-based life path builder",
+      "title": "Science picks the habits\nthat work for you.",
+      "subtitle": "Smitch starts from who you want to become. Choose evidence-backed habits yourself, and see how they move your healthy years, mood, and money — an evidence-based life path builder.",
+      "ctaPrimary": "Start your free diagnosis",
+      "ctaSecondary": "See how it works",
+      "trust": "Impact on your life — not streaks."
+    },
+    "problem": {
+      "title": "Tired of\nhabit apps?",
+      "bullets": [
+        "The moment a streak breaks, it all feels pointless",
+        "You start life hacks just because they showed up in your feed",
+        "Keeping the streak becomes the goal — and you lose sight of who you're becoming"
+      ]
+    },
+    "how": {
+      "title": "From passive self-improvement\nto choosing on purpose.",
+      "quote": "Habits aren't the goal. They're how your life moves.",
+      "steps": [
+        {
+          "label": "Choose who you want to become",
+          "desc": "Start from the area you care about: health, mood, money, time."
+        },
+        {
+          "label": "Science ranks the habits",
+          "desc": "Habits ranked by impact, backed by research — with how strong the evidence is."
+        },
+        {
+          "label": "See the impact in numbers",
+          "desc": "See how each habit adds up over your life, estimated for you."
+        }
+      ]
+    },
+    "impact": {
+      "title": "Four things\nwe turn into numbers.",
+      "axes": [
+        {
+          "label": "Healthy years",
+          "desc": "Years you stay active and well"
+        },
+        {
+          "label": "Positive mood",
+          "desc": "Time you spend feeling good"
+        },
+        {
+          "label": "Money saved",
+          "desc": "Spending your habits cut"
+        },
+        {
+          "label": "Income gained",
+          "desc": "What focus and health add up to"
+        }
+      ],
+      "note": "All figures are research-based estimates. Results vary by person and are not guaranteed."
+    },
+    "difference": {
+      "title": "We're looking at\nsomething different.",
+      "colOther": "Typical habit apps",
+      "colSmitch": "Smitch",
+      "rows": [
+        {
+          "other": "You decide what to do",
+          "smitch": "Science guides you from who you want to become"
+        },
+        {
+          "other": "Motivated by day streaks",
+          "smitch": "Felt through impact tied to your values"
+        },
+        {
+          "other": "Helps you keep going",
+          "smitch": "Helps you choose, build, and move to the next"
+        },
+        {
+          "other": "One metric for everyone",
+          "smitch": "Metrics that fit what you value"
+        }
+      ]
+    },
+    "evidence": {
+      "title": "What you get is\nevidence, not pep talk.",
+      "body": "Every habit comes with what it affects, how strong the evidence is, and the caveats. No hype — just enough for you to look at the basis and decide for yourself."
+    },
+    "cta": {
+      "title": "Switch your path,\nquietly.",
+      "body": "Smitch is live. Start with the free diagnosis.",
+      "ctaPrimary": "Open the app",
+      "foundingHeading": "For our first members",
+      "foundingBody": "Support us early and your discount stays for good. No fake countdowns.",
+      "foundingCta": "About Founding Members"
+    },
+    "faq": {
+      "title": "Frequently asked",
+      "items": [
+        {
+          "q": "Is it free?",
+          "a": "The diagnosis and trial are free to start. Ongoing features are a paid plan, and you can try without registering a card."
+        },
+        {
+          "q": "How real is the science?",
+          "a": "We estimate from published research and show how strong the evidence is. Figures are guidance, not a guarantee of results."
+        },
+        {
+          "q": "How is this different from other habit apps?",
+          "a": "Choosing over keeping. We work backward from who you want to become and suggest evidence-backed habits, each with its impact on your life."
+        },
+        {
+          "q": "Are there streaks?",
+          "a": "Day streaks aren't the point. What matters isn't the count — it's whether your life actually changed."
+        },
+        {
+          "q": "Can I cancel anytime?",
+          "a": "Cancel whenever you like. No penalties, no retention traps."
+        },
+        {
+          "q": "What do I need to run it?",
+          "a": "It's a web app that runs in your browser. It works right from your phone too."
+        }
+      ]
+    },
+    "footer": {
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "tokushoho": "Commercial Transactions Act"
+    }
+  },
   "app": {
     "name": "Smitch",
     "tagline": "Switch your path."
