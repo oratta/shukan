@@ -593,5 +593,120 @@
       "installed": "Already added to your Home Screen.",
       "unsupported": "Open Smitch in Safari or Chrome on your phone to add it to your Home Screen."
     }
+  },
+  "marketing": {
+    "hero": {
+      "eyebrow": "An evidence-based life path builder",
+      "title": "See the numbers first. Then start the habit.",
+      "lede": "Smitch only carries habits that are tied to peer-reviewed research. How far does one habit move your healthy lifespan, your spending, your income, your time feeling positive? We publish the estimate — and the reasoning that produced it — before you begin.",
+      "ctaPrimary": "Join as a founding member",
+      "ctaSecondary": "Read how we calculate",
+      "note": "Every figure on this page is generated from the evidence-article dataset that ships inside the app."
+    },
+    "figures": {
+      "articlesLabel": "Evidence articles",
+      "sourcesLabel": "Cited papers",
+      "axesLabel": "Outcome measures",
+      "highConfidenceLabel": "Articles rated high confidence"
+    },
+    "axes": {
+      "heading": "Four measures",
+      "lede": "A habit is measured by these four outcomes, not by how many days you kept the streak. Each unit is the estimated effect of performing the habit for one day.",
+      "health": {
+        "name": "Healthy lifespan",
+        "unit": "min/day",
+        "description": "Estimated healthy lifespan gained per day the habit is performed."
+      },
+      "cost": {
+        "name": "Cost saving",
+        "unit": "JPY/day",
+        "description": "Daily amount expected from reduced medical costs and spending."
+      },
+      "income": {
+        "name": "Income Growth",
+        "unit": "JPY/day",
+        "description": "Daily income gain expected from changes in productivity and absenteeism."
+      },
+      "mood": {
+        "name": "Time feeling positive",
+        "unit": "min/day",
+        "description": "Additional minutes per day spent in a positive frame of mind."
+      }
+    },
+    "table": {
+      "heading": "Eight representative habits",
+      "lede": "Each bar is scaled against the maximum of its own column. Bar lengths cannot be compared across columns.",
+      "colHabit": "Habit",
+      "colConfidence": "Confidence",
+      "caption": "Source: the in-app evidence-article dataset ({articles} articles / {sources} cited papers). All values are per-day estimates.",
+      "moodZeroNote": "A zero means we have not found sufficient research for that measure. It is not proof that the effect is absent.",
+      "outlierHeading": "Held out as an outlier: quitting smoking",
+      "outlierBody": "Quitting smoking is estimated at {value} min/day of healthy lifespan — about {ratio}× the largest value in the table above. Plotting it on the same axis would flatten every other bar, so it is shown separately.",
+      "outlierUnit": "min/day"
+    },
+    "cumulative": {
+      "heading": "Held for ten years",
+      "lede": "A simple accumulation for three habits — sleeping 7 hours, daily walking, and eating vegetables ({minutes} min/day combined) — assuming they are completed every single day.",
+      "yAxis": "Cumulative healthy lifespan (days)",
+      "xAxis": "Years sustained",
+      "yearMark": "yr {year}",
+      "dayUnit": "days",
+      "assumption": "Model: daily estimate × 365 days × years sustained. Interactions between habits and diminishing returns are not modelled.",
+      "readout": "{days} days of healthy lifespan over ten years — {perYear} days a year."
+    },
+    "method": {
+      "heading": "What the numbers assume",
+      "lede": "Most studies report a relative reduction in risk. Turning that into minutes and yen per day requires assumptions, and those assumptions are ours. We list them rather than hide them.",
+      "profileHeading": "Model profile",
+      "profileAgeLabel": "Age",
+      "profileAgeValue": "{age}, Japanese male",
+      "profileIncomeLabel": "Annual income",
+      "profileIncomeValue": "JPY {income}",
+      "profileLifeLabel": "Remaining life expectancy",
+      "profileLifeValue": "{years} years",
+      "formulaHeading": "Formulas",
+      "formulaAnnual": "Annual impact = daily estimate × 365 days",
+      "formulaCumulative": "Cumulative impact = daily estimate × days completed",
+      "caveatHeading": "What these numbers are not",
+      "caveat": "They are estimates for the model profile above. They do not predict or guarantee the effect on you, and they are not medical advice. The conversions are deliberately conservative, but change the assumptions and the numbers change with them."
+    },
+    "confidence": {
+      "heading": "Confidence across the corpus",
+      "lede": "Every article carries a confidence rating for the strength of its evidence. Meta-analyses and large cohort studies are rated high.",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low (estimated)",
+      "articleUnit": "articles",
+      "note": "Habits that fall short of high confidence are still included — labelled as such, not quietly dropped."
+    },
+    "references": {
+      "heading": "References (excerpt)",
+      "lede": "Sources behind the habits shown in the figures above.",
+      "note": "All {sources} cited papers are listed inside their evidence articles in the app."
+    },
+    "habits": {
+      "sleep_7hours": "Sleeping 7 hours",
+      "daily_walking": "Daily walking",
+      "daily_cardio": "Daily cardio",
+      "eat_vegetables": "Eating vegetables",
+      "daily_meditation": "Daily meditation",
+      "quit_alcohol": "Quitting alcohol",
+      "home_cooking": "Cooking at home",
+      "daily_saving": "Saving daily",
+      "quit_smoking": "Quitting smoking"
+    },
+    "cta": {
+      "heading": "Check the evidence. Then begin.",
+      "body": "Smitch is still in development. Founding members receive progress updates and every new evidence article as it lands.",
+      "primary": "Join as a founding member",
+      "secondary": "Try the prototype",
+      "note": "Free to join. Leave whenever you like."
+    },
+    "footer": {
+      "tagline": "Switch your path.",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "credit": "© Genetta Inc."
+    }
   }
 }

@@ -593,5 +593,120 @@
       "installed": "すでにホーム画面に追加されています。",
       "unsupported": "ホーム画面に追加するには、スマホの Safari または Chrome で Smitch を開いてください。"
     }
+  },
+  "marketing": {
+    "hero": {
+      "eyebrow": "エビデンスベースのライフパスビルダー",
+      "title": "習慣の効果を、数字で確かめてから始める。",
+      "lede": "Smitch が扱うのは、査読付き研究にひもづいた習慣だけです。ひとつの習慣が健康寿命・出費・収入・前向きな気持ちの時間をどれだけ動かすのか。その推定値と、そこにたどり着くまでの計算根拠を、始める前に開示します。",
+      "ctaPrimary": "Founding メンバーに登録する",
+      "ctaSecondary": "算出の前提を読む",
+      "note": "このページの図表に出る数値は、すべてアプリに搭載されたエビデンス記事データセットから生成しています。"
+    },
+    "figures": {
+      "articlesLabel": "エビデンス記事",
+      "sourcesLabel": "参照文献",
+      "axesLabel": "評価指標",
+      "highConfidenceLabel": "信頼度「高」の記事"
+    },
+    "axes": {
+      "heading": "4つの指標",
+      "lede": "習慣の効果は、続けた日数ではなく次の4指標で測ります。単位はいずれも「その習慣を1日実行したときの推定値」です。",
+      "health": {
+        "name": "健康寿命",
+        "unit": "分/日",
+        "description": "その習慣を1日実行することで延びる健康寿命の推定値。"
+      },
+      "cost": {
+        "name": "出費削減",
+        "unit": "円/日",
+        "description": "医療費や消費の減少として見込める、1日あたりの金額。"
+      },
+      "income": {
+        "name": "増える収入",
+        "unit": "円/日",
+        "description": "生産性や欠勤率の変化から見込める、1日あたりの収入増。"
+      },
+      "mood": {
+        "name": "前向きな気持ちの時間",
+        "unit": "分/日",
+        "description": "前向きな気持ちで過ごせる時間の増加分。"
+      }
+    },
+    "table": {
+      "heading": "代表的な8つの習慣",
+      "lede": "各セルの棒は、その列の最大値に対する比率です。列をまたいで棒の長さを比べることはできません。",
+      "colHabit": "習慣",
+      "colConfidence": "信頼度",
+      "caption": "出典: アプリ内エビデンス記事データセット（記事 {articles} 本 / 参照文献 {sources} 件）。値はいずれも1日あたりの推定値。",
+      "moodZeroNote": "0 は「この指標について十分な研究が見つかっていない」ことを示します。効果が無いことの証明ではありません。",
+      "outlierHeading": "外れ値として扱っている習慣: 禁煙",
+      "outlierBody": "禁煙の健康寿命は {value} 分/日 で、上の表の最大値のおよそ {ratio} 倍にあたります。同じ軸に載せると他の習慣の棒が読めなくなるため、表から外して単独で示しています。",
+      "outlierUnit": "分/日"
+    },
+    "cumulative": {
+      "heading": "10年続けたとき",
+      "lede": "「7時間睡眠」「毎日ウォーキング」「野菜を食べる」の3つ（合計 {minutes} 分/日）を、達成率100%で継続した場合の単純な積み上げです。",
+      "yAxis": "健康寿命の累積（日）",
+      "xAxis": "継続年数（年）",
+      "yearMark": "{year}年",
+      "dayUnit": "日",
+      "assumption": "モデル: 日次の推定値 × 365日 × 継続年数。習慣どうしの相互作用や、効果の逓減は考慮していません。",
+      "readout": "10年間で健康寿命 {days} 日ぶん。1年あたりに直すと {perYear} 日です。"
+    },
+    "method": {
+      "heading": "算出の前提",
+      "lede": "研究が示すのは多くの場合「相対リスクの低下」です。それを1日あたりの分や円へ換算する過程には、Smitch が置いた仮定が含まれます。仮定は隠さず、すべてここに書きます。",
+      "profileHeading": "モデルプロフィール",
+      "profileAgeLabel": "年齢",
+      "profileAgeValue": "{age}歳・日本人男性",
+      "profileIncomeLabel": "年収",
+      "profileIncomeValue": "{income}円",
+      "profileLifeLabel": "残存寿命",
+      "profileLifeValue": "{years}年",
+      "formulaHeading": "計算式",
+      "formulaAnnual": "年間インパクト = 日次の推定値 × 365日",
+      "formulaCumulative": "累積インパクト = 日次の推定値 × 達成した日数",
+      "caveatHeading": "この数値が意味しないこと",
+      "caveat": "これは上記モデルプロフィールに対する推定値であり、あなた個人に生じる効果を予測・保証するものではありません。医学的助言でもありません。換算には保守的な仮定を置いていますが、仮定を変えれば数値も変わります。"
+    },
+    "confidence": {
+      "heading": "信頼度の分布",
+      "lede": "記事ごとに、根拠の強さを3段階で表示しています。メタ分析や大規模コホート研究に基づくものを「高」としています。",
+      "high": "高",
+      "medium": "中",
+      "low": "低（推定）",
+      "articleUnit": "本",
+      "note": "「高」に届かない習慣も、根拠の弱さを明示したうえで扱います。除外はしません。"
+    },
+    "references": {
+      "heading": "参照文献（抜粋）",
+      "lede": "このページの図表に使った習慣の出典です。",
+      "note": "全 {sources} 件の文献は、アプリ内の各エビデンス記事に掲載しています。"
+    },
+    "habits": {
+      "sleep_7hours": "7時間睡眠",
+      "daily_walking": "毎日ウォーキング",
+      "daily_cardio": "毎日有酸素運動",
+      "eat_vegetables": "野菜を食べる",
+      "daily_meditation": "毎日瞑想",
+      "quit_alcohol": "禁酒",
+      "home_cooking": "自炊",
+      "daily_saving": "毎日貯金",
+      "quit_smoking": "禁煙"
+    },
+    "cta": {
+      "heading": "確かめてから、始める。",
+      "body": "Smitch はまだ開発中です。Founding メンバーとして登録すると、開発の進捗と、追加されたエビデンス記事の更新を受け取れます。",
+      "primary": "Founding メンバーに登録する",
+      "secondary": "プロトタイプ版を試す",
+      "note": "登録は無料です。いつでも解除できます。"
+    },
+    "footer": {
+      "tagline": "Switch your path.",
+      "privacy": "プライバシー",
+      "terms": "利用規約",
+      "credit": "© Genetta Inc."
+    }
   }
 }
