@@ -16,10 +16,11 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  const host = request.headers.get('host') ?? '';
+  // host はブラウザ/プロキシによって大文字混じりになりうるため lowercase 正規化して比較する
+  const host = (request.headers.get('host') ?? '').toLowerCase();
   const marketingHosts =
     process.env.NEXT_PUBLIC_MARKETING_HOSTS?.split(',')
-      .map((s) => s.trim())
+      .map((s) => s.trim().toLowerCase())
       .filter(Boolean) ?? [];
 
   const pathname = request.nextUrl.pathname;
