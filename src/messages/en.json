@@ -593,5 +593,132 @@
       "installed": "Already added to your Home Screen.",
       "unsupported": "Open Smitch in Safari or Chrome on your phone to add it to your Home Screen."
     }
+  },
+  "marketing": {
+    "nav": {
+      "cta": "Join"
+    },
+    "hero": {
+      "eyebrow": "MANIFESTO",
+      "lines": [
+        "Habit apps",
+        "never",
+        "changed you."
+      ],
+      "body": "It was never your willpower. The order was wrong. Start from what you do, and doing becomes the point. Smitch starts from who you want to become.",
+      "ctaPrimary": "Claim a founding seat",
+      "ctaSecondary": "Read the manifesto",
+      "note": "An evidence-based life path builder — Switch your path."
+    },
+    "indictment": {
+      "eyebrow": "01 — Indictment",
+      "lines": [
+        "The problem",
+        "was never",
+        "you."
+      ],
+      "items": [
+        {
+          "title": "A streak is not a measure of a life.",
+          "body": "It records how many days you held on. It says nothing about who you became."
+        },
+        {
+          "title": "You were handed habits with no evidence.",
+          "body": "Five a.m. wake-ups. Cold showers. A trending list lands on you, and nobody explains why it would work for you."
+        },
+        {
+          "title": "Continuing quietly became the goal.",
+          "body": "The means replaced the end. So the day it breaks, everything you built looks meaningless."
+        }
+      ]
+    },
+    "turn": {
+      "eyebrow": "02 — Reversal",
+      "lines": [
+        "So we",
+        "reverse",
+        "the order."
+      ],
+      "body": "Don't start from the habit. Start from who you want to become. Let science map the way there."
+    },
+    "doctrine": {
+      "eyebrow": "03 — Declaration",
+      "heading": "Smitch holds to three things.",
+      "items": [
+        {
+          "title": "Start from who you want to become.",
+          "body": "Pick a template or write it in your own words. The goal comes first. A habit is only the way there."
+        },
+        {
+          "title": "Every option arrives with evidence.",
+          "body": "Each suggested habit states what it affects, how certain that is, and what to watch for. We hand you the material. You decide."
+        },
+        {
+          "title": "Change is measured on your own scale.",
+          "body": "Not one streak for everyone. Impact is shown on the axes tied to your values."
+        }
+      ]
+    },
+    "impact": {
+      "eyebrow": "04 — Measure",
+      "lines": [
+        "We don't",
+        "measure",
+        "days."
+      ],
+      "lead": "Where does the habit you chose actually land? Smitch shows impact on four axes.",
+      "axes": [
+        "Healthy lifespan",
+        "Time feeling positive",
+        "Cost saving",
+        "Income Growth"
+      ],
+      "disclaimer": "The numbers are research-based estimates, not promises. Assumptions and calculations are disclosed inside the app."
+    },
+    "method": {
+      "eyebrow": "05 — Method",
+      "heading": "Three steps to begin.",
+      "steps": [
+        {
+          "title": "Choose who you want to become.",
+          "body": "Pick from templates, or write it in your own words. The intake weaves in your situation."
+        },
+        {
+          "title": "Science lays out the options.",
+          "body": "Your goal is broken down, and habits with evidence behind them are put on the table — with how certain that evidence is."
+        },
+        {
+          "title": "Choose one, and make it yours.",
+          "body": "Not five at once. One lands, then the next unlocks."
+        }
+      ]
+    },
+    "honesty": {
+      "eyebrow": "06 — Honesty",
+      "heading": "What we won't promise.",
+      "items": [
+        "We won't tell you your life changes in N days.",
+        "No fake countdowns. No inflated user counts.",
+        "We won't blame you for the times you stopped."
+      ],
+      "closing": "Not being suspect is where this product's trust comes from."
+    },
+    "cta": {
+      "lines": [
+        "The path",
+        "can be switched."
+      ],
+      "body": "Smitch is still being built. Claim a founding seat and you'll be the first to hear when a place opens.",
+      "primary": "Claim a founding seat",
+      "secondary": "Try the prototype",
+      "note": "Free to join. Nothing to pay today."
+    },
+    "footer": {
+      "tagline": "Switch your path.",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "tokushoho": "Legal notice (Japan)",
+      "copyright": "© Genetta Inc."
+    }
   }
 }
