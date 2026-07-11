@@ -29,6 +29,17 @@ export async function fetchInitialHabitData(): Promise<InitialHabitData | null> 
     ]);
     return { habits, completions };
   } catch (err) {
+    // build 時の静的レンダリング試行で cookies() が投げる DynamicServerError は
+    // Next.js が「このルートは dynamic」と判定するためのシグナルなので握りつぶさず再 throw する
+    // （catch すると build ログに毎回 console.error ノイズが出る。PR #79 レビュー指摘）。
+    if (
+      typeof err === 'object' &&
+      err !== null &&
+      'digest' in err &&
+      (err as { digest?: unknown }).digest === 'DYNAMIC_SERVER_USAGE'
+    ) {
+      throw err;
+    }
     // prefetch はあくまで最適化。失敗してもページを落とさず client fetch に委ねる。
     console.error('fetchInitialHabitData failed:', err);
     return null;

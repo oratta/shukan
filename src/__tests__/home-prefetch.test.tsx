@@ -130,6 +130,44 @@ describe('fetchInitialHabitData (habits-server)', () => {
 
     await expect(fetchInitialHabitData()).resolves.toBeNull();
   });
+
+  it('DynamicServerError（digest=DYNAMIC_SERVER_USAGE）は握りつぶさず再 throw する', async () => {
+    // build 時の静的レンダリング試行で cookies() が投げるエラー。Next.js の
+    // dynamic 判定シグナルなので catch → null に落とすと build ログが汚れる（PR #79 指摘）
+    const dynamicServerError = Object.assign(
+      new Error('Dynamic server usage: Route / used `cookies`'),
+      { digest: 'DYNAMIC_SERVER_USAGE' }
+    );
+    vi.doMock('@/lib/supabase/server', () => ({
+      createClient: async () => {
+        throw dynamicServerError;
+      },
+    }));
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const { fetchInitialHabitData } = await import('@/lib/supabase/habits-server');
+      await expect(fetchInitialHabitData()).rejects.toBe(dynamicServerError);
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
+    } finally {
+      consoleErrorSpy.mockRestore();
+    }
+  });
+});
+
+// --- habit-list.tsx: DndContext の静的 id（hydration mismatch 回帰防止） ----
+
+describe('habit-list.tsx DndContext', () => {
+  it('DndContext に静的な id prop を渡している（dnd-kit 自動連番 id の SSR mismatch 防止）', () => {
+    // 本 PR で習慣カードが SSR されるようになったため、id 無しだと server 側の
+    // 自動連番（DndDescribedBy-N）がリクエスト毎に増えて client と恒常的に食い違う。
+    // vitest は node 環境（jsdom 無し）のため、既存の page.tsx テストと同様に
+    // ソースアサーションで回帰を防ぐ。
+    const src = fs.readFileSync(
+      path.resolve(__dirname, '../components/habits/habit-list.tsx'),
+      'utf-8'
+    );
+    expect(src).toMatch(/<DndContext\s+id="habit-list-dnd"/);
+  });
 });
 
 // --- fetchHabits / fetchCompletions のクライアント注入 ---------------------
