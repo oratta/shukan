@@ -102,6 +102,10 @@ export const dailyHabitReview: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1643706755543-2d1f7adff211',
+    gradient: 'from-violet-400 to-indigo-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'list-checks',
 };

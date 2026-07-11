@@ -75,6 +75,10 @@ export const coldShower: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1566969208336-b1af5efae927',
+    gradient: 'from-cyan-400 to-blue-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'shower-head',
 };

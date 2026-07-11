@@ -102,6 +102,10 @@ export const morningTidying: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92',
+    gradient: 'from-sky-400 to-cyan-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'sparkles',
 };

@@ -107,6 +107,10 @@ export const scheduleAdherence: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b',
+    gradient: 'from-blue-400 to-slate-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'clipboard-list',
 };

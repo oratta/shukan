@@ -101,6 +101,10 @@ export const noYoutube: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://plus.unsplash.com/premium_photo-1661313613228-88dab4e3d22e',
+    gradient: 'from-red-400 to-red-600',
+  },
   defaultHabitType: 'quit',
   defaultIcon: 'tv-minimal',
 };
