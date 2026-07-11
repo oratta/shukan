@@ -62,6 +62,8 @@ describe('推定値表示 UI の近接注記（近接性要件）', () => {
     'src/components/habits/evidence-article-sheet.tsx',
     'src/components/habits/impact-article-sheet.tsx',
     'src/components/habits/established-section.tsx',
+    'src/components/habits/evidence-manager-sheet.tsx',
+    'src/components/habits/evidence-picker.tsx',
     'src/components/onboarding/onboarding-wizard.tsx',
     'src/app/(app)/stats/page.tsx',
     'src/app/(app)/discover/page.tsx',
