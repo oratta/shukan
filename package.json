@@ -11,6 +11,7 @@
     "test:run": "vitest run",
     "check:migrations": "node scripts/check-migration-numbers.mjs",
     "validate:evidence": "tsx scripts/validate-evidence.ts",
+    "scaffold:article": "tsx scripts/scaffold-evidence-article.ts",
     "stripe:setup": "tsx scripts/stripe-setup.ts"
   },
   "dependencies": {
