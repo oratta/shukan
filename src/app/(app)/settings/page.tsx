@@ -5,9 +5,10 @@ import { useTheme } from 'next-themes';
 import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Sun, Moon, Monitor, Trash2, LogOut, User, ExternalLink, Smartphone } from 'lucide-react';
+import { Sun, Moon, Monitor, Trash2, LogOut, User, ExternalLink, Smartphone, MessageSquarePlus } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { InstallHelpDialog } from '@/components/pwa/install-help-dialog';
+import { FeedbackDialog } from '@/components/feedback/feedback-dialog';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -89,6 +90,7 @@ export default function SettingsPage() {
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [installHelpOpen, setInstallHelpOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   const tPwa = useTranslations('pwa');
 
   const handleDeleteAccount = async () => {
@@ -295,6 +297,27 @@ export default function SettingsPage() {
         </Card>
       )}
 
+      {/* アプリ内フィードバック導線（issue #19） */}
+      {user && (
+        <Card className="p-4">
+          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            {t('feedback.title')}
+          </h3>
+          <p className="mb-3 text-sm text-muted-foreground">
+            {t('feedback.settingsDescription')}
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setFeedbackOpen(true)}
+            className="w-full justify-start"
+          >
+            <MessageSquarePlus className="mr-2 size-4" />
+            {t('feedback.openForm')}
+          </Button>
+        </Card>
+      )}
+
       <Card className="p-4">
         <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           {t('settings.about')}
@@ -344,6 +367,7 @@ export default function SettingsPage() {
       </Card>
 
       <InstallHelpDialog open={installHelpOpen} onOpenChange={setInstallHelpOpen} />
+      <FeedbackDialog open={feedbackOpen} onOpenChange={setFeedbackOpen} />
     </div>
   );
 }
