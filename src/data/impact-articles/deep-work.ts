@@ -77,6 +77,10 @@ export const deepWork: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1633250999791-3134c302139b',
+    gradient: 'from-blue-400 to-slate-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'target',
 };

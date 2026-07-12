@@ -100,6 +100,10 @@ export const morningPlanning: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://plus.unsplash.com/premium_photo-1706028469800-7c719a733e10',
+    gradient: 'from-sky-400 to-blue-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'clipboard-list',
 };

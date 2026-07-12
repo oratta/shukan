@@ -75,6 +75,10 @@ export const dailyStretching: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1758599880489-403f7ae405f3',
+    gradient: 'from-cyan-400 to-teal-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'stretch-horizontal',
 };

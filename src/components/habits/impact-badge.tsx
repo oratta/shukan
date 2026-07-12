@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { HeartPulse, Wallet, TrendingUp, Smile } from 'lucide-react';
 import { calculateDailyImpact, calculateAnnualImpact, formatHealthMinutes, formatCurrency, type DailyImpact } from '@/lib/impact';
 import { getArticle } from '@/data/impact-articles';
+import { EstimateDisclaimer } from '@/components/habits/estimate-disclaimer';
 import { cn } from '@/lib/utils';
 import type { HabitEvidence, LifeImpactArticle } from '@/types/impact';
 
@@ -104,11 +105,9 @@ export function ImpactBadge(props: ImpactBadgeProps) {
   return (
     <Wrapper
       {...wrapperProps}
-      className={cn(
-        'flex w-full items-center justify-between text-left',
-        wrapperChrome
-      )}
+      className={cn('flex w-full flex-col gap-1.5 text-left', wrapperChrome)}
     >
+      <div className="flex w-full items-center justify-between">
       <div className="flex flex-col items-center gap-0.5">
         <HeartPulse className={cn('size-4', iconClass)} />
         <span className={cn('text-sm font-bold', valueClass)}>
@@ -148,6 +147,9 @@ export function ImpactBadge(props: ImpactBadgeProps) {
         </span>
       </div>
       <span className={cn('text-xs font-medium', labelClass)}>{periodLabel}</span>
+      </div>
+      {/* 景表法・打消し表示対応（issue #39）: 推定値の直下に近接注記を表示する */}
+      <EstimateDisclaimer surface={light ? 'onImage' : 'default'} />
     </Wrapper>
   );
 }

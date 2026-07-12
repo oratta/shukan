@@ -86,6 +86,10 @@ export const timeInNature: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1620802470382-5799c79143ab',
+    gradient: 'from-green-400 to-teal-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'tree-pine',
 };
