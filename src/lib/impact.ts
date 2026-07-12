@@ -23,6 +23,33 @@ export interface AnnualImpact {
 
 const DAYS_PER_YEAR = 365;
 
+/** de-dup 計算に必要な最小形（articleId + weight）。HabitEvidence を包含する。 */
+export type EvidenceRef = Pick<HabitEvidence, 'articleId' | 'weight'>;
+
+/**
+ * articleId 単位の de-dup（issue #34: エビデンス重複加算の防止）。
+ * 同一 articleId は1回だけ計上し、strength（weight や達成率）が最大の項目を採用する。
+ * 順序は初出順を保つ（Map の挿入順）。
+ */
+export function dedupeByArticleId<T extends { articleId: HabitEvidence['articleId'] }>(
+  items: readonly T[],
+  getStrength: (item: T) => number
+): T[] {
+  const byArticle = new Map<HabitEvidence['articleId'], T>();
+  for (const item of items) {
+    const existing = byArticle.get(item.articleId);
+    if (!existing || getStrength(item) > getStrength(existing)) {
+      byArticle.set(item.articleId, item);
+    }
+  }
+  return [...byArticle.values()];
+}
+
+/** evidences を articleId de-dup（最大ウェイト採用）で1本化する。 */
+export function dedupeEvidences<T extends EvidenceRef>(evidences: readonly T[]): T[] {
+  return dedupeByArticleId(evidences, (e) => e.weight);
+}
+
 /**
  * 日次インパクトを年間に変換
  */
@@ -39,7 +66,7 @@ export function calculateAnnualImpact(daily: DailyImpact): AnnualImpact {
  * 複数エビデンスの重み付き合計で日次インパクトを計算
  */
 export function calculateDailyImpact(
-  evidences: HabitEvidence[],
+  evidences: readonly EvidenceRef[],
   getArticleFn: (id: HabitEvidence['articleId']) => LifeImpactArticle | undefined
 ): DailyImpact {
   let healthMinutes = 0;
@@ -56,6 +83,20 @@ export function calculateDailyImpact(
     positiveMoodMinutes += article.calculationParams.dailyPositiveMoodMinutes * w;
   }
   return { healthMinutes, costSaving, incomeGain, positiveMoodMinutes };
+}
+
+/**
+ * 複数習慣ぶんの evidences を横断して日次インパクトを計算する（issue #34）。
+ * 同一 articleId を複数習慣が参照していても1回だけ（最大ウェイト採用）計上する。
+ * ホーム集計（DailyImpactSummary 等）の習慣横断合算はこちらを使うこと。
+ */
+export function calculateDedupedDailyImpact(
+  evidenceGroups: readonly (readonly EvidenceRef[])[],
+  getArticleFn: (id: HabitEvidence['articleId']) => LifeImpactArticle | undefined
+): DailyImpact {
+  const flattened: EvidenceRef[] = [];
+  for (const group of evidenceGroups) flattened.push(...group);
+  return calculateDailyImpact(dedupeEvidences(flattened), getArticleFn);
 }
 
 /**
