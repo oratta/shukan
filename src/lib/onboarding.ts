@@ -21,6 +21,7 @@ import type { KpiKey } from '@/data/kpi/catalog';
 import { getKpi, KPI_KEYS } from '@/data/kpi/catalog';
 import { getHabitPreset, type HabitPreset } from '@/data/habit-presets';
 import { getArticle } from '@/data/impact-articles';
+import type { LifeImpactArticle } from '@/types/impact';
 import type { ProfileGender, UserProfile } from '@/lib/supabase/profiles';
 import { upsertUserProfile } from '@/lib/supabase/profiles';
 import { insertHabit, replaceHabitEvidences } from '@/lib/supabase/habits';
@@ -304,6 +305,24 @@ export interface PresetEffect {
 }
 
 /**
+ * 記事1本の per-day 効果を KPI 軸で取り出す（calculationParams → KPI のマッピング1箇所化）。
+ * presetPerTimeEffectValue と diagnosis-v3 の記事単位 de-dup 集計（issue #34）が共用する。
+ */
+export function articleKpiPerDay(article: LifeImpactArticle, kpi: KpiKey): number {
+  const p = article.calculationParams;
+  switch (kpi) {
+    case 'health_lifespan':
+      return p.dailyHealthMinutes;
+    case 'positive_mood':
+      return p.dailyPositiveMoodMinutes;
+    case 'cost_saving':
+      return p.dailyCostSaving;
+    case 'earning':
+      return p.dailyIncomeGain;
+  }
+}
+
+/**
  * プリセットの「1回あたりの効果」を指定 KPI 軸で算出する（diagnosis-v3 の建材）。
  * プリセットが参照する記事群の calculationParams を合算する。文言は付けず構造化データで返す。
  * 未知プリセット・効果0は null。
@@ -317,21 +336,7 @@ export function presetPerTimeEffectValue(presetId: string, kpi: KpiKey): PresetE
   for (const articleId of preset.articleIds) {
     const article = getArticle(articleId);
     if (!article) continue;
-    const p = article.calculationParams;
-    switch (kpi) {
-      case 'health_lifespan':
-        value += p.dailyHealthMinutes;
-        break;
-      case 'positive_mood':
-        value += p.dailyPositiveMoodMinutes;
-        break;
-      case 'cost_saving':
-        value += p.dailyCostSaving;
-        break;
-      case 'earning':
-        value += p.dailyIncomeGain;
-        break;
-    }
+    value += articleKpiPerDay(article, kpi);
   }
 
   const rounded = Math.round(value);
