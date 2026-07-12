@@ -40,7 +40,9 @@ export async function middleware(request: NextRequest) {
   }
 
   // Branch 3: hide /marketing on non-marketing hosts (no Supabase)
-  if (!isMarketingHost && pathname === '/marketing') {
+  // Vercel Preview では LP 確認のため隠さない
+  const isVercelPreview = process.env.VERCEL_ENV === 'preview';
+  if (!isMarketingHost && !isVercelPreview && pathname === '/marketing') {
     return NextResponse.rewrite(new URL('/', request.url));
   }
 
