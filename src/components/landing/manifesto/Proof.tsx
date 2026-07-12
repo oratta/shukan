@@ -58,10 +58,12 @@ export async function Proof() {
     ? formatOneDecimal(outlier.healthMinutes / maxima.healthMinutes)
     : '—';
 
+  // 3 つ目の「手で書いた効果数値 0」は evidence-figures 層の設計そのものの言明。
+  // LP 上の効果数値はすべてデータセット由来で、手書きの数字は構造的に存在しない。
   const stats = [
     { label: t('proof.stats.articles'), value: corpus.articleCount, unit: t('proof.stats.articlesUnit') },
     { label: t('proof.stats.sources'), value: corpus.sourceCount, unit: t('proof.stats.sourcesUnit') },
-    { label: t('proof.stats.axes'), value: corpus.axisCount, unit: t('proof.stats.axesUnit') },
+    { label: t('proof.stats.handwritten'), value: 0, unit: t('proof.stats.handwrittenUnit') },
   ];
 
   return (

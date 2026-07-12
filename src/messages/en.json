@@ -653,19 +653,19 @@
         "articlesUnit": "",
         "sources": "Cited references",
         "sourcesUnit": "",
-        "axes": "Outcome axes",
-        "axesUnit": ""
+        "handwritten": "Hand-written figures",
+        "handwrittenUnit": ""
       },
       "colHabit": "Habit",
       "colConfidence": "Confidence",
-      "barNote": "Each bar shows the ratio to the column's maximum. Bars cannot be compared across columns.",
+      "barNote": "Bar lengths are ratios within each column — they cannot be compared across columns.",
       "moodZeroNote": "A zero means no sufficient research has been found yet — not proof of no effect.",
-      "caption": "Every figure in this table is generated from the evidence-article dataset that ships inside the app ({articles} articles / {sources} cited references). Not one number here was written by hand.",
+      "caption": "Every figure in this table is generated from the evidence-article dataset that ships inside the app ({articles} articles / {sources} cited references).",
       "disclaimer": "The numbers are research-based estimates, not promises. Assumptions and calculations are disclosed inside the app.",
       "outlier": {
-        "eyebrow": "Outlier",
+        "eyebrow": "An order of magnitude",
         "heading": "Quitting smoking is in a different league.",
-        "body": "{value} minutes of healthy lifespan per day — roughly {ratio}× the largest value in the table above. Plotted on the same axis it would crush every other bar, so it stands alone here.",
+        "body": "{value} minutes of healthy lifespan per day — {ratio}× the largest habit in the table above. Habits are not equal. What you pick changes the payoff by orders of magnitude. So pick by the numbers, not by the trend.",
         "unit": "min/day"
       }
     },
@@ -731,7 +731,7 @@
       ],
       "closing": "Not being suspect is where this product's trust comes from.",
       "confidenceHeading": "Weak evidence is disclosed in numbers, too.",
-      "confidenceBody": "Of {articles} evidence articles, only {high} are rated high — backed by meta-analyses or large cohort studies. {medium} are medium, {low} are low (estimated). Weak evidence is labelled weak and kept on the table — never quietly dropped.",
+      "confidenceBody": "Of {articles} evidence articles, {high} are strong enough to be rated high — backed by meta-analyses or large cohort studies. Every other article states the strength of its evidence, one by one. Weak evidence is never quietly dropped, and never dressed up as strong.",
       "distributionLabel": "Confidence distribution",
       "articleUnit": ""
     },

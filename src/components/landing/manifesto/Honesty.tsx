@@ -13,11 +13,12 @@ export async function Honesty() {
   const items = t.raw('honesty.items') as string[];
   const corpus = getCorpusFigures();
 
+  // ゼロ件のカテゴリはバーにも凡例にも出さない（「低 0本」という表示は意味を持たない）。
   const segments = [
     { key: 'high' as const, count: corpus.confidence.high, color: ACCENT },
     { key: 'medium' as const, count: corpus.confidence.medium, color: '#0A0A0A' },
     { key: 'low' as const, count: corpus.confidence.low, color: 'rgba(10,10,10,0.25)' },
-  ];
+  ].filter((segment) => segment.count > 0);
 
   return (
     <section className="bg-[#FAFAFA] text-[#0A0A0A]">
@@ -52,8 +53,6 @@ export async function Honesty() {
             {t('honesty.confidenceBody', {
               articles: formatInt(corpus.articleCount),
               high: formatInt(corpus.confidence.high),
-              medium: formatInt(corpus.confidence.medium),
-              low: formatInt(corpus.confidence.low),
             })}
           </p>
 

@@ -188,11 +188,15 @@ describe('Smitch marketing landing page (Manifesto)', () => {
 
     expect(joined).toContain('約束しないこと。');
     expect(joined).toContain('偽のカウントダウンも、盛った利用者数も出さない。');
-    // high / medium / low の記事数を実数で開示する
+    // 信頼度の内訳を実数で開示する（ゼロ件のカテゴリは表示しない）
     const corpus = figures.getCorpusFigures();
     for (const level of ['high', 'medium', 'low'] as const) {
-      expect(joined).toContain(String(corpus.confidence[level]));
+      if (corpus.confidence[level] > 0) {
+        expect(joined).toContain(String(corpus.confidence[level]));
+      }
     }
+    // 作り手側の編集判断ではなく、製品の主張として語る（内情コピーの再発ガード）
+    expect(joined).not.toContain('表から外して');
   });
 
   it('keeps footer legal links and brand credit visible', async () => {
