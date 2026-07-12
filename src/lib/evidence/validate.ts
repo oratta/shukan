@@ -201,7 +201,11 @@ function checkCalculationLogicConsistency(findings: Finding[]): void {
 
 /**
  * 習慣プリセット間で同一 article_id を複数プリセットが参照している箇所を検出する（WARNING）。
- * issue #34（エビデンス重複加算防止）の恒久版に向けた布石。ここでは検出して列挙するだけ。
+ * 集計の二重計上そのものは #34（PR #66）で解消済み: ホーム集計・診断集計とも impact.ts の
+ * de-dup（同一 article_id は最大ウェイトで1回だけ計上）を通るため、重複参照があっても数値は壊れない。
+ * したがってこれは計算バグの検出ではなく、プリセット設計上の意図確認のための警告。
+ * 「別々のプリセットが同じ根拠で同じ効果を主張している」状態は UX 上ふつう意図的ではないので、
+ * 新しいプリセット追加時に気付けるようにしてある。現行プリセットは重複ゼロ。
  * 併せてプリセットの article_id がレジストリに存在するか（ERROR）も見る。
  */
 function checkPresetArticleReferences(findings: Finding[]): void {
@@ -223,7 +227,7 @@ function checkPresetArticleReferences(findings: Finding[]): void {
       push(findings, {
         level: 'warning',
         code: 'preset-duplicate-article',
-        message: `article_id '${aid}' が複数プリセットから参照されている: ${presets.join(', ')}（#34: 重複加算に注意）`,
+        message: `article_id '${aid}' が複数プリセットから参照されている: ${presets.join(', ')}（集計は #66 の de-dup で1回だけ計上されるため数値は正しい。プリセット設計として意図的か確認）`,
       });
     }
   }
