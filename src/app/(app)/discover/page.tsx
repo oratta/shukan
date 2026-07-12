@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Plus } from 'lucide-react';
 import { getArticleList } from '@/data/impact-articles';
 import { formatCurrency, formatHealthMinutes, calculateAnnualImpact } from '@/lib/impact';
+import { EstimateDisclaimer } from '@/components/habits/estimate-disclaimer';
 import { EvidenceArticleSheet } from '@/components/habits/evidence-article-sheet';
 import { HabitForm } from '@/components/habits/habit-form';
 import { KpiIcon } from '@/components/onboarding/kpi-icon';
@@ -126,6 +127,8 @@ export default function DiscoverPage() {
       {/* F11/F13: KPI 選択（4軸）→ その KPI への効果順にソート */}
       <div className="mb-4">
         <p className="mb-2 text-xs text-muted-foreground">{t('discover.sortLead')}</p>
+        {/* 景表法・打消し表示対応（issue #39）: リストの推定値に対する近接注記 */}
+        <EstimateDisclaimer className="mb-2" />
         <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
           {DISCOVER_KPIS.map((k) => {
             const selected = selectedKpi === k.key;

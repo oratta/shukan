@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { HeartPulse, Wallet, TrendingUp, PartyPopper, Smile } from 'lucide-react';
 import { calculateDedupedDailyImpact, formatHealthMinutes, formatCurrency } from '@/lib/impact';
 import { getArticle } from '@/data/impact-articles';
+import { EstimateDisclaimer } from '@/components/habits/estimate-disclaimer';
 import { cn } from '@/lib/utils';
 import type { HabitWithStats } from '@/types/habit';
 import type { HabitEvidence } from '@/types/impact';
@@ -214,6 +215,9 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
           </div>
         </div>
       </div>
+
+      {/* 景表法・打消し表示対応（issue #39）: 推定値と同一ビューポート内の近接注記 */}
+      <EstimateDisclaimer className="mt-3" />
     </div>
   );
 }

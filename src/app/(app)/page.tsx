@@ -281,6 +281,7 @@ export default function DashboardPage() {
         onOpenVsTemptation={handleOpenVsTemptation}
         onReorder={reorderHabits}
         onSkipToday={handleSkipToday}
+        onOpenArticle={(articleId) => setOpenArticleId(articleId)}
       />
 
       <EstablishedSection habits={establishedHabits} profile={profile} />

@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { getArticle } from '@/data/impact-articles';
 import { calculateAnnualImpact, formatHealthMinutes, formatCurrency } from '@/lib/impact';
 import { HabitIcon } from '@/components/ui/habit-icon';
+import { EstimateDisclaimer } from '@/components/habits/estimate-disclaimer';
 import { EvidencePicker } from '@/components/habits/evidence-picker';
 import { HelpButton } from '@/components/ui/help-button';
 import type { HabitEvidence, ArticleId } from '@/types/impact';
@@ -132,6 +133,8 @@ export function EvidenceManagerSheet({
                   </span>
                 )}
               </div>
+              {/* 近接注記（景表法・打消し表示 / issue #39）: 合算年間推定値と同一ビューポート内に表示 */}
+              <EstimateDisclaimer className="mt-2" />
             </div>
           )}
 

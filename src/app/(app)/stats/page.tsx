@@ -9,6 +9,7 @@ import { ProgressRing } from '@/components/habits/progress-ring';
 import { useHabits } from '@/hooks/useHabits';
 import { isDailyTrackedHabit } from '@/lib/habits';
 import { calculateTotalSavings, formatHealthMinutes, formatCurrency } from '@/lib/impact';
+import { EstimateDisclaimer } from '@/components/habits/estimate-disclaimer';
 import { useReviewHistory } from '@/hooks/useReviewHistory';
 import { ReviewCalendar } from '@/components/review/ReviewCalendar';
 
@@ -179,6 +180,9 @@ export default function StatsPage() {
               </div>
             )}
           </div>
+
+          {/* 景表法・打消し表示対応（issue #39）: 累積推定値直下の近接注記 */}
+          <EstimateDisclaimer />
         </Card>
 
       {/* Per-habit savings breakdown */}
