@@ -100,8 +100,10 @@ describe('推定値 → 算出根拠への 1 タップ導線', () => {
     expect(src).toMatch(/onTap=/);
   });
 
-  it('home（page.tsx）は HabitList に onOpenArticle を渡す', () => {
-    const src = readSource('src/app/(app)/page.tsx');
+  // ホームのクライアント本体は issue #59 の server prefetch 化で
+  // src/app/(app)/page.tsx（Server Component）→ dashboard-client.tsx へ分離された。
+  it('home（dashboard-client.tsx）は HabitList に onOpenArticle を渡す', () => {
+    const src = readSource('src/components/dashboard/dashboard-client.tsx');
     expect(src).toMatch(/onOpenArticle=\{?\(articleId\)/);
   });
 
