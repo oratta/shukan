@@ -81,6 +81,10 @@ export const dailyYoga: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1758599879559-efc4a3fb4243',
+    gradient: 'from-violet-400 to-purple-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'flower-2',
 };

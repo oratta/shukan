@@ -77,6 +77,10 @@ export const drinkWater: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1760627317288-8cc2b44efb2d',
+    gradient: 'from-sky-400 to-cyan-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'droplets',
 };

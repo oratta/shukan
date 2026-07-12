@@ -80,6 +80,10 @@ export const learnLanguage: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1673515336416-a859f5b02afa',
+    gradient: 'from-teal-400 to-cyan-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'globe',
 };

@@ -99,6 +99,10 @@ export const movementBreaks: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b',
+    gradient: 'from-green-400 to-teal-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'stretch-horizontal',
 };

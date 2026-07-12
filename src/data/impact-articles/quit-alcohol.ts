@@ -112,6 +112,10 @@ export const quitAlcohol: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1535683577427-740aaac4ec25',
+    gradient: 'from-amber-400 to-amber-600',
+  },
   defaultHabitType: 'quit',
   defaultIcon: 'wine-off',
 };

@@ -80,6 +80,10 @@ export const intermittentFasting: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1744194699438-1fca92810d11',
+    gradient: 'from-slate-400 to-gray-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'timer',
 };

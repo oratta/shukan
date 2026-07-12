@@ -100,6 +100,10 @@ export const pomodoroTechnique: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3',
+    gradient: 'from-red-400 to-orange-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'timer',
 };

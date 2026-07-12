@@ -77,6 +77,10 @@ export const noImpulseBuying: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1758525226490-c1553d9f3ad3',
+    gradient: 'from-emerald-400 to-teal-600',
+  },
   defaultHabitType: 'quit',
   defaultIcon: 'shopping-cart',
 };

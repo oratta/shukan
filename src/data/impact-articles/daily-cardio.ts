@@ -114,6 +114,10 @@ export const dailyCardio: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://plus.unsplash.com/premium_photo-1663127773019-2d977286d60a',
+    gradient: 'from-orange-400 to-orange-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'person-standing',
 };

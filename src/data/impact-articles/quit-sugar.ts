@@ -76,6 +76,10 @@ export const quitSugar: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1668141077204-4cb8d28c6f1d',
+    gradient: 'from-pink-400 to-pink-600',
+  },
   defaultHabitType: 'quit',
   defaultIcon: 'candy-off',
 };

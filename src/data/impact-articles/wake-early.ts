@@ -72,6 +72,10 @@ export const wakeEarly: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1763037415656-93716b1721f5',
+    gradient: 'from-amber-400 to-orange-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'sunrise',
 };

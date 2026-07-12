@@ -100,6 +100,10 @@ export const quitPorn: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1573511860302-28c524319d2a',
+    gradient: 'from-purple-400 to-purple-600',
+  },
   defaultHabitType: 'quit',
   defaultIcon: 'brain',
 };
