@@ -80,6 +80,10 @@ export const dailyReading: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1623771702313-39dc4f71d275',
+    gradient: 'from-amber-400 to-yellow-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'book-open',
 };

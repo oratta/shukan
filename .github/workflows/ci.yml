@@ -54,6 +54,11 @@ jobs:
       - name: Check migration version uniqueness
         run: npm run check:migrations
 
+      - name: Validate evidence data quality
+        # 出典の必須性・効果値のサニティ・calculationLogic 整合・プリセット参照を検証。
+        # 到達性チェック(--online)はネットワーク依存のため CI では回さない（ローカル任意実行）。
+        run: npm run validate:evidence
+
       - name: Run ESLint
         run: npm run lint
 

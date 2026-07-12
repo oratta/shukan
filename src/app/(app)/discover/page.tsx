@@ -8,7 +8,7 @@ import { formatCurrency, formatHealthMinutes, calculateAnnualImpact } from '@/li
 import { EvidenceArticleSheet } from '@/components/habits/evidence-article-sheet';
 import { HabitForm } from '@/components/habits/habit-form';
 import { KpiIcon } from '@/components/onboarding/kpi-icon';
-import { EVIDENCE_HERO_IMAGES as HERO_IMAGES } from '@/data/evidence-hero-images';
+import { EVIDENCE_HERO_IMAGES as HERO_IMAGES, getEvidenceHeroGradient } from '@/data/evidence-hero-images';
 import { useHabits } from '@/hooks/useHabits';
 import { cn } from '@/lib/utils';
 import type { KpiKey } from '@/data/kpi/catalog';
@@ -31,45 +31,6 @@ const DISCOVER_KPIS: {
   { key: 'cost_saving', icon: 'piggy-bank', labelKey: 'impact.dailyCost', param: 'dailyCostSaving' },
   { key: 'earning', icon: 'trending-up', labelKey: 'impact.dailyIncome', param: 'dailyIncomeGain' },
 ];
-
-/** Fallback gradient color map */
-const GRADIENT_MAP: Record<string, string> = {
-  quit_smoking: 'from-gray-400 to-gray-600',
-  quit_alcohol: 'from-amber-400 to-amber-600',
-  quit_porn: 'from-purple-400 to-purple-600',
-  no_youtube: 'from-red-400 to-red-600',
-  daily_cardio: 'from-orange-400 to-orange-600',
-  daily_strength: 'from-rose-500 to-red-600',
-  morning_planning: 'from-sky-400 to-blue-600',
-  quit_sugar: 'from-pink-400 to-pink-600',
-  quit_junk_food: 'from-yellow-400 to-orange-600',
-  quit_social_media: 'from-blue-400 to-indigo-600',
-  no_screens_before_bed: 'from-indigo-400 to-purple-600',
-  no_impulse_buying: 'from-emerald-400 to-teal-600',
-  daily_walking: 'from-green-400 to-emerald-600',
-  daily_stretching: 'from-cyan-400 to-teal-600',
-  daily_yoga: 'from-violet-400 to-purple-600',
-  cold_shower: 'from-cyan-400 to-blue-600',
-  daily_meditation: 'from-indigo-400 to-violet-600',
-  daily_journaling: 'from-amber-400 to-orange-600',
-  gratitude_practice: 'from-yellow-400 to-amber-600',
-  sleep_7hours: 'from-blue-400 to-indigo-600',
-  wake_early: 'from-amber-400 to-orange-600',
-  drink_water: 'from-sky-400 to-cyan-600',
-  eat_vegetables: 'from-green-400 to-lime-600',
-  intermittent_fasting: 'from-slate-400 to-gray-600',
-  home_cooking: 'from-orange-400 to-red-600',
-  daily_reading: 'from-amber-400 to-yellow-600',
-  deep_work: 'from-blue-400 to-slate-600',
-  learn_language: 'from-teal-400 to-cyan-600',
-  daily_saving: 'from-emerald-400 to-green-600',
-  time_in_nature: 'from-green-400 to-teal-600',
-  morning_tidying: 'from-sky-400 to-cyan-600',
-  daily_habit_review: 'from-violet-400 to-indigo-600',
-  schedule_adherence: 'from-blue-400 to-slate-600',
-  pomodoro_technique: 'from-red-400 to-orange-600',
-  movement_breaks: 'from-green-400 to-teal-600',
-};
 
 export default function DiscoverPage() {
   const t = useTranslations();
@@ -201,7 +162,7 @@ export default function DiscoverPage() {
             name={article.name}
             calculationParams={article.calculationParams}
             heroImage={HERO_IMAGES[article.id]}
-            gradient={GRADIENT_MAP[article.id] ?? 'from-gray-400 to-gray-600'}
+            gradient={getEvidenceHeroGradient(article.id) ?? 'from-gray-400 to-gray-600'}
             confidenceLabel={t(`discover.confidence.${article.confidenceLevel}`)}
             timeUnits={timeUnits}
             perYear={perYear}

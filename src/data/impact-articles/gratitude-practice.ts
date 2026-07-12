@@ -83,6 +83,10 @@ export const gratitudePractice: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1712229462026-190941c6b083',
+    gradient: 'from-yellow-400 to-amber-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'hand-heart',
 };
