@@ -2,6 +2,18 @@ import { createServerClient } from '@supabase/ssr';
 import { get } from '@vercel/edge-config';
 import { NextResponse, type NextRequest } from 'next/server';
 
+/**
+ * Rewrites the request to /marketing while forcing the ja locale (#57).
+ * The LP is Japanese content, so the request's `locale` cookie is overridden
+ * to `ja` for this request only — src/i18n/request.ts then resolves ja and
+ * RootLayout renders `<html lang="ja">`. No Set-Cookie is emitted, so the
+ * browser's own locale cookie (used on the app host) is left untouched.
+ */
+function rewriteToMarketing(request: NextRequest): NextResponse {
+  request.cookies.set('locale', 'ja');
+  return NextResponse.rewrite(new URL('/marketing', request.url), { request });
+}
+
 export async function middleware(request: NextRequest) {
   // Maintenance mode: Edge Config の maintenance フラグが ON なら全ページを
   // メンテページへ rewrite（EDGE_CONFIG 未設定環境や到達不能時は素通し）
@@ -27,7 +39,7 @@ export async function middleware(request: NextRequest) {
 
   // Branch 1: marketing host + root → internal rewrite to /marketing (no Supabase)
   if (isMarketingHost && pathname === '/') {
-    return NextResponse.rewrite(new URL('/marketing', request.url));
+    return rewriteToMarketing(request);
   }
 
   // Branch 2: dev escape hatch (non-production only)
@@ -36,7 +48,7 @@ export async function middleware(request: NextRequest) {
     pathname === '/' &&
     request.nextUrl.searchParams.get('marketing') === '1'
   ) {
-    return NextResponse.rewrite(new URL('/marketing', request.url));
+    return rewriteToMarketing(request);
   }
 
   // Branch 3: hide /marketing on non-marketing hosts (no Supabase)
