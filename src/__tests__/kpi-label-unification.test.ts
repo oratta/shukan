@@ -102,9 +102,11 @@ describe('LP コピーの KPI 名統一', () => {
     for (const t of oldAxisTokens) expect(marketingJa).not.toContain(t);
   });
   it('marketing namespace（ja）が4つの正式 KPI 名を軸として掲げている', () => {
-    const axes = (ja as unknown as { marketing: { impact: { axes: string[] } } }).marketing
-      .impact.axes;
-    expect([...axes].sort()).toEqual([...canonical].sort());
+    const axes = (
+      ja as unknown as { marketing: { axes: Record<string, { name: string }> } }
+    ).marketing.axes;
+    const names = Object.values(axes).map((axis) => axis.name);
+    expect([...names].sort()).toEqual([...canonical].sort());
   });
   it('LP に旧軸名を含むソースが残っていない', () => {
     const src = readSource('src/app/marketing/page.tsx');

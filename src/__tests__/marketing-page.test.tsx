@@ -84,8 +84,9 @@ const SECTIONS = [
   'Declaration',
   'Indictment',
   'Turn',
+  'Proof',
+  'Cumulative',
   'Doctrine',
-  'ImpactAxes',
   'Method',
   'Honesty',
   'CallToAction',
@@ -137,23 +138,61 @@ describe('Smitch marketing landing page (Manifesto)', () => {
     expect(joined).toContain('なりたい自分から始める。');
   });
 
-  it('names the four impact axes without asserting any concrete number', async () => {
-    const { ImpactAxes } = await import('@/components/landing/manifesto/ImpactAxes');
-    const joined = collect(await ImpactAxes()).texts.join(' ');
+  it('backs the reversal with figures derived from the evidence dataset', async () => {
+    const [{ Proof }, figures] = await Promise.all([
+      import('@/components/landing/manifesto/Proof'),
+      import('@/lib/marketing/evidence-figures'),
+    ]);
+    const joined = collect(await Proof()).texts.join(' ');
 
+    // 4 軸の名前は台帳テーブルの列見出しとして残る
     for (const axis of ['健康寿命', '前向きな気持ちの時間', '出費削減', '増える収入']) {
       expect(joined).toContain(axis);
     }
+    // 代表 8 習慣がすべて行として出る（コピーは ja.json の habits ラベル）
+    const habitLabels = ((ja as Json).marketing as Json).habits as Record<string, string>;
+    for (const id of figures.FEATURED_ARTICLE_IDS) {
+      expect(joined).toContain(habitLabels[id]);
+    }
+    // コーパスの実数（記事数）と外れ値（禁煙）の値がデータセット由来で出る
+    const corpus = figures.getCorpusFigures();
+    expect(joined).toContain(Math.round(corpus.articleCount).toLocaleString('en-US'));
+    const outlier = figures.getOutlierHabit();
+    expect(joined).toContain(Math.round(outlier.healthMinutes).toLocaleString('en-US'));
     // 推定値である旨の断りを外さない（景表法まわりのガード）
     expect(joined).toContain('約束ではない');
   });
 
-  it('refuses to over-promise in the honesty section', async () => {
-    const { Honesty } = await import('@/components/landing/manifesto/Honesty');
+  it('compounds the daily figure into a life-scale number over ten years', async () => {
+    const [{ Cumulative }, figures] = await Promise.all([
+      import('@/components/landing/manifesto/Cumulative'),
+      import('@/lib/marketing/evidence-figures'),
+    ]);
+    const acc = collect(await Cumulative());
+    const joined = acc.texts.join(' ');
+
+    const series = figures.getCumulativeSeries();
+    const finalDays = series[series.length - 1].healthyDays;
+    expect(joined).toContain(`+${Math.round(finalDays).toLocaleString('en-US')}`);
+    expect(joined).toContain('約束ではない');
+    // 数字の直後に導線を置く（このページの主 CV ポイント）
+    expect(acc.hrefs).toContain('/founding');
+  });
+
+  it('refuses to over-promise and discloses the confidence distribution', async () => {
+    const [{ Honesty }, figures] = await Promise.all([
+      import('@/components/landing/manifesto/Honesty'),
+      import('@/lib/marketing/evidence-figures'),
+    ]);
     const joined = collect(await Honesty()).texts.join(' ');
 
     expect(joined).toContain('約束しないこと。');
     expect(joined).toContain('偽のカウントダウンも、盛った利用者数も出さない。');
+    // high / medium / low の記事数を実数で開示する
+    const corpus = figures.getCorpusFigures();
+    for (const level of ['high', 'medium', 'low'] as const) {
+      expect(joined).toContain(String(corpus.confidence[level]));
+    }
   });
 
   it('keeps footer legal links and brand credit visible', async () => {
@@ -173,7 +212,8 @@ describe('Smitch marketing landing page (Manifesto)', () => {
       import('@/components/landing/manifesto/Indictment').then((m) => m.Indictment()),
       import('@/components/landing/manifesto/Turn').then((m) => m.Turn()),
       import('@/components/landing/manifesto/Doctrine').then((m) => m.Doctrine()),
-      import('@/components/landing/manifesto/ImpactAxes').then((m) => m.ImpactAxes()),
+      import('@/components/landing/manifesto/Proof').then((m) => m.Proof()),
+      import('@/components/landing/manifesto/Cumulative').then((m) => m.Cumulative()),
       import('@/components/landing/manifesto/Method').then((m) => m.Method()),
       import('@/components/landing/manifesto/Honesty').then((m) => m.Honesty()),
       import('@/components/landing/manifesto/CallToAction').then((m) => m.CallToAction()),
