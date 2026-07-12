@@ -641,8 +641,52 @@
       ],
       "body": "Don't start from the habit. Start from who you want to become. Let science map the way there."
     },
+    "proof": {
+      "eyebrow": "03 — Evidence",
+      "lines": [
+        "Here are",
+        "the numbers."
+      ],
+      "lead": "Every habit on Smitch carries an estimate derived from peer-reviewed research. Perform it for one day — which part of your life moves, and by how much. We show all of it before you start.",
+      "stats": {
+        "articles": "Evidence articles",
+        "articlesUnit": "",
+        "sources": "Cited references",
+        "sourcesUnit": "",
+        "axes": "Outcome axes",
+        "axesUnit": ""
+      },
+      "colHabit": "Habit",
+      "colConfidence": "Confidence",
+      "barNote": "Each bar shows the ratio to the column's maximum. Bars cannot be compared across columns.",
+      "moodZeroNote": "A zero means no sufficient research has been found yet — not proof of no effect.",
+      "caption": "Every figure in this table is generated from the evidence-article dataset that ships inside the app ({articles} articles / {sources} cited references). Not one number here was written by hand.",
+      "disclaimer": "The numbers are research-based estimates, not promises. Assumptions and calculations are disclosed inside the app.",
+      "outlier": {
+        "eyebrow": "Outlier",
+        "heading": "Quitting smoking is in a different league.",
+        "body": "{value} minutes of healthy lifespan per day — roughly {ratio}× the largest value in the table above. Plotted on the same axis it would crush every other bar, so it stands alone here.",
+        "unit": "min/day"
+      }
+    },
+    "cumulative": {
+      "eyebrow": "04 — Compounding",
+      "lines": [
+        "Think those",
+        "numbers are small?"
+      ],
+      "lead": "Sleeping 7 hours, daily walking, eating vegetables — together, {minutes} minutes of healthy lifespan per day. Keep them for ten years and it looks like this.",
+      "readoutLabel": "Cumulative healthy lifespan (10 years, estimated)",
+      "dayUnit": "days",
+      "perYear": "That's {perYear} days per year. Choose habits by this number — not by streak length.",
+      "cta": "Claim a founding seat",
+      "yAxis": "Cumulative healthy lifespan (days)",
+      "xAxis": "Years continued",
+      "yearMark": "Year {year}",
+      "assumption": "Model: daily estimate × 365 days × years, simple addition at 100% adherence. Interactions between habits and diminishing returns are not modelled. An estimate, not a promise."
+    },
     "doctrine": {
-      "eyebrow": "03 — Declaration",
+      "eyebrow": "05 — Declaration",
       "heading": "Smitch holds to three things.",
       "items": [
         {
@@ -659,24 +703,8 @@
         }
       ]
     },
-    "impact": {
-      "eyebrow": "04 — Measure",
-      "lines": [
-        "We don't",
-        "measure",
-        "days."
-      ],
-      "lead": "Where does the habit you chose actually land? Smitch shows impact on four axes.",
-      "axes": [
-        "Healthy lifespan",
-        "Time feeling positive",
-        "Cost saving",
-        "Income Growth"
-      ],
-      "disclaimer": "The numbers are research-based estimates, not promises. Assumptions and calculations are disclosed inside the app."
-    },
     "method": {
-      "eyebrow": "05 — Method",
+      "eyebrow": "06 — Method",
       "heading": "Three steps to begin.",
       "steps": [
         {
@@ -694,14 +722,18 @@
       ]
     },
     "honesty": {
-      "eyebrow": "06 — Honesty",
+      "eyebrow": "07 — Honesty",
       "heading": "What we won't promise.",
       "items": [
         "We won't tell you your life changes in N days.",
         "No fake countdowns. No inflated user counts.",
         "We won't blame you for the times you stopped."
       ],
-      "closing": "Not being suspect is where this product's trust comes from."
+      "closing": "Not being suspect is where this product's trust comes from.",
+      "confidenceHeading": "Weak evidence is disclosed in numbers, too.",
+      "confidenceBody": "Of {articles} evidence articles, only {high} are rated high — backed by meta-analyses or large cohort studies. {medium} are medium, {low} are low (estimated). Weak evidence is labelled weak and kept on the table — never quietly dropped.",
+      "distributionLabel": "Confidence distribution",
+      "articleUnit": ""
     },
     "cta": {
       "lines": [
@@ -719,6 +751,40 @@
       "terms": "Terms",
       "tokushoho": "Legal notice (Japan)",
       "copyright": "© Genetta Inc."
+    },
+    "axes": {
+      "health": {
+        "name": "Healthy lifespan",
+        "unit": "min/day"
+      },
+      "cost": {
+        "name": "Cost saving",
+        "unit": "JPY/day"
+      },
+      "income": {
+        "name": "Income Growth",
+        "unit": "JPY/day"
+      },
+      "mood": {
+        "name": "Time feeling positive",
+        "unit": "min/day"
+      }
+    },
+    "habits": {
+      "sleep_7hours": "Sleeping 7 hours",
+      "daily_walking": "Daily walking",
+      "daily_cardio": "Daily cardio",
+      "eat_vegetables": "Eating vegetables",
+      "daily_meditation": "Daily meditation",
+      "quit_alcohol": "Quitting alcohol",
+      "home_cooking": "Cooking at home",
+      "daily_saving": "Saving daily",
+      "quit_smoking": "Quitting smoking"
+    },
+    "confidence": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low (estimated)"
     }
   }
 }
