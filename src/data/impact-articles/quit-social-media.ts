@@ -81,6 +81,10 @@ export const quitSocialMedia: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1675352161865-27816c76141a',
+    gradient: 'from-blue-400 to-indigo-600',
+  },
   defaultHabitType: 'quit',
   defaultIcon: 'message-circle-off',
 };

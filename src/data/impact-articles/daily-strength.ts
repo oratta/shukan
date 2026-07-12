@@ -93,6 +93,10 @@ export const dailyStrength: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1544033527-b192daee1f5b',
+    gradient: 'from-rose-500 to-red-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'dumbbell',
 };

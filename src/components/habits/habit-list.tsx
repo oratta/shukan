@@ -28,6 +28,8 @@ interface HabitListProps {
   onOpenVsTemptation: (id: string) => void;
   onReorder: (orderedIds: string[]) => void;
   onSkipToday: (id: string) => void;
+  /** 推定値タップで算出根拠（エビデンス記事）を開く導線（issue #39） */
+  onOpenArticle?: (articleId: string) => void;
 }
 
 export function HabitList({
@@ -38,6 +40,7 @@ export function HabitList({
   onOpenVsTemptation,
   onReorder,
   onSkipToday,
+  onOpenArticle,
 }: HabitListProps) {
   const t = useTranslations('habits');
   const [expandedHabitId, setExpandedHabitId] = useState<string | null>(null);
@@ -125,6 +128,7 @@ export function HabitList({
                       onOpenDetail={onOpenDetail}
                       onOpenVsTemptation={onOpenVsTemptation}
                       onSkipToday={onSkipToday}
+                      onOpenArticle={onOpenArticle}
                     />
                   </div>
                 ))}
@@ -153,6 +157,7 @@ export function HabitList({
                       onOpenDetail={onOpenDetail}
                       onOpenVsTemptation={onOpenVsTemptation}
                       onSkipToday={onSkipToday}
+                      onOpenArticle={onOpenArticle}
                     />
                   </div>
                 ))}

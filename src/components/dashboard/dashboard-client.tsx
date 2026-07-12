@@ -290,6 +290,7 @@ export function DashboardClient({
         onOpenVsTemptation={handleOpenVsTemptation}
         onReorder={reorderHabits}
         onSkipToday={handleSkipToday}
+        onOpenArticle={(articleId) => setOpenArticleId(articleId)}
       />
 
       <EstablishedSection habits={establishedHabits} profile={profile} />
