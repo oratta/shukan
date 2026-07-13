@@ -160,7 +160,7 @@ describe('Smitch marketing landing page (Manifesto)', () => {
     const outlier = figures.getOutlierHabit();
     expect(joined).toContain(Math.round(outlier.healthMinutes).toLocaleString('en-US'));
     // 推定値である旨の断りを外さない（景表法まわりのガード）
-    expect(joined).toContain('約束ではない');
+    expect(joined).toContain('お約束するものではありません');
   });
 
   it('compounds the daily figure into a life-scale number over ten years', async () => {
@@ -174,7 +174,7 @@ describe('Smitch marketing landing page (Manifesto)', () => {
     const series = figures.getCumulativeSeries();
     const finalDays = series[series.length - 1].healthyDays;
     expect(joined).toContain(`+${Math.round(finalDays).toLocaleString('en-US')}`);
-    expect(joined).toContain('約束ではない');
+    expect(joined).toContain('お約束するものではありません');
     // 数字の直後に導線を置く（このページの主 CV ポイント）
     expect(acc.hrefs).toContain('/founding');
   });
@@ -187,7 +187,7 @@ describe('Smitch marketing landing page (Manifesto)', () => {
     const joined = collect(await Honesty()).texts.join(' ');
 
     expect(joined).toContain('約束しないこと。');
-    expect(joined).toContain('偽のカウントダウンも、盛った利用者数も出さない。');
+    expect(joined).toContain('偽のカウントダウンや、盛った利用者数は出しません。');
     // 信頼度の内訳を実数で開示する（ゼロ件のカテゴリは表示しない）
     const corpus = figures.getCorpusFigures();
     for (const level of ['high', 'medium', 'low'] as const) {
