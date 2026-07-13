@@ -638,13 +638,22 @@
       ],
       "body": "Don't start from the habit. Start from who you want to become. Let science map the way there."
     },
+    "kpis": {
+      "eyebrow": "03 — The KPIs",
+      "lines": [
+        "Four KPIs",
+        "for a changing life."
+      ],
+      "lead": "A streak can't tell you whether you're getting closer to who you want to become. Smitch measures how your life is changing on these four KPIs.",
+      "closing": "So how far does each habit actually move them?"
+    },
     "proof": {
-      "eyebrow": "03 — Evidence",
+      "eyebrow": "04 — Evidence",
       "lines": [
         "Here are",
         "the numbers."
       ],
-      "lead": "Every habit on Smitch carries an estimate derived from peer-reviewed research. Perform it for one day — which part of your life moves, and by how much. We show all of it before you start.",
+      "lead": "Eight representative habits, with estimates on all four KPIs — every figure derived from peer-reviewed research. We show all of it before you start.",
       "stats": {
         "articles": "Evidence articles",
         "articlesUnit": "",
@@ -658,16 +667,10 @@
       "barNote": "Bar lengths are ratios within each column — they cannot be compared across columns.",
       "moodZeroNote": "A zero means no sufficient research has been found yet — not proof of no effect.",
       "caption": "Every figure in this table is generated from the evidence-article dataset that ships inside the app ({articles} articles / {sources} cited references).",
-      "disclaimer": "The numbers are research-based estimates, not promises. Assumptions and calculations are disclosed inside the app.",
-      "outlier": {
-        "eyebrow": "An order of magnitude",
-        "heading": "Quitting smoking is in a different league.",
-        "body": "{value} minutes of healthy lifespan per day — {ratio}× the largest habit in the table above. Habits are not equal. What you pick changes the payoff by orders of magnitude. So pick by the numbers, not by the trend.",
-        "unit": "min/day"
-      }
+      "disclaimer": "The numbers are research-based estimates, not promises. Assumptions and calculations are disclosed inside the app."
     },
     "cumulative": {
-      "eyebrow": "04 — Compounding",
+      "eyebrow": "05 — Compounding",
       "lines": [
         "Think those",
         "numbers are small?"
@@ -683,7 +686,7 @@
       "assumption": "Model: daily estimate × 365 days × years, simple addition at 100% adherence. Interactions between habits and diminishing returns are not modelled. An estimate, not a promise."
     },
     "doctrine": {
-      "eyebrow": "05 — Declaration",
+      "eyebrow": "06 — Declaration",
       "heading": "Smitch holds to three things.",
       "items": [
         {
@@ -701,7 +704,7 @@
       ]
     },
     "method": {
-      "eyebrow": "06 — Method",
+      "eyebrow": "07 — Method",
       "heading": "Three steps to begin.",
       "steps": [
         {
@@ -719,7 +722,7 @@
       ]
     },
     "honesty": {
-      "eyebrow": "07 — Honesty",
+      "eyebrow": "08 — Honesty",
       "heading": "What we won't promise.",
       "items": [
         "We won't tell you your life changes in N days.",
@@ -752,19 +755,23 @@
     "axes": {
       "health": {
         "name": "Healthy lifespan",
-        "unit": "min/day"
+        "unit": "min/day",
+        "description": "How much longer you get to live in good health — estimated in minutes per day the habit is performed."
       },
       "cost": {
         "name": "Cost saving",
-        "unit": "JPY/day"
+        "unit": "JPY/day",
+        "description": "How much less you spend on medical costs and waste, in yen per day."
       },
       "income": {
         "name": "Income Growth",
-        "unit": "JPY/day"
+        "unit": "JPY/day",
+        "description": "The income gain expected from changes in productivity and absenteeism, in yen per day."
       },
       "mood": {
         "name": "Time feeling positive",
-        "unit": "min/day"
+        "unit": "min/day",
+        "description": "How many more minutes per day you spend feeling positive."
       }
     },
     "habits": {

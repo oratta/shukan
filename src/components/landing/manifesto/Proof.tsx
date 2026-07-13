@@ -3,14 +3,14 @@ import {
   getColumnMaxima,
   getCorpusFigures,
   getFeaturedHabits,
-  getOutlierHabit,
   type HabitFigure,
 } from '@/lib/marketing/evidence-figures';
-import { formatInt, formatOneDecimal } from '@/lib/marketing/format';
+import { formatInt } from '@/lib/marketing/format';
 import { ACCENT, DISPLAY, DISPLAY_LG, EYEBROW, SHELL } from './theme';
 
 /**
- * Turn（転回）が「数字から始めろ」と言い切った直後に、実際の数字で受ける章。
+ * Kpis（指標）が立てた「では実際にどれだけ動くのか」という問いに、
+ * 実データで答える章。
  *
  * 数値はすべて evidence-figures 経由でアプリ本体のエビデンス記事データセット
  * から導出する。この章にハードコードされた効果の数値は 1 つも無い。
@@ -42,7 +42,6 @@ export async function Proof() {
 
   const rows = getFeaturedHabits();
   const maxima = getColumnMaxima(rows);
-  const outlier = getOutlierHabit();
   const corpus = getCorpusFigures();
 
   const maxFor = (axis: (typeof COLUMNS)[number]['axis']): number =>
@@ -53,10 +52,6 @@ export async function Proof() {
         : axis === 'income'
           ? maxima.incomeGain
           : maxima.positiveMoodMinutes;
-
-  const outlierRatio = maxima.healthMinutes
-    ? formatOneDecimal(outlier.healthMinutes / maxima.healthMinutes)
-    : '—';
 
   // 3 つ目の「手で書いた効果数値 0」は evidence-figures 層の設計そのものの言明。
   // LP 上の効果数値はすべてデータセット由来で、手書きの数字は構造的に存在しない。
@@ -163,33 +158,6 @@ export async function Proof() {
           </li>
           <li>{t('proof.disclaimer')}</li>
         </ul>
-
-        {/* 外れ値は軸を歪めないよう表から外し、単独の見出しで示す。 */}
-        <aside className="mt-20 grid gap-8 border-t-4 border-[#0A0A0A] pt-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-16">
-          <div>
-            <p className={`${EYEBROW} text-[#0A0A0A]/50`}>{t('proof.outlier.eyebrow')}</p>
-            <h3 className="mt-6 text-3xl leading-tight font-black md:text-5xl">
-              {t('proof.outlier.heading')}
-            </h3>
-            <p className="mt-6 max-w-xl text-base leading-relaxed text-[#0A0A0A]/75 md:text-lg">
-              {t('proof.outlier.body', {
-                value: formatInt(outlier.healthMinutes),
-                ratio: outlierRatio,
-              })}
-            </p>
-          </div>
-          <p className="flex items-baseline gap-3 md:justify-end">
-            <span
-              className={`${DISPLAY} font-mono text-7xl tabular-nums md:text-9xl`}
-              style={{ color: ACCENT }}
-            >
-              {formatInt(outlier.healthMinutes)}
-            </span>
-            <span className="font-mono text-sm font-bold text-[#0A0A0A]/60">
-              {t('proof.outlier.unit')}
-            </span>
-          </p>
-        </aside>
       </div>
     </section>
   );

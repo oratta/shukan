@@ -84,6 +84,7 @@ const SECTIONS = [
   'Declaration',
   'Indictment',
   'Turn',
+  'Kpis',
   'Proof',
   'Cumulative',
   'Doctrine',
@@ -138,6 +139,19 @@ describe('Smitch marketing landing page (Manifesto)', () => {
     expect(joined).toContain('なりたい自分から始める。');
   });
 
+  it('explains the four KPIs and hands off to the evidence section', async () => {
+    const { Kpis } = await import('@/components/landing/manifesto/Kpis');
+    const joined = collect(await Kpis()).texts.join(' ');
+
+    for (const kpi of ['健康寿命', '前向きな気持ちの時間', '出費削減', '増える収入']) {
+      expect(joined).toContain(kpi);
+    }
+    // 各 KPI に説明文が付く
+    expect(joined).toContain('健康に過ごせる時間');
+    // 章末の問いが次章（証拠）への橋渡しになる
+    expect(joined).toContain('実際にどれだけ動かす');
+  });
+
   it('backs the reversal with figures derived from the evidence dataset', async () => {
     const [{ Proof }, figures] = await Promise.all([
       import('@/components/landing/manifesto/Proof'),
@@ -154,11 +168,11 @@ describe('Smitch marketing landing page (Manifesto)', () => {
     for (const id of figures.FEATURED_ARTICLE_IDS) {
       expect(joined).toContain(habitLabels[id]);
     }
-    // コーパスの実数（記事数）と外れ値（禁煙）の値がデータセット由来で出る
+    // コーパスの実数（記事数）がデータセット由来で出る
     const corpus = figures.getCorpusFigures();
     expect(joined).toContain(Math.round(corpus.articleCount).toLocaleString('en-US'));
-    const outlier = figures.getOutlierHabit();
-    expect(joined).toContain(Math.round(outlier.healthMinutes).toLocaleString('en-US'));
+    // 禁煙の外れ値ブロックは削除済み（作図都合の説明をユーザに見せない）
+    expect(joined).not.toContain('禁煙');
     // 推定値である旨の断りを外さない（景表法まわりのガード）
     expect(joined).toContain('お約束するものではありません');
   });
@@ -216,6 +230,7 @@ describe('Smitch marketing landing page (Manifesto)', () => {
       import('@/components/landing/manifesto/Indictment').then((m) => m.Indictment()),
       import('@/components/landing/manifesto/Turn').then((m) => m.Turn()),
       import('@/components/landing/manifesto/Doctrine').then((m) => m.Doctrine()),
+      import('@/components/landing/manifesto/Kpis').then((m) => m.Kpis()),
       import('@/components/landing/manifesto/Proof').then((m) => m.Proof()),
       import('@/components/landing/manifesto/Cumulative').then((m) => m.Cumulative()),
       import('@/components/landing/manifesto/Method').then((m) => m.Method()),
