@@ -53,7 +53,12 @@ export async function middleware(request: NextRequest) {
   }
 
   // Branch 3: hide /marketing on non-marketing hosts (no Supabase)
+  // Vercel Preview では LP 確認のため認証なしで素通しする
+  const isVercelPreview = process.env.VERCEL_ENV === 'preview';
   if (!isMarketingHost && pathname === '/marketing') {
+    if (isVercelPreview) {
+      return NextResponse.next();
+    }
     return NextResponse.rewrite(new URL('/', request.url));
   }
 

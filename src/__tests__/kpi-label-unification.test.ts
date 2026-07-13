@@ -89,24 +89,27 @@ describe('en impact.* の KPI 英語名が正準 onboarding.kpi.*.name と一致
   });
 });
 
-describe('LP alt テキストの KPI 名統一', () => {
+// LP のコピーは Manifesto 版で next-intl の marketing namespace に集約されたため、
+// 画像 alt ではなく messages 側で KPI 名の統一を検証する。
+describe('LP コピーの KPI 名統一', () => {
   const oldAxisTokens = ['生涯コスト', '可処分時間', '集中時間'];
   const canonical = ['健康寿命', '出費削減', '増える収入', '前向きな気持ちの時間'];
+  const marketingJa = JSON.stringify(
+    (ja as unknown as { marketing: Json }).marketing
+  );
 
-  it('Process.tsx の alt に旧軸名が残っていない', () => {
-    const src = readSource('src/components/landing/Process.tsx');
+  it('marketing namespace（ja）に旧軸名が残っていない', () => {
+    for (const t of oldAxisTokens) expect(marketingJa).not.toContain(t);
+  });
+  it('marketing namespace（ja）が4つの正式 KPI 名を軸として掲げている', () => {
+    const axes = (
+      ja as unknown as { marketing: { axes: Record<string, { name: string }> } }
+    ).marketing.axes;
+    const names = Object.values(axes).map((axis) => axis.name);
+    expect([...names].sort()).toEqual([...canonical].sort());
+  });
+  it('LP に旧軸名を含むソースが残っていない', () => {
+    const src = readSource('src/app/marketing/page.tsx');
     for (const t of oldAxisTokens) expect(src).not.toContain(t);
-  });
-  it('Process.tsx の alt に4つの正式 KPI 名が含まれる', () => {
-    const src = readSource('src/components/landing/Process.tsx');
-    for (const t of canonical) expect(src).toContain(t);
-  });
-  it('Detail.tsx の alt に旧軸名が残っていない', () => {
-    const src = readSource('src/components/landing/Detail.tsx');
-    for (const t of oldAxisTokens) expect(src).not.toContain(t);
-  });
-  it('Detail.tsx の alt に4つの正式 KPI 名が含まれる', () => {
-    const src = readSource('src/components/landing/Detail.tsx');
-    for (const t of canonical) expect(src).toContain(t);
   });
 });

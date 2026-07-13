@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getLocale } from 'next-intl/server';
 import type { ReactNode } from 'react';
 
 const TITLE = 'Smitch — Switch your path.';
@@ -25,16 +26,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function MarketingLayout({
+export default async function MarketingLayout({
   children,
 }: {
   children: ReactNode;
 }) {
   // NOTE: <html> / <body> are provided by the root layout (src/app/layout.tsx).
   // This wrapper only sets the language on the LP subtree so screen readers and
-  // search engines see ja content (D8-3).
+  // search engines see the served locale (D8-3). The copy now comes from the
+  // next-intl `marketing` namespace, so the language follows the locale cookie
+  // rather than being pinned to ja.
+  const locale = await getLocale();
+
   return (
-    <div lang="ja" className="min-h-screen bg-background text-foreground">
+    <div lang={locale} className="min-h-screen bg-[#0A0A0A]">
       {children}
     </div>
   );

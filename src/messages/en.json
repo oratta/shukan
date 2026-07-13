@@ -591,6 +591,206 @@
       "unsupported": "Open Smitch in Safari or Chrome on your phone to add it to your Home Screen."
     }
   },
+  "marketing": {
+    "nav": {
+      "cta": "Join"
+    },
+    "hero": {
+      "eyebrow": "MANIFESTO",
+      "lines": [
+        "Habit apps",
+        "never",
+        "changed you."
+      ],
+      "body": "It was never your willpower. The order was wrong. Start from what you do, and doing becomes the point. Smitch starts from who you want to become.",
+      "ctaPrimary": "Claim a founding seat",
+      "ctaSecondary": "Read the manifesto",
+      "note": "An evidence-based life path builder — Switch your path."
+    },
+    "indictment": {
+      "eyebrow": "01 — Indictment",
+      "lines": [
+        "The problem",
+        "was never",
+        "you."
+      ],
+      "items": [
+        {
+          "title": "A streak is not a measure of a life.",
+          "body": "It records how many days you held on. It says nothing about who you became."
+        },
+        {
+          "title": "You were handed habits with no evidence.",
+          "body": "Five a.m. wake-ups. Cold showers. A trending list lands on you, and nobody explains why it would work for you."
+        },
+        {
+          "title": "Continuing quietly became the goal.",
+          "body": "The means replaced the end. So the day it breaks, everything you built looks meaningless."
+        }
+      ]
+    },
+    "turn": {
+      "eyebrow": "02 — Reversal",
+      "lines": [
+        "So we",
+        "reverse",
+        "the order."
+      ],
+      "body": "Don't start from the habit. Start from who you want to become. Let science map the way there."
+    },
+    "kpis": {
+      "eyebrow": "03 — The KPIs",
+      "lines": [
+        "Four KPIs",
+        "for a changing life."
+      ],
+      "lead": "A streak can't tell you whether you're getting closer to who you want to become. Smitch measures how your life is changing on these four KPIs.",
+      "closing": "So how far does each habit actually move them?"
+    },
+    "proof": {
+      "eyebrow": "04 — Evidence",
+      "lines": [
+        "Here are",
+        "the numbers."
+      ],
+      "lead": "Eight representative habits, with estimates on all four KPIs — every figure derived from peer-reviewed research. We show all of it before you start.",
+      "stats": {
+        "articles": "Evidence articles",
+        "articlesUnit": "",
+        "sources": "Cited references",
+        "sourcesUnit": "",
+        "handwritten": "Hand-written figures",
+        "handwrittenUnit": ""
+      },
+      "colHabit": "Habit",
+      "colConfidence": "Confidence",
+      "barNote": "Bar lengths are ratios within each column — they cannot be compared across columns.",
+      "moodZeroNote": "A zero means no sufficient research has been found yet — not proof of no effect.",
+      "caption": "Every figure in this table is generated from the evidence-article dataset that ships inside the app ({articles} articles / {sources} cited references).",
+      "disclaimer": "The numbers are research-based estimates, not promises. Assumptions and calculations are disclosed inside the app."
+    },
+    "cumulative": {
+      "eyebrow": "05 — Compounding",
+      "lines": [
+        "Think those",
+        "numbers are small?"
+      ],
+      "lead": "Sleeping 7 hours, daily walking, eating vegetables — together, {minutes} minutes of healthy lifespan per day. Keep them for ten years and it looks like this.",
+      "readoutLabel": "Cumulative healthy lifespan (10 years, estimated)",
+      "dayUnit": "days",
+      "perYear": "That's {perYear} days per year. Choose habits by this number — not by streak length.",
+      "cta": "Claim a founding seat",
+      "yAxis": "Cumulative healthy lifespan (days)",
+      "xAxis": "Years continued",
+      "yearMark": "Year {year}",
+      "assumption": "Model: daily estimate × 365 days × years, simple addition at 100% adherence. Interactions between habits and diminishing returns are not modelled. An estimate, not a promise."
+    },
+    "doctrine": {
+      "eyebrow": "06 — Declaration",
+      "heading": "Smitch holds to three things.",
+      "items": [
+        {
+          "title": "Start from who you want to become.",
+          "body": "Pick a template or write it in your own words. The goal comes first. A habit is only the way there."
+        },
+        {
+          "title": "Every option arrives with evidence.",
+          "body": "Each suggested habit states what it affects, how certain that is, and what to watch for. We hand you the material. You decide."
+        },
+        {
+          "title": "Change is measured on your own scale.",
+          "body": "Not one streak for everyone. Impact is shown on the axes tied to your values."
+        }
+      ]
+    },
+    "method": {
+      "eyebrow": "07 — Method",
+      "heading": "Three steps to begin.",
+      "steps": [
+        {
+          "title": "Choose who you want to become.",
+          "body": "Pick from templates, or write it in your own words. The intake weaves in your situation."
+        },
+        {
+          "title": "Science lays out the options.",
+          "body": "Your goal is broken down, and habits with evidence behind them are put on the table — with how certain that evidence is."
+        },
+        {
+          "title": "Choose one, and make it yours.",
+          "body": "Not five at once. One lands, then the next unlocks."
+        }
+      ]
+    },
+    "honesty": {
+      "eyebrow": "08 — Honesty",
+      "heading": "What we won't promise.",
+      "items": [
+        "We won't tell you your life changes in N days.",
+        "No fake countdowns. No inflated user counts.",
+        "We won't blame you for the times you stopped."
+      ],
+      "closing": "Not being suspect is where this product's trust comes from.",
+      "confidenceHeading": "Weak evidence is disclosed in numbers, too.",
+      "confidenceBody": "Of {articles} evidence articles, {high} are strong enough to be rated high — backed by meta-analyses or large cohort studies. Every other article states the strength of its evidence, one by one. Weak evidence is never quietly dropped, and never dressed up as strong.",
+      "distributionLabel": "Confidence distribution",
+      "articleUnit": ""
+    },
+    "cta": {
+      "lines": [
+        "The path",
+        "can be switched."
+      ],
+      "body": "Smitch is still being built. Claim a founding seat and you'll be the first to hear when a place opens.",
+      "primary": "Claim a founding seat",
+      "secondary": "Try the prototype",
+      "note": "Free to join. Nothing to pay today."
+    },
+    "footer": {
+      "tagline": "Switch your path.",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "tokushoho": "Legal notice (Japan)",
+      "copyright": "© Genetta Inc."
+    },
+    "axes": {
+      "health": {
+        "name": "Healthy lifespan",
+        "unit": "min/day",
+        "description": "How much longer you get to live in good health — estimated in minutes per day the habit is performed."
+      },
+      "cost": {
+        "name": "Cost saving",
+        "unit": "JPY/day",
+        "description": "How much less you spend on medical costs and waste, in yen per day."
+      },
+      "income": {
+        "name": "Income Growth",
+        "unit": "JPY/day",
+        "description": "The income gain expected from changes in productivity and absenteeism, in yen per day."
+      },
+      "mood": {
+        "name": "Time feeling positive",
+        "unit": "min/day",
+        "description": "How many more minutes per day you spend feeling positive."
+      }
+    },
+    "habits": {
+      "sleep_7hours": "Sleeping 7 hours",
+      "daily_walking": "Daily walking",
+      "daily_cardio": "Daily cardio",
+      "eat_vegetables": "Eating vegetables",
+      "daily_meditation": "Daily meditation",
+      "quit_alcohol": "Quitting alcohol",
+      "home_cooking": "Cooking at home",
+      "daily_saving": "Saving daily",
+      "quit_smoking": "Quitting smoking"
+    },
+    "confidence": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low (estimated)"
+    }
+  },
   "feedback": {
     "title": "Feedback",
     "description": "Send us bug reports and feature requests. We use them to improve the app.",
