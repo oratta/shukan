@@ -80,6 +80,10 @@ export const eatVegetables: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1758721218560-aec50748d450',
+    gradient: 'from-green-400 to-lime-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'leaf',
 };

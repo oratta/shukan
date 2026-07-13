@@ -78,6 +78,10 @@ export const dailySaving: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1561837581-abd854e0ee22',
+    gradient: 'from-emerald-400 to-green-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'piggy-bank',
 };

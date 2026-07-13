@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { HabitIcon } from '@/components/ui/habit-icon';
+import { EstimateDisclaimer } from '@/components/habits/estimate-disclaimer';
 import { cn } from '@/lib/utils';
 import { getArticleList } from '@/data/impact-articles';
 import { calculateAnnualImpact, formatHealthMinutes, formatCurrency } from '@/lib/impact';
@@ -158,6 +159,11 @@ export function EvidencePicker({
             </button>
           ))}
         </div>
+
+        {/* 近接注記（景表法・打消し表示 / issue #39）:
+            リストの各行は年間推定値を表示しながらスクロールするため、
+            スクロール外に出ない shrink-0 のヘッダー領域（リスト直上）に常時表示する */}
+        <EstimateDisclaimer className="shrink-0 px-4 pb-2" />
 
         {/* Article list */}
         <div className="flex-1 overflow-y-auto px-4 pb-24">

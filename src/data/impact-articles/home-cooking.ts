@@ -80,6 +80,10 @@ export const homeCooking: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1758522489348-6e33d0e14669',
+    gradient: 'from-orange-400 to-red-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'chef-hat',
 };

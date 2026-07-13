@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { getArticle } from '@/data/impact-articles';
+import { EstimateDisclaimer } from '@/components/habits/estimate-disclaimer';
 import { renderArticle, formatHealthMinutes, formatCurrency } from '@/lib/impact';
 import type { HabitWithStats } from '@/types/habit';
 
@@ -91,6 +92,9 @@ export function ImpactArticleSheet({
               {confidenceLabel}
             </span>
           </div>
+
+          {/* 景表法・打消し表示対応（issue #39）: 推定値サマリー直下の近接注記＋AI 明示 */}
+          <EstimateDisclaimer withAiNote className="mt-2" />
         </div>
 
         {/* Article body */}

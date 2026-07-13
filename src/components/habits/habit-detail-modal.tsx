@@ -253,7 +253,15 @@ export function HabitDetailModal({
         {/* Impact Badge */}
         {habit.evidences.length > 0 && (
           <div className="px-5">
-            <ImpactBadge evidences={habit.evidences} mode="daily" />
+            <ImpactBadge
+              evidences={habit.evidences}
+              mode="daily"
+              onTap={
+                onOpenArticle
+                  ? () => onOpenArticle(habit.evidences[0].articleId)
+                  : undefined
+              }
+            />
           </div>
         )}
 

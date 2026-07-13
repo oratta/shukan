@@ -126,11 +126,6 @@
     "language": "言語",
     "english": "English",
     "japanese": "日本語",
-    "data": "データ",
-    "export": "データをエクスポート",
-    "import": "データをインポート",
-    "reset": "すべてのデータをリセット",
-    "resetConfirm": "すべての習慣とデータが削除されます。この操作は取り消せません。",
     "account": "アカウント",
     "signInWithGoogle": "Googleでサインイン",
     "signInDescription": "サインインして習慣をデバイス間で同期しましょう。",
@@ -205,6 +200,8 @@
     "todayImpact": "今日のライフインパクト",
     "fiveDaysImpact": "5日間のインパクト",
     "perfect": "パーフェクト！",
+    "estimateDisclaimer": "数値は研究の集団平均に基づく試算です。個人の結果を保証するものではありません（個人差があります）。",
+    "aiEstimateNote": "本文のあなたへの当てはめ部分は、AIによる推定を含みます。",
     "confidence": {
       "high": "信頼度: 高",
       "medium": "信頼度: 中",
@@ -708,5 +705,22 @@
       "terms": "利用規約",
       "credit": "© Genetta Inc."
     }
+  },
+  "feedback": {
+    "title": "フィードバック",
+    "description": "バグ報告やご要望をお送りください。今後の改善に活用します。",
+    "settingsDescription": "バグ報告・ご要望はこちらから送れます。",
+    "openForm": "フィードバックを送る",
+    "category": {
+      "bug": "バグ報告",
+      "idea": "要望",
+      "other": "その他"
+    },
+    "bodyLabel": "フィードバック本文",
+    "placeholder": "気づいたこと・困っていること・欲しい機能などを自由にお書きください",
+    "submit": "送信",
+    "submitting": "送信中...",
+    "success": "送信しました。ありがとうございます！",
+    "error": "送信に失敗しました。時間をおいて再度お試しください。"
   }
 }

@@ -25,6 +25,8 @@ interface HabitCardProps {
   onOpenDetail: (id: string) => void;
   onOpenVsTemptation: (id: string) => void;
   onSkipToday: (id: string) => void;
+  /** 推定値（ImpactBadge）タップで算出根拠（エビデンス記事）へ 1 タップ到達する導線（issue #39） */
+  onOpenArticle?: (articleId: string) => void;
 }
 
 function nextStatus(current: DayStatus['status']): 'completed' | 'failed' | 'none' {
@@ -237,6 +239,7 @@ export function HabitCard({
   onOpenDetail,
   onOpenVsTemptation,
   onSkipToday,
+  onOpenArticle,
 }: HabitCardProps) {
   const t = useTranslations('habits');
   const tDays = useTranslations('days');
@@ -444,7 +447,16 @@ export function HabitCard({
             {hasEvidenceBg ? (
               <div className="space-y-3 rounded-xl bg-white/10 p-3 backdrop-blur-sm">
                 {habit.evidences.length > 0 && (
-                  <ImpactBadge evidences={habit.evidences} mode="daily" surface="bare" />
+                  <ImpactBadge
+                    evidences={habit.evidences}
+                    mode="daily"
+                    surface="bare"
+                    onTap={
+                      onOpenArticle
+                        ? () => onOpenArticle(habit.evidences[0].articleId)
+                        : undefined
+                    }
+                  />
                 )}
                 {habit.evidences.length > 0 && <div className="h-px bg-white/15" />}
                 <div>{streakInner(true)}</div>
@@ -457,7 +469,16 @@ export function HabitCard({
               <>
                 {/* Impact Badge */}
                 {habit.evidences.length > 0 && (
-                  <ImpactBadge evidences={habit.evidences} mode="daily" surface="default" />
+                  <ImpactBadge
+                    evidences={habit.evidences}
+                    mode="daily"
+                    surface="default"
+                    onTap={
+                      onOpenArticle
+                        ? () => onOpenArticle(habit.evidences[0].articleId)
+                        : undefined
+                    }
+                  />
                 )}
                 {/* Streak card */}
                 <div className="rounded-lg bg-success/15 p-3">{streakInner(false)}</div>

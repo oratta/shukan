@@ -200,6 +200,33 @@ describe('middleware: marketing host routing', () => {
       expect(getUserMock).toHaveBeenCalledTimes(0);
     });
   });
+
+  describe('S9: marketing host matching is case-insensitive (#56)', () => {
+    it('rewrites to /marketing when the request host has mixed case', async () => {
+      process.env.NEXT_PUBLIC_MARKETING_HOSTS = 'www.s-mitch.com';
+      // 大文字混じり host（プロキシ/ブラウザ由来）でも lowercase 正規化でマッチする
+      const req = makeRequest('https://WWW.S-Mitch.com/', 'WWW.S-Mitch.com');
+
+      const res = await middleware(req);
+
+      const rewriteHeader = res!.headers.get('x-middleware-rewrite');
+      expect(rewriteHeader).toBeTruthy();
+      expect(rewriteHeader).toContain('/marketing');
+      expect(createServerClientMock).not.toHaveBeenCalled();
+    });
+
+    it('matches even when the env value itself has mixed case', async () => {
+      process.env.NEXT_PUBLIC_MARKETING_HOSTS = 'WWW.S-Mitch.com';
+      const req = makeRequest('https://www.s-mitch.com/', 'www.s-mitch.com');
+
+      const res = await middleware(req);
+
+      const rewriteHeader = res!.headers.get('x-middleware-rewrite');
+      expect(rewriteHeader).toBeTruthy();
+      expect(rewriteHeader).toContain('/marketing');
+      expect(createServerClientMock).not.toHaveBeenCalled();
+    });
+  });
 });
 
 describe('middleware: marketing page renders standalone layout (S8)', () => {
