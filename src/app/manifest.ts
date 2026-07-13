@@ -27,5 +27,24 @@ export default function manifest(): MetadataRoute.Manifest {
         type: "image/png",
       },
     ],
+    // Screenshots power Chrome's "Richer Install UI" (#60). Desktop requires at
+    // least one `form_factor: "wide"` entry; mobile requires at least one entry
+    // whose form_factor is unset or anything other than "wide".
+    screenshots: [
+      {
+        src: "/screenshot-wide.png",
+        sizes: "1280x800",
+        type: "image/png",
+        form_factor: "wide",
+        label: "Today's habits with your streak history at a glance",
+      },
+      {
+        src: "/screenshot-mobile.png",
+        sizes: "390x844",
+        type: "image/png",
+        form_factor: "narrow",
+        label: "Check off today's habits from your phone",
+      },
+    ],
   };
 }
