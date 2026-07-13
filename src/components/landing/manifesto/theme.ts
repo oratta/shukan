@@ -24,7 +24,12 @@ export const CTA_GHOST_ON_ACCENT =
   'inline-flex items-center justify-center border-2 border-[#0A0A0A] px-8 py-5 text-base font-bold text-[#0A0A0A] transition-colors hover:bg-[#0A0A0A] hover:text-[#FAFAFA] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0A0A0A]';
 
 /** 見出しは装飾を持たず、サイズとウェイトだけで殴る。 */
-export const DISPLAY = 'font-black leading-[0.86] tracking-tight';
+/**
+ * leading-[0.86] は欧文大文字向けの詰め。字面がエムボックスいっぱいの日本語では
+ * 行同士が接触して読めなくなるため、html[lang=ja] のときだけ行送りを広げる。
+ */
+export const DISPLAY =
+  'font-black leading-[0.86] tracking-tight [html[lang=ja]_&]:leading-[1.16]';
 export const DISPLAY_XL = `${DISPLAY} text-[clamp(2.75rem,10vw,8.5rem)]`;
 export const DISPLAY_LG = `${DISPLAY} text-[clamp(2.25rem,7vw,5.5rem)]`;
 
