@@ -73,6 +73,10 @@ export const noScreensBeforeBed: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1636101630293-ca3c1518717f',
+    gradient: 'from-indigo-400 to-purple-600',
+  },
   defaultHabitType: 'quit',
   defaultIcon: 'phone-off',
 };

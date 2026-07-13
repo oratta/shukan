@@ -17,7 +17,11 @@
 
 import type { KpiKey } from '@/data/kpi/catalog';
 import { KPI_KEYS } from '@/data/kpi/catalog';
-import { presetPerTimeEffectValue, ONBOARDING_V3_PRESET_IDS } from '@/lib/onboarding';
+import { getHabitPreset } from '@/data/habit-presets';
+import { getArticle } from '@/data/impact-articles';
+import type { ArticleId } from '@/types/impact';
+import { dedupeByArticleId } from '@/lib/impact';
+import { articleKpiPerDay, ONBOARDING_V3_PRESET_IDS } from '@/lib/onboarding';
 import {
   WORKING_DAYS_PER_YEAR,
   resolveDerivedProfileValues,
@@ -130,24 +134,46 @@ export interface DiagnosisV3Result {
   byKpi: Record<KpiKey, KpiDiagnosisValue>;
 }
 
-/** プリセットの per-day 効果（達成率100%基準）を取得する。未知・効果0は 0。 */
-function presetPerDay(presetId: string, kpi: KpiKey): number {
-  const eff = presetPerTimeEffectValue(presetId, kpi);
-  return eff ? eff.value : 0;
+/** 記事単位の集計要素（articleId + その記事に適用する達成率）。 */
+interface ArticleRate {
+  articleId: ArticleId;
+  rate: AchievementRate;
+}
+
+/**
+ * 選択された習慣群を記事（エビデンス）単位に展開し、同一 articleId は
+ * 「1回だけ計上・最大の達成率を採用」で de-dup する（issue #34: エビデンス重複加算の防止）。
+ * 複数プリセットが同じ記事を参照していても（例: cardio 系と walking 系の内包関係）、
+ * その記事の効果は最も高い達成率の1回分しか数えない。未知プリセットはスキップ。
+ */
+function dedupeSelectionArticles(selections: readonly HabitSelection[]): ArticleRate[] {
+  const expanded: ArticleRate[] = [];
+  for (const sel of selections) {
+    const preset = getHabitPreset(sel.presetId);
+    if (!preset) continue;
+    for (const articleId of preset.articleIds) {
+      expanded.push({ articleId, rate: sel.rate });
+    }
+  }
+  return dedupeByArticleId(expanded, (a) => a.rate);
 }
 
 /**
  * 選択された習慣群 × 達成率から4KPIの未来インパクト（新表示単位）を集計する。
  * 過去項は持たない（MVP=未来のみ）。全選択0%・選択なし・未知プリセットでもエラーにせず0を返す。
+ * 集計は記事（エビデンス）単位で行い、同一 articleId は最大達成率の1回だけ計上する（issue #34）。
  */
 export function computeDiagnosisV3(input: DiagnosisV3Input): DiagnosisV3Result {
   const derived = resolveDerivedProfileValues(input.profile);
+  const articleRates = dedupeSelectionArticles(input.selections);
   const byKpi = {} as Record<KpiKey, KpiDiagnosisValue>;
 
   for (const kpi of KPI_KEYS) {
     let raw = 0;
-    for (const sel of input.selections) {
-      raw += kpiRawValue(kpi, presetPerDay(sel.presetId, kpi), sel.rate, derived);
+    for (const { articleId, rate } of articleRates) {
+      const article = getArticle(articleId);
+      if (!article) continue;
+      raw += kpiRawValue(kpi, articleKpiPerDay(article, kpi), rate, derived);
     }
     byKpi[kpi] = { raw, ...formatKpiValue(kpi, raw) };
   }

@@ -5,9 +5,10 @@ import { useTheme } from 'next-themes';
 import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Sun, Moon, Monitor, Trash2, Download, Upload, LogOut, User, ExternalLink, Smartphone } from 'lucide-react';
+import { Sun, Moon, Monitor, Trash2, LogOut, User, ExternalLink, Smartphone, MessageSquarePlus } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { InstallHelpDialog } from '@/components/pwa/install-help-dialog';
+import { FeedbackDialog } from '@/components/feedback/feedback-dialog';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -44,18 +45,6 @@ export default function SettingsPage() {
   const toggleLocale = (newLocale: string) => {
     document.cookie = `locale=${newLocale};path=/;max-age=31536000`;
     router.refresh();
-  };
-
-  const handleExport = () => {
-    // TODO: implement Supabase-based export
-  };
-
-  const handleImport = () => {
-    // TODO: implement Supabase-based import
-  };
-
-  const handleReset = () => {
-    // TODO: implement Supabase-based reset
   };
 
   const themeOptions = [
@@ -101,6 +90,7 @@ export default function SettingsPage() {
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [installHelpOpen, setInstallHelpOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   const tPwa = useTranslations('pwa');
 
   const handleDeleteAccount = async () => {
@@ -258,46 +248,6 @@ export default function SettingsPage() {
         </Button>
       </Card>
 
-      <Card className="p-4">
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          {t('settings.data')}
-        </h3>
-
-        <div className="space-y-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleExport}
-            className="w-full justify-start"
-          >
-            <Download className="mr-2 size-4" />
-            {t('settings.export')}
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleImport}
-            className="w-full justify-start"
-          >
-            <Upload className="mr-2 size-4" />
-            {t('settings.import')}
-          </Button>
-
-          <Separator className="my-2" />
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleReset}
-            className="w-full justify-start text-destructive hover:bg-destructive/10 hover:text-destructive/90"
-          >
-            <Trash2 className="mr-2 size-4" />
-            {t('settings.reset')}
-          </Button>
-        </div>
-      </Card>
-
       {user && (
         <Card className="p-4 border-red-200 dark:border-red-900">
           <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-destructive">
@@ -344,6 +294,27 @@ export default function SettingsPage() {
               </AlertDialogContent>
             </AlertDialog>
           </div>
+        </Card>
+      )}
+
+      {/* アプリ内フィードバック導線（issue #19） */}
+      {user && (
+        <Card className="p-4">
+          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            {t('feedback.title')}
+          </h3>
+          <p className="mb-3 text-sm text-muted-foreground">
+            {t('feedback.settingsDescription')}
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setFeedbackOpen(true)}
+            className="w-full justify-start"
+          >
+            <MessageSquarePlus className="mr-2 size-4" />
+            {t('feedback.openForm')}
+          </Button>
         </Card>
       )}
 
@@ -396,6 +367,7 @@ export default function SettingsPage() {
       </Card>
 
       <InstallHelpDialog open={installHelpOpen} onOpenChange={setInstallHelpOpen} />
+      <FeedbackDialog open={feedbackOpen} onOpenChange={setFeedbackOpen} />
     </div>
   );
 }

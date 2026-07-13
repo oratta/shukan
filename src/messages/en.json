@@ -126,11 +126,6 @@
     "language": "Language",
     "english": "English",
     "japanese": "Japanese",
-    "data": "Data",
-    "export": "Export Data",
-    "import": "Import Data",
-    "reset": "Reset All Data",
-    "resetConfirm": "This will delete all your habits and data. This cannot be undone.",
     "account": "Account",
     "signInWithGoogle": "Sign in with Google",
     "signInDescription": "Sign in to sync your habits across devices.",
@@ -205,6 +200,8 @@
     "todayImpact": "Today's Life Impact",
     "fiveDaysImpact": "5 Days Impact",
     "perfect": "Perfect!",
+    "estimateDisclaimer": "Figures are estimates based on population averages from research. They do not guarantee individual results (results vary by person).",
+    "aiEstimateNote": "The parts of this article applied to you include AI-generated estimates.",
     "confidence": {
       "high": "Confidence: High",
       "medium": "Confidence: Medium",
@@ -786,5 +783,22 @@
       "medium": "Medium",
       "low": "Low (estimated)"
     }
+  },
+  "feedback": {
+    "title": "Feedback",
+    "description": "Send us bug reports and feature requests. We use them to improve the app.",
+    "settingsDescription": "Report bugs or request features here.",
+    "openForm": "Send feedback",
+    "category": {
+      "bug": "Bug report",
+      "idea": "Request",
+      "other": "Other"
+    },
+    "bodyLabel": "Feedback body",
+    "placeholder": "Tell us anything: issues you hit, things that confused you, features you want",
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "success": "Sent. Thank you!",
+    "error": "Failed to send. Please try again later."
   }
 }
