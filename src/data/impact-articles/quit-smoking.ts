@@ -91,6 +91,10 @@ export const quitSmoking: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1554548405-74d68637f897',
+    gradient: 'from-gray-400 to-gray-600',
+  },
   defaultHabitType: 'quit',
   defaultIcon: 'cigarette-off',
 };

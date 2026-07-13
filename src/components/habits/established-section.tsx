@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card';
 import { calculateDailyImpact } from '@/lib/impact';
 import { computeHabitLifetimeEffect } from '@/lib/diagnosis-v3';
 import { getArticle } from '@/data/impact-articles';
+import { EstimateDisclaimer } from '@/components/habits/estimate-disclaimer';
 import type { KpiKey } from '@/data/kpi/catalog';
 import type { UserProfile } from '@/lib/supabase/profiles';
 import type { Habit } from '@/types/habit';
@@ -94,6 +95,9 @@ export function EstablishedSection({ habits, profile = null }: EstablishedSectio
                 );
               })}
             </div>
+
+            {/* 景表法・打消し表示対応（issue #39）: 生涯効果の推定値直下の近接注記 */}
+            <EstimateDisclaimer />
           </Card>
         ))}
       </div>

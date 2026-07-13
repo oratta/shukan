@@ -9,6 +9,7 @@ import { useAuth } from "@/components/auth-provider";
 import { KPI_CATALOG, KPI_KEYS, type KpiKey } from "@/data/kpi/catalog";
 import { KpiIcon } from "@/components/onboarding/kpi-icon";
 import { EvidenceArticleSheet } from "@/components/habits/evidence-article-sheet";
+import { EstimateDisclaimer } from "@/components/habits/estimate-disclaimer";
 import { getHabitPreset } from "@/data/habit-presets";
 import {
   createInitialWizardState,
@@ -359,7 +360,19 @@ export function OnboardingWizard() {
               {t(`preset.${currentPreset.id}`)}
             </h1>
 
-            <HabitImpactBox presetId={currentPreset.id} profileResult={habitPotentialV3(currentPreset.id, calcProfile)} t={t} />
+            <HabitImpactBox
+              presetId={currentPreset.id}
+              profileResult={habitPotentialV3(currentPreset.id, calcProfile)}
+              t={t}
+              onTap={
+                currentPreset.articleIds.length > 0
+                  ? () => setArticleSheetId(currentPreset.articleIds[0])
+                  : undefined
+              }
+            />
+
+            {/* 景表法・打消し表示対応（issue #39）: 推定値直下の近接注記 */}
+            <EstimateDisclaimer />
 
             <p className="text-xs leading-relaxed text-muted-foreground">
               {t(`habitSub.${currentPreset.id}`)}
@@ -427,6 +440,9 @@ export function OnboardingWizard() {
           <p className="text-sm leading-relaxed text-muted-foreground">
             {t("result.sectionsLead")}
           </p>
+
+          {/* 景表法・打消し表示対応（issue #39）: 診断結果の推定値に対する近接注記 */}
+          <EstimateDisclaimer />
 
           {/* F4: KPIごとに独立したセクション（アイコン＋名前＋説明文＋数字対比） */}
           <div className="space-y-4">
@@ -509,6 +525,9 @@ export function OnboardingWizard() {
                 );
               })}
             </ul>
+
+            {/* 景表法・打消し表示対応（issue #39）: まとめ数値直下の近接注記 */}
+            <EstimateDisclaimer className="mt-3" />
           </div>
 
           {/* F5/F6: 身についている習慣（アイコン＋主要KPIの効果値＋タップでエビデンス記事） */}
@@ -661,6 +680,9 @@ export function OnboardingWizard() {
             </ul>
           )}
 
+          {/* 景表法・打消し表示対応（issue #39）: 伸びしろ数値直下の近接注記 */}
+          {growthCandidates.length > 0 && <EstimateDisclaimer />}
+
           {writeError && (
             <div
               role="alert"
@@ -742,13 +764,20 @@ function HabitImpactBox({
   presetId,
   profileResult,
   t,
+  onTap,
 }: {
   presetId: string;
   profileResult: DiagnosisV3Result;
   t: ReturnType<typeof useTranslations>;
+  /** 推定値から算出根拠（エビデンス記事）へ 1 タップで到達する導線（issue #39） */
+  onTap?: () => void;
 }) {
+  const Wrapper = onTap ? 'button' : 'div';
   return (
-    <div className="rounded-xl border border-border bg-muted/30 p-3">
+    <Wrapper
+      {...(onTap ? { type: 'button' as const, onClick: onTap } : {})}
+      className="block w-full rounded-xl border border-border bg-muted/30 p-3 text-left"
+    >
       <p className="mb-2.5 text-[11px] font-semibold text-muted-foreground">
         {t("habits.impactLead")}
       </p>
@@ -779,7 +808,7 @@ function HabitImpactBox({
           );
         })}
       </div>
-    </div>
+    </Wrapper>
   );
 }
 

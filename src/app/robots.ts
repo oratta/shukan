@@ -15,10 +15,10 @@ import { headers } from 'next/headers';
  * v15.0, fully async in v16). Always `await` it.
  */
 export default async function robots(): Promise<MetadataRoute.Robots> {
-  const host = (await headers()).get('host') ?? '';
+  const host = ((await headers()).get('host') ?? '').toLowerCase();
   const marketingHosts = (process.env.NEXT_PUBLIC_MARKETING_HOSTS ?? '')
     .split(',')
-    .map((s) => s.trim())
+    .map((s) => s.trim().toLowerCase())
     .filter(Boolean);
 
   if (marketingHosts.includes(host)) {

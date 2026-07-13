@@ -86,6 +86,10 @@ export const dailyMeditation: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1577344718665-3e7c0c1ecf6b',
+    gradient: 'from-indigo-400 to-violet-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'brain',
 };

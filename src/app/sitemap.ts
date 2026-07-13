@@ -11,10 +11,10 @@ import { headers } from 'next/headers';
  * `headers()` is async in Next.js 16 — `await` it.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const host = (await headers()).get('host') ?? '';
+  const host = ((await headers()).get('host') ?? '').toLowerCase();
   const marketingHosts = (process.env.NEXT_PUBLIC_MARKETING_HOSTS ?? '')
     .split(',')
-    .map((s) => s.trim())
+    .map((s) => s.trim().toLowerCase())
     .filter(Boolean);
 
   if (!marketingHosts.includes(host)) {

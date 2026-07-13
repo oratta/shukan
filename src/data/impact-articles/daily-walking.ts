@@ -81,6 +81,10 @@ export const dailyWalking: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1759683730011-c72b69bf7f81',
+    gradient: 'from-green-400 to-emerald-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'footprints',
 };

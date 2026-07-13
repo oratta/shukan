@@ -81,6 +81,10 @@ export const sleep7hours: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1594296220371-a34da13ff6d4',
+    gradient: 'from-blue-400 to-indigo-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'moon',
 };

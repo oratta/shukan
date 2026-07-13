@@ -77,6 +77,10 @@ export const quitJunkFood: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1564362411991-472954b39f56',
+    gradient: 'from-yellow-400 to-orange-600',
+  },
   defaultHabitType: 'quit',
   defaultIcon: 'utensils-crossed',
 };

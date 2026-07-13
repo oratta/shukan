@@ -85,6 +85,10 @@ export const dailyJournaling: LifeImpactArticle = {
     ],
   },
 
+  heroImage: {
+    url: 'https://images.unsplash.com/photo-1704966029445-82c499aff85e',
+    gradient: 'from-amber-400 to-orange-600',
+  },
   defaultHabitType: 'positive',
   defaultIcon: 'notebook-pen',
 };
