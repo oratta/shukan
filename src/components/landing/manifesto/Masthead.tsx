@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { LocaleSwitcher } from '@/components/locale-switcher';
+import { CtaLink } from './CtaLink';
 import { EYEBROW, SHELL } from './theme';
 
 export async function Masthead() {
@@ -17,12 +18,13 @@ export async function Masthead() {
           <div className="[&_button]:text-[#FAFAFA] [&_button:hover]:bg-[#FAFAFA]/10">
             <LocaleSwitcher />
           </div>
-          <a
+          <CtaLink
             href="/founding"
+            location="masthead"
             className={`${EYEBROW} border-b-2 border-[#4A8FE7] pb-1 text-[#4A8FE7] transition-colors hover:border-[#FAFAFA] hover:text-[#FAFAFA]`}
           >
             {t('nav.cta')}
-          </a>
+          </CtaLink>
         </div>
       </div>
     </header>
