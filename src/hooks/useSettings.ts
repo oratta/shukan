@@ -5,7 +5,11 @@ import { useTheme } from 'next-themes';
 import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/auth-provider';
-import { fetchUserSettings, upsertUserSettings } from '@/lib/supabase/settings';
+import {
+  fetchUserSettings,
+  seedUserSettings,
+  updateUserSettings,
+} from '@/lib/supabase/settings';
 import {
   DEFAULT_LOCALE,
   DEFAULT_THEME,
@@ -24,8 +28,12 @@ import {
  *
  * - ローカル（next-themes の localStorage / locale cookie）へは常に即時反映する。
  *   未ログインでもここで完結するため、LP など認証の無い画面でも従来どおり動きエラーにならない（受け入れ条件3）。
- * - ログイン中は同じ値を `user_settings` へ upsert する（受け入れ条件1）。
+ * - ログイン中は**変更したカラムだけ**を `user_settings` へ書く（受け入れ条件1）。
  *   DB がアカウントの正本になり、他デバイスは `useSettingsSync` でこれを取り込む。
+ *   カラム単位で書くのは、この端末のローカル値が他デバイスの変更に対して stale になりうるため
+ *   （`useSettingsSync` の取り込みは userId ごとに 1 回きりで realtime 購読が無い）。
+ *   行まるごと書くと、ユーザーが触っていないカラムを stale なローカル値で巻き戻す（#101）。
+ *   詳細は `updateUserSettings` の doc コメント参照。
  * - DB 書き込みの失敗は UI を壊さない（ローカルには既に反映済み。次回変更時に再送される）。
  */
 export function useSettings() {
@@ -49,7 +57,12 @@ export function useSettings() {
       setTheme(next);
       if (!userId) return;
       try {
-        await upsertUserSettings(userId, { theme: next, locale: currentLocale });
+        // 送るのは theme だけ。locale は「行がまだ無いとき」の insert にしか使わない（#101）
+        await updateUserSettings(
+          userId,
+          { theme: next },
+          { theme: next, locale: currentLocale }
+        );
       } catch {
         // 同期失敗はローカル動作を妨げない
       }
@@ -63,7 +76,12 @@ export function useSettings() {
       router.refresh();
       if (!userId) return;
       try {
-        await upsertUserSettings(userId, { theme: currentTheme, locale: next });
+        // 送るのは locale だけ。theme は「行がまだ無いとき」の insert にしか使わない（#101）
+        await updateUserSettings(
+          userId,
+          { locale: next },
+          { theme: currentTheme, locale: next }
+        );
       } catch {
         // 同期失敗はローカル動作を妨げない
       }
@@ -117,9 +135,11 @@ export function useSettingsSync() {
       const resolved = reconcileSettings(local, remote);
 
       if (resolved.needsSeed) {
-        // 初回ログイン: この端末の現在値を DB へ移行する（ローカルの選択を失わない）
+        // 初回ログイン: この端末の現在値を DB へ移行する（ローカルの選択を失わない）。
+        // seedUserSettings は on conflict do nothing なので、fetch 後に別デバイスが行を
+        // 作っていた場合でもその行を上書きしない（#101）。
         try {
-          await upsertUserSettings(uid, {
+          await seedUserSettings(uid, {
             theme: resolved.theme,
             locale: resolved.locale,
           });
