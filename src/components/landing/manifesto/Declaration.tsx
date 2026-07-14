@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server';
+import { CtaLink } from './CtaLink';
 import { CTA_GHOST_ON_INK, CTA_ON_INK, DISPLAY_XL, EYEBROW, SHELL } from './theme';
 
 export async function Declaration() {
@@ -27,9 +28,9 @@ export async function Declaration() {
           </p>
 
           <div className="flex flex-col items-stretch gap-4">
-            <a href="/founding" className={CTA_ON_INK}>
+            <CtaLink href="/founding" location="declaration" className={CTA_ON_INK}>
               {t('hero.ctaPrimary')}
-            </a>
+            </CtaLink>
             <a href="#indictment" className={CTA_GHOST_ON_INK}>
               {t('hero.ctaSecondary')}
             </a>

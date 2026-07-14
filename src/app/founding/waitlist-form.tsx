@@ -1,7 +1,8 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { track } from '@/lib/analytics';
 import { submitWaitlist, type WaitlistState } from './actions';
 
 const INITIAL_STATE: WaitlistState = { ok: false };
@@ -9,6 +10,17 @@ const INITIAL_STATE: WaitlistState = { ok: false };
 export function WaitlistForm() {
   const t = useTranslations('founding.waitlist');
   const [state, formAction, pending] = useActionState(submitWaitlist, INITIAL_STATE);
+
+  // Waitlist conversion (issue #58). The form posts to a Server Action, so the
+  // only client-visible signal of success is `state.ok` flipping true. Fire the
+  // event from that transition — never the raw submit — so bounced/invalid
+  // attempts are not counted. No email or other free text is sent (privacy
+  // rule in analytics.ts); `track()` is a no-op when PostHog is unconfigured.
+  useEffect(() => {
+    if (state.ok) {
+      track('waitlist_submitted', { source: 'founding-teaser' });
+    }
+  }, [state.ok]);
 
   return (
     <form action={formAction} className="space-y-4" noValidate>

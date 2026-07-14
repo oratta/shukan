@@ -5,6 +5,7 @@ import {
   getCumulativeSeries,
 } from '@/lib/marketing/evidence-figures';
 import { formatInt, formatOneDecimal } from '@/lib/marketing/format';
+import { CtaLink } from './CtaLink';
 import { ACCENT, CTA_ON_INK, DISPLAY, DISPLAY_LG, EYEBROW, SHELL } from './theme';
 
 const WIDTH = 720;
@@ -74,9 +75,9 @@ export async function Cumulative() {
             <p className="mt-8 max-w-md text-lg leading-relaxed font-bold md:text-xl">
               {t('cumulative.perYear', { perYear: formatOneDecimal(finalDays / CUMULATIVE_YEARS) })}
             </p>
-            <a href="/founding" className={`${CTA_ON_INK} mt-10`}>
+            <CtaLink href="/founding" location="cumulative" className={`${CTA_ON_INK} mt-10`}>
               {t('cumulative.cta')}
-            </a>
+            </CtaLink>
           </div>
 
           <figure>

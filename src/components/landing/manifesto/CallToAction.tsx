@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server';
+import { CtaLink } from './CtaLink';
 import { CTA_GHOST_ON_ACCENT, CTA_ON_ACCENT, DISPLAY_XL, SHELL } from './theme';
 
 export async function CallToAction() {
@@ -22,12 +23,16 @@ export async function CallToAction() {
           </p>
 
           <div className="flex flex-col items-stretch gap-4">
-            <a href="/founding" className={CTA_ON_ACCENT}>
+            <CtaLink href="/founding" location="cta_primary" className={CTA_ON_ACCENT}>
               {t('cta.primary')}
-            </a>
-            <a href="https://s-mitch.com" className={CTA_GHOST_ON_ACCENT}>
+            </CtaLink>
+            <CtaLink
+              href="https://s-mitch.com"
+              location="cta_secondary"
+              className={CTA_GHOST_ON_ACCENT}
+            >
               {t('cta.secondary')}
-            </a>
+            </CtaLink>
             <p className="font-mono text-xs text-[#0A0A0A]/70">{t('cta.note')}</p>
           </div>
         </div>

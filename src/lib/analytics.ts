@@ -24,7 +24,14 @@ export type AnalyticsEvent =
   | 'urge_flow_started'
   | 'urge_flow_completed'
   | 'rocket_used'
-  | 'reflection_saved';
+  | 'reflection_saved'
+  // Marketing LP (issue #58). Page views are captured automatically by
+  // posthog-js (`capture_pageview: 'history_change'` via the 2025-05-24
+  // defaults in instrumentation-client.ts), so there is no manual LP-view
+  // event here — only the conversion interactions autocapture cannot label:
+  // which CTA was clicked, and whether the waitlist form actually succeeded.
+  | 'lp_cta_click'
+  | 'waitlist_submitted';
 
 function ready(): boolean {
   return typeof window !== 'undefined' && !!posthog.__loaded;
