@@ -174,6 +174,82 @@ describe('middleware: marketing host routing', () => {
     });
   });
 
+  describe('S10: auth failure falls back to /login instead of 500 (#81)', () => {
+    it('redirects to /login without throwing when getUser() rejects', async () => {
+      process.env.NEXT_PUBLIC_MARKETING_HOSTS = 'www.s-mitch.com';
+      getUserMock.mockRejectedValue(new Error('Supabase unreachable'));
+      const req = makeRequest('https://s-mitch.com/', 's-mitch.com');
+
+      // middleware は例外を throw せず解決すること
+      const res = await middleware(req);
+
+      expect(res!.status).toBe(307);
+      expect(res!.headers.get('location')).toContain('/login');
+      expect(createServerClientMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not reject the promise when getUser() rejects', async () => {
+      process.env.NEXT_PUBLIC_MARKETING_HOSTS = 'www.s-mitch.com';
+      getUserMock.mockRejectedValue(new Error('network down'));
+      const req = makeRequest('https://s-mitch.com/', 's-mitch.com');
+
+      await expect(middleware(req)).resolves.toBeDefined();
+    });
+
+    it('redirects to /login when createServerClient throws', async () => {
+      process.env.NEXT_PUBLIC_MARKETING_HOSTS = 'www.s-mitch.com';
+      createServerClientMock.mockImplementationOnce(() => {
+        throw new Error('Invalid supabaseUrl');
+      });
+      const req = makeRequest('https://s-mitch.com/', 's-mitch.com');
+
+      const res = await middleware(req);
+
+      expect(res!.status).toBe(307);
+      expect(res!.headers.get('location')).toContain('/login');
+    });
+
+    it('redirects to /login when NEXT_PUBLIC_SUPABASE_URL is empty', async () => {
+      process.env.NEXT_PUBLIC_MARKETING_HOSTS = 'www.s-mitch.com';
+      process.env.NEXT_PUBLIC_SUPABASE_URL = '';
+      const req = makeRequest('https://s-mitch.com/', 's-mitch.com');
+
+      const res = await middleware(req);
+
+      expect(res!.status).toBe(307);
+      expect(res!.headers.get('location')).toContain('/login');
+      // env が空なら Supabase クライアントを構築しない
+      expect(createServerClientMock).not.toHaveBeenCalled();
+    });
+
+    it('redirects to /login when NEXT_PUBLIC_SUPABASE_ANON_KEY is empty', async () => {
+      process.env.NEXT_PUBLIC_MARKETING_HOSTS = 'www.s-mitch.com';
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = '';
+      const req = makeRequest('https://s-mitch.com/', 's-mitch.com');
+
+      const res = await middleware(req);
+
+      expect(res!.status).toBe(307);
+      expect(res!.headers.get('location')).toContain('/login');
+      expect(createServerClientMock).not.toHaveBeenCalled();
+    });
+
+    it('does not affect maintenance / marketing rewrite branches', async () => {
+      // marketing host は Supabase フローに到達しないので env 空でも rewrite される
+      process.env.NEXT_PUBLIC_MARKETING_HOSTS = 'www.s-mitch.com';
+      process.env.NEXT_PUBLIC_SUPABASE_URL = '';
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = '';
+      const req = makeRequest('https://www.s-mitch.com/', 'www.s-mitch.com');
+
+      const res = await middleware(req);
+
+      const rewriteHeader = res!.headers.get('x-middleware-rewrite');
+      expect(rewriteHeader).toContain('/marketing');
+      expect(res!.headers.get('location')).toBeFalsy();
+      expect(createServerClientMock).not.toHaveBeenCalled();
+    });
+  });
+
   describe('S9: marketing host matching is case-insensitive (#56)', () => {
     it('rewrites to /marketing when the request host has mixed case', async () => {
       process.env.NEXT_PUBLIC_MARKETING_HOSTS = 'www.s-mitch.com';

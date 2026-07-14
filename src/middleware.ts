@@ -63,12 +63,33 @@ export async function middleware(request: NextRequest) {
   }
 
   // Default: existing Supabase auth flow
-  let supabaseResponse = NextResponse.next({ request });
+  //
+  // 認証フロー全体を try/catch で防御する（#81）。Supabase が到達不能・env が
+  // 空文字・ネットワーク断のいずれでも middleware が例外を投げると全ページが
+  // 500 MIDDLEWARE_INVOCATION_FAILED になるため、失敗時は throw せず /login へ
+  // フォールバックして白い 500 画面を避ける。env が空文字のケースも同様に扱う。
+  const redirectToLogin = (): NextResponse => {
+    const url = request.nextUrl.clone();
+    url.pathname = '/login';
+    return NextResponse.redirect(url);
+  };
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  // env が空文字/未設定なら createServerClient が throw するので、先に検知して
+  // フォールバックする（Vercel の Sensitive 型 env が vercel pull で空になる事故対策）
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error(
+      '[middleware] Supabase env が未設定のため /login へフォールバックします'
+    );
+    return redirectToLogin();
+  }
+
+  try {
+    let supabaseResponse = NextResponse.next({ request });
+
+    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
       cookies: {
         getAll() {
           return request.cookies.getAll();
@@ -83,20 +104,22 @@ export async function middleware(request: NextRequest) {
           );
         },
       },
+    });
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return redirectToLogin();
     }
-  );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/login';
-    return NextResponse.redirect(url);
+    return supabaseResponse;
+  } catch (error) {
+    // Supabase 到達不能・getUser() reject 等はログを残しつつ /login へ倒す
+    console.error('[middleware] Supabase 認証フローで例外が発生しました', error);
+    return redirectToLogin();
   }
-
-  return supabaseResponse;
 }
 
 export const config = {
