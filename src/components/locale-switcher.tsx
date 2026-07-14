@@ -1,17 +1,16 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { useSettings } from '@/hooks/useSettings';
 
 export function LocaleSwitcher() {
   const locale = useLocale();
-  const router = useRouter();
+  // ロケール変更は useSettings 経由（cookie 即反映 ＋ ログイン中は user_settings へ同期 / #24）
+  const { saveLocale } = useSettings();
 
   const toggleLocale = () => {
-    const newLocale = locale === 'en' ? 'ja' : 'en';
-    document.cookie = `locale=${newLocale};path=/;max-age=31536000`;
-    router.refresh();
+    void saveLocale(locale === 'en' ? 'ja' : 'en');
   };
 
   return (

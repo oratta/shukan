@@ -2,6 +2,7 @@
 
 import { useTheme } from 'next-themes';
 import { usePathname } from 'next/navigation';
+import { useSettings } from '@/hooks/useSettings';
 import { Sun, Moon, User, Home, Compass, BarChart3, Settings, MessageSquarePlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FeedbackDialog } from '@/components/feedback/feedback-dialog';
@@ -21,7 +22,9 @@ const navItems = [
 ];
 
 export function Header() {
-  const { theme, setTheme } = useTheme();
+  const { theme } = useTheme();
+  // テーマ変更は useSettings 経由（ローカル即反映 ＋ ログイン中は user_settings へ同期 / #24）
+  const { saveTheme } = useSettings();
   const { user } = useAuth();
   const pathname = usePathname();
   const t = useTranslations('nav');
@@ -37,7 +40,7 @@ export function Header() {
   }, []);
 
   const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+    void saveTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   const avatarUrl = user?.user_metadata?.avatar_url;
