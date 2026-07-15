@@ -58,6 +58,9 @@ jobs:
             } >> "$ENV_FILE"
           fi
 
+      - name: Check required env is present
+        run: node scripts/check-required-env.mjs preview
+
       - name: Build
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
