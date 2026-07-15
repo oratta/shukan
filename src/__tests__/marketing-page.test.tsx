@@ -134,7 +134,7 @@ describe('Smitch marketing landing page (Manifesto)', () => {
       .map((tree) => collect(tree).texts.join(' '))
       .join(' ');
 
-    expect(joined).toContain('ストリークは、人生の指標ではない。');
+    expect(joined).toContain('連続記録は、人生の指標ではない。');
     expect(joined).toContain('順番を');
     expect(joined).toContain('なりたい自分から始める。');
   });
