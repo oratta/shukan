@@ -3,7 +3,6 @@
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import { useLocale } from 'next-intl';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Sun, Moon, Monitor, Trash2, LogOut, User, ExternalLink, Smartphone, MessageSquarePlus } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -28,12 +27,15 @@ import { createClient } from '@/lib/supabase/client';
 import { BillingPortalCard } from '@/components/billing/billing-portal-card';
 import { ProfileEditor } from '@/components/settings/profile-editor';
 import { useProfile } from '@/hooks/useProfile';
+import { useSettings } from '@/hooks/useSettings';
+import type { SettingsLocale, SettingsTheme } from '@/lib/supabase/settings';
 
 export default function SettingsPage() {
   const t = useTranslations();
-  const { theme, setTheme } = useTheme();
+  const { theme } = useTheme();
   const locale = useLocale();
-  const router = useRouter();
+  // テーマ／ロケール変更は useSettings 経由（ローカル即反映 ＋ ログイン中は user_settings へ同期 / #24）
+  const { saveTheme, saveLocale } = useSettings();
   const { user } = useAuth();
   const { profile, loading: profileLoading, save: saveProfile } = useProfile();
   const [mounted, setMounted] = useState(false);
@@ -42,18 +44,17 @@ export default function SettingsPage() {
     setMounted(true);
   }, []);
 
-  const toggleLocale = (newLocale: string) => {
-    document.cookie = `locale=${newLocale};path=/;max-age=31536000`;
-    router.refresh();
+  const toggleLocale = (newLocale: SettingsLocale) => {
+    void saveLocale(newLocale);
   };
 
-  const themeOptions = [
+  const themeOptions: { value: SettingsTheme; label: string; icon: typeof Sun }[] = [
     { value: 'light', label: t('settings.light'), icon: Sun },
     { value: 'dark', label: t('settings.dark'), icon: Moon },
     { value: 'system', label: t('settings.system'), icon: Monitor },
   ];
 
-  const languageOptions = [
+  const languageOptions: { value: SettingsLocale; label: string }[] = [
     { value: 'en', label: 'English' },
     { value: 'ja', label: '日本語' },
   ];
@@ -201,7 +202,7 @@ export default function SettingsPage() {
                     key={opt.value}
                     variant={theme === opt.value ? 'default' : 'outline'}
                     size="sm"
-                    onClick={() => setTheme(opt.value)}
+                    onClick={() => void saveTheme(opt.value)}
                     className="flex-1"
                   >
                     <opt.icon className="mr-1.5 size-3.5" />
