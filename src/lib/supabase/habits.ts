@@ -1,3 +1,4 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Habit, HabitInsertInput, HabitCompletion, CopingStep, UrgeLog, DailyReflection } from '@/types/habit';
 import type { HabitEvidence } from '@/types/impact';
 import { isValidArticleId } from '@/data/impact-articles';
@@ -189,8 +190,13 @@ function toDailyReflection(row: DailyReflectionRow): DailyReflection {
   };
 }
 
-export async function fetchHabits(): Promise<Habit[]> {
-  const supabase = createClient();
+/**
+ * habits を一覧取得する。`client` 未指定ならブラウザクライアントを使う。
+ * Server Component から呼ぶ場合は cookie バウンドの server クライアントを渡すこと
+ * （RLS はリクエスト元ユーザーのセッションで評価されるため。subscriptions.ts と同じ規約）。
+ */
+export async function fetchHabits(client?: SupabaseClient): Promise<Habit[]> {
+  const supabase = client ?? createClient();
   const { data, error } = await supabase
     .from('habits')
     .select('*, habit_evidences(*)')
@@ -202,8 +208,9 @@ export async function fetchHabits(): Promise<Habit[]> {
   );
 }
 
-export async function fetchCompletions(days: number = 90): Promise<HabitCompletion[]> {
-  const supabase = createClient();
+/** completions を直近 `days` 日分取得する。`client` の扱いは fetchHabits と同じ。 */
+export async function fetchCompletions(days: number = 90, client?: SupabaseClient): Promise<HabitCompletion[]> {
+  const supabase = client ?? createClient();
   const fromDate = new Date();
   fromDate.setDate(fromDate.getDate() - days);
   const fromDateStr = fromDate.toISOString().split('T')[0];

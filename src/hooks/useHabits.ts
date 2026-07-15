@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Habit, HabitInsertInput, HabitCompletion, HabitWithStats, CopingStep, UrgeLog } from '@/types/habit';
 import { useAuth } from '@/components/auth-provider';
 import { track } from '@/lib/analytics';
@@ -28,16 +28,49 @@ import {
   updateCompletionNote,
 } from '@/lib/supabase/habits';
 
-export function useHabits() {
-  const { user } = useAuth();
-  const [habits, setHabits] = useState<Habit[]>([]);
-  const [completions, setCompletions] = useState<HabitCompletion[]>([]);
+/** Server Component（(app)/page.tsx）で prefetch した初期データ（issue #59）。 */
+export interface InitialHabitData {
+  habits: Habit[];
+  completions: HabitCompletion[];
+}
+
+/**
+ * useState 初期値の計算（テスト可能な純関数）。
+ * initialData があれば初回レンダリングからデータ入り・loading=false でスピナーを出さない。
+ */
+export function computeInitialHabitState(initialData?: InitialHabitData | null): {
+  habits: Habit[];
+  completions: HabitCompletion[];
+  loading: boolean;
+} {
+  return {
+    habits: initialData?.habits ?? [],
+    completions: initialData?.completions ?? [],
+    loading: !initialData,
+  };
+}
+
+export function useHabits(initialData?: InitialHabitData | null) {
+  const { user, loading: authLoading } = useAuth();
+  const initial = computeInitialHabitState(initialData);
+  const [habits, setHabits] = useState<Habit[]>(initial.habits);
+  const [completions, setCompletions] = useState<HabitCompletion[]>(initial.completions);
   const [copingStepsMap, setCopingStepsMap] = useState<Map<string, CopingStep[]>>(new Map());
   const [urgeLogs, setUrgeLogs] = useState<UrgeLog[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(initial.loading);
+  // prefetch は「初回1回だけ」消費する。ログアウト→再ログイン等の再ロードでは使わない。
+  const pendingInitialRef = useRef<InitialHabitData | null>(initialData ?? null);
+  // onAuthStateChange は同一ユーザーでも毎回新しい user オブジェクトを返すため、
+  // 参照ではなく user.id を effect の依存にする（同一ユーザーでの再フェッチを防ぐ）。
+  const userId = user?.id ?? null;
 
   useEffect(() => {
-    if (!user) {
+    // auth 解決前に !user 分岐へ入ると、SSR prefetch 済みの state を空で上書きしてしまう。
+    // auth の解決を待ってから load / reset を判断する。
+    if (authLoading) return;
+
+    if (!userId) {
+      pendingInitialRef.current = null;
       setHabits([]);
       setCompletions([]);
       setCopingStepsMap(new Map());
@@ -47,14 +80,22 @@ export function useHabits() {
     }
 
     let cancelled = false;
+    const prefetched = pendingInitialRef.current;
+    pendingInitialRef.current = null;
 
     async function load() {
       try {
-        const [h, c] = await Promise.all([fetchHabits(), fetchCompletions()]);
-        if (cancelled) return;
-
-        setHabits(h);
-        setCompletions(c);
+        let h: Habit[];
+        if (prefetched) {
+          // habits/completions は SSR 済み。ここでは再フェッチしない（初回読み込みのみの最適化）。
+          h = prefetched.habits;
+        } else {
+          const [h2, c] = await Promise.all([fetchHabits(), fetchCompletions()]);
+          if (cancelled) return;
+          setHabits(h2);
+          setCompletions(c);
+          h = h2;
+        }
 
         // Load coping steps for quit habits (single batch query)
         const quitHabits = h.filter((habit) => habit.type === 'quit');
@@ -78,7 +119,7 @@ export function useHabits() {
 
     load();
     return () => { cancelled = true; };
-  }, [user]);
+  }, [userId, authLoading]);
 
   const addHabit = useCallback(
     async (

@@ -77,7 +77,9 @@ describe('resolveTrackedKpiDefinitions (Scenario 5-1)', () => {
 });
 
 describe('ホームが profile を配線している (Scenario 5-1)', () => {
-  const home = readSource('src/app/(app)/page.tsx');
+  // issue #59: ホーム本体は (app)/page.tsx（Server Component 化）から
+  // components/dashboard/dashboard-client.tsx へ移設された。
+  const home = readSource('src/components/dashboard/dashboard-client.tsx');
   it('useProfile フックで profile を取得する', () => {
     expect(home).toContain('useProfile');
   });
@@ -263,7 +265,8 @@ describe('computeHabitLifetimeEffect の個人化 (Scenario 5-3)', () => {
 });
 
 describe('ホームが profile を EstablishedSection に接続している (Scenario 5-3)', () => {
-  const home = readSource('src/app/(app)/page.tsx');
+  // issue #59: ホーム本体は dashboard-client.tsx へ移設（page.tsx は Server Component の prefetch 殻）。
+  const home = readSource('src/components/dashboard/dashboard-client.tsx');
   it('EstablishedSection に profile を渡す', () => {
     expect(home).toMatch(/EstablishedSection[\s\S]*profile=/);
   });

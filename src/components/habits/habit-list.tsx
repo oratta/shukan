@@ -102,7 +102,13 @@ export function HabitList({
       ) : (
         <>
           {/* Active habits section (drag-and-drop enabled) */}
+          {/*
+            静的 id 必須: SSR 時に dnd-kit が自動連番 id（DndDescribedBy-N）を振ると
+            server プロセスのカウンタがリクエスト毎に増えて client と恒常的に食い違い、
+            hydration mismatch + aria-describedby の宙吊り参照が発生する（PR #79 レビュー指摘）
+          */}
           <DndContext
+            id="habit-list-dnd"
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
