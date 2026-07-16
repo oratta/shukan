@@ -34,22 +34,23 @@ interface HabitCardProps {
 
 function DayStatusDot({
   day,
-  onTap,
-  onLongPress,
+  onOpen,
 }: {
   day: DayStatus;
-  onTap: () => void;
-  onLongPress: () => void;
+  onOpen: () => void;
 }) {
   const { status } = day;
-  const pressHandlers = useLongPress(onLongPress, onTap);
 
   return (
-    // 24px タッチターゲット確保のため不可視パディング（p-1.5）＋負マージンで見た目は size-3 のまま
+    // 過去日は小ターゲットに精密操作を要求しない: タップ一発でアクションシートを開き、
+    // 操作はシート内の大きなボタンで完結させる（案A）。不可視パディングでタッチターゲットも拡大。
     <button
       type="button"
-      {...pressHandlers}
-      className="-m-1.5 flex touch-none items-center justify-center p-1.5"
+      onClick={(e) => {
+        e.stopPropagation();
+        onOpen();
+      }}
+      className="-m-1.5 flex items-center justify-center p-1.5"
     >
       <span
         className={cn(
@@ -353,8 +354,7 @@ export function HabitCard({
                   <span className={cn('text-[9px] leading-none', hasEvidenceBg ? 'text-white/70' : 'text-muted-foreground')}>{dayLabel}</span>
                   <DayStatusDot
                     day={day}
-                    onTap={() => handleDotTap(day)}
-                    onLongPress={() => onOpenActionSheet(habit.id, day.date)}
+                    onOpen={() => onOpenActionSheet(habit.id, day.date)}
                   />
                 </div>
               );

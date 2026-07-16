@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { XCircle, SkipForward, Undo2, StickyNote } from 'lucide-react';
+import { CheckCircle2, XCircle, SkipForward, Undo2, StickyNote, Eraser } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -34,15 +34,16 @@ interface HabitActionSheetProps {
   /** 対象日の既存メモ（プリフィル用） */
   currentNote: string;
   onSetStatus: (
-    status: 'failed' | 'none' | 'skipped',
+    status: 'completed' | 'failed' | 'none' | 'skipped',
     opts?: { resistRate?: number }
   ) => void;
   onSaveNote: (note: string) => void;
 }
 
 /**
- * 長押しで開く共通アクションシート（issue #104）。
- * 「失敗した / スキップ / メモ」を positive・quit 共通で提供する。
+ * 共通アクションシート（issue #104）。今日はステータスボタンの長押し、
+ * 過去日は週ドットのタップで開く（案A: 小ターゲットに精密操作を要求せず、
+ * 達成/失敗/スキップ/メモをシート内の大きなボタンで完結させる）。
  * quit の「失敗した」は即 failed を記録してから我慢率チップに切り替える
  * （チップを無視して閉じても失敗は記録済み、という順序が仕様）。
  */
@@ -119,6 +120,20 @@ export function HabitActionSheet({
 
         {view === 'menu' && (
           <div className="flex flex-col gap-2 p-4 pt-2">
+            {/* 達成: 緑＝達成専用カラー。既に達成済みの日には出さない */}
+            {currentStatus !== 'completed' && currentStatus !== 'rocket_used' && (
+              <button
+                type="button"
+                onClick={() => {
+                  onSetStatus('completed');
+                  onOpenChange(false);
+                }}
+                className="flex items-center gap-3 rounded-xl bg-success/10 px-4 py-3.5 text-left text-sm font-medium text-success ring-1 ring-success/30 transition-colors hover:bg-success/20"
+              >
+                <CheckCircle2 className="size-5 shrink-0" />
+                {t('actionSheet.markDone')}
+              </button>
+            )}
             <button
               type="button"
               onClick={handleFailed}
@@ -153,6 +168,20 @@ export function HabitActionSheet({
               >
                 <StickyNote className="size-5 shrink-0" />
                 {t('actionSheet.memo')}
+              </button>
+            )}
+            {/* 取り消し: 何か記録がある日だけ。誤記録をシートから戻せるように */}
+            {currentStatus !== 'none' && (
+              <button
+                type="button"
+                onClick={() => {
+                  onSetStatus('none');
+                  onOpenChange(false);
+                }}
+                className="flex items-center gap-3 rounded-xl px-4 py-3.5 text-left text-sm font-medium text-muted-foreground ring-1 ring-border transition-colors hover:bg-secondary/60"
+              >
+                <Eraser className="size-5 shrink-0" />
+                {t('actionSheet.clearStatus')}
               </button>
             )}
           </div>

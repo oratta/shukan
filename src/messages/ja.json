@@ -87,6 +87,7 @@
     "trackedKpisTitle": "あなたが大切にしていること",
     "actionSheet": {
       "today": "今日",
+      "markDone": "達成した",
       "markFailed": "失敗した",
       "memo": "メモ",
       "memoPlaceholder": "この日のメモ...",
@@ -95,7 +96,8 @@
       "resist25": "少しは耐えた",
       "resist50": "半分くらい",
       "resist75": "ほとんど耐えた",
-      "closeWithoutAnswer": "入力せずに閉じる"
+      "closeWithoutAnswer": "入力せずに閉じる",
+      "clearStatus": "未入力に戻す"
     }
   },
   "stats": {

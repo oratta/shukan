@@ -87,6 +87,7 @@
     "trackedKpisTitle": "What matters to you",
     "actionSheet": {
       "today": "Today",
+      "markDone": "Mark as done",
       "markFailed": "Mark as failed",
       "memo": "Note",
       "memoPlaceholder": "Note for this day...",
@@ -95,7 +96,8 @@
       "resist25": "Resisted a little",
       "resist50": "About half",
       "resist75": "Mostly resisted",
-      "closeWithoutAnswer": "Close without answering"
+      "closeWithoutAnswer": "Close without answering",
+      "clearStatus": "Clear entry"
     }
   },
   "stats": {
