@@ -85,139 +85,98 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
 
   if (!hasImpact) return null;
 
+  // B案「静かな精密さ」: 新聞のデータ面のように、獲得値を Geist Mono の大きな tabular 数値で
+  // 静かに堂々と見せる。緑は「獲得＝積み上げ（ポジティブ）」の意味だけに使い、分母・ラベルは中立。
+  const todayMetrics = [
+    { icon: HeartPulse, label: t('dailyHealth'), value: `+${formatHealthMinutes(earned.healthMinutes)}`, sub: `/ ${formatHealthMinutes(total.healthMinutes)}` },
+    { icon: Wallet, label: t('dailyCost'), value: formatCurrency(earned.costSaving, false), sub: `/ ${formatCurrency(total.costSaving, false)}` },
+    { icon: TrendingUp, label: t('dailyIncome'), value: formatCurrency(earned.incomeGain, false), sub: `/ ${formatCurrency(total.incomeGain, false)}` },
+    { icon: Smile, label: t('dailyPositiveMood'), value: `+${formatHealthMinutes(earned.positiveMoodMinutes)}`, sub: `/ ${formatHealthMinutes(total.positiveMoodMinutes)}` },
+  ];
+
+  const fiveDaysMetrics = [
+    { icon: HeartPulse, label: t('dailyHealth'), value: `+${formatHealthMinutes(fiveDays.healthMinutes)}` },
+    { icon: Wallet, label: t('dailyCost'), value: formatCurrency(fiveDays.costSaving, false) },
+    { icon: TrendingUp, label: t('dailyIncome'), value: formatCurrency(fiveDays.incomeGain, false) },
+    { icon: Smile, label: t('dailyPositiveMood'), value: `+${formatHealthMinutes(fiveDays.positiveMoodMinutes)}` },
+  ];
+
   return (
-    <div
+    <section
       className={cn(
-        'rounded-xl border px-4 py-3 transition-all',
-        isPerfect
-          ? 'border-success/40 bg-success/10 animate-[perfectPulse_600ms_ease-out]'
-          : 'border-border bg-card'
+        'quiet-rise overflow-hidden rounded-xl border bg-card shadow-[var(--elev-2)]',
+        isPerfect && 'border-success/40 animate-[perfectPulse_600ms_ease-out]'
       )}
     >
-      <p className={cn(
-        'text-[11px] font-semibold uppercase tracking-wider',
-        isPerfect ? 'text-success' : 'text-muted-foreground'
-      )}>
-        {isPerfect ? <><PartyPopper className="mr-1 inline size-3.5" />{t('perfect')}</> : t('todayImpact')}
-      </p>
-
-      <div className="mt-2 flex flex-wrap items-end gap-x-5 gap-y-1.5">
-        {/* Health */}
-        <div className="flex flex-col">
-          <div className="flex items-center gap-1">
-            <HeartPulse className="size-3.5 text-success" />
-            <span className="text-sm font-bold tabular-nums text-success">
-              {isPerfect
-                ? `+${formatHealthMinutes(earned.healthMinutes)}`
-                : `+${formatHealthMinutes(earned.healthMinutes)}`}
-            </span>
-            {!isPerfect && (
-              <span className="text-xs tabular-nums text-muted-foreground">
-                /{formatHealthMinutes(total.healthMinutes)}
-              </span>
-            )}
-          </div>
-          <span className="text-[9px] font-medium text-muted-foreground">{t('dailyHealth')}</span>
-        </div>
-
-        {/* Cost */}
-        <div className="flex flex-col">
-          <div className="flex items-center gap-1">
-            <Wallet className="size-3.5 text-success" />
-            <span className="text-sm font-bold tabular-nums text-success">
-              {formatCurrency(earned.costSaving, false)}
-            </span>
-            {!isPerfect && (
-              <span className="text-xs tabular-nums text-muted-foreground">
-                /{formatCurrency(total.costSaving, false)}
-              </span>
-            )}
-          </div>
-          <span className="text-[9px] font-medium text-muted-foreground">{t('dailyCost')}</span>
-        </div>
-
-        {/* Income */}
-        <div className="flex flex-col">
-          <div className="flex items-center gap-1">
-            <TrendingUp className="size-3.5 text-success" />
-            <span className="text-sm font-bold tabular-nums text-success">
-              {formatCurrency(earned.incomeGain, false)}
-            </span>
-            {!isPerfect && (
-              <span className="text-xs tabular-nums text-muted-foreground">
-                /{formatCurrency(total.incomeGain, false)}
-              </span>
-            )}
-          </div>
-          <span className="text-[9px] font-medium text-muted-foreground">{t('dailyIncome')}</span>
-        </div>
-
-        {/* Positive mood (4th axis) — この画面（DailyImpactSummary）に限り値が0でも常時表示（F10）。
-            他の表示箇所（stats/savings-card/impact-badge/記事シート）は「> 0 のみ」を維持する。 */}
-        <div className="flex flex-col">
-          <div className="flex items-center gap-1">
-            <Smile className="size-3.5 text-success" />
-            <span className="text-sm font-bold tabular-nums text-success">
-              +{formatHealthMinutes(earned.positiveMoodMinutes)}
-            </span>
-            {!isPerfect && (
-              <span className="text-xs tabular-nums text-muted-foreground">
-                /{formatHealthMinutes(total.positiveMoodMinutes)}
-              </span>
-            )}
-          </div>
-          <span className="text-[9px] font-medium text-muted-foreground">{t('dailyPositiveMood')}</span>
-        </div>
+      {/* ヘッダー: mono の細いトラッキングでラベルを組む。達成時は右に success バッジ。 */}
+      <div className="flex items-center justify-between px-5 py-3.5">
+        <span className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+          {t('todayImpact')}
+        </span>
+        {isPerfect && (
+          <span className="flex items-center gap-1 font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-success">
+            <PartyPopper className="size-3.5" />
+            {t('perfect')}
+          </span>
+        )}
       </div>
 
-      {/* 5 Days Impact */}
-      <div className="mt-3 border-t border-border pt-3">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+      {/* 今日のインパクト: 2×2 グリッドをヘアライン罫線で組む（gap-px + bg-border）。
+          新聞のデータ面のように数値はインク（foreground）で大きく、緑はアイコンの差し色に留める。
+          達成時のみ数値も success に切り替える。 */}
+      <div className="grid grid-cols-2 gap-px border-y bg-border">
+        {todayMetrics.map((m) => (
+          <div key={m.label} className="flex flex-col gap-2 bg-card px-5 py-4">
+            <div className="flex items-center gap-1.5">
+              <m.icon className="size-3.5 text-success" />
+              <span className="font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                {m.label}
+              </span>
+            </div>
+            {/* 実データ（達成時）は値が長くなるため flex-wrap で「値→分母」の順に折り返す。
+                値そのものは whitespace-nowrap で数字の途中では折らない（+27 と 分 を割らない）。 */}
+            <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+              <span
+                className={cn(
+                  'whitespace-nowrap font-mono text-[24px] font-semibold leading-none tracking-tight tabular-nums',
+                  isPerfect ? 'text-success' : 'text-foreground'
+                )}
+              >
+                {m.value}
+              </span>
+              <span className="whitespace-nowrap font-mono text-[11px] tabular-nums text-muted-foreground">
+                {m.sub}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* 5日間のインパクト: 二次情報。ラベル左・数値右の罫線区切り行リストで、
+          長い日本語の値（+13時間12分 等）も折り返さず端正に組む。 */}
+      <div className="px-5 py-4">
+        <span className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
           {t('fiveDaysImpact')}
-        </p>
-        <div className="mt-2 flex flex-wrap items-end gap-x-5 gap-y-1.5">
-          <div className="flex flex-col">
-            <div className="flex items-center gap-1">
-              <HeartPulse className="size-3.5 text-success" />
-              <span className="text-sm font-bold tabular-nums text-success">
-                +{formatHealthMinutes(fiveDays.healthMinutes)}
+        </span>
+        <div className="mt-2 divide-y divide-border/60">
+          {fiveDaysMetrics.map((m) => (
+            <div key={m.label} className="flex items-center justify-between py-1.5">
+              <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                <m.icon className="size-3 shrink-0" />
+                {m.label}
+              </span>
+              <span className="font-mono text-[13px] font-medium tabular-nums text-foreground">
+                {m.value}
               </span>
             </div>
-            <span className="text-[9px] font-medium text-muted-foreground">{t('dailyHealth')}</span>
-          </div>
-          <div className="flex flex-col">
-            <div className="flex items-center gap-1">
-              <Wallet className="size-3.5 text-success" />
-              <span className="text-sm font-bold tabular-nums text-success">
-                {formatCurrency(fiveDays.costSaving, false)}
-              </span>
-            </div>
-            <span className="text-[9px] font-medium text-muted-foreground">{t('dailyCost')}</span>
-          </div>
-          <div className="flex flex-col">
-            <div className="flex items-center gap-1">
-              <TrendingUp className="size-3.5 text-success" />
-              <span className="text-sm font-bold tabular-nums text-success">
-                {formatCurrency(fiveDays.incomeGain, false)}
-              </span>
-            </div>
-            <span className="text-[9px] font-medium text-muted-foreground">{t('dailyIncome')}</span>
-          </div>
-          {/* 4th axis — 今日の表示と揃え、値0でも常時表示（F10） */}
-          <div className="flex flex-col">
-            <div className="flex items-center gap-1">
-              <Smile className="size-3.5 text-success" />
-              <span className="text-sm font-bold tabular-nums text-success">
-                +{formatHealthMinutes(fiveDays.positiveMoodMinutes)}
-              </span>
-            </div>
-            <span className="text-[9px] font-medium text-muted-foreground">{t('dailyPositiveMood')}</span>
-          </div>
+          ))}
         </div>
       </div>
 
       {/* 景表法・打消し表示対応（issue #39）: 推定値と同一ビューポート内の近接注記 */}
-      <EstimateDisclaimer className="mt-3" />
-    </div>
+      <div className="border-t px-5 py-3">
+        <EstimateDisclaimer />
+      </div>
+    </section>
   );
 }

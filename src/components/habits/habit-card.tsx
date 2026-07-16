@@ -382,7 +382,7 @@ export function HabitCard({
     <Card
       className={cn(
         'gap-0 py-0 overflow-hidden transition-all duration-200',
-        hasEvidenceBg && 'relative rounded-2xl border-0 shadow-lg shadow-black/10 ring-1 ring-black/5 dark:ring-white/10'
+        hasEvidenceBg && 'relative isolate rounded-2xl border-0 shadow-lg shadow-black/10 ring-1 ring-black/5 dark:ring-white/10'
       )}
     >
       {/* A案（シネマティック・バナー）: エビデンス写真を主役にする。等分割コラージュは
@@ -398,6 +398,8 @@ export function HabitCard({
             loading="lazy"
             className="absolute inset-0 h-full w-full object-cover"
           />
+          {/* 色相統一のティント（暗くはしない）。可読性の暗さは下の banner-scrim が担う。 */}
+          <div aria-hidden className="banner-tint absolute inset-0" />
           <div
             aria-hidden
             className={cn('absolute inset-0', isExpanded ? 'banner-scrim-expanded' : 'banner-scrim')}
@@ -486,7 +488,7 @@ export function HabitCard({
                 外周ボーダーはなし。区切りはごく薄いディバイダ。隙間から背景が見える状態を解消。
                 写真なしカードは従来どおり個別の箱で表示する。 */}
             {hasEvidenceBg ? (
-              <div className="space-y-3 rounded-xl bg-white/10 p-3 backdrop-blur-sm">
+              <div className="space-y-3 rounded-xl bg-white/10 p-3 backdrop-blur-md">
                 {habit.evidences.length > 0 && (
                   <ImpactBadge
                     evidences={habit.evidences}

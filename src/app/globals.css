@@ -108,6 +108,14 @@
   --danger-foreground: oklch(1 0 0);
   --skipped: oklch(0.72 0.02 260);
   --track: oklch(0.9 0.005 260);
+  /* C案由来（控えめ運用）: 写真バナーの色相をインディゴへ寄せて複数写真のトーンを揃える。
+     C案は tint+grade の二重掛けで沈んだため、hybrid では mix-blend-color の 1 枚だけにし、
+     輝度は保ったまま色相だけを寄せる（＝暗くせずトーン統一）。強度は控えめに。 */
+  --photo-tint: oklch(0.55 0.12 262 / 0.20);
+  /* C案由来: light の平板さ対策に用いるエレベーション（薄く採用）。 */
+  --elev-2:
+    0 6px 18px -6px oklch(0.35 0.05 250 / 0.16),
+    0 2px 6px -2px oklch(0.35 0.05 250 / 0.10);
 }
 
 .dark {
@@ -155,6 +163,10 @@
   --danger-foreground: oklch(0.16 0.02 40);
   --skipped: oklch(0.6 0.02 260);
   --track: oklch(0.42 0.02 260);
+  --photo-tint: oklch(0.55 0.13 262 / 0.26);
+  --elev-2:
+    0 8px 22px -8px oklch(0 0 0 / 0.55),
+    0 3px 8px -4px oklch(0 0 0 / 0.42);
 }
 
 @layer base {
@@ -170,6 +182,23 @@
   0% { transform: scale(1); }
   50% { transform: scale(1.02); }
   100% { transform: scale(1); }
+}
+
+/* B案由来「静かな精密さ」: インパクトサマリーが下から静かに立ち上がる入場。
+   派手なバウンドを避け、余韻のある ease でデータ面のように整列させる。 */
+@keyframes quietRise {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.quiet-rise {
+  animation: quietRise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes fadeSlideIn {
@@ -259,6 +288,14 @@
 
 .banner-label {
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+/* 写真の色相統一（C案の思想を控えめに）: mix-blend-color で輝度は保ったまま
+   色相だけをインディゴへ寄せ、複数写真のトーンのバラつきを揃える。暗くはしない
+   （暗さ＝可読性は下の banner-scrim が担う）。A案の写真の映えを殺さない強度。 */
+.banner-tint {
+  background: var(--photo-tint);
+  mix-blend-mode: color;
 }
 
 /* 下→上の映画的スクリム。下部は濃く（テキスト面）、上部は写真をほぼ素通し。
