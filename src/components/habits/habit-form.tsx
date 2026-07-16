@@ -52,12 +52,10 @@ interface HabitFormProps {
   onOpenChange: (open: boolean) => void;
   onSubmit: (
     data: HabitInsertInput,
-    copingSteps?: { title: string; sortOrder: number }[],
     initialEvidences?: EvidenceEntry[]
   ) => void;
   onDelete?: () => void;
   initialData?: Partial<Habit>;
-  initialCopingSteps?: { title: string; sortOrder: number }[];
   prefilledEvidences?: EvidenceEntry[];
 }
 
@@ -67,7 +65,6 @@ export function HabitForm({
   onSubmit,
   onDelete,
   initialData,
-  initialCopingSteps,
   prefilledEvidences,
 }: HabitFormProps) {
   const t = useTranslations('habits');
@@ -92,16 +89,10 @@ export function HabitForm({
   const [weeklyTarget, setWeeklyTarget] = useState(
     initialData?.weeklyTarget ?? 1
   );
-  const [dailyTarget, setDailyTarget] = useState(
-    initialData?.dailyTarget ?? 3
-  );
   // 3場面構造: status の手動設定（established=「完全に身についた」）。自動昇格は行わない。
   const [established, setEstablished] = useState(
     initialData?.status === 'established'
   );
-  const [copingSteps, setCopingSteps] = useState<
-    { title: string; sortOrder: number }[]
-  >(initialCopingSteps ?? [{ title: '', sortOrder: 0 }]);
   const [evidences, setEvidences] = useState<EvidenceEntry[]>(
     prefilledEvidences ??
     initialData?.evidences?.map((ev) => ({ articleId: ev.articleId, weight: ev.weight })) ??
@@ -110,7 +101,7 @@ export function HabitForm({
   const [pickerOpen, setPickerOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
-  // Sync state when initialData/initialCopingSteps change (e.g., editing a different habit).
+  // Sync state when initialData changes (e.g., editing a different habit).
   // prop 変化時に編集対象を意図的に state へリセットするパターンのため同期 setState が必要。
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- sync form fields when editing a different habit
@@ -122,25 +113,18 @@ export function HabitForm({
     setCustomDays(initialData?.customDays ?? [1, 2, 3, 4, 5]);
     setType(initialData?.type ?? 'positive');
     setWeeklyTarget(initialData?.weeklyTarget ?? 1);
-    setDailyTarget(initialData?.dailyTarget ?? 3);
     setEstablished(initialData?.status === 'established');
-    setCopingSteps(initialCopingSteps ?? [{ title: '', sortOrder: 0 }]);
     setEvidences(
       prefilledEvidences ??
       initialData?.evidences?.map((ev) => ({ articleId: ev.articleId, weight: ev.weight })) ??
       []
     );
-  }, [initialData, initialCopingSteps, prefilledEvidences]);
+  }, [initialData, prefilledEvidences]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    if (type === 'quit' && copingSteps.every((s) => !s.title.trim())) return;
     if (frequency === 'custom' && customDays.length === 0) return;
-
-    const validSteps = copingSteps
-      .filter((s) => s.title.trim())
-      .map((s, i) => ({ title: s.title.trim(), sortOrder: i }));
 
     onSubmit(
       {
@@ -152,12 +136,10 @@ export function HabitForm({
         customDays: frequency === 'custom' ? customDays : undefined,
         weeklyTarget: frequency === 'weekly' ? weeklyTarget : undefined,
         type,
-        dailyTarget: type === 'quit' ? dailyTarget : 1,
         impactArticleId: undefined,
         evidences: initialData?.evidences ?? [],
         status: established ? 'established' : 'active',
       },
-      type === 'quit' ? validSteps : undefined,
       evidences.length > 0 ? evidences : undefined
     );
 
@@ -170,9 +152,7 @@ export function HabitForm({
       setCustomDays([1, 2, 3, 4, 5]);
       setWeeklyTarget(1);
       setType('positive');
-      setDailyTarget(3);
       setEstablished(false);
-      setCopingSteps([{ title: '', sortOrder: 0 }]);
       setEvidences([]);
     }
 
@@ -182,23 +162,6 @@ export function HabitForm({
   const toggleDay = (day: number) => {
     setCustomDays((prev) =>
       prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
-    );
-  };
-
-  const addStep = () => {
-    setCopingSteps((prev) => [
-      ...prev,
-      { title: '', sortOrder: prev.length },
-    ]);
-  };
-
-  const removeStep = (index: number) => {
-    setCopingSteps((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const updateStep = (index: number, title: string) => {
-    setCopingSteps((prev) =>
-      prev.map((s, i) => (i === index ? { ...s, title } : s))
     );
   };
 
@@ -343,70 +306,6 @@ export function HabitForm({
                 </p>
               )}
             </div>
-
-            {type === 'quit' && (
-              <>
-                <div className="space-y-2">
-                  <Label>{t('copingSteps')}</Label>
-                  <p className="text-xs text-muted-foreground">
-                    {t('copingStepsDesc')}
-                  </p>
-                  <div className="space-y-2">
-                    {copingSteps.map((step, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <Input
-                          value={step.title}
-                          onChange={(e) => updateStep(index, e.target.value)}
-                          placeholder={t('stepPlaceholder')}
-                          className="flex-1"
-                        />
-                        {copingSteps.length > 1 && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="shrink-0 size-9"
-                            onClick={() => removeStep(index)}
-                          >
-                            <X className="size-4" />
-                          </Button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={addStep}
-                    className="w-full"
-                  >
-                    <Plus className="size-4" />
-                    {t('addStep')}
-                  </Button>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="daily-target">{t('dailyTarget')}</Label>
-                  <p className="text-xs text-muted-foreground">
-                    {t('dailyTargetDesc')}
-                  </p>
-                  <Input
-                    id="daily-target"
-                    type="number"
-                    min={1}
-                    max={20}
-                    value={dailyTarget}
-                    onChange={(e) =>
-                      setDailyTarget(
-                        Math.max(1, Math.min(20, parseInt(e.target.value) || 1))
-                      )
-                    }
-                    className="w-24"
-                  />
-                </div>
-              </>
-            )}
 
             <div className="space-y-2">
               <Label>{t('icon')}</Label>

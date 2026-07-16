@@ -17,7 +17,6 @@ function baseRow(overrides: Partial<HabitRow> = {}): HabitRow {
     frequency: 'everyday',
     custom_days: null,
     type: 'positive',
-    daily_target: 1,
     weekly_target: 1,
     created_at: '2026-01-01',
     archived: false,
@@ -35,7 +34,6 @@ function baseInput(overrides: Partial<HabitInsertInput> = {}): HabitInsertInput 
     icon: 'target',
     frequency: 'everyday',
     type: 'positive',
-    dailyTarget: 1,
     evidences: [],
     ...overrides,
   };

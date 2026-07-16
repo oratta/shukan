@@ -44,7 +44,6 @@ function makeHabit(overrides: Partial<Habit> & { id: string }): Habit {
     icon: 'target',
     frequency: 'everyday',
     type: 'positive',
-    dailyTarget: 1,
     createdAt: '2026-01-01',
     archived: false,
     evidences: [],
