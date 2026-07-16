@@ -49,7 +49,8 @@ export function Header() {
     <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4">
         <Link href="/" className="flex items-center">
-          <SmitchLogo height={22} />
+          {/* ダークではロゴの濃紺(#180A4F)が沈むため、明度を持ち上げて視認性を確保する */}
+          <SmitchLogo height={22} className="dark:brightness-[1.85]" />
         </Link>
 
         {/* Desktop nav - hidden on mobile (bottom nav handles it) */}

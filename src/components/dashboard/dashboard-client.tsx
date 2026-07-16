@@ -249,12 +249,13 @@ export function DashboardClient({
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">
+        <h2 className="text-[28px] font-bold leading-tight tracking-tight">
           {t('habits.title')}
         </h2>
         {totalCount > 0 && (
-          <p className="mt-1 text-sm text-muted-foreground">
-            {completedCount}/{totalCount} {t('habits.completed').toLowerCase()}
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            <span className="font-semibold tabular-nums text-foreground">{completedCount}</span>
+            <span className="tabular-nums">/{totalCount}</span> {t('habits.completed').toLowerCase()}
           </p>
         )}
       </div>

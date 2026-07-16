@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Check, ChevronDown, ChevronUp, Maximize2, GripVertical, SkipForward, Undo2 } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp, Maximize2, GripVertical, SkipForward, Undo2, Images } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Card } from '@/components/ui/card';
@@ -38,9 +38,12 @@ function nextStatus(current: DayStatus['status']): 'completed' | 'failed' | 'non
 function DayStatusDot({
   day,
   onTap,
+  onImage = false,
 }: {
   day: DayStatus;
   onTap: () => void;
+  /** 写真バナー上に載る場合は未達/スキップを白系にして視認性を保つ */
+  onImage?: boolean;
 }) {
   const { status } = day;
 
@@ -54,9 +57,9 @@ function DayStatusDot({
       className={cn(
         'flex items-center justify-center rounded-full size-3 transition-all',
         (status === 'completed' || status === 'rocket_used') && 'bg-success',
-        status === 'failed' && 'bg-[#D08068]',
-        status === 'none' && 'border border-gray-300 bg-transparent',
-        status === 'skipped' && 'bg-gray-300',
+        status === 'failed' && 'bg-danger',
+        status === 'none' && (onImage ? 'border border-white/70 bg-white/10' : 'border border-skipped bg-transparent'),
+        status === 'skipped' && (onImage ? 'bg-white/45' : 'bg-skipped'),
       )}
     />
   );
@@ -96,12 +99,17 @@ function StatusIndicator({
   habit,
   onTapToday,
   onTapVs,
+  onImage = false,
 }: {
   habit: HabitWithStats;
   onTapToday?: () => void;
   onTapVs?: () => void;
+  /** 写真バナー上では未達リング/枠を白系にして視認性を保つ */
+  onImage?: boolean;
 }) {
   const isQuit = habit.type === 'quit';
+  const idleBorder = onImage ? 'border-white/70' : 'border-skipped';
+  const trackStroke = onImage ? 'rgba(255,255,255,0.35)' : 'var(--track)';
   const [showCelebration, setShowCelebration] = useState(false);
   const prevStatusRef = useRef<string | null>(null);
 
@@ -146,7 +154,7 @@ function StatusIndicator({
       >
         {isFailed ? (
           /* Failed: solid red circle, no progress arc */
-          <div className="flex size-8 items-center justify-center rounded-full bg-[#D08068]" />
+          <div className="flex size-8 items-center justify-center rounded-full bg-danger" />
         ) : (isCompleted || isDone) ? (
           /* Completed: solid green circle */
           <div className="flex size-8 items-center justify-center rounded-full bg-success">
@@ -160,7 +168,7 @@ function StatusIndicator({
             <svg width="32" height="32" viewBox="0 0 32 32" className="-rotate-90">
               <circle
                 cx="16" cy="16" r={radius}
-                fill="none" stroke="#E5E7EB" strokeWidth="2.5"
+                fill="none" stroke={trackStroke} strokeWidth="2.5"
               />
               <circle
                 cx="16" cy="16" r={radius}
@@ -194,7 +202,7 @@ function StatusIndicator({
           }}
           className={cn(
             'flex size-8 shrink-0 items-center justify-center rounded-full transition-all',
-            weeklyDone ? 'bg-success' : 'border-2 border-gray-300',
+            weeklyDone ? 'bg-success' : cn('border-2', idleBorder),
           )}
         >
           {weeklyDone && (
@@ -218,8 +226,8 @@ function StatusIndicator({
         className={cn(
           'flex size-8 shrink-0 items-center justify-center rounded-full transition-all',
           (todayStatus === 'completed' || todayStatus === 'rocket_used') && 'bg-success',
-          todayStatus === 'failed' && 'bg-[#D08068]',
-          todayStatus === 'none' && 'border-2 border-gray-300',
+          todayStatus === 'failed' && 'bg-danger',
+          todayStatus === 'none' && cn('border-2', idleBorder),
         )}
       >
         {(todayStatus === 'completed' || todayStatus === 'rocket_used') && (
@@ -304,30 +312,96 @@ export function HabitCard({
     </>
   );
 
+  // 折りたたみ行を写真バナー版・通常版で共有する部品。light=写真上（白文字＋影）。
+  const dragHandle = (
+    <button
+      type="button"
+      className={cn(
+        'touch-none shrink-0 cursor-grab active:cursor-grabbing transition-colors',
+        hasEvidenceBg
+          ? 'text-white/55 hover:text-white/90'
+          : 'text-skipped hover:text-muted-foreground'
+      )}
+      {...attributes}
+      {...listeners}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <GripVertical className="size-4" />
+    </button>
+  );
+
+  const statusIndicator = (
+    <StatusIndicator
+      habit={habit}
+      onImage={hasEvidenceBg}
+      onTapToday={() => {
+        const todayDay = (habit.recentDays ?? [])[0];
+        if (todayDay) handleDotTap(todayDay);
+      }}
+      onTapVs={() => onOpenVsTemptation(habit.id)}
+    />
+  );
+
+  const chevron = isExpanded ? (
+    <ChevronUp className="size-5" />
+  ) : (
+    <ChevronDown className="size-5" />
+  );
+
+  const frequencyLabel = (light: boolean) => {
+    const cls = cn('shrink-0 text-[11px]', light ? 'text-white/85 banner-label' : 'text-muted-foreground');
+    if (habit.frequency === 'weekly') {
+      return <span className={cls}>{t('weeklyProgress', { current: habit.weeklyCompletedCount ?? 0, target: habit.weeklyTarget ?? 1 })}</span>;
+    }
+    if (habit.frequency === 'weekday') {
+      return <span className={cls}>{t('weekday')}</span>;
+    }
+    if (habit.frequency === 'custom' && habit.customDays && habit.customDays.length > 0) {
+      return <span className={cls}>{[...habit.customDays].sort((a, b) => a - b).map((d) => dayLabels[d]).join('・')}</span>;
+    }
+    return null;
+  };
+
+  const dayDotsRow = (light: boolean) => (
+    <div className="flex items-center gap-1.5">
+      {/* Past days only (skip index 0 = today), left=yesterday, right=oldest */}
+      {(habit.recentDays ?? []).slice(1).map((day) => {
+        const dayLabel = new Date(day.date + 'T00:00:00').toLocaleDateString(locale, { weekday: 'narrow' });
+        return (
+          <div key={day.date} className="flex flex-col items-center gap-0.5">
+            <span className={cn('text-[9px] leading-none', light ? 'text-white/75 banner-label' : 'text-muted-foreground')}>{dayLabel}</span>
+            <DayStatusDot day={day} onTap={() => handleDotTap(day)} onImage={light} />
+          </div>
+        );
+      })}
+    </div>
+  );
+
   return (
     <div ref={setNodeRef} style={style} className={cn(isDragging && 'z-50 opacity-80')}>
     <Card
       className={cn(
         'gap-0 py-0 overflow-hidden transition-all duration-200',
-        hasEvidenceBg && 'relative border-0'
+        hasEvidenceBg && 'relative rounded-2xl border-0 shadow-lg shadow-black/10 ring-1 ring-black/5 dark:ring-white/10'
       )}
     >
-      {/* F15/F17: エビデンス画像の等分割コラージュを「カード全体」の背景に敷く（展開時も維持）。
-          可読性スクリムを重ね、緑の枠（Card border）は border-0 で外す。画像を持つ習慣のみ。 */}
+      {/* A案（シネマティック・バナー）: エビデンス写真を主役にする。等分割コラージュは
+          写真同士が細切れになって濁るためやめ、1枚目をメインに全面へ敷く（枚数は右上バッジ）。
+          可読性は全面スクリムではなく、下→上のグラデーション（下濃く・上は写真素通し）＋
+          文字影で確保し、写真に「光」を残す。展開時は下地をやや落として下部パネルを読ませる。 */}
       {hasEvidenceBg && (
         <>
-          <div className="absolute inset-0 flex" aria-hidden>
-            {evidenceImages.map((url, i) => (
-              <img
-                key={i}
-                src={url}
-                alt=""
-                loading="lazy"
-                className="h-full min-w-0 flex-1 object-cover"
-              />
-            ))}
-          </div>
-          <div className="absolute inset-0 bg-black/60" aria-hidden />
+          <img
+            src={evidenceImages[0]}
+            alt=""
+            aria-hidden
+            loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div
+            aria-hidden
+            className={cn('absolute inset-0', isExpanded ? 'banner-scrim-expanded' : 'banner-scrim')}
+          />
         </>
       )}
 
@@ -339,85 +413,52 @@ export function HabitCard({
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onToggleExpand(habit.id); }}
         className="relative z-10 w-full cursor-pointer text-left"
       >
-        <div className="flex items-center gap-3 p-3">
-        {/* Drag handle */}
-        <button
-          type="button"
-          className={cn(
-            'touch-none shrink-0 cursor-grab active:cursor-grabbing',
-            hasEvidenceBg
-              ? 'text-white/50 hover:text-white/80'
-              : 'text-gray-300 hover:text-gray-500 dark:text-gray-600 dark:hover:text-gray-400'
-          )}
-          {...attributes}
-          {...listeners}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <GripVertical className="size-4" />
-        </button>
+        {hasEvidenceBg ? (
+          /* シネマティック・バナー: 高さのある写真バナー。上段にドラッグ/枚数/開閉、
+             下段にステータス丸＋大きく太い白タイトル＋曜日ドットを重ねる。 */
+          <div className="relative flex min-h-[118px] flex-col justify-end">
+            <div className="absolute inset-x-0 top-0 flex items-center justify-between px-3 pt-2.5">
+              {dragHandle}
+              <div className="flex items-center gap-2">
+                {evidenceImages.length > 1 && (
+                  <span className="flex items-center gap-1 rounded-full bg-black/30 px-2 py-0.5 backdrop-blur-sm">
+                    <Images className="size-3 text-white/85" />
+                    <span className="text-[10px] font-semibold tabular-nums text-white/90">{evidenceImages.length}</span>
+                  </span>
+                )}
+                <span className="text-white/85">{chevron}</span>
+              </div>
+            </div>
 
-        {/* Left: Status indicator (tappable for today's toggle) */}
-        <StatusIndicator
-          habit={habit}
-          onTapToday={() => {
-            const todayDay = (habit.recentDays ?? [])[0];
-            if (todayDay) handleDotTap(todayDay);
-          }}
-          onTapVs={() => onOpenVsTemptation(habit.id)}
-        />
-
-        {/* Center: Name + frequency label + past day dots */}
-        <div className="flex-1 min-w-0 flex flex-col gap-1">
-          <div className="flex items-baseline gap-2 min-w-0">
-            <span
-              className={cn(
-                'text-[15px] font-medium truncate',
-                hasEvidenceBg
-                  ? cn('text-white drop-shadow-sm', isSkipped && 'text-white/50')
-                  : isSkipped && 'text-muted-foreground'
-              )}
-            >
-              {habit.name}
-            </span>
-            {habit.frequency === 'weekly' && (
-              <span className={cn('shrink-0 text-[11px]', hasEvidenceBg ? 'text-white/80' : 'text-muted-foreground')}>
-                {t('weeklyProgress', { current: habit.weeklyCompletedCount ?? 0, target: habit.weeklyTarget ?? 1 })}
-              </span>
-            )}
-            {habit.frequency === 'weekday' && (
-              <span className={cn('shrink-0 text-[11px]', hasEvidenceBg ? 'text-white/80' : 'text-muted-foreground')}>
-                {t('weekday')}
-              </span>
-            )}
-            {habit.frequency === 'custom' && habit.customDays && habit.customDays.length > 0 && (
-              <span className={cn('shrink-0 text-[11px]', hasEvidenceBg ? 'text-white/80' : 'text-muted-foreground')}>
-                {[...habit.customDays].sort((a, b) => a - b).map((d) => dayLabels[d]).join('・')}
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-1.5">
-            {/* Past days only (skip index 0 = today), left=yesterday, right=oldest */}
-            {(habit.recentDays ?? []).slice(1).map((day) => {
-              const dayLabel = new Date(day.date + 'T00:00:00').toLocaleDateString(locale, { weekday: 'narrow' });
-              return (
-                <div key={day.date} className="flex flex-col items-center gap-0.5">
-                  <span className={cn('text-[9px] leading-none', hasEvidenceBg ? 'text-white/70' : 'text-muted-foreground')}>{dayLabel}</span>
-                  <DayStatusDot day={day} onTap={() => handleDotTap(day)} />
+            <div className="flex items-end gap-3 px-3 pb-3 pt-10">
+              {statusIndicator}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-baseline gap-2 min-w-0">
+                  <span className={cn('banner-title truncate text-[21px] font-bold leading-tight tracking-tight text-white', isSkipped && 'text-white/50')}>
+                    {habit.name}
+                  </span>
+                  {frequencyLabel(true)}
                 </div>
-              );
-            })}
+                <div className="mt-2">{dayDotsRow(true)}</div>
+              </div>
+            </div>
           </div>
-        </div>
-
-        {/* Right: Chevron */}
-        <div className={cn('shrink-0', hasEvidenceBg ? 'text-white/80' : 'text-gray-400')}>
-          {isExpanded ? (
-            <ChevronUp className="size-5" />
-          ) : (
-            <ChevronDown className="size-5" />
-          )}
-        </div>
-        </div>
+        ) : (
+          <div className="flex items-center gap-3 p-3">
+            {dragHandle}
+            {statusIndicator}
+            <div className="flex-1 min-w-0 flex flex-col gap-1">
+              <div className="flex items-baseline gap-2 min-w-0">
+                <span className={cn('text-[15px] font-medium truncate', isSkipped && 'text-muted-foreground')}>
+                  {habit.name}
+                </span>
+                {frequencyLabel(false)}
+              </div>
+              {dayDotsRow(false)}
+            </div>
+            <div className="shrink-0 text-muted-foreground">{chevron}</div>
+          </div>
+        )}
       </div>
 
       {/* Expanded body - smooth height transition via grid trick */}
@@ -432,7 +473,7 @@ export function HabitCard({
             {/* Life Significance */}
             {habit.lifeSignificance && (
               <div>
-                <p className={cn('text-[10px] uppercase tracking-wider font-semibold mb-0.5', hasEvidenceBg ? 'text-white/60' : 'text-gray-400')}>
+                <p className={cn('text-[10px] uppercase tracking-wider font-semibold mb-0.5', hasEvidenceBg ? 'text-white/60' : 'text-muted-foreground')}>
                   {t('lifeSignificance')}
                 </p>
                 <p className={cn('text-sm', hasEvidenceBg ? 'text-white/90' : 'text-foreground/80')}>

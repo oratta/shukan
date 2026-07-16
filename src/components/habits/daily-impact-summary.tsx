@@ -95,7 +95,7 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
       )}
     >
       <p className={cn(
-        'text-xs font-semibold',
+        'text-[11px] font-semibold uppercase tracking-wider',
         isPerfect ? 'text-success' : 'text-muted-foreground'
       )}>
         {isPerfect ? <><PartyPopper className="mr-1 inline size-3.5" />{t('perfect')}</> : t('todayImpact')}
@@ -106,50 +106,50 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
         <div className="flex flex-col">
           <div className="flex items-center gap-1">
             <HeartPulse className="size-3.5 text-success" />
-            <span className="text-sm font-bold text-success">
+            <span className="text-sm font-bold tabular-nums text-success">
               {isPerfect
                 ? `+${formatHealthMinutes(earned.healthMinutes)}`
                 : `+${formatHealthMinutes(earned.healthMinutes)}`}
             </span>
             {!isPerfect && (
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs tabular-nums text-muted-foreground">
                 /{formatHealthMinutes(total.healthMinutes)}
               </span>
             )}
           </div>
-          <span className="text-[9px] font-medium text-[#9C9B99]">{t('dailyHealth')}</span>
+          <span className="text-[9px] font-medium text-muted-foreground">{t('dailyHealth')}</span>
         </div>
 
         {/* Cost */}
         <div className="flex flex-col">
           <div className="flex items-center gap-1">
             <Wallet className="size-3.5 text-success" />
-            <span className="text-sm font-bold text-success">
+            <span className="text-sm font-bold tabular-nums text-success">
               {formatCurrency(earned.costSaving, false)}
             </span>
             {!isPerfect && (
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs tabular-nums text-muted-foreground">
                 /{formatCurrency(total.costSaving, false)}
               </span>
             )}
           </div>
-          <span className="text-[9px] font-medium text-[#9C9B99]">{t('dailyCost')}</span>
+          <span className="text-[9px] font-medium text-muted-foreground">{t('dailyCost')}</span>
         </div>
 
         {/* Income */}
         <div className="flex flex-col">
           <div className="flex items-center gap-1">
             <TrendingUp className="size-3.5 text-success" />
-            <span className="text-sm font-bold text-success">
+            <span className="text-sm font-bold tabular-nums text-success">
               {formatCurrency(earned.incomeGain, false)}
             </span>
             {!isPerfect && (
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs tabular-nums text-muted-foreground">
                 /{formatCurrency(total.incomeGain, false)}
               </span>
             )}
           </div>
-          <span className="text-[9px] font-medium text-[#9C9B99]">{t('dailyIncome')}</span>
+          <span className="text-[9px] font-medium text-muted-foreground">{t('dailyIncome')}</span>
         </div>
 
         {/* Positive mood (4th axis) — この画面（DailyImpactSummary）に限り値が0でも常時表示（F10）。
@@ -157,61 +157,61 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
         <div className="flex flex-col">
           <div className="flex items-center gap-1">
             <Smile className="size-3.5 text-success" />
-            <span className="text-sm font-bold text-success">
+            <span className="text-sm font-bold tabular-nums text-success">
               +{formatHealthMinutes(earned.positiveMoodMinutes)}
             </span>
             {!isPerfect && (
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs tabular-nums text-muted-foreground">
                 /{formatHealthMinutes(total.positiveMoodMinutes)}
               </span>
             )}
           </div>
-          <span className="text-[9px] font-medium text-[#9C9B99]">{t('dailyPositiveMood')}</span>
+          <span className="text-[9px] font-medium text-muted-foreground">{t('dailyPositiveMood')}</span>
         </div>
       </div>
 
       {/* 5 Days Impact */}
       <div className="mt-3 border-t border-border pt-3">
-        <p className="text-xs font-semibold text-muted-foreground">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
           {t('fiveDaysImpact')}
         </p>
         <div className="mt-2 flex flex-wrap items-end gap-x-5 gap-y-1.5">
           <div className="flex flex-col">
             <div className="flex items-center gap-1">
               <HeartPulse className="size-3.5 text-success" />
-              <span className="text-sm font-bold text-success">
+              <span className="text-sm font-bold tabular-nums text-success">
                 +{formatHealthMinutes(fiveDays.healthMinutes)}
               </span>
             </div>
-            <span className="text-[9px] font-medium text-[#9C9B99]">{t('dailyHealth')}</span>
+            <span className="text-[9px] font-medium text-muted-foreground">{t('dailyHealth')}</span>
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-1">
               <Wallet className="size-3.5 text-success" />
-              <span className="text-sm font-bold text-success">
+              <span className="text-sm font-bold tabular-nums text-success">
                 {formatCurrency(fiveDays.costSaving, false)}
               </span>
             </div>
-            <span className="text-[9px] font-medium text-[#9C9B99]">{t('dailyCost')}</span>
+            <span className="text-[9px] font-medium text-muted-foreground">{t('dailyCost')}</span>
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-1">
               <TrendingUp className="size-3.5 text-success" />
-              <span className="text-sm font-bold text-success">
+              <span className="text-sm font-bold tabular-nums text-success">
                 {formatCurrency(fiveDays.incomeGain, false)}
               </span>
             </div>
-            <span className="text-[9px] font-medium text-[#9C9B99]">{t('dailyIncome')}</span>
+            <span className="text-[9px] font-medium text-muted-foreground">{t('dailyIncome')}</span>
           </div>
           {/* 4th axis — 今日の表示と揃え、値0でも常時表示（F10） */}
           <div className="flex flex-col">
             <div className="flex items-center gap-1">
               <Smile className="size-3.5 text-success" />
-              <span className="text-sm font-bold text-success">
+              <span className="text-sm font-bold tabular-nums text-success">
                 +{formatHealthMinutes(fiveDays.positiveMoodMinutes)}
               </span>
             </div>
-            <span className="text-[9px] font-medium text-[#9C9B99]">{t('dailyPositiveMood')}</span>
+            <span className="text-[9px] font-medium text-muted-foreground">{t('dailyPositiveMood')}</span>
           </div>
         </div>
       </div>

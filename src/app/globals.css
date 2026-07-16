@@ -54,6 +54,10 @@
   --color-impact-income: var(--impact-income);
   --color-impact-bg: var(--impact-bg);
   --color-streak: var(--streak);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-skipped: var(--skipped);
+  --color-track: var(--track);
 }
 
 :root {
@@ -99,6 +103,11 @@
   --impact-income: oklch(0.55 0.12 250);
   --impact-bg: oklch(0.97 0.01 85);
   --streak: oklch(0.65 0.12 30);
+  /* Danger = Coral (#D08068) / Skipped = Slate (#9CA3AF) / Track = 進捗リング下地 */
+  --danger: oklch(0.66 0.1 40);
+  --danger-foreground: oklch(1 0 0);
+  --skipped: oklch(0.72 0.02 260);
+  --track: oklch(0.9 0.005 260);
 }
 
 .dark {
@@ -142,6 +151,10 @@
   --impact-income: oklch(0.65 0.12 250);
   --impact-bg: oklch(0.25 0.02 85);
   --streak: oklch(0.7 0.12 30);
+  --danger: oklch(0.68 0.11 40);
+  --danger-foreground: oklch(0.16 0.02 40);
+  --skipped: oklch(0.6 0.02 260);
+  --track: oklch(0.42 0.02 260);
 }
 
 @layer base {
@@ -234,4 +247,45 @@
 
 .onb-kpi-bump {
   animation: onbKpiBump 0.6s ease;
+}
+
+/* ───────── シネマティック・バナー（A案: 習慣カードの写真バナー） ───────── */
+
+/* 写真の上に載る白文字の可読性を、全面スクリムではなく影で確保する。
+   写真の「光」を残したまま、タイトル/ラベルだけを浮かせる意図。 */
+.banner-title {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55), 0 2px 14px rgba(0, 0, 0, 0.45);
+}
+
+.banner-label {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+/* 下→上の映画的スクリム。下部は濃く（テキスト面）、上部は写真をほぼ素通し。
+   左からもわずかに敷いて左下のタイトル面をさらに持ち上げる。 */
+.banner-scrim {
+  background:
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.82) 0%,
+      rgba(0, 0, 0, 0.5) 32%,
+      rgba(0, 0, 0, 0.18) 62%,
+      rgba(0, 0, 0, 0.02) 100%
+    ),
+    linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.42) 0%,
+      rgba(0, 0, 0, 0.12) 46%,
+      rgba(0, 0, 0, 0) 72%
+    );
+}
+
+/* 展開時の下半分。写真を写真として残しつつ、ガラスパネルの背後を落ち着かせる。 */
+.banner-scrim-expanded {
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.72) 0%,
+    rgba(0, 0, 0, 0.6) 55%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
 }
