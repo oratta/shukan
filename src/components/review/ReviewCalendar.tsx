@@ -3,7 +3,6 @@
 import { useLocale, useTranslations } from 'next-intl';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { MOOD_ICONS } from '@/lib/mood-icons';
 import type { DailyReflection } from '@/types/habit';
 import type { MonthlyHabitCompletion } from '@/lib/supabase/habits';
 import { ReviewDayDetail } from './ReviewDayDetail';
@@ -21,10 +20,14 @@ interface ReviewCalendarProps {
   onDateSelect: (date: string) => void;
 }
 
+// ムードのドット色は DESIGN §8 の Mood Icons スペクトル（意図的例外#3）に揃える。
+// 5=green / 4=lime / 3=中立(muted) / 2=orange / 1=red。3 に amber を使わない（原則①）。
 function getMoodDotColor(mood: number | undefined): string {
   if (mood === undefined) return '';
-  if (mood >= 4) return 'bg-green-400';
-  if (mood === 3) return 'bg-yellow-400';
+  if (mood >= 5) return 'bg-green-500';
+  if (mood === 4) return 'bg-lime-500';
+  if (mood === 3) return 'bg-muted-foreground';
+  if (mood === 2) return 'bg-orange-400';
   return 'bg-red-400';
 }
 
@@ -155,7 +158,7 @@ export function ReviewCalendar({
                 className={cn(
                   'flex flex-col items-center justify-center rounded-lg py-1.5 gap-0.5 transition-all text-xs font-medium',
                   isFuture
-                    ? 'text-gray-300 dark:text-gray-600 opacity-50 cursor-default'
+                    ? 'text-muted-foreground/40 cursor-default'
                     : 'hover:bg-muted cursor-pointer',
                   isSelected && 'ring-2 ring-primary bg-primary/5'
                 )}
