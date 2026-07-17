@@ -91,7 +91,7 @@ export function ImpactBadge(props: ImpactBadgeProps) {
   // onImage（写真上白ガラス）は従来どおり白系。default は success(緑)。
   const iconClass = bare ? 'text-foreground dark:text-white' : light ? 'text-white' : 'text-success';
   const valueClass = bare ? 'text-foreground dark:text-white' : light ? 'text-white' : 'text-success';
-  const labelClass = bare ? 'text-muted-foreground dark:text-white/70' : light ? 'text-white/70' : 'text-[#9C9B99]';
+  const labelClass = bare ? 'text-muted-foreground dark:text-white/70' : light ? 'text-white/70' : 'text-muted-foreground';
 
   const Wrapper = props.onTap ? 'button' : 'div';
   const wrapperProps = props.onTap

@@ -32,7 +32,7 @@ export function SavingsCard({ savings, surface = 'default' }: SavingsCardProps) 
   // v2: bare（ホーム展開のガラスボックス内）は light=インク / dark=白。PiggyBank ラベルは
   // 「累積＝積み上げ」の意味なので success(緑) を維持し、内訳の数値だけ中立にする。
   const labelColor = bare ? 'text-success' : light ? 'text-white' : 'text-success';
-  const valuesColor = bare ? 'text-muted-foreground dark:text-white/80' : light ? 'text-white/80' : 'text-[#6D6C6A]';
+  const valuesColor = bare ? 'text-muted-foreground dark:text-white/80' : light ? 'text-white/80' : 'text-muted-foreground';
 
   return (
     <div className={cn('flex items-center justify-between', chrome)}>

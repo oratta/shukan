@@ -65,7 +65,9 @@ function DayStatusDot({
   );
 }
 
-const CELEBRATION_COLORS = ['#4CAF76', '#5BAF7A', '#A8D5BA', '#D4AF37', '#E8C97A', '#7AB89B'];
+// 達成時の紙吹雪パーティクル。装飾だが「達成＝緑」の意味に沿わせ、全粒を success トークンで
+// 統一する（旧: 虹色 hex 直書き）。恣意的な装飾色は使わない（DESIGN.md「意味だけが色を持つ」）。
+const CELEBRATION_COLORS = Array.from({ length: 6 }, () => 'var(--success)');
 
 function CelebrationEffect() {
   return (
@@ -563,8 +565,9 @@ export function HabitCard({
                 <Maximize2 className="size-4" />
                 {t('detail')}
               </button>
-              {/* F19: スキップは中立操作。緑以外の中立アクセント（primary=スレート/白ガラス）＋
-                  リングで押せる affordance を明示。skipped 中は amber。 */}
+              {/* スキップは中立操作。緑以外の中立アクセント（primary=インク/白ガラス）＋リングで
+                  affordance を明示。v2: skipped 中の状態も琥珀をやめ無彩色（muted）に。休止＝注意は
+                  色ではなく濃淡で示す（DESIGN.md「警告的注意は無彩色+濃淡で」）。 */}
               <button
                 type="button"
                 onClick={(e) => {
@@ -574,7 +577,7 @@ export function HabitCard({
                 className={cn(
                   'flex shrink-0 items-center justify-center gap-1 rounded-lg px-3 py-2.5 text-sm font-medium ring-1 transition-colors',
                   isSkipped
-                    ? 'bg-amber-100 text-amber-700 ring-amber-200 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:ring-amber-900/40 dark:hover:bg-amber-900/50'
+                    ? 'bg-muted text-foreground ring-border hover:bg-muted/70'
                     : hasEvidenceBg
                       ? 'bg-primary/10 text-primary ring-primary/20 hover:bg-primary/20 dark:bg-white/15 dark:text-white dark:ring-white/30 dark:hover:bg-white/25'
                       : 'bg-primary/10 text-primary ring-primary/20 hover:bg-primary/20'
