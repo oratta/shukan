@@ -16,7 +16,7 @@ import { calculateAnnualImpact, formatHealthMinutes, formatCurrency } from '@/li
 import { HabitIcon } from '@/components/ui/habit-icon';
 import { EstimateDisclaimer } from '@/components/habits/estimate-disclaimer';
 import { EvidencePicker } from '@/components/habits/evidence-picker';
-import { HelpButton } from '@/components/ui/help-button';
+import { HelpButton } from '@/components/help/help-button';
 import type { HabitEvidence, ArticleId } from '@/types/impact';
 
 interface EvidenceManagerSheetProps {
@@ -98,9 +98,7 @@ export function EvidenceManagerSheet({
           <div className="flex shrink-0 items-center justify-between border-b px-5 py-4">
             <div className="flex items-center gap-2">
               <h2 className="text-lg font-bold">{t('manage')}</h2>
-              <HelpButton title={t('weight')}>
-                <p>{t('weightAbout')}</p>
-              </HelpButton>
+              <HelpButton topic="evidenceWeight" />
             </div>
             <button
               type="button"
