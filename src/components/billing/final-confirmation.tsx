@@ -63,6 +63,22 @@ function interpolate(template: string, vars: Record<string, string>): string {
   );
 }
 
+// Interpolation that renders each substituted value in Geist Mono + tabular-nums
+// so charged amounts read as clean digits (DESIGN §6 / ⑥). Label text stays sans.
+function interpolateMono(template: string, vars: Record<string, string>) {
+  return template.split(/(\{\w+\})/).map((part, i) => {
+    const key = part.match(/^\{(\w+)\}$/)?.[1];
+    if (key && key in vars) {
+      return (
+        <span key={i} className="font-mono tabular-nums">
+          {vars[key]}
+        </span>
+      );
+    }
+    return part;
+  });
+}
+
 export function FinalConfirmation({
   plan,
   locale = 'ja',
@@ -101,11 +117,11 @@ export function FinalConfirmation({
             <h3 className="text-sm font-semibold">{m.priceHeading}</h3>
             <p className="mt-1 text-sm leading-relaxed text-foreground">
               {plan === 'monthly'
-                ? interpolate(m.perCycleMonthly, { price: perCyclePrice })
-                : interpolate(m.perCycleAnnual, { price: perCyclePrice })}
+                ? interpolateMono(m.perCycleMonthly, { price: perCyclePrice })
+                : interpolateMono(m.perCycleAnnual, { price: perCyclePrice })}
             </p>
             <p className="mt-1 text-sm font-medium text-foreground">
-              {m.annualTotalLabel}：{interpolate(m.annualTotalValue, { total: annualTotalStr })}
+              {m.annualTotalLabel}：{interpolateMono(m.annualTotalValue, { total: annualTotalStr })}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">{m.taxNote}</p>
           </div>
@@ -138,7 +154,8 @@ export function FinalConfirmation({
               {m.lifetimeBody}
             </p>
             <p className="mt-2 text-sm font-medium text-foreground">
-              {m.lifetimePriceLabel}：{perCyclePrice}
+              {m.lifetimePriceLabel}：
+              <span className="font-mono tabular-nums">{perCyclePrice}</span>
             </p>
             <p className="mt-1 text-xs text-muted-foreground">{m.taxNote}</p>
           </div>

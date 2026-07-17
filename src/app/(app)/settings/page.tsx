@@ -121,13 +121,13 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold tracking-tight">
+      <h2 className="text-[28px] font-bold leading-tight tracking-tight">
         {t('settings.title')}
       </h2>
 
       {user && (
-        <Card className="p-4">
-          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+        <Card className="p-4 shadow-none">
+          <h3 className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
             {t('settings.account')}
           </h3>
 
@@ -174,7 +174,7 @@ export default function SettingsPage() {
       )}
 
       {user && profileLoading && (
-        <Card className="flex items-center justify-center p-8">
+        <Card className="flex items-center justify-center p-8 shadow-none">
           <div
             role="status"
             aria-label={t('common.loading')}
@@ -187,8 +187,8 @@ export default function SettingsPage() {
         <ProfileEditor profile={profile} onSave={saveProfile} />
       )}
 
-      <Card className="p-4">
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+      <Card className="p-4 shadow-none">
+        <h3 className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
           {t('settings.appearance')}
         </h3>
 
@@ -234,8 +234,8 @@ export default function SettingsPage() {
         </div>
       </Card>
 
-      <Card className="p-4">
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+      <Card className="p-4 shadow-none">
+        <h3 className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
           {tPwa('help.title')}
         </h3>
         <Button
@@ -250,8 +250,8 @@ export default function SettingsPage() {
       </Card>
 
       {user && (
-        <Card className="p-4 border-red-200 dark:border-red-900">
-          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-destructive">
+        <Card className="p-4 shadow-none border-destructive/30">
+          <h3 className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-destructive">
             {t('settings.deleteAccount')}
           </h3>
 
@@ -300,8 +300,8 @@ export default function SettingsPage() {
 
       {/* アプリ内フィードバック導線（issue #19） */}
       {user && (
-        <Card className="p-4">
-          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+        <Card className="p-4 shadow-none">
+          <h3 className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
             {t('feedback.title')}
           </h3>
           <p className="mb-3 text-sm text-muted-foreground">
@@ -319,13 +319,13 @@ export default function SettingsPage() {
         </Card>
       )}
 
-      <Card className="p-4">
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+      <Card className="p-4 shadow-none">
+        <h3 className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
           {t('settings.about')}
         </h3>
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">{t('settings.version')}</span>
-          <span className="font-mono">1.0.0</span>
+          <span className="font-mono tabular-nums">1.0.0</span>
         </div>
       </Card>
 
@@ -338,8 +338,8 @@ export default function SettingsPage() {
         />
       )}
 
-      <Card className="p-4">
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+      <Card className="p-4 shadow-none">
+        <h3 className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
           {t('settings.legal')}
         </h3>
         <div className="space-y-1">

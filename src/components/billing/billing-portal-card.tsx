@@ -41,9 +41,9 @@ export function BillingPortalCard({
   return (
     <section
       data-billing-portal-card
-      className="space-y-3 rounded-lg border border-border p-4"
+      className="space-y-3 rounded-xl border border-border p-4"
     >
-      <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+      <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
         {m.heading}
       </h3>
 
