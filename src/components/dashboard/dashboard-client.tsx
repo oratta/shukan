@@ -6,7 +6,7 @@ import { HabitList } from '@/components/habits/habit-list';
 import { HabitForm } from '@/components/habits/habit-form';
 import { HabitActions } from '@/components/habits/habit-actions';
 import { HabitDetailModal } from '@/components/habits/habit-detail-modal';
-import { VsTemptationModal } from '@/components/habits/vs-temptation-modal';
+import { HabitActionSheet } from '@/components/habits/habit-action-sheet';
 import { EvidenceArticleSheet } from '@/components/habits/evidence-article-sheet';
 import { DailyImpactSummary } from '@/components/habits/daily-impact-summary';
 import { EstablishedSection } from '@/components/habits/established-section';
@@ -47,10 +47,6 @@ export function DashboardClient({
     updateHabit,
     deleteHabit,
     setDayStatus,
-    copingStepsMap,
-    urgeLogs,
-    startUrgeFlow,
-    completeUrgeStep,
     useRocket,
     reorderHabits,
     addEvidence,
@@ -64,7 +60,8 @@ export function DashboardClient({
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [actionsHabitId, setActionsHabitId] = useState<string | null>(null);
   const [detailHabitId, setDetailHabitId] = useState<string | null>(null);
-  const [vsHabitId, setVsHabitId] = useState<string | null>(null);
+  // 長押しアクションシートの対象（issue #104）。habitId + 対象日（過去日も来る）
+  const [actionSheetTarget, setActionSheetTarget] = useState<{ habitId: string; date: string } | null>(null);
   const [openArticleId, setOpenArticleId] = useState<string | null>(null);
 
   // 3場面構造: デイリーチェックリスト・積み上げ表示は active（デイリー追跡）習慣のみ。
@@ -72,8 +69,8 @@ export function DashboardClient({
   // 下部の「身についた習慣」セクションに生涯効果として表示する。
   const todayHabits = useMemo(() => {
     const filtered = habits.filter(isDailyTrackedHabit);
-    return getHabitsWithStats(filtered, completions, urgeLogs, copingStepsMap, getArticle);
-  }, [habits, completions, urgeLogs, copingStepsMap]);
+    return getHabitsWithStats(filtered, completions, getArticle);
+  }, [habits, completions]);
 
   const establishedHabits = useMemo(
     () => habits.filter(isEstablishedHabit),
@@ -155,9 +152,19 @@ export function DashboardClient({
     [todayHabits, detailHabitId]
   );
 
-  const vsHabit = useMemo(
-    () => todayHabits.find((h) => h.id === vsHabitId) ?? null,
-    [todayHabits, vsHabitId]
+  const actionSheetHabit = useMemo(
+    () => todayHabits.find((h) => h.id === actionSheetTarget?.habitId) ?? null,
+    [todayHabits, actionSheetTarget]
+  );
+
+  const actionSheetCompletion = useMemo(
+    () =>
+      actionSheetTarget
+        ? completions.find(
+            (c) => c.habitId === actionSheetTarget.habitId && c.date === actionSheetTarget.date
+          ) ?? null
+        : null,
+    [completions, actionSheetTarget]
   );
 
   const handleAdd = useCallback(() => {
@@ -186,13 +193,12 @@ export function DashboardClient({
   const handleSubmit = useCallback(
     (
       data: HabitInsertInput,
-      copingSteps?: { title: string; sortOrder: number }[],
       initialEvidences?: { articleId: string; weight: number }[]
     ) => {
       if (editingHabit) {
-        updateHabit(editingHabit.id, data, copingSteps, initialEvidences);
+        updateHabit(editingHabit.id, data, initialEvidences);
       } else {
-        addHabit(data, copingSteps, initialEvidences);
+        addHabit(data, initialEvidences);
       }
       setEditingHabit(null);
     },
@@ -203,8 +209,8 @@ export function DashboardClient({
     setDetailHabitId(id);
   }, []);
 
-  const handleOpenVsTemptation = useCallback((id: string) => {
-    setVsHabitId(id);
+  const handleOpenActionSheet = useCallback((habitId: string, date: string) => {
+    setActionSheetTarget({ habitId, date });
   }, []);
 
   const handleDelete = useCallback(() => {
@@ -287,7 +293,7 @@ export function DashboardClient({
         onDayStatusChange={setDayStatus}
         onAdd={handleAdd}
         onOpenDetail={handleOpenDetail}
-        onOpenVsTemptation={handleOpenVsTemptation}
+        onOpenActionSheet={handleOpenActionSheet}
         onReorder={reorderHabits}
         onSkipToday={handleSkipToday}
         onOpenArticle={(articleId) => setOpenArticleId(articleId)}
@@ -301,13 +307,6 @@ export function DashboardClient({
         onSubmit={handleSubmit}
         onDelete={editingHabit ? handleFormDelete : undefined}
         initialData={editingHabit ?? undefined}
-        initialCopingSteps={
-          editingHabit
-            ? copingStepsMap
-                ?.get(editingHabit.id)
-                ?.map((s) => ({ title: s.title, sortOrder: s.sortOrder }))
-            : undefined
-        }
       />
 
       <HabitActions
@@ -340,15 +339,21 @@ export function DashboardClient({
         onSetWeight={setEvidenceWeight}
       />
 
-      <VsTemptationModal
-        open={!!vsHabitId}
-        onOpenChange={(open) => !open && setVsHabitId(null)}
-        habit={vsHabit}
-        onStartFlow={() => startUrgeFlow(vsHabitId!)}
-        onCompleteStep={completeUrgeStep}
-        onFailed={() => {
-          if (vsHabitId) {
-            setDayStatus(vsHabitId, getTodayString(), 'failed');
+      <HabitActionSheet
+        open={!!actionSheetTarget}
+        onOpenChange={(open) => !open && setActionSheetTarget(null)}
+        habit={actionSheetHabit}
+        date={actionSheetTarget?.date ?? null}
+        currentStatus={(actionSheetCompletion?.status ?? 'none') as 'completed' | 'failed' | 'none' | 'rocket_used' | 'skipped'}
+        currentNote={actionSheetCompletion?.note ?? ''}
+        onSetStatus={(status, opts) => {
+          if (actionSheetTarget) {
+            setDayStatus(actionSheetTarget.habitId, actionSheetTarget.date, status, opts);
+          }
+        }}
+        onSaveNote={(note) => {
+          if (actionSheetTarget) {
+            updateNote(actionSheetTarget.habitId, actionSheetTarget.date, note);
           }
         }}
       />

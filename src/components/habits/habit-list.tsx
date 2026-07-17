@@ -25,7 +25,8 @@ interface HabitListProps {
   onDayStatusChange: (habitId: string, date: string, status: 'completed' | 'failed' | 'none' | 'skipped') => void;
   onAdd: () => void;
   onOpenDetail: (id: string) => void;
-  onOpenVsTemptation: (id: string) => void;
+  /** 長押しで対象日のアクションシートを開く（issue #104） */
+  onOpenActionSheet: (habitId: string, date: string) => void;
   onReorder: (orderedIds: string[]) => void;
   onSkipToday: (id: string) => void;
   /** 推定値タップで算出根拠（エビデンス記事）を開く導線（issue #39） */
@@ -37,7 +38,7 @@ export function HabitList({
   onDayStatusChange,
   onAdd,
   onOpenDetail,
-  onOpenVsTemptation,
+  onOpenActionSheet,
   onReorder,
   onSkipToday,
   onOpenArticle,
@@ -126,7 +127,7 @@ export function HabitList({
                       onToggleExpand={handleToggleExpand}
                       onDayStatusChange={onDayStatusChange}
                       onOpenDetail={onOpenDetail}
-                      onOpenVsTemptation={onOpenVsTemptation}
+                      onOpenActionSheet={onOpenActionSheet}
                       onSkipToday={onSkipToday}
                       onOpenArticle={onOpenArticle}
                     />
@@ -155,7 +156,7 @@ export function HabitList({
                       onToggleExpand={handleToggleExpand}
                       onDayStatusChange={onDayStatusChange}
                       onOpenDetail={onOpenDetail}
-                      onOpenVsTemptation={onOpenVsTemptation}
+                      onOpenActionSheet={onOpenActionSheet}
                       onSkipToday={onSkipToday}
                       onOpenArticle={onOpenArticle}
                     />

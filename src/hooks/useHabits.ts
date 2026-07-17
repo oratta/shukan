@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import type { Habit, HabitInsertInput, HabitCompletion, HabitWithStats, CopingStep, UrgeLog } from '@/types/habit';
+import type { Habit, HabitInsertInput, HabitCompletion, HabitWithStats } from '@/types/habit';
 import { useAuth } from '@/components/auth-provider';
 import { track } from '@/lib/analytics';
 import { getTodayString, getHabitsWithStats } from '@/lib/habits';
@@ -14,11 +14,6 @@ import {
   deleteHabitById,
   deleteCompletion,
   upsertCompletion,
-  fetchCopingStepsByHabitIds,
-  upsertCopingSteps,
-  fetchUrgeLogsForDate,
-  insertUrgeLog,
-  updateUrgeLog,
   redeemRocketOnDate,
   updateHabitSortOrders,
   insertHabitEvidence,
@@ -55,8 +50,6 @@ export function useHabits(initialData?: InitialHabitData | null) {
   const initial = computeInitialHabitState(initialData);
   const [habits, setHabits] = useState<Habit[]>(initial.habits);
   const [completions, setCompletions] = useState<HabitCompletion[]>(initial.completions);
-  const [copingStepsMap, setCopingStepsMap] = useState<Map<string, CopingStep[]>>(new Map());
-  const [urgeLogs, setUrgeLogs] = useState<UrgeLog[]>([]);
   const [loading, setLoading] = useState(initial.loading);
   // prefetch は「初回1回だけ」消費する。ログアウト→再ログイン等の再ロードでは使わない。
   const pendingInitialRef = useRef<InitialHabitData | null>(initialData ?? null);
@@ -73,8 +66,6 @@ export function useHabits(initialData?: InitialHabitData | null) {
       pendingInitialRef.current = null;
       setHabits([]);
       setCompletions([]);
-      setCopingStepsMap(new Map());
-      setUrgeLogs([]);
       setLoading(false);
       return;
     }
@@ -85,33 +76,14 @@ export function useHabits(initialData?: InitialHabitData | null) {
 
     async function load() {
       try {
-        let h: Habit[];
         if (prefetched) {
           // habits/completions は SSR 済み。ここでは再フェッチしない（初回読み込みのみの最適化）。
-          h = prefetched.habits;
-        } else {
-          const [h2, c] = await Promise.all([fetchHabits(), fetchCompletions()]);
-          if (cancelled) return;
-          setHabits(h2);
-          setCompletions(c);
-          h = h2;
+          return;
         }
-
-        // Load coping steps for quit habits (single batch query)
-        const quitHabits = h.filter((habit) => habit.type === 'quit');
-        if (quitHabits.length > 0) {
-          const stepsMap = await fetchCopingStepsByHabitIds(quitHabits.map((habit) => habit.id));
-          if (!cancelled) {
-            setCopingStepsMap(stepsMap);
-          }
-        }
-
-        // Load today's urge logs
-        const today = getTodayString();
-        const logs = await fetchUrgeLogsForDate(today);
-        if (!cancelled) {
-          setUrgeLogs(logs);
-        }
+        const [h, c] = await Promise.all([fetchHabits(), fetchCompletions()]);
+        if (cancelled) return;
+        setHabits(h);
+        setCompletions(c);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -124,15 +96,10 @@ export function useHabits(initialData?: InitialHabitData | null) {
   const addHabit = useCallback(
     async (
       habit: HabitInsertInput,
-      copingSteps?: { title: string; sortOrder: number }[],
       initialEvidences?: { articleId: string; weight: number }[]
     ) => {
       if (!user) return;
       const newHabit = await insertHabit(user.id, habit);
-      if (copingSteps && copingSteps.length > 0 && newHabit.type === 'quit') {
-        const steps = await upsertCopingSteps(newHabit.id, copingSteps);
-        setCopingStepsMap((prev) => new Map(prev).set(newHabit.id, steps));
-      }
       if (initialEvidences && initialEvidences.length > 0) {
         const evs = await replaceHabitEvidences(newHabit.id, initialEvidences);
         newHabit.evidences = evs;
@@ -140,7 +107,6 @@ export function useHabits(initialData?: InitialHabitData | null) {
       setHabits((prev) => [...prev, newHabit]);
       track('habit_created', {
         habit_type: newHabit.type,
-        coping_steps_count: copingSteps?.length ?? 0,
         evidence_count: initialEvidences?.length ?? 0,
       });
       return newHabit;
@@ -152,7 +118,6 @@ export function useHabits(initialData?: InitialHabitData | null) {
     async (
       id: string,
       updates: Partial<Omit<Habit, 'id' | 'createdAt'>>,
-      copingSteps?: { title: string; sortOrder: number }[],
       newEvidences?: { articleId: string; weight: number }[]
     ) => {
       await updateHabitById(id, updates);
@@ -166,10 +131,6 @@ export function useHabits(initialData?: InitialHabitData | null) {
       setHabits((prev) =>
         prev.map((h) => (h.id === id ? { ...h, ...safeUpdates } : h))
       );
-      if (copingSteps) {
-        const steps = await upsertCopingSteps(id, copingSteps);
-        setCopingStepsMap((prev) => new Map(prev).set(id, steps));
-      }
       if (newEvidences) {
         const evs = await replaceHabitEvidences(id, newEvidences);
         setHabits((prev) =>
@@ -186,18 +147,17 @@ export function useHabits(initialData?: InitialHabitData | null) {
       track('habit_deleted', { habit_id: id });
       setHabits((prev) => prev.filter((h) => h.id !== id));
       setCompletions((prev) => prev.filter((c) => c.habitId !== id));
-      setUrgeLogs((prev) => prev.filter((l) => l.habitId !== id));
-      setCopingStepsMap((prev) => {
-        const next = new Map(prev);
-        next.delete(id);
-        return next;
-      });
     },
     []
   );
 
   const setDayStatus = useCallback(
-    async (habitId: string, date: string, status: 'completed' | 'failed' | 'none' | 'skipped') => {
+    async (
+      habitId: string,
+      date: string,
+      status: 'completed' | 'failed' | 'none' | 'skipped',
+      opts?: { resistRate?: number }
+    ) => {
       if (!user) return;
       try {
         if (status === 'none') {
@@ -206,7 +166,7 @@ export function useHabits(initialData?: InitialHabitData | null) {
             prev.filter((c) => !(c.habitId === habitId && c.date === date))
           );
         } else {
-          const updated = await upsertCompletion(user.id, habitId, date, status);
+          const updated = await upsertCompletion(user.id, habitId, date, status, opts);
           setCompletions((prev) => {
             const filtered = prev.filter((c) => !(c.habitId === habitId && c.date === date));
             return [...filtered, updated];
@@ -216,6 +176,7 @@ export function useHabits(initialData?: InitialHabitData | null) {
           habit_id: habitId,
           status,
           is_today: date === getTodayString(),
+          ...(opts?.resistRate !== undefined ? { resist_rate: opts.resistRate } : {}),
         });
       } catch (err) {
         console.error('setDayStatus failed:', err);
@@ -223,45 +184,6 @@ export function useHabits(initialData?: InitialHabitData | null) {
     },
     [user]
   );
-
-  const markQuitDailyDone = useCallback(
-    async (habitId: string) => {
-      if (!user) return;
-      const today = getTodayString();
-      const updated = await upsertCompletion(user.id, habitId, today, 'completed');
-      setCompletions((prev) => {
-        const filtered = prev.filter((c) => !(c.habitId === habitId && c.date === today));
-        return [...filtered, updated];
-      });
-      track('quit_daily_done', { habit_id: habitId });
-    },
-    [user]
-  );
-
-  const startUrgeFlow = useCallback(async (habitId: string): Promise<UrgeLog> => {
-    if (!user) throw new Error('Not authenticated');
-    const today = getTodayString();
-    const log = await insertUrgeLog(user.id, habitId, today);
-    setUrgeLogs((prev) => [...prev, log]);
-    track('urge_flow_started', { habit_id: habitId });
-    return log;
-  }, [user]);
-
-  const completeUrgeStep = useCallback(async (logId: string, stepId: string, allDone: boolean) => {
-    const log = urgeLogs.find((l) => l.id === logId);
-    if (!log) return;
-    const newSteps = [...log.completedSteps, stepId];
-    await updateUrgeLog(logId, newSteps, allDone);
-    if (allDone) {
-      track('urge_flow_completed', {
-        habit_id: log.habitId,
-        steps_count: newSteps.length,
-      });
-    }
-    setUrgeLogs((prev) =>
-      prev.map((l) => l.id === logId ? { ...l, completedSteps: newSteps, allCompleted: allDone } : l)
-    );
-  }, [urgeLogs]);
 
   const useRocket = useCallback(
     async (habitId: string, date: string) => {
@@ -364,8 +286,8 @@ export function useHabits(initialData?: InitialHabitData | null) {
   );
 
   const getStats = useCallback((): HabitWithStats[] => {
-    return getHabitsWithStats(habits, completions, urgeLogs, copingStepsMap, getArticle);
-  }, [habits, completions, urgeLogs, copingStepsMap]);
+    return getHabitsWithStats(habits, completions, getArticle);
+  }, [habits, completions]);
 
   return {
     habits,
@@ -375,12 +297,7 @@ export function useHabits(initialData?: InitialHabitData | null) {
     updateHabit,
     deleteHabit,
     setDayStatus,
-    markQuitDailyDone,
     getStats,
-    copingStepsMap,
-    urgeLogs,
-    startUrgeFlow,
-    completeUrgeStep,
     useRocket,
     reorderHabits,
     addEvidence,

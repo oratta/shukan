@@ -7,10 +7,12 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { getTodayString } from '@/lib/habits';
+import { getTodayString, nextStatus } from '@/lib/habits';
+import { useLongPress } from '@/hooks/useLongPress';
 import { ImpactBadge } from '@/components/habits/impact-badge';
 import { SavingsCard } from '@/components/habits/savings-card';
 import { getEvidenceHeroImage } from '@/data/evidence-hero-images';
+import { failedFillStyle } from '@/components/habits/failed-fill';
 import type { DayStatus, HabitWithStats } from '@/types/habit';
 
 // F15: デイリー習慣カード背景に敷くエビデンス画像コラージュの最大枚数。
@@ -23,42 +25,43 @@ interface HabitCardProps {
   onToggleExpand: (id: string) => void;
   onDayStatusChange: (habitId: string, date: string, status: 'completed' | 'failed' | 'none' | 'skipped') => void;
   onOpenDetail: (id: string) => void;
-  onOpenVsTemptation: (id: string) => void;
+  /** 長押しで対象日のアクションシート（失敗/スキップ/メモ）を開く（issue #104） */
+  onOpenActionSheet: (habitId: string, date: string) => void;
   onSkipToday: (id: string) => void;
   /** 推定値（ImpactBadge）タップで算出根拠（エビデンス記事）へ 1 タップ到達する導線（issue #39） */
   onOpenArticle?: (articleId: string) => void;
 }
 
-function nextStatus(current: DayStatus['status']): 'completed' | 'failed' | 'none' {
-  if (current === 'none') return 'completed';
-  if (current === 'completed' || current === 'rocket_used') return 'failed';
-  return 'none';
-}
-
 function DayStatusDot({
   day,
-  onTap,
+  onOpen,
 }: {
   day: DayStatus;
-  onTap: () => void;
+  onOpen: () => void;
 }) {
   const { status } = day;
 
   return (
+    // 過去日は小ターゲットに精密操作を要求しない: タップ一発でアクションシートを開き、
+    // 操作はシート内の大きなボタンで完結させる（案A）。不可視パディングでタッチターゲットも拡大。
     <button
       type="button"
       onClick={(e) => {
         e.stopPropagation();
-        onTap();
+        onOpen();
       }}
-      className={cn(
-        'flex items-center justify-center rounded-full size-3 transition-all',
-        (status === 'completed' || status === 'rocket_used') && 'bg-success',
-        status === 'failed' && 'bg-[#D08068]',
-        status === 'none' && 'border border-gray-300 bg-transparent',
-        status === 'skipped' && 'bg-gray-300',
-      )}
-    />
+      className="-m-1.5 flex items-center justify-center p-1.5"
+    >
+      <span
+        className={cn(
+          'flex items-center justify-center rounded-full size-3 transition-all',
+          (status === 'completed' || status === 'rocket_used') && 'bg-success',
+          status === 'none' && 'border border-gray-300 bg-transparent',
+          status === 'skipped' && 'bg-gray-300',
+        )}
+        style={status === 'failed' ? failedFillStyle(day.resistRate) : undefined}
+      />
+    </button>
   );
 }
 
@@ -95,17 +98,18 @@ function CelebrationEffect() {
 function StatusIndicator({
   habit,
   onTapToday,
-  onTapVs,
+  onLongPressToday,
 }: {
   habit: HabitWithStats;
-  onTapToday?: () => void;
-  onTapVs?: () => void;
+  onTapToday: () => void;
+  onLongPressToday: () => void;
 }) {
-  const isQuit = habit.type === 'quit';
   const [showCelebration, setShowCelebration] = useState(false);
   const prevStatusRef = useRef<string | null>(null);
+  const pressHandlers = useLongPress(onLongPressToday, onTapToday);
 
-  const todayStatus = habit.recentDays?.[0]?.status ?? 'none';
+  const today = habit.recentDays?.[0];
+  const todayStatus = today?.status ?? 'none';
 
   // 未完了→完了への遷移を検知して祝福演出を一度だけ表示する意図的パターン。
   useEffect(() => {
@@ -123,77 +127,17 @@ function StatusIndicator({
     prevStatusRef.current = todayStatus;
   }, [todayStatus]);
 
-  // Quit habits: show urge progress ring (tappable to open VS modal)
-  if (isQuit) {
-    const current = habit.todayUrgeCount ?? 0;
-    const target = habit.dailyTarget;
-    const progress = target > 0 ? current / target : 0;
-    const radius = 13;
-    const circumference = 2 * Math.PI * radius;
-    const strokeDashoffset = circumference * (1 - Math.min(progress, 1));
-    const isFailed = todayStatus === 'failed';
-    const isCompleted = todayStatus === 'completed' || todayStatus === 'rocket_used';
-    const isDone = progress >= 1;
-
-    return (
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          onTapVs?.();
-        }}
-        className="relative flex size-8 shrink-0 items-center justify-center cursor-pointer active:scale-90 transition-transform"
-      >
-        {isFailed ? (
-          /* Failed: solid red circle, no progress arc */
-          <div className="flex size-8 items-center justify-center rounded-full bg-[#D08068]" />
-        ) : (isCompleted || isDone) ? (
-          /* Completed: solid green circle */
-          <div className="flex size-8 items-center justify-center rounded-full bg-success">
-            <span className="text-[9px] font-bold text-white">
-              {current}/{target}
-            </span>
-          </div>
-        ) : (
-          /* In progress: gray bg ring + green progress arc */
-          <>
-            <svg width="32" height="32" viewBox="0 0 32 32" className="-rotate-90">
-              <circle
-                cx="16" cy="16" r={radius}
-                fill="none" stroke="#E5E7EB" strokeWidth="2.5"
-              />
-              <circle
-                cx="16" cy="16" r={radius}
-                fill="none" stroke="var(--success)" strokeWidth="2.5"
-                strokeDasharray={circumference}
-                strokeDashoffset={strokeDashoffset}
-                strokeLinecap="round"
-                className="transition-all duration-300"
-              />
-            </svg>
-            <span className="absolute text-[9px] font-bold text-success">
-              {current}/{target}
-            </span>
-          </>
-        )}
-      </button>
-    );
-  }
-
   // Weekly positive habits: status based on weekly target achievement
-  if (!isQuit && habit.frequency === 'weekly') {
+  if (habit.type !== 'quit' && habit.frequency === 'weekly') {
     const weeklyDone = (habit.weeklyCompletedCount ?? 0) >= (habit.weeklyTarget ?? 1);
 
     return (
       <div className="relative flex size-8 shrink-0 items-center justify-center">
         <button
           type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onTapToday?.();
-          }}
+          {...pressHandlers}
           className={cn(
-            'flex size-8 shrink-0 items-center justify-center rounded-full transition-all',
+            'flex size-8 shrink-0 touch-none items-center justify-center rounded-full transition-all',
             weeklyDone ? 'bg-success' : 'border-2 border-gray-300',
           )}
         >
@@ -206,24 +150,30 @@ function StatusIndicator({
     );
   }
 
-  // Positive habits: tappable circle that toggles today's status
+  // Daily habits (positive & quit): tap = 達成の二値トグル、長押し = アクションシート（issue #104）
+  const isFailed = todayStatus === 'failed';
+  const showResistRate = isFailed && today?.resistRate !== undefined && today.resistRate > 0;
+
   return (
     <div className="relative flex size-8 shrink-0 items-center justify-center">
       <button
         type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          onTapToday?.();
-        }}
+        {...pressHandlers}
         className={cn(
-          'flex size-8 shrink-0 items-center justify-center rounded-full transition-all',
+          'flex size-8 shrink-0 touch-none items-center justify-center rounded-full transition-all',
           (todayStatus === 'completed' || todayStatus === 'rocket_used') && 'bg-success',
-          todayStatus === 'failed' && 'bg-[#D08068]',
           todayStatus === 'none' && 'border-2 border-gray-300',
+          todayStatus === 'skipped' && 'bg-gray-300',
         )}
+        style={isFailed ? failedFillStyle(today?.resistRate) : undefined}
       >
         {(todayStatus === 'completed' || todayStatus === 'rocket_used') && (
           <Check className="size-4 text-white" strokeWidth={3} />
+        )}
+        {showResistRate && (
+          <span className="text-[9px] font-bold text-white drop-shadow-sm">
+            {today?.resistRate}%
+          </span>
         )}
       </button>
       {showCelebration && <CelebrationEffect />}
@@ -237,7 +187,7 @@ export function HabitCard({
   onToggleExpand,
   onDayStatusChange,
   onOpenDetail,
-  onOpenVsTemptation,
+  onOpenActionSheet,
   onSkipToday,
   onOpenArticle,
 }: HabitCardProps) {
@@ -356,14 +306,14 @@ export function HabitCard({
           <GripVertical className="size-4" />
         </button>
 
-        {/* Left: Status indicator (tappable for today's toggle) */}
+        {/* Left: Status indicator (tap = 達成トグル, long-press = アクションシート) */}
         <StatusIndicator
           habit={habit}
           onTapToday={() => {
             const todayDay = (habit.recentDays ?? [])[0];
             if (todayDay) handleDotTap(todayDay);
           }}
-          onTapVs={() => onOpenVsTemptation(habit.id)}
+          onLongPressToday={() => onOpenActionSheet(habit.id, today)}
         />
 
         {/* Center: Name + frequency label + past day dots */}
@@ -402,7 +352,10 @@ export function HabitCard({
               return (
                 <div key={day.date} className="flex flex-col items-center gap-0.5">
                   <span className={cn('text-[9px] leading-none', hasEvidenceBg ? 'text-white/70' : 'text-muted-foreground')}>{dayLabel}</span>
-                  <DayStatusDot day={day} onTap={() => handleDotTap(day)} />
+                  <DayStatusDot
+                    day={day}
+                    onOpen={() => onOpenActionSheet(habit.id, day.date)}
+                  />
                 </div>
               );
             })}
