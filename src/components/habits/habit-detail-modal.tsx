@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { Rocket, X, Pencil, ChevronRight, ChevronLeft, Settings, Crown } from 'lucide-react';
+import { Rocket, X, Pencil, ChevronRight, ChevronLeft, Settings, Crown, HeartPulse, Wallet, TrendingUp, Smile } from 'lucide-react';
 import { HabitIcon } from '@/components/ui/habit-icon';
 import {
   Dialog,
@@ -21,7 +21,9 @@ import {
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import { getArticle } from '@/data/impact-articles';
-import { ImpactBadge } from '@/components/habits/impact-badge';
+import { calculateDailyImpact, formatHealthMinutes, formatCurrency } from '@/lib/impact';
+import { ImpactKpiGrid, type ImpactKpiMetric } from '@/components/habits/impact-kpi-grid';
+import { EstimateDisclaimer } from '@/components/habits/estimate-disclaimer';
 import { SavingsCard } from '@/components/habits/savings-card';
 import { EvidenceManagerSheet } from '@/components/habits/evidence-manager-sheet';
 import { HelpButton } from '@/components/ui/help-button';
@@ -114,6 +116,7 @@ export function HabitDetailModal({
   const tHabits = useTranslations('habits');
   const tDays = useTranslations('days');
   const tEvidence = useTranslations('evidence');
+  const tImpact = useTranslations('impact');
   const [rocketConfirmDate, setRocketConfirmDate] = useState<string | null>(null);
   const [evidenceManagerOpen, setEvidenceManagerOpen] = useState(false);
 
@@ -181,6 +184,19 @@ export function HabitDetailModal({
     }
     return set;
   }, [habit]);
+
+  // この習慣の 1 日あたりインパクト（ホーム「今日のライフインパクト」と同じ 4 KPI）。
+  // ホームと同じ ImpactKpiGrid で見せるため metrics 配列に整形する。
+  const kpiMetrics = useMemo<ImpactKpiMetric[] | null>(() => {
+    if (!habit || habit.evidences.length === 0) return null;
+    const daily = calculateDailyImpact(habit.evidences, getArticle);
+    return [
+      { icon: HeartPulse, label: tImpact('dailyHealth'), value: `+${formatHealthMinutes(daily.healthMinutes)}` },
+      { icon: Wallet, label: tImpact('dailyCost'), value: formatCurrency(daily.costSaving, false) },
+      { icon: TrendingUp, label: tImpact('dailyIncome'), value: formatCurrency(daily.incomeGain, false) },
+      { icon: Smile, label: tImpact('dailyPositiveMood'), value: `+${formatHealthMinutes(daily.positiveMoodMinutes)}` },
+    ];
+  }, [habit, tImpact]);
 
   // Resolve evidence articles for display
   const evidenceArticles = useMemo(() => {
@@ -250,57 +266,52 @@ export function HabitDetailModal({
           </div>
         )}
 
-        {/* Impact Badge */}
-        {habit.evidences.length > 0 && (
+        {/* 1日あたりのライフインパクト: ホーム「今日のライフインパクト」(daily-impact-summary) と
+            同じ 2×2 ヘアライングリッド（ImpactKpiGrid 共通部品）。アイコン＋ラベルのキャプション行の下に
+            大きい mono 数値を置く＝画面をまたいで同じ意味を同じ構造で見せる。 */}
+        {kpiMetrics && (
           <div className="px-5">
-            <ImpactBadge
-              evidences={habit.evidences}
-              mode="daily"
-              onTap={
-                onOpenArticle
-                  ? () => onOpenArticle(habit.evidences[0].articleId)
-                  : undefined
-              }
-            />
+            <p className="mb-2 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              {tImpact('perDayImpact')}
+            </p>
+            <ImpactKpiGrid metrics={kpiMetrics} className="overflow-hidden rounded-xl border" />
+            <EstimateDisclaimer className="mt-2" />
           </div>
         )}
 
-        {/* Stats Row。継続中＝積み上げの達成なので success(緑)。最長記録は歴史値なので無彩色（原則①）。
-            数値は Geist Mono + tabular-nums（原則⑥）。30日到達の Crown も達成の記号＝success（琥珀は原則①で不可）。 */}
-        <div className="flex gap-3 px-5">
-          <div className="flex-1 rounded-xl border border-success/20 bg-success/10 p-4">
-            <div className="flex items-baseline gap-1">
-              {habit.currentStreak >= 30 && <Crown className="size-5 text-success" />}
-              <span className="font-mono text-3xl font-bold tabular-nums text-success">
+        {/* 連続日数: stats ページと同じ「塗りなし・ヘアライン罫線グリッド＋巨大 mono 数値」。
+            塗りカードをやめ、緑は面でなく数値・アイコン（達成の記号）に載せる（原則①/⑤）。
+            30日到達の Crown も達成の記号＝success。％は 30日ゴールに対する進捗の従属値。 */}
+        <div className="mx-5 grid grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border">
+          <div className="flex flex-col gap-1.5 bg-card px-5 py-4">
+            <span className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              {t('currentStreak')}
+            </span>
+            <div className="flex items-baseline gap-1.5">
+              {habit.currentStreak >= 30 && <Crown className="size-5 self-center text-success" />}
+              <span className="font-mono text-[32px] font-semibold leading-none tabular-nums text-success">
                 {habit.currentStreak}
               </span>
-              <span className="text-sm text-success/80">
-                {t('days')}
-              </span>
+              <span className="text-sm text-muted-foreground">{t('days')}</span>
             </div>
-            <p className="mt-1 text-xs text-success/80">
-              {t('currentStreak')}
-            </p>
-            <p className="font-mono text-xs font-medium tabular-nums text-success">
+            <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
               {streakPercent}%
-            </p>
+            </span>
           </div>
-          <div className="flex-1 rounded-xl border border-border bg-muted p-4">
-            <div className="flex items-baseline gap-1">
-              {habit.longestStreak >= 30 && <Crown className="size-5 text-success" />}
-              <span className="font-mono text-3xl font-bold tabular-nums text-foreground">
+          <div className="flex flex-col gap-1.5 bg-card px-5 py-4">
+            <span className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              {t('longestStreak')}
+            </span>
+            <div className="flex items-baseline gap-1.5">
+              {habit.longestStreak >= 30 && <Crown className="size-5 self-center text-success" />}
+              <span className="font-mono text-[32px] font-semibold leading-none tabular-nums text-success">
                 {habit.longestStreak}
               </span>
-              <span className="text-sm text-muted-foreground">
-                {t('days')}
-              </span>
+              <span className="text-sm text-muted-foreground">{t('days')}</span>
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {t('longestStreak')}
-            </p>
-            <p className="font-mono text-xs font-medium tabular-nums text-muted-foreground">
+            <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
               {bestPercent}%
-            </p>
+            </span>
           </div>
         </div>
 

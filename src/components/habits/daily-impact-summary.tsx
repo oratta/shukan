@@ -6,6 +6,7 @@ import { HeartPulse, Wallet, TrendingUp, PartyPopper, Smile } from 'lucide-react
 import { calculateDedupedDailyImpact, formatHealthMinutes, formatCurrency } from '@/lib/impact';
 import { getArticle } from '@/data/impact-articles';
 import { EstimateDisclaimer } from '@/components/habits/estimate-disclaimer';
+import { ImpactKpiGrid } from '@/components/habits/impact-kpi-grid';
 import { cn } from '@/lib/utils';
 import type { HabitWithStats } from '@/types/habit';
 import type { HabitEvidence } from '@/types/impact';
@@ -123,36 +124,9 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
         )}
       </div>
 
-      {/* 今日のインパクト: 2×2 グリッドをヘアライン罫線で組む（gap-px + bg-border）。
-          新聞のデータ面のように数値はインク（foreground）で大きく、緑はアイコンの差し色に留める。
-          達成時のみ数値も success に切り替える。 */}
-      <div className="grid grid-cols-2 gap-px border-y bg-border">
-        {todayMetrics.map((m) => (
-          <div key={m.label} className="flex flex-col gap-2 bg-card px-5 py-4">
-            <div className="flex items-center gap-1.5">
-              <m.icon className="size-3.5 text-success" />
-              <span className="font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                {m.label}
-              </span>
-            </div>
-            {/* 実データ（達成時）は値が長くなるため flex-wrap で「値→分母」の順に折り返す。
-                値そのものは whitespace-nowrap で数字の途中では折らない（+27 と 分 を割らない）。 */}
-            <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
-              <span
-                className={cn(
-                  'whitespace-nowrap font-mono text-[26px] font-semibold leading-none tracking-tight tabular-nums',
-                  isPerfect ? 'text-success' : 'text-foreground'
-                )}
-              >
-                {m.value}
-              </span>
-              <span className="whitespace-nowrap font-mono text-[11px] tabular-nums text-muted-foreground">
-                {m.sub}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* 今日のインパクト: 2×2 のヘアライン罫線グリッド（ImpactKpiGrid 共通部品）。
+          border-y でヘッダー／5日間セクションと挟む。習慣詳細ビューと同じ構造を共有する。 */}
+      <ImpactKpiGrid metrics={todayMetrics} accent={isPerfect} className="border-y" />
 
       {/* 5日間のインパクト: 二次情報。ラベル左・数値右の罫線区切り行リストで、
           長い日本語の値（+13時間12分 等）も折り返さず端正に組む。 */}
