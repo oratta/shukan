@@ -18,6 +18,8 @@ export const noImpulseBuying: LifeImpactArticle = {
       '{{cost_inference}}\n\n' +
       '自己制御力は筋肉のように鍛えられる。衝動買いを我慢する習慣は、仕事における意思決定の質も高める。\n\n' +
       '{{income_inference}}\n\n' +
+      '衝動買いを我慢することは、心の平穏にも直結する。Vohs & Faber（2007）は購入後の後悔が幸福度を下げる悪循環を指摘し、Ryu & Fan（2023）の米国成人を対象とした研究では、お金の心配が強い人ほど心理的苦痛が大きいことが示されている。衝動買いを抑えることは、この後悔と金銭不安の両方を減らす。\n\n' +
+      '{{positive_mood_inference}}\n\n' +
       '{{cumulative}}',
 
     sources: [
@@ -35,6 +37,11 @@ export const noImpulseBuying: LifeImpactArticle = {
         id: 3,
         text: 'Rook DW & Fisher RJ (1995). "Normative Influences on Impulsive Buying Behavior." Journal of Consumer Research, 22(3), 305-313.',
       },
+      {
+        id: 4,
+        text: 'Ryu S, Fan L (2023). "The Relationship Between Financial Worries and Psychological Distress Among U.S. Adults." Journal of Family and Economic Issues, 44(1), 16-33.',
+        url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC8806009/',
+      },
     ],
   },
 
@@ -45,10 +52,12 @@ export const noImpulseBuying: LifeImpactArticle = {
       '日本人の衝動買い平均は月約2-3万円と推定されます（米国データを購買力で調整）。このうち50%を抑制できたとすると月1.5万円の節約。さらにクレジットカードの利息負担減少を含め、1日あたり¥700のコスト削減と推定されます。',
     income:
       '年収1,500万円（日給¥62,500）に対して、自己制御力の向上は仕事での衝動的な判断ミスの減少に寄与します。Baumeister（2011）の研究では、自己制御力が高い人は職場パフォーマンスも高いと報告。間接的な生産性向上を控えめに1%と見積もると、1日あたり¥500の収入ポテンシャルと推定されます。',
+    positiveMood:
+      '衝動買いの後悔は幸福度を下げ（Vohs & Faber, 2007）、お金の心配は心理的苦痛を高めます（Ryu & Fan, 2023）。衝動買いを抑える習慣は、この後悔と金銭不安を和らげ、家計への統制感を取り戻させます。ただし気分への効果は間接的なため、何もしないときに前向きでいられる時間（起床16時間のうち約50%＝480分）を基準に、気分改善を控えめに5%とみなすと、1日あたり約24分（480分×5%）、前向きな気持ちで過ごせる時間が増えると推定されます。',
     cumulative:
-      '**1ヶ月続けると**：健康寿命+1時間、¥21,000節約、¥15,000の収入増。\n' +
-      '**1年続けると**：健康寿命+0.6日、¥25.6万節約、¥18.3万の収入増。\n' +
-      '**10年続けると**：健康寿命+6日、¥256万節約、¥183万の収入増。\n' +
+      '**1ヶ月続けると**：健康寿命+1時間、¥21,000節約、¥15,000の収入増、前向きな気持ちの時間+12時間。\n' +
+      '**1年続けると**：健康寿命+0.6日、¥25.6万節約、¥18.3万の収入増、前向きな気持ちの時間+6.1日。\n' +
+      '**10年続けると**：健康寿命+6日、¥256万節約、¥183万の収入増、前向きな気持ちの時間+60.8日。\n' +
       '「本当に必要か？」と3秒考えるだけで、人生が変わります。',
   },
 
@@ -56,8 +65,7 @@ export const noImpulseBuying: LifeImpactArticle = {
     dailyHealthMinutes: 2,
     dailyCostSaving: 700,
     dailyIncomeGain: 500,
-    // positiveMood 0: 依存・衝動の抑制による便益は健康寿命/出費削減で計上済み。前向きな気持ちの時間への独立した一次エビデンスが確立していないため、二重計上を避けて 0 のままとする。
-    dailyPositiveMoodMinutes: 0,
+    dailyPositiveMoodMinutes: 24,
   },
 
   confidenceLevel: 'medium',
@@ -74,6 +82,11 @@ export const noImpulseBuying: LifeImpactArticle = {
     income: [
       { label: '自己制御力向上', value: '職場の意思決定の質改善（Baumeister, 2011）' },
       { label: '生産性1%', formula: '62500 × 1% ≈ 625 → 保守的に', result: '500円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: '購入後の後悔は幸福度を下げ（Vohs & Faber, 2007）、金銭不安は心理的苦痛を高める（Ryu & Fan, 2023）。効果は間接的なため気分改善を控えめに5%' },
+      { label: '日割り計算', formula: '480分 × 5%', result: '24分/日' },
     ],
   },
 

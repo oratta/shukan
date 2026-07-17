@@ -35,6 +35,8 @@ export const scheduleAdherence: LifeImpactArticle = {
       '{{cost_inference}}\n\n' +
       '仕事の成果にも直結する。Barrick & Mount（1991）の117研究・23,994人を対象としたメタ分析では、誠実性がすべての職種において最も強い業績予測因子であることが示された（r=.22-.23）。加えてGollwitzer & Sheeran（2006）は、「いつ・どこで・何をするか」を事前に決める実行意図（implementation intentions）が目標達成に大きな効果を持つことを確認した（d=0.65）。\n\n' +
       '{{income_inference}}\n\n' +
+      'スケジュールを守れる人が得るのは、成果や健康だけではない。自己制御力の高い人ほど、日々の動機づけの葛藤や情緒的な苦痛が少なく、幸福感が高いことも分かっている（Hofmann et al., 2014）。\n\n' +
+      '{{positive_mood_inference}}\n\n' +
       '{{cumulative}}',
     sources: [
       {
@@ -62,6 +64,11 @@ export const scheduleAdherence: LifeImpactArticle = {
         text: 'Sirois FM, Pychyl TA (2013). "Procrastination and the Priority of Short-Term Mood Regulation: Consequences for Future Self." Social and Personality Psychology Compass, 7(2), 115-127.',
         url: 'https://doi.org/10.1111/spc3.12011',
       },
+      {
+        id: 6,
+        text: 'Hofmann W, Luhmann M, Fisher RR, Vohs KD, Baumeister RF (2014). "Yes, But Are They Happy? Effects of Trait Self-Control on Affective Well-Being and Life Satisfaction." Journal of Personality, 82(4), 265-277.',
+        url: 'https://doi.org/10.1111/jopy.12050',
+      },
     ],
   },
 
@@ -72,10 +79,12 @@ export const scheduleAdherence: LifeImpactArticle = {
       '年収1,500万円の生活水準では、先延ばしによるコストは目に見えにくいが確実に発生します。朝のスケジュールを崩すと、タクシー代の増加（電車に間に合わない）、締切間際の割増料金、計画外の外食費、衝動買いなどが積み重なります。Sirois & Pychylが示す「感情調節の失敗→衝動的支出」のメカニズムを考慮し、1日あたり¥400のコスト削減効果と推定します。',
     income:
       '年収1,500万円（日給¥62,500）に対して、Barrick & Mountのメタ分析が示す誠実性と業績の相関（r=.22-.23）は非常に強力です。スケジュール遵守は誠実性の行動面での発現であり、実行意図の効果（d=0.65）とも整合します。朝決めたスケジュール通りに動くことで、最も生産性の高い午前中の時間を最大活用でき、タスク切替のロスも減少します。保守的に日給の約2.5%の生産性向上と推定すると、¥62,500 × 2.5% ≒ ¥1,560/日の収入ポテンシャルに相当します。',
+    positiveMood:
+      '自己制御力（トレイト・セルフコントロール）が高い人ほど、動機づけの葛藤や情緒的な苦痛が少なく、その結果として日々の感情的ウェルビーイングと生活満足度が高いことが3つの研究で示されています（Hofmann et al., 2014）。スケジュール遵守はこの自己制御力の行動面での発現であり、先延ばしによる短期的な気分の乱れ（Sirois & Pychyl, 2013）を防ぎます。何もしないときに前向きでいられる時間（起床16時間のうち約50%＝480分）を基準に、葛藤・ストレス低減による気分改善効果を保守的に6%とみなすと、1日あたり約29分（480分×6%）、前向きな気持ちで過ごせる時間が増えると推定されます。',
     cumulative:
-      '**1ヶ月続けると**：健康寿命+2.5時間、¥12,000節約、¥46,800の収入増。\n' +
-      '**1年続けると**：健康寿命+30時間、¥14.6万節約、¥56.9万の収入増。\n' +
-      '**10年続けると**：健康寿命+12.7日、¥146万節約、¥569万の収入増。\n' +
+      '**1ヶ月続けると**：健康寿命+2.5時間、¥12,000節約、¥46,800の収入増、前向きな気持ちの時間+15時間。\n' +
+      '**1年続けると**：健康寿命+30時間、¥14.6万節約、¥56.9万の収入増、前向きな気持ちの時間+7.4日。\n' +
+      '**10年続けると**：健康寿命+12.7日、¥146万節約、¥569万の収入増、前向きな気持ちの時間+73.5日。\n' +
       '「もう10分だけ」を断ち切るだけで、10年後には健康寿命が約2週間延び、700万円以上の経済効果が生まれます。',
   },
 
@@ -83,8 +92,7 @@ export const scheduleAdherence: LifeImpactArticle = {
     dailyHealthMinutes: 5,
     dailyCostSaving: 400,
     dailyIncomeGain: 1560,
-    // positiveMood 0: 生産性・時間創出の効果は増える収入/健康寿命で計上済み。前向きな気持ちの時間への独立した一次エビデンスに乏しく、二重計上回避のため 0 のままとする。
-    dailyPositiveMoodMinutes: 0,
+    dailyPositiveMoodMinutes: 29,
   },
 
   confidenceLevel: 'medium',
@@ -104,6 +112,11 @@ export const scheduleAdherence: LifeImpactArticle = {
       { label: '基準日給', value: '年収1500万円', formula: '15000000 ÷ 240日', result: '62500円/日' },
       { label: '研究結果', value: '誠実性→業績予測因子 r=.22-.23（Barrick & Mount, 1991）' },
       { label: '生産性向上', formula: '62500 × 2.5%', result: '1560円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: '自己制御力が高いほど葛藤・情緒的苦痛が少なく感情的ウェルビーイングが高い（Hofmann et al., 2014）／先延ばしは短期的な気分の乱れを招く（Sirois & Pychyl, 2013）。気分改善を保守的に6%' },
+      { label: '日割り計算', formula: '480分 × 6%', result: '29分/日' },
     ],
   },
 
