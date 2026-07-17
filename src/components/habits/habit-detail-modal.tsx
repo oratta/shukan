@@ -24,7 +24,6 @@ import { getArticle } from '@/data/impact-articles';
 import { calculateDailyImpact, formatHealthMinutes, formatCurrency } from '@/lib/impact';
 import { ImpactKpiGrid, type ImpactKpiMetric } from '@/components/habits/impact-kpi-grid';
 import { EstimateDisclaimer } from '@/components/habits/estimate-disclaimer';
-import { SavingsCard } from '@/components/habits/savings-card';
 import { EvidenceManagerSheet } from '@/components/habits/evidence-manager-sheet';
 import { HelpButton } from '@/components/ui/help-button';
 import type { HabitWithStats, DayStatus } from '@/types/habit';
@@ -185,16 +184,39 @@ export function HabitDetailModal({
     return set;
   }, [habit]);
 
-  // この習慣の 1 日あたりインパクト（ホーム「今日のライフインパクト」と同じ 4 KPI）。
-  // ホームと同じ ImpactKpiGrid で見せるため metrics 配列に整形する。
-  const kpiMetrics = useMemo<ImpactKpiMetric[] | null>(() => {
-    if (!habit || habit.evidences.length === 0) return null;
+  // 詳細ビューの主役は「累計インパクト」（積み上げ）。大きい数値＝累計、その下に「1日あたり +X」を
+  // 小さい muted 文字で従属表示する（ホーム「今日のライフインパクト」と同じ ImpactKpiGrid の言語）。
+  // 累計は habit.impactSavings（旧・累積貯金ピルの値）、1日あたりは evidences から算出。
+  const cumulativeMetrics = useMemo<ImpactKpiMetric[] | null>(() => {
+    if (!habit || !habit.impactSavings) return null;
     const daily = calculateDailyImpact(habit.evidences, getArticle);
+    const cum = habit.impactSavings;
+    const perDay = (s: string) => `${tImpact('perDayPrefix')} ${s}`;
     return [
-      { icon: HeartPulse, label: tImpact('dailyHealth'), value: `+${formatHealthMinutes(daily.healthMinutes)}` },
-      { icon: Wallet, label: tImpact('dailyCost'), value: formatCurrency(daily.costSaving, false) },
-      { icon: TrendingUp, label: tImpact('dailyIncome'), value: formatCurrency(daily.incomeGain, false) },
-      { icon: Smile, label: tImpact('dailyPositiveMood'), value: `+${formatHealthMinutes(daily.positiveMoodMinutes)}` },
+      {
+        icon: HeartPulse,
+        label: tImpact('dailyHealth'),
+        value: `+${formatHealthMinutes(cum.healthMinutes)}`,
+        sub: perDay(`+${formatHealthMinutes(daily.healthMinutes)}`),
+      },
+      {
+        icon: Wallet,
+        label: tImpact('dailyCost'),
+        value: formatCurrency(cum.costSaving),
+        sub: perDay(formatCurrency(daily.costSaving, false)),
+      },
+      {
+        icon: TrendingUp,
+        label: tImpact('dailyIncome'),
+        value: formatCurrency(cum.incomeGain),
+        sub: perDay(formatCurrency(daily.incomeGain, false)),
+      },
+      {
+        icon: Smile,
+        label: tImpact('dailyPositiveMood'),
+        value: `+${formatHealthMinutes(cum.positiveMoodMinutes)}`,
+        sub: perDay(`+${formatHealthMinutes(daily.positiveMoodMinutes)}`),
+      },
     ];
   }, [habit, tImpact]);
 
@@ -266,15 +288,21 @@ export function HabitDetailModal({
           </div>
         )}
 
-        {/* 1日あたりのライフインパクト: ホーム「今日のライフインパクト」(daily-impact-summary) と
-            同じ 2×2 ヘアライングリッド（ImpactKpiGrid 共通部品）。アイコン＋ラベルのキャプション行の下に
-            大きい mono 数値を置く＝画面をまたいで同じ意味を同じ構造で見せる。 */}
-        {kpiMetrics && (
+        {/* 累計インパクト（詳細ビューの主役）: ホーム「今日のライフインパクト」と同じ 2×2 ヘアライン
+            グリッド（ImpactKpiGrid）。大きい数値＝累計の積み上げ（success=積み上げの意味）、その下に
+            「1日あたり +X」を muted で従属表示。キャプションに実行日数を添える（旧・累積貯金ピルの役割を吸収）。 */}
+        {cumulativeMetrics && habit.impactSavings && (
           <div className="px-5">
             <p className="mb-2 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-              {tImpact('perDayImpact')}
+              {tImpact('cumulativeImpact')}・{tImpact('executedDays', { days: habit.impactSavings.completedDays })}
             </p>
-            <ImpactKpiGrid metrics={kpiMetrics} className="overflow-hidden rounded-xl border" />
+            {/* 累計は桁が長くなる（+14時間24分 等）ため値は一段小さめの text-[22px] にして溢れを防ぐ。 */}
+            <ImpactKpiGrid
+              metrics={cumulativeMetrics}
+              accent
+              valueClassName="text-[22px]"
+              className="overflow-hidden rounded-xl border"
+            />
             <EstimateDisclaimer className="mt-2" />
           </div>
         )}
@@ -314,13 +342,6 @@ export function HabitDetailModal({
             </span>
           </div>
         </div>
-
-        {/* Savings Card */}
-        {habit.impactSavings && (
-          <div className="px-5">
-            <SavingsCard savings={habit.impactSavings} />
-          </div>
-        )}
 
         {/* Evidence Section */}
         {evidenceArticles.length > 0 && (

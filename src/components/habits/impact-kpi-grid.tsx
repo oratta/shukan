@@ -17,6 +17,11 @@ interface ImpactKpiGridProps {
   accent?: boolean;
   /** グリッド外枠の指定。border-y（サンドイッチ）や rounded-xl border（単独カード）を渡す。 */
   className?: string;
+  /**
+   * 大きい数値のフォントサイズ等の上書き。既定は `text-[26px]`（ホームの「今日のライフインパクト」）。
+   * 累計インパクトのように桁が長くなる用途では一段小さいサイズ（例: text-[22px]）を渡して溢れを防ぐ。
+   */
+  valueClassName?: string;
 }
 
 /**
@@ -27,13 +32,18 @@ interface ImpactKpiGridProps {
  * ホームの「今日のライフインパクト」(daily-impact-summary) と習慣詳細で共有し、
  * 同じ意味の情報を画面をまたいで同じ構造で見せる。
  */
-export function ImpactKpiGrid({ metrics, accent = false, className }: ImpactKpiGridProps) {
+export function ImpactKpiGrid({
+  metrics,
+  accent = false,
+  className,
+  valueClassName = 'text-[26px]',
+}: ImpactKpiGridProps) {
   return (
     <div className={cn('grid grid-cols-2 gap-px bg-border', className)}>
       {metrics.map((m) => (
-        <div key={m.label} className="flex flex-col gap-2 bg-card px-5 py-4">
+        <div key={m.label} className="flex min-w-0 flex-col gap-2 bg-card px-5 py-4">
           <div className="flex items-center gap-1.5">
-            <m.icon className="size-3.5 text-success" />
+            <m.icon className="size-3.5 shrink-0 text-success" />
             <span className="font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
               {m.label}
             </span>
@@ -41,7 +51,8 @@ export function ImpactKpiGrid({ metrics, accent = false, className }: ImpactKpiG
           <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
             <span
               className={cn(
-                'whitespace-nowrap font-mono text-[26px] font-semibold leading-none tracking-tight tabular-nums',
+                'whitespace-nowrap font-mono font-semibold leading-none tracking-tight tabular-nums',
+                valueClassName,
                 accent ? 'text-success' : 'text-foreground'
               )}
             >
