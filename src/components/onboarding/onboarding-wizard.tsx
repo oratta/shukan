@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { markTutorialPending } from "@/lib/tutorial";
 import { useAuth } from "@/components/auth-provider";
 import { KPI_CATALOG, KPI_KEYS, type KpiKey } from "@/data/kpi/catalog";
 import { KpiIcon } from "@/components/onboarding/kpi-icon";
@@ -138,6 +139,8 @@ export function OnboardingWizard() {
       });
       completedPresetIdsRef.current = completed;
       setWriting(false);
+      // ホーム到着後に初回チュートリアル（コーチマーク）を起動する
+      markTutorialPending();
       router.push("/");
     } catch (error) {
       if (error instanceof OnboardingWriteError) {

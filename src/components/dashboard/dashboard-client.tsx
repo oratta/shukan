@@ -22,6 +22,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { shouldBlockCreateHabit } from '@/lib/billing/create-habit-gate';
 import { upsertDailyReflection } from '@/lib/supabase/habits';
 import { track } from '@/lib/analytics';
+import { emitTutorialEvent } from '@/lib/tutorial';
 import { InstallBanner } from '@/components/pwa/install-banner';
 import { isCompletionTransition, type DayStatus as PwaDayStatus } from '@/lib/pwa/completion';
 import type { Habit, HabitInsertInput } from '@/types/habit';
@@ -223,7 +224,18 @@ export function DashboardClient({
 
   const handleOpenActionSheet = useCallback((habitId: string, date: string) => {
     setActionSheetTarget({ habitId, date });
+    emitTutorialEvent('action-sheet-open');
   }, []);
+
+  // チュートリアル用: メインリストの達成トグルを横取りせず通知だけ添える
+  const handleDayStatusChange = useCallback<typeof setDayStatus>(
+    async (habitId, date, status, opts) => {
+      await setDayStatus(habitId, date, status, opts);
+      if (status === 'completed') emitTutorialEvent('habit-completed');
+      else if (status === 'none') emitTutorialEvent('habit-uncompleted');
+    },
+    [setDayStatus]
+  );
 
   const handleOpenBulkEdit = useCallback((habitId: string) => {
     setBulkEditTarget(habitId);
@@ -338,7 +350,7 @@ export function DashboardClient({
 
       <HabitList
         habits={todayHabits}
-        onDayStatusChange={setDayStatus}
+        onDayStatusChange={handleDayStatusChange}
         onAdd={handleAdd}
         onOpenDetail={handleOpenDetail}
         onOpenActionSheet={handleOpenActionSheet}
@@ -390,7 +402,12 @@ export function DashboardClient({
 
       <HabitActionSheet
         open={!!actionSheetTarget}
-        onOpenChange={(open) => !open && setActionSheetTarget(null)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setActionSheetTarget(null);
+            emitTutorialEvent('action-sheet-closed');
+          }
+        }}
         habit={actionSheetHabit}
         date={actionSheetTarget?.date ?? null}
         currentStatus={(actionSheetCompletion?.status ?? 'none') as 'completed' | 'failed' | 'none' | 'rocket_used' | 'skipped'}
