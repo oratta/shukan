@@ -326,6 +326,21 @@
   -webkit-backdrop-filter: blur(3.5px) saturate(1.03);
 }
 
+/* v2 入口画面（発見）用の軽ベール: .banner-veil は全面フロスト（blur＋均一ウォッシュ）で、
+   写真が主役の入口では全カードが washed out に見え「押せないグレー板」に読める。browse では
+   全面ぼかしをやめ、テキストが乗る下部だけ背景色ウォッシュ、上部は写真を素通しにして彩度を残す。
+   これで light でも「タップできる写真タイル」に見える。文字は foreground(インク)で、下端の
+   濃いウォッシュで可読性を確保する。dark は従来どおり .banner-scrim（黒スクリム）を使う。 */
+.banner-veil-browse {
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--background) 90%, transparent) 0%,
+    color-mix(in srgb, var(--background) 62%, transparent) 28%,
+    color-mix(in srgb, var(--background) 16%, transparent) 54%,
+    transparent 74%
+  );
+}
+
 /* 下→上の映画的スクリム。下部は濃く（テキスト面）、上部は写真をほぼ素通し。
    左からもわずかに敷いて左下のタイトル面をさらに持ち上げる。 */
 /* エッセンス④: バナーを「常時ダークの島」として規格化し、②の大数字・③の緑が常に視覚の

@@ -265,12 +265,13 @@ export function HabitDetailModal({
           </div>
         )}
 
-        {/* Stats Row */}
+        {/* Stats Row。継続中＝積み上げの達成なので success(緑)。最長記録は歴史値なので無彩色（原則①）。
+            数値は Geist Mono + tabular-nums（原則⑥）。30日到達の Crown も達成の記号＝success（琥珀は原則①で不可）。 */}
         <div className="flex gap-3 px-5">
-          <div className="flex-1 rounded-xl bg-success/15 p-4">
+          <div className="flex-1 rounded-xl border border-success/20 bg-success/10 p-4">
             <div className="flex items-baseline gap-1">
-              {habit.currentStreak >= 30 && <Crown className="size-5 text-amber-500" />}
-              <span className="text-3xl font-bold text-success">
+              {habit.currentStreak >= 30 && <Crown className="size-5 text-success" />}
+              <span className="font-mono text-3xl font-bold tabular-nums text-success">
                 {habit.currentStreak}
               </span>
               <span className="text-sm text-success/80">
@@ -280,24 +281,24 @@ export function HabitDetailModal({
             <p className="mt-1 text-xs text-success/80">
               {t('currentStreak')}
             </p>
-            <p className="text-xs font-medium text-success">
+            <p className="font-mono text-xs font-medium tabular-nums text-success">
               {streakPercent}%
             </p>
           </div>
-          <div className="flex-1 rounded-xl bg-[#EDECEA] p-4 dark:bg-neutral-800">
+          <div className="flex-1 rounded-xl border border-border bg-muted p-4">
             <div className="flex items-baseline gap-1">
-              {habit.longestStreak >= 30 && <Crown className="size-5 text-amber-500" />}
-              <span className="text-3xl font-bold text-neutral-800 dark:text-neutral-200">
+              {habit.longestStreak >= 30 && <Crown className="size-5 text-success" />}
+              <span className="font-mono text-3xl font-bold tabular-nums text-foreground">
                 {habit.longestStreak}
               </span>
-              <span className="text-sm text-neutral-600 dark:text-neutral-400">
+              <span className="text-sm text-muted-foreground">
                 {t('days')}
               </span>
             </div>
-            <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
+            <p className="mt-1 text-xs text-muted-foreground">
               {t('longestStreak')}
             </p>
-            <p className="text-xs font-medium text-neutral-500 dark:text-neutral-500">
+            <p className="font-mono text-xs font-medium tabular-nums text-muted-foreground">
               {bestPercent}%
             </p>
           </div>
@@ -324,7 +325,7 @@ export function HabitDetailModal({
                   key={evidence.id}
                   type="button"
                   onClick={() => onOpenArticle?.(evidence.articleId)}
-                  className="flex w-full items-center gap-3 rounded-xl border border-[#E5E4E1] bg-card px-3.5 py-3 text-left transition-colors hover:bg-accent/50"
+                  className="flex w-full items-center gap-3 rounded-xl border border-border bg-card px-3.5 py-3 text-left transition-colors hover:bg-accent/50"
                 >
                   <HabitIcon name={article.defaultIcon} size={18} />
                   <div className="flex-1 min-w-0">
@@ -344,7 +345,9 @@ export function HabitDetailModal({
               <button
                 type="button"
                 onClick={() => setEvidenceManagerOpen(true)}
-                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-success/30 bg-success/5 px-3.5 py-2.5 text-sm font-medium text-success transition-colors hover:bg-success/10"
+                /* エビデンス管理は中立の UI 操作なので彩色せずインク（原則①: 緑は達成専用）。
+                   discover の「ゼロからつくる」ダッシュ枠と同じ neutral affordance に揃える。 */
+                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-secondary/50 px-3.5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:bg-secondary hover:text-foreground"
               >
                 <Settings className="size-4" />
                 {tEvidence('manage')}
@@ -353,12 +356,13 @@ export function HabitDetailModal({
           </div>
         )}
 
-        {/* Rocket Section */}
-        <div className="mx-5 flex items-center gap-3 rounded-xl border p-4">
-          <Rocket className="size-6 text-[#D89575]" />
+        {/* Rocket Section。ロケットは失敗日を救済する中立の道具（達成でも破壊でもない）なので
+            アイコンは無彩色インク（原則①/⑥: 独自色を付けない）。個数は mono + tabular-nums。 */}
+        <div className="mx-5 flex items-center gap-3 rounded-xl border border-border p-4">
+          <Rocket className="size-6 text-foreground" />
           <div className="flex-1">
             <p className="text-sm font-semibold">
-              {tHabits('rockets')}: {habit.rockets}
+              {tHabits('rockets')}: <span className="font-mono tabular-nums">{habit.rockets}</span>
             </p>
             <p className="text-xs text-muted-foreground">
               {tHabits('rocketNextIn', { days: habit.rocketNextIn })}
@@ -392,7 +396,7 @@ export function HabitDetailModal({
               >
                 <ChevronLeft className="size-4" />
               </button>
-              <span className="min-w-[5.5rem] text-center text-xs font-medium text-muted-foreground">
+              <span className="min-w-[5.5rem] text-center font-mono text-xs font-medium tabular-nums text-muted-foreground">
                 {monthLabel}
               </span>
               <button
@@ -449,17 +453,17 @@ export function HabitDetailModal({
                         }
                       }}
                       className={cn(
-                        'relative flex aspect-square items-center justify-center rounded-lg text-[10px] font-medium transition-all',
-                        // Status colors
+                        'relative flex aspect-square items-center justify-center rounded-lg font-mono text-[10px] font-medium tabular-nums transition-all',
+                        // Status colors（達成=success / 失敗=danger。いずれもトークン。原則①）
                         isCompleted && 'bg-success text-success-foreground',
-                        isFailed && !isRocketEligible && 'bg-[#D89575] text-white dark:bg-[#B87A5E]',
+                        isFailed && !isRocketEligible && 'bg-danger text-primary-foreground',
                         !isCompleted && !isFailed && !isFuture && 'text-foreground',
                         isFuture && 'text-muted-foreground/40',
                         // Tappable border (last 5 days)
                         isTappable && !isCompleted && !isFailed && 'ring-1.5 ring-primary/40 ring-inset',
                         isTappable && 'cursor-pointer',
-                        // Rocket eligible
-                        isRocketEligible && 'cursor-pointer ring-2 ring-[#D89575] ring-offset-1',
+                        // Rocket eligible: 失敗日で救済可能。danger 色域に留めつつロケットで「救える」を示す
+                        isRocketEligible && 'cursor-pointer text-danger ring-2 ring-danger ring-offset-1',
                         // Today highlight
                         isToday && !isCompleted && !isFailed && 'font-bold',
                         // Non-interactive
@@ -467,9 +471,9 @@ export function HabitDetailModal({
                       )}
                     >
                       {status === 'rocket_used' ? (
-                        <Rocket className="size-3 text-white" />
+                        <Rocket className="size-3 text-success-foreground" />
                       ) : isRocketEligible ? (
-                        <Rocket className="size-3 animate-pulse text-white" />
+                        <Rocket className="size-3 animate-pulse text-danger" />
                       ) : (
                         dayOfMonth
                       )}

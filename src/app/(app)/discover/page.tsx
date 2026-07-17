@@ -278,15 +278,16 @@ function ArticleCard({
         <div className="absolute inset-0 bg-muted" />
       )}
 
-      {/* v2 写真規格（原則④）: テーマで写真の扱いを分ける。ホームの banner 部品を再利用。
+      {/* v2 写真規格（原則④）: テーマで写真の扱いを分ける。
           ・dark = 「暗い島」: 色相ティント + 黒スクリムで写真に光を残しつつ白文字を可読に。
-          ・light = 「明るいベール」: 背景色ウォッシュ + ぼかしで frosted にし、インク文字を馴染ませる。
-          写真が入口の主役なので上半分は素通し、テキスト面（下部）だけ濃くする。 */}
+          ・light = 入口用の軽ベール（.banner-veil-browse）: 全面フロストの .banner-veil だと入口で
+            全カードが washed out に見え「押せないグレー板」になるため、下部だけウォッシュし写真の
+            彩度を残す。写真が入口の主役なので上半分は素通し、テキスト面（下部）だけ濃くする。 */}
       {hasImage && (
         <>
           <div aria-hidden className="banner-tint absolute inset-0 hidden dark:block" />
           <div aria-hidden className="banner-scrim absolute inset-0 hidden dark:block" />
-          <div aria-hidden className="banner-veil absolute inset-0 dark:hidden" />
+          <div aria-hidden className="banner-veil-browse absolute inset-0 dark:hidden" />
         </>
       )}
 
