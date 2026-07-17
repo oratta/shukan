@@ -89,7 +89,7 @@ export const proteinIntake: LifeImpactArticle = {
   },
 
   heroImage: {
-    url: 'https://images.unsplash.com/photo-1607532941433-304659e8198a',
+    url: 'https://images.unsplash.com/photo-1496074620649-6b1b02e5c1c8',
     gradient: 'from-rose-300 to-amber-600',
   },
   defaultHabitType: 'positive',

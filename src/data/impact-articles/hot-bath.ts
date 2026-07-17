@@ -102,7 +102,7 @@ export const hotBath: LifeImpactArticle = {
   },
 
   heroImage: {
-    url: 'https://images.unsplash.com/photo-1600334129128-685c5582fd35',
+    url: 'https://images.unsplash.com/photo-1648475233136-e291e7bed05a',
     gradient: 'from-cyan-400 to-blue-600',
   },
   defaultHabitType: 'positive',

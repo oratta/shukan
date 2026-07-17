@@ -83,7 +83,7 @@ export const expenseTracking: LifeImpactArticle = {
   },
 
   heroImage: {
-    url: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f',
+    url: 'https://images.unsplash.com/photo-1763730512449-f1a505f432a9',
     gradient: 'from-emerald-400 to-green-700',
   },
   defaultHabitType: 'positive',

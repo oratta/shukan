@@ -94,7 +94,7 @@ export const saunaBathing: LifeImpactArticle = {
   },
 
   heroImage: {
-    url: 'https://images.unsplash.com/photo-1743286159555-ea765c1bc5e6',
+    url: 'https://images.unsplash.com/photo-1770625468096-ff53cd24ee38',
     gradient: 'from-orange-400 to-red-700',
   },
   defaultHabitType: 'positive',

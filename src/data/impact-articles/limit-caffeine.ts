@@ -91,7 +91,7 @@ export const limitCaffeine: LifeImpactArticle = {
   },
 
   heroImage: {
-    url: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93',
+    url: 'https://images.unsplash.com/photo-1643316408393-9328a1e973ed',
     gradient: 'from-amber-400 to-orange-700',
   },
   defaultHabitType: 'quit',

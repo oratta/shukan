@@ -96,7 +96,7 @@ export const breathingExercise: LifeImpactArticle = {
   },
 
   heroImage: {
-    url: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773',
+    url: 'https://images.unsplash.com/photo-1677741447380-ede69fb0046f',
     gradient: 'from-sky-300 to-indigo-500',
   },
   defaultHabitType: 'positive',

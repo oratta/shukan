@@ -95,7 +95,7 @@ export const powerNap: LifeImpactArticle = {
   },
 
   heroImage: {
-    url: 'https://images.unsplash.com/photo-1520206183501-b80df61043c2',
+    url: 'https://images.unsplash.com/photo-1567016420071-ec27a7835119',
     gradient: 'from-indigo-300 to-slate-600',
   },
   defaultHabitType: 'positive',

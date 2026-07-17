@@ -96,7 +96,7 @@ export const dentalCare: LifeImpactArticle = {
   },
 
   heroImage: {
-    url: 'https://images.unsplash.com/photo-1685084844860-5d94e6c82939',
+    url: 'https://images.unsplash.com/photo-1550985543-f1ea83691cd8',
     gradient: 'from-sky-300 to-teal-500',
   },
   defaultHabitType: 'positive',
