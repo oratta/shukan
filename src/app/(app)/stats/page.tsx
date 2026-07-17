@@ -2,27 +2,14 @@
 
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { Flame, Trophy, TrendingUp, HeartPulse, Wallet, BarChart3, Smile } from 'lucide-react';
+import { TrendingUp, HeartPulse, Wallet, BarChart3, Smile } from 'lucide-react';
 import { HabitIcon } from '@/components/ui/habit-icon';
-import { Card } from '@/components/ui/card';
-import { ProgressRing } from '@/components/habits/progress-ring';
 import { useHabits } from '@/hooks/useHabits';
 import { isDailyTrackedHabit } from '@/lib/habits';
 import { calculateTotalSavings, formatHealthMinutes, formatCurrency } from '@/lib/impact';
 import { EstimateDisclaimer } from '@/components/habits/estimate-disclaimer';
 import { useReviewHistory } from '@/hooks/useReviewHistory';
 import { ReviewCalendar } from '@/components/review/ReviewCalendar';
-
-const CHART_COLORS = [
-  'oklch(0.6 0.2 260)',
-  'oklch(0.6 0.18 145)',
-  'oklch(0.65 0.2 30)',
-  'oklch(0.7 0.18 80)',
-  'oklch(0.6 0.2 300)',
-  'oklch(0.65 0.15 180)',
-  'oklch(0.65 0.2 50)',
-  'oklch(0.65 0.2 340)',
-];
 
 export default function StatsPage() {
   const t = useTranslations();
@@ -78,7 +65,7 @@ export default function StatsPage() {
   if (stats.totalHabits === 0) {
     return (
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold tracking-tight">
+        <h2 className="text-[28px] font-bold leading-tight tracking-tight">
           {t('stats.title')}
         </h2>
         <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -89,174 +76,203 @@ export default function StatsPage() {
     );
   }
 
+  const completionPercent = Math.round(stats.avgCompletionRate * 100);
+  const units = {
+    min: t('impact.minuteUnit'),
+    hour: t('impact.hourUnit'),
+    day: t('impact.dayUnit'),
+  };
+
+  // 人生インパクト貯金（累積）。ホームの DailyImpactSummary と同じ言語で組む:
+  // アイコン=success（積み上げの意味）/ 数値=インク（foreground）/ ラベル=muted。
+  const savingsMetrics = [
+    { icon: HeartPulse, label: t('impact.dailyHealth'), value: `+${formatHealthMinutes(stats.totalSavings.healthMinutes, units)}` },
+    { icon: Wallet, label: t('impact.dailyCost'), value: formatCurrency(stats.totalSavings.costSaving) },
+    { icon: TrendingUp, label: t('impact.dailyIncome'), value: formatCurrency(stats.totalSavings.incomeGain) },
+  ];
+  if (stats.totalSavings.positiveMoodMinutes > 0) {
+    savingsMetrics.push({
+      icon: Smile,
+      label: t('impact.dailyPositiveMood'),
+      value: `+${formatHealthMinutes(stats.totalSavings.positiveMoodMinutes, units)}`,
+    });
+  }
+
+  const impactHabits = stats.habits.filter(
+    (h) => h.impactSavings && h.impactSavings.completedDays > 0
+  );
+
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold tracking-tight">
-        {t('stats.title')}
-      </h2>
+      {/* エッセンス③: 静的タイトル「統計」を一等地に置かず、動的な数値ヒーローを主役にする。
+          統計はデータ画面なので、今月の達成率を画面最大タイポ（Geist Mono / tabular-nums）で出す。
+          緑は達成＝意味にだけ載せ、単位・ラベルは無彩色。 */}
+      <header>
+        <p className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+          {t('stats.completionRate')}（{t('stats.thisMonth')}）
+        </p>
+        <div className="mt-0.5 flex items-baseline leading-none">
+          <span className="font-mono text-[72px] font-semibold leading-[0.85] tracking-tighter tabular-nums text-success">
+            {completionPercent}
+          </span>
+          <span className="font-mono text-[40px] font-medium leading-none tracking-tight tabular-nums text-muted-foreground">
+            %
+          </span>
+        </div>
+        {/* 進捗バー: 緑＝達成（ポジティブ）の意味で使用 */}
+        <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full rounded-full bg-success transition-all duration-500 ease-out"
+            style={{ width: `${completionPercent}%` }}
+          />
+        </div>
+      </header>
 
-      <div className="grid grid-cols-2 gap-3">
-        <Card className="flex flex-col items-center gap-2 p-4 text-center">
-          <Flame className="size-5 text-orange-500" />
-          <div className="text-2xl font-bold">{stats.avgCurrentStreak}</div>
-          <div className="text-xs text-muted-foreground">
+      {/* 連続日数: 巨大数値＋従属ラベルの2枠。ヘアライン罫線（gap-px + bg-border）で組む。
+          連続＝積み上げの意味なので数値は success。旧・炎/トロフィーのハードコード色は撤去。 */}
+      <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border">
+        <div className="flex flex-col gap-1.5 bg-card px-5 py-4">
+          <span className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
             {t('stats.currentStreak')}
+          </span>
+          <div className="flex items-baseline gap-1">
+            <span className="font-mono text-[32px] font-semibold leading-none tabular-nums text-success">
+              {stats.avgCurrentStreak}
+            </span>
+            <span className="text-sm text-muted-foreground">{t('stats.days')}</span>
           </div>
-        </Card>
-
-        <Card className="flex flex-col items-center gap-2 p-4 text-center">
-          <Trophy className="size-5 text-yellow-500" />
-          <div className="text-2xl font-bold">{stats.longestStreak}</div>
-          <div className="text-xs text-muted-foreground">
+        </div>
+        <div className="flex flex-col gap-1.5 bg-card px-5 py-4">
+          <span className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
             {t('stats.longestStreak')}
+          </span>
+          <div className="flex items-baseline gap-1">
+            <span className="font-mono text-[32px] font-semibold leading-none tabular-nums text-success">
+              {stats.longestStreak}
+            </span>
+            <span className="text-sm text-muted-foreground">{t('stats.days')}</span>
           </div>
-        </Card>
+        </div>
       </div>
 
-      <Card className="flex items-center gap-4 p-4">
-        <ProgressRing
-          progress={stats.avgCompletionRate}
-          size={64}
-          strokeWidth={5}
-          color="oklch(0.6 0.18 145)"
-        />
-        <div>
-          <div className="text-lg font-bold">
-            {Math.round(stats.avgCompletionRate * 100)}%
-          </div>
-          <div className="text-sm text-muted-foreground">
-            {t('stats.completionRate')} ({t('stats.thisMonth')})
-          </div>
-        </div>
-      </Card>
-
-      {/* Total Life Impact Savings */}
-      <Card className="space-y-3 p-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold">
-              {t('impact.totalSavings')}
-            </h3>
-            <span className="rounded-full bg-success px-2 py-0.5 text-[10px] font-semibold text-success-foreground">
-              {t('impact.cumulative')}
-            </span>
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between rounded-lg bg-impact-bg px-3 py-2.5">
-              <div>
-                <div className="text-xs font-medium text-impact-cost">{t('impact.dailyHealth')}</div>
-                <div className="text-[10px] text-impact-cost/50">{t('impact.allHabitsTotal')}</div>
-              </div>
-              <div className="text-lg font-bold text-impact-cost">
-                +{formatHealthMinutes(stats.totalSavings.healthMinutes, { min: t('impact.minuteUnit'), hour: t('impact.hourUnit'), day: t('impact.dayUnit') })}
-              </div>
-            </div>
-            <div className="flex items-center justify-between rounded-lg bg-impact-bg px-3 py-2.5">
-              <div>
-                <div className="text-xs font-medium text-impact-cost">{t('impact.dailyCost')}</div>
-                <div className="text-[10px] text-impact-cost/50">{t('impact.allHabitsTotal')}</div>
-              </div>
-              <div className="text-lg font-bold text-impact-cost">
-                {formatCurrency(stats.totalSavings.costSaving)}
-              </div>
-            </div>
-            <div className="flex items-center justify-between rounded-lg bg-impact-bg px-3 py-2.5">
-              <div>
-                <div className="text-xs font-medium text-impact-cost">{t('impact.dailyIncome')}</div>
-                <div className="text-[10px] text-impact-cost/50">{t('impact.allHabitsTotal')}</div>
-              </div>
-              <div className="text-lg font-bold text-impact-cost">
-                {formatCurrency(stats.totalSavings.incomeGain)}
-              </div>
-            </div>
-            {stats.totalSavings.positiveMoodMinutes > 0 && (
-              <div className="flex items-center justify-between rounded-lg bg-impact-bg px-3 py-2.5">
-                <div>
-                  <div className="text-xs font-medium text-impact-cost">{t('impact.dailyPositiveMood')}</div>
-                  <div className="text-[10px] text-impact-cost/50">{t('impact.allHabitsTotal')}</div>
-                </div>
-                <div className="text-lg font-bold text-impact-cost">
-                  +{formatHealthMinutes(stats.totalSavings.positiveMoodMinutes, { min: t('impact.minuteUnit'), hour: t('impact.hourUnit'), day: t('impact.dayUnit') })}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* 景表法・打消し表示対応（issue #39）: 累積推定値直下の近接注記 */}
-          <EstimateDisclaimer />
-        </Card>
-
-      {/* Per-habit savings breakdown */}
-      {stats.habits.some((h) => h.impactSavings && h.impactSavings.completedDays > 0) && (
-        <div>
-          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-            {t('impact.perHabitBreakdown')}
-          </h3>
-          <div className="space-y-2">
-            {stats.habits
-              .filter((h) => h.impactSavings && h.impactSavings.completedDays > 0)
-              .map((habit) => (
-                <Card key={habit.id} className="flex items-center gap-3 p-3">
-                  <HabitIcon name={habit.icon} size={20} />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">{habit.name}</p>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-0.5"><HeartPulse className="size-3" /> {formatHealthMinutes(habit.impactSavings!.healthMinutes, { min: t('impact.minuteUnit'), hour: t('impact.hourUnit'), day: t('impact.dayUnit') })}</span>
-                    <span className="flex items-center gap-0.5"><Wallet className="size-3" /> {formatCurrency(habit.impactSavings!.costSaving)}</span>
-                    <span className="flex items-center gap-0.5"><TrendingUp className="size-3" /> {formatCurrency(habit.impactSavings!.incomeGain)}</span>
-                    {habit.impactSavings!.positiveMoodMinutes > 0 && (
-                      <span className="flex items-center gap-0.5" aria-label={t('impact.dailyPositiveMood')}><Smile className="size-3" /> {formatHealthMinutes(habit.impactSavings!.positiveMoodMinutes, { min: t('impact.minuteUnit'), hour: t('impact.hourUnit'), day: t('impact.dayUnit') })}</span>
-                    )}
-                  </div>
-                </Card>
-              ))}
-          </div>
-        </div>
-      )}
-
-      <div>
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+      {/* 習慣ごとの達成率・連続日数: 罫線区切りのリスト（divide-y）で端正に組む。
+          旧・壊れた ProgressRing（0-1 を 0-100 リングに渡していた）と CHART_COLORS 直書きを撤去し、
+          達成率は細い緑バーで示す（達成＝緑の規律）。行内の数値はインク。 */}
+      <section>
+        <h3 className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
           {t('stats.perHabit')}
         </h3>
-        <div className="space-y-2">
-          {stats.habits.map((habit, index) => (
-            <Card
-              key={habit.id}
-              className="flex items-center gap-3 p-3"
-            >
-              <HabitIcon name={habit.icon} size={20} />
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium">{habit.name}</p>
-                <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <Flame className="size-3 text-orange-400" />
-                    {habit.currentStreak} {t('stats.days')}
-                  </span>
-                  <span>
-                    <TrendingUp className="mr-1 inline size-3" />
-                    {Math.round(habit.completionRate * 100)}%
+        <div className="divide-y divide-border/60 overflow-hidden rounded-xl border bg-card">
+          {stats.habits.map((habit) => {
+            const pct = Math.round(habit.completionRate * 100);
+            return (
+              <div key={habit.id} className="px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <HabitIcon name={habit.icon} size={18} />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">{habit.name}</p>
+                    <p className="mt-0.5 font-mono text-[11px] tabular-nums text-muted-foreground">
+                      {habit.currentStreak}
+                      {t('stats.days')}
+                    </p>
+                  </div>
+                  <span className="shrink-0 font-mono text-[20px] font-semibold leading-none tabular-nums text-foreground">
+                    {pct}
+                    <span className="ml-0.5 text-[13px] font-medium text-muted-foreground">%</span>
                   </span>
                 </div>
+                <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full rounded-full bg-success transition-all duration-500 ease-out"
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
               </div>
-              <ProgressRing
-                progress={habit.completionRate}
-                size={40}
-                strokeWidth={3}
-                color={CHART_COLORS[index % CHART_COLORS.length]}
-              />
-            </Card>
-          ))}
+            );
+          })}
         </div>
-      </div>
+      </section>
 
-      {/* Review History Section */}
-      <div>
-        <div className="mb-4 border-t border-border pt-4">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-            {t('reviewHistory.title')}
-          </h3>
+      {/* 人生インパクト貯金（累積）: ホームの今日のインパクトと同じ言語。
+          ヘアライン 2×N グリッド、アイコン=success、数値=インク、ラベル=muted。
+          旧・全 amber 塗り（text-impact-cost を全軸に適用）を撤去。 */}
+      <section className="overflow-hidden rounded-xl border bg-card">
+        <div className="flex items-center justify-between px-5 py-3.5">
+          <span className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+            {t('impact.totalSavings')}
+          </span>
+          <span className="flex items-center gap-1 rounded-full bg-success px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-success-foreground">
+            {t('impact.cumulative')}
+          </span>
         </div>
-        <Card className="p-4">
+        <div className="grid grid-cols-2 gap-px border-y bg-border">
+          {savingsMetrics.map((m) => (
+            <div key={m.label} className="flex flex-col gap-2 bg-card px-5 py-4">
+              <div className="flex items-center gap-1.5">
+                <m.icon className="size-3.5 text-success" />
+                <span className="font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                  {m.label}
+                </span>
+              </div>
+              <span className="font-mono text-[22px] font-semibold leading-none tracking-tight tabular-nums text-foreground">
+                {m.value}
+              </span>
+            </div>
+          ))}
+          {savingsMetrics.length % 2 === 1 && <div className="bg-card" />}
+        </div>
+        {/* 景表法・打消し表示対応（issue #39）: 累積推定値と同一ビューポート内の近接注記 */}
+        <div className="px-5 py-3">
+          <EstimateDisclaimer />
+        </div>
+      </section>
+
+      {/* 習慣ごとの内訳（インパクト）: 罫線区切りのリスト。軸アイコンは muted、数値は mono インク。 */}
+      {impactHabits.length > 0 && (
+        <section>
+          <h3 className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+            {t('impact.perHabitBreakdown')}
+          </h3>
+          <div className="divide-y divide-border/60 overflow-hidden rounded-xl border bg-card">
+            {impactHabits.map((habit) => (
+              <div key={habit.id} className="px-4 py-3">
+                <div className="flex items-center gap-2.5">
+                  <HabitIcon name={habit.icon} size={18} />
+                  <p className="min-w-0 flex-1 truncate text-sm font-medium">{habit.name}</p>
+                </div>
+                {/* 数値は自軸のアイコン（muted）＋ mono インクで。名前を潰さないよう次行に折り返す。 */}
+                <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 pl-[26px] font-mono text-[11px] tabular-nums text-foreground">
+                  <span className="flex items-center gap-1">
+                    <HeartPulse className="size-3 text-muted-foreground" />
+                    {formatHealthMinutes(habit.impactSavings!.healthMinutes, units)}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Wallet className="size-3 text-muted-foreground" />
+                    {formatCurrency(habit.impactSavings!.costSaving)}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <TrendingUp className="size-3 text-muted-foreground" />
+                    {formatCurrency(habit.impactSavings!.incomeGain)}
+                  </span>
+                  {habit.impactSavings!.positiveMoodMinutes > 0 && (
+                    <span className="flex items-center gap-1" aria-label={t('impact.dailyPositiveMood')}>
+                      <Smile className="size-3 text-muted-foreground" />
+                      {formatHealthMinutes(habit.impactSavings!.positiveMoodMinutes, units)}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 振り返り履歴 */}
+      <section>
+        <h3 className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+          {t('reviewHistory.title')}
+        </h3>
+        <div className="rounded-xl border border-border bg-card p-4">
           <ReviewCalendar
             displayYear={reviewHistory.displayYear}
             displayMonth={reviewHistory.displayMonth}
@@ -269,8 +285,8 @@ export default function StatsPage() {
             onNextMonth={reviewHistory.goToNextMonth}
             onDateSelect={reviewHistory.selectDate}
           />
-        </Card>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }

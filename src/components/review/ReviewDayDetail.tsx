@@ -2,7 +2,6 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 import { Check, X, Minus, Circle } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { MOOD_ICONS } from '@/lib/mood-icons';
 import type { DailyReflection } from '@/types/habit';
 import type { MonthlyHabitCompletion } from '@/lib/supabase/habits';
@@ -20,9 +19,9 @@ function StatusIcon({ status }: { status: string }) {
     case 'rocket_used':
       return <Check size={14} className="text-success shrink-0" />;
     case 'failed':
-      return <X size={14} className="text-red-400 shrink-0" />;
+      return <X size={14} className="text-danger shrink-0" />;
     case 'skipped':
-      return <Minus size={14} className="text-gray-400 shrink-0" />;
+      return <Minus size={14} className="text-skipped shrink-0" />;
     default:
       return <Circle size={14} className="text-muted-foreground/30 shrink-0" />;
   }
