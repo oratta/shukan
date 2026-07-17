@@ -7,6 +7,7 @@ import { calculateDedupedDailyImpact, formatHealthMinutes, formatCurrency } from
 import { getArticle } from '@/data/impact-articles';
 import { EstimateDisclaimer } from '@/components/habits/estimate-disclaimer';
 import { ImpactKpiGrid } from '@/components/habits/impact-kpi-grid';
+import { HelpButton } from '@/components/help/help-button';
 import { cn } from '@/lib/utils';
 import type { HabitWithStats } from '@/types/habit';
 import type { HabitEvidence } from '@/types/impact';
@@ -113,8 +114,9 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
     >
       {/* ヘッダー: mono の細いトラッキングでラベルを組む。達成時は右に success バッジ。 */}
       <div className="flex items-center justify-between px-5 py-3.5">
-        <span className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+        <span className="flex items-center gap-1 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
           {t('todayImpact')}
+          <HelpButton topic="lifeImpact" className="size-4" iconClassName="size-3.5" />
         </span>
         {isPerfect && (
           <span className="flex items-center gap-1 font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-success">
