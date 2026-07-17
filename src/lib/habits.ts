@@ -1,4 +1,4 @@
-import type { Habit, HabitCompletion, HabitWithStats, UrgeLog, CopingStep, DayStatus } from '@/types/habit';
+import type { Habit, HabitCompletion, HabitWithStats, DayStatus } from '@/types/habit';
 import type { ArticleId, LifeImpactArticle } from '@/types/impact';
 import { calculateImpactSavings, calculateMultiEvidenceImpact } from '@/lib/impact';
 
@@ -363,26 +363,13 @@ export function isSkippedToday(
   return completions.some((c) => c.habitId === habitId && c.date === today && c.status === 'skipped');
 }
 
-export function isQuitHabitCompletedToday(
-  habitId: string,
-  urgeLogs: UrgeLog[],
-  dailyTarget: number
-): boolean {
-  const today = getTodayString();
-  const todayLogs = urgeLogs.filter(
-    (log) => log.habitId === habitId && log.date === today && log.allCompleted
-  );
-  return todayLogs.length >= dailyTarget;
-}
-
-export function getTodayUrgeCount(
-  habitId: string,
-  urgeLogs: UrgeLog[]
-): number {
-  const today = getTodayString();
-  return urgeLogs.filter(
-    (log) => log.habitId === habitId && log.date === today && log.allCompleted
-  ).length;
+/**
+ * ステータスボタン・週ドットのタップが返す次ステータス（issue #104）。
+ * 達成の二値トグルのみ: 未入力→達成、それ以外（達成/失敗/スキップ）→未入力。
+ * タップだけで failed に到達する経路は置かない（失敗の記録は長押しアクションシート）。
+ */
+export function nextStatus(current: DayStatus['status']): 'completed' | 'none' {
+  return current === 'none' ? 'completed' : 'none';
 }
 
 export function getRecentDays(
@@ -406,6 +393,7 @@ export function getRecentDays(
     result.push({
       date: dateStr,
       status: dayStatus,
+      ...(completion?.resistRate !== undefined ? { resistRate: completion.resistRate } : {}),
     });
   }
   return result;
@@ -482,6 +470,7 @@ export function getAllDayStatuses(
       result.push({
         date: dateStr,
         status: completion.status as DayStatus['status'],
+        ...(completion.resistRate !== undefined ? { resistRate: completion.resistRate } : {}),
       });
     } else {
       // Check if it's been more than 5 days ago (auto-fail)
@@ -502,16 +491,12 @@ export function getAllDayStatuses(
 export function getHabitsWithStats(
   habits: Habit[],
   completions: HabitCompletion[],
-  urgeLogs?: UrgeLog[],
-  copingStepsMap?: Map<string, CopingStep[]>,
   getArticleFn?: (id: ArticleId) => LifeImpactArticle | undefined
 ): HabitWithStats[] {
   return habits.map((habit) => {
     const { current, longest } = calculateStreak(habit.id, completions, habit);
-    const isQuit = habit.type === 'quit';
-    const completedToday = isQuit && urgeLogs
-      ? isQuitHabitCompletedToday(habit.id, urgeLogs, habit.dailyTarget)
-      : isCompletedToday(habit.id, completions);
+    // 達成判定は習慣タイプ問わず completion レコード一本（issue #104 で urge_logs 依存を撤去）
+    const completedToday = isCompletedToday(habit.id, completions);
 
     const { rockets, nextIn } = calculateRockets(habit.id, completions);
 
@@ -598,8 +583,6 @@ export function getHabitsWithStats(
       rockets,
       rocketNextIn: nextIn,
       ...(weeklyCompletedCount !== undefined ? { weeklyCompletedCount } : {}),
-      ...(isQuit && urgeLogs ? { todayUrgeCount: getTodayUrgeCount(habit.id, urgeLogs) } : {}),
-      ...(isQuit && copingStepsMap ? { copingSteps: copingStepsMap.get(habit.id) } : {}),
       ...(impactSavings ? { impactSavings } : {}),
     };
   });

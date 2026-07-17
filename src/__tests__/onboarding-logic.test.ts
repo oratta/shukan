@@ -367,16 +367,14 @@ describe('buildHabitFromPreset', () => {
     expect(h).toBeTruthy();
     expect(h!.type).toBe('positive');
     expect(h!.frequency).toBe('everyday');
-    expect(h!.dailyTarget).toBe(1);
     expect(h!.status).toBeUndefined();
     expect(h!.establishedSince).toBeUndefined();
     expect(h!.name).toBe('少し息が切れるくらいの運動を毎日15分以上行う');
   });
 
-  it('quit プリセットは type=quit / dailyTarget=3', () => {
+  it('quit プリセットは type=quit', () => {
     const h = buildHabitFromPreset('quit_smoking_for_health');
     expect(h!.type).toBe('quit');
-    expect(h!.dailyTarget).toBe(3);
   });
 
   it('未知プリセットは null', () => {

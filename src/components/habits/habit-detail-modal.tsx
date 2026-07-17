@@ -26,6 +26,8 @@ import { ImpactKpiGrid, type ImpactKpiMetric } from '@/components/habits/impact-
 import { EstimateDisclaimer } from '@/components/habits/estimate-disclaimer';
 import { EvidenceManagerSheet } from '@/components/habits/evidence-manager-sheet';
 import { HelpButton } from '@/components/ui/help-button';
+import { nextStatus } from '@/lib/habits';
+import { failedFillStyle } from '@/components/habits/failed-fill';
 import type { HabitWithStats, DayStatus } from '@/types/habit';
 
 interface HabitDetailModalProps {
@@ -51,16 +53,12 @@ function getDateString(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-function nextStatus(current: DayStatus['status'] | null): 'completed' | 'failed' | 'none' {
-  if (!current || current === 'none') return 'completed';
-  if (current === 'completed' || current === 'rocket_used') return 'failed';
-  return 'none';
-}
-
 interface CalendarCell {
   date: string;
   dayOfMonth: number;
   status: DayStatus['status'] | null;
+  /** failed 日の我慢率（0-100）。反転塗り表示に使う（issue #104） */
+  resistRate?: number;
 }
 
 function buildCalendarGrid(
@@ -72,9 +70,9 @@ function buildCalendarGrid(
   const firstDateStr = `${year}-${String(month + 1).padStart(2, '0')}-01`;
   const firstDow = getDayOfWeekMondayBased(firstDateStr);
 
-  const statusMap = new Map<string, DayStatus['status']>();
+  const statusMap = new Map<string, DayStatus>();
   for (const day of allDays) {
-    statusMap.set(day.date, day.status);
+    statusMap.set(day.date, day);
   }
 
   const cells: (CalendarCell | null)[] = [];
@@ -85,8 +83,13 @@ function buildCalendarGrid(
   // Fill all days of month
   for (let d = 1; d <= daysInMonth; d++) {
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-    const status = statusMap.get(dateStr) ?? null;
-    cells.push({ date: dateStr, dayOfMonth: d, status });
+    const day = statusMap.get(dateStr);
+    cells.push({
+      date: dateStr,
+      dayOfMonth: d,
+      status: day?.status ?? null,
+      ...(day?.resistRate !== undefined ? { resistRate: day.resistRate } : {}),
+    });
   }
 
   // Pad end
@@ -463,7 +466,7 @@ export function HabitDetailModal({
                     return <div key={`empty-${colIndex}`} className="aspect-square" />;
                   }
 
-                  const { date, dayOfMonth, status } = cell;
+                  const { date, dayOfMonth, status, resistRate } = cell;
                   const isToday = date === todayStr;
                   const isTappable = tappableDates.has(date) && !!onDayStatusChange;
                   const isRocketEligible = rocketEligibleDates.has(date);
@@ -481,14 +484,15 @@ export function HabitDetailModal({
                         if (isRocketEligible) {
                           setRocketConfirmDate(date);
                         } else if (isTappable) {
-                          onDayStatusChange!(habit.id, date, nextStatus(status));
+                          onDayStatusChange!(habit.id, date, nextStatus(status ?? 'none'));
                         }
                       }}
                       className={cn(
                         'relative flex aspect-square items-center justify-center rounded-lg font-mono text-[10px] font-medium tabular-nums transition-all',
                         // Status colors（達成=success / 失敗=danger。いずれもトークン。原則①）
                         isCompleted && 'bg-success text-success-foreground',
-                        isFailed && !isRocketEligible && 'bg-danger text-primary-foreground',
+                        // 失敗日は inline の failedFillStyle（conic-gradient）で塗る（#105）。静的 bg-danger は使わない。
+                        isFailed && !isRocketEligible && 'text-white',
                         !isCompleted && !isFailed && !isFuture && 'text-foreground',
                         isFuture && 'text-muted-foreground/40',
                         // Tappable border (last 5 days)
@@ -501,6 +505,11 @@ export function HabitDetailModal({
                         // Non-interactive
                         !isTappable && !isRocketEligible && 'cursor-default',
                       )}
+                      style={
+                        isFailed && !isRocketEligible
+                          ? failedFillStyle(resistRate)
+                          : undefined
+                      }
                     >
                       {status === 'rocket_used' ? (
                         <Rocket className="size-3 text-success-foreground" />

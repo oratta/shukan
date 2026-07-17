@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Habit, HabitInsertInput, HabitCompletion, CopingStep, UrgeLog, DailyReflection } from '@/types/habit';
+import type { Habit, HabitInsertInput, HabitCompletion, DailyReflection } from '@/types/habit';
 import type { HabitEvidence } from '@/types/impact';
 import { isValidArticleId } from '@/data/impact-articles';
 import { createClient } from './client';
@@ -14,7 +14,6 @@ export interface HabitRow {
   frequency: 'everyday' | 'weekday' | 'custom' | 'weekly';
   custom_days: number[] | null;
   type: string;
-  daily_target: number;
   weekly_target: number | null;
   created_at: string;
   archived: boolean;
@@ -34,30 +33,11 @@ export interface HabitInsertRow {
   frequency: 'everyday' | 'weekday' | 'custom' | 'weekly';
   custom_days: number[] | null;
   type: string;
-  daily_target: number;
   weekly_target: number | null;
   impact_article_id: string | null;
   status: 'active' | 'established';
   established_since: string | null;
   sort_order: number;
-}
-
-interface CopingStepRow {
-  id: string;
-  habit_id: string;
-  title: string;
-  sort_order: number;
-  created_at: string;
-}
-
-interface UrgeLogRow {
-  id: string;
-  user_id: string;
-  habit_id: string;
-  date: string;
-  completed_steps: string[];
-  all_completed: boolean;
-  created_at: string;
 }
 
 interface CompletionRow {
@@ -68,6 +48,7 @@ interface CompletionRow {
   completed_at: string;
   status: string;
   note: string | null;
+  resist_rate: number | null;
 }
 
 interface DailyReflectionRow {
@@ -107,7 +88,6 @@ export function toHabit(row: HabitRow, evidenceRows?: HabitEvidenceRow[]): Habit
     frequency: row.frequency,
     customDays: row.custom_days ?? undefined,
     type: (row.type as 'positive' | 'quit') || 'positive',
-    dailyTarget: row.daily_target ?? 1,
     weeklyTarget: row.weekly_target ?? 1,
     createdAt: row.created_at,
     archived: row.archived,
@@ -139,32 +119,11 @@ export function buildHabitInsertRow(
     frequency: habit.frequency,
     custom_days: habit.customDays || null,
     type: habit.type || 'positive',
-    daily_target: habit.dailyTarget ?? 1,
     weekly_target: habit.weeklyTarget ?? 1,
     impact_article_id: habit.impactArticleId ?? null,
     status: habit.status ?? 'active',
     established_since: habit.establishedSince ?? null,
     sort_order: sortOrder,
-  };
-}
-
-function toCopingStep(row: CopingStepRow): CopingStep {
-  return {
-    id: row.id,
-    habitId: row.habit_id,
-    title: row.title,
-    sortOrder: row.sort_order,
-  };
-}
-
-function toUrgeLog(row: UrgeLogRow): UrgeLog {
-  return {
-    id: row.id,
-    habitId: row.habit_id,
-    date: row.date,
-    completedSteps: row.completed_steps ?? [],
-    allCompleted: row.all_completed,
-    createdAt: row.created_at,
   };
 }
 
@@ -175,6 +134,7 @@ function toCompletion(row: CompletionRow): HabitCompletion {
     completedAt: row.completed_at,
     status: (row.status as 'completed' | 'failed' | 'rocket_used' | 'skipped') || 'completed',
     ...(row.note != null ? { note: row.note } : {}),
+    ...(row.resist_rate != null ? { resistRate: row.resist_rate } : {}),
   };
 }
 
@@ -264,7 +224,6 @@ export async function updateHabitById(
   if (updates.frequency !== undefined) row.frequency = updates.frequency;
   if (updates.customDays !== undefined) row.custom_days = updates.customDays || null;
   if (updates.type !== undefined) row.type = updates.type;
-  if (updates.dailyTarget !== undefined) row.daily_target = updates.dailyTarget;
   if (updates.weeklyTarget !== undefined) row.weekly_target = updates.weeklyTarget ?? 1;
   if (updates.archived !== undefined) row.archived = updates.archived;
   if (updates.impactArticleId !== undefined) row.impact_article_id = updates.impactArticleId ?? null;
@@ -307,7 +266,8 @@ export async function upsertCompletion(
   userId: string,
   habitId: string,
   date: string,
-  status: 'completed' | 'failed' | 'skipped'
+  status: 'completed' | 'failed' | 'skipped',
+  opts?: { resistRate?: number }
 ): Promise<HabitCompletion> {
   const supabase = createClient();
   // Preserve existing note when updating status
@@ -327,6 +287,8 @@ export async function upsertCompletion(
         date,
         status,
         note: existing?.note ?? null,
+        // resist_rate は failed の追記入力。未指定の upsert（達成トグル等）では null に戻す
+        resist_rate: status === 'failed' ? (opts?.resistRate ?? null) : null,
       },
       { onConflict: 'habit_id,date' }
     )
@@ -348,130 +310,6 @@ export async function deleteCompletion(
     .eq('habit_id', habitId)
     .eq('date', date);
 
-  if (error) throw error;
-}
-
-// --- Coping Steps ---
-
-export async function fetchCopingSteps(habitId: string): Promise<CopingStep[]> {
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from('coping_steps')
-    .select('*')
-    .eq('habit_id', habitId)
-    .order('sort_order', { ascending: true });
-
-  if (error) throw error;
-  return (data as CopingStepRow[]).map(toCopingStep);
-}
-
-export async function fetchCopingStepsByHabitIds(habitIds: string[]): Promise<Map<string, CopingStep[]>> {
-  if (habitIds.length === 0) return new Map();
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from('coping_steps')
-    .select('*')
-    .in('habit_id', habitIds)
-    .order('sort_order', { ascending: true });
-
-  if (error) throw error;
-  const map = new Map<string, CopingStep[]>();
-  for (const row of (data as CopingStepRow[])) {
-    const step = toCopingStep(row);
-    const existing = map.get(row.habit_id) ?? [];
-    existing.push(step);
-    map.set(row.habit_id, existing);
-  }
-  return map;
-}
-
-export async function upsertCopingSteps(
-  habitId: string,
-  steps: { title: string; sortOrder: number }[]
-): Promise<CopingStep[]> {
-  const supabase = createClient();
-
-  // Delete existing steps
-  const { error: deleteError } = await supabase
-    .from('coping_steps')
-    .delete()
-    .eq('habit_id', habitId);
-  if (deleteError) throw deleteError;
-
-  if (steps.length === 0) return [];
-
-  // Insert new steps
-  const rows = steps.map((s) => ({
-    habit_id: habitId,
-    title: s.title,
-    sort_order: s.sortOrder,
-  }));
-
-  const { data, error } = await supabase
-    .from('coping_steps')
-    .insert(rows)
-    .select();
-
-  if (error) throw error;
-  return (data as CopingStepRow[]).map(toCopingStep);
-}
-
-// --- Urge Logs ---
-
-export async function fetchUrgeLogsForDate(date: string): Promise<UrgeLog[]> {
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from('urge_logs')
-    .select('*')
-    .eq('date', date)
-    .order('created_at', { ascending: true });
-
-  if (error) throw error;
-  return (data as UrgeLogRow[]).map(toUrgeLog);
-}
-
-export async function insertUrgeLog(
-  userId: string,
-  habitId: string,
-  date: string
-): Promise<UrgeLog> {
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from('urge_logs')
-    .insert({
-      user_id: userId,
-      habit_id: habitId,
-      date,
-      completed_steps: [],
-      all_completed: false,
-    })
-    .select()
-    .single();
-
-  if (error) throw error;
-  return toUrgeLog(data as UrgeLogRow);
-}
-
-export async function updateUrgeLog(
-  id: string,
-  completedSteps: string[],
-  allCompleted: boolean
-): Promise<void> {
-  const supabase = createClient();
-  const { error } = await supabase
-    .from('urge_logs')
-    .update({
-      completed_steps: completedSteps,
-      all_completed: allCompleted,
-    })
-    .eq('id', id);
-
-  if (error) throw error;
-}
-
-export async function deleteUrgeLog(id: string): Promise<void> {
-  const supabase = createClient();
-  const { error } = await supabase.from('urge_logs').delete().eq('id', id);
   if (error) throw error;
 }
 
@@ -679,6 +517,7 @@ interface MonthlyCompletionRow {
   completed_at: string;
   status: string;
   note: string | null;
+  resist_rate: number | null;
   habits: {
     name: string;
     icon: string;

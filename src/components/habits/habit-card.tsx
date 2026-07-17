@@ -7,10 +7,12 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { getTodayString } from '@/lib/habits';
+import { getTodayString, nextStatus } from '@/lib/habits';
+import { useLongPress } from '@/hooks/useLongPress';
 import { ImpactBadge } from '@/components/habits/impact-badge';
 import { SavingsCard } from '@/components/habits/savings-card';
 import { getEvidenceHeroImage } from '@/data/evidence-hero-images';
+import { failedFillStyle } from '@/components/habits/failed-fill';
 import type { DayStatus, HabitWithStats } from '@/types/habit';
 
 // F15: デイリー習慣カード背景に敷くエビデンス画像コラージュの最大枚数。
@@ -23,45 +25,47 @@ interface HabitCardProps {
   onToggleExpand: (id: string) => void;
   onDayStatusChange: (habitId: string, date: string, status: 'completed' | 'failed' | 'none' | 'skipped') => void;
   onOpenDetail: (id: string) => void;
-  onOpenVsTemptation: (id: string) => void;
+  /** 長押しで対象日のアクションシート（失敗/スキップ/メモ）を開く（issue #104） */
+  onOpenActionSheet: (habitId: string, date: string) => void;
   onSkipToday: (id: string) => void;
   /** 推定値（ImpactBadge）タップで算出根拠（エビデンス記事）へ 1 タップ到達する導線（issue #39） */
   onOpenArticle?: (articleId: string) => void;
 }
 
-function nextStatus(current: DayStatus['status']): 'completed' | 'failed' | 'none' {
-  if (current === 'none') return 'completed';
-  if (current === 'completed' || current === 'rocket_used') return 'failed';
-  return 'none';
-}
-
 function DayStatusDot({
   day,
-  onTap,
+  onOpen,
   onImage = false,
 }: {
   day: DayStatus;
-  onTap: () => void;
+  onOpen: () => void;
   /** 写真バナー上に載る場合の扱い。v2: light=インク（明るいベール上）/ dark=白（暗い島上）。 */
   onImage?: boolean;
 }) {
   const { status } = day;
 
   return (
+    // 過去日は小ターゲットに精密操作を要求しない: タップ一発でアクションシートを開き、
+    // 操作はシート内の大きなボタンで完結させる（案A）。不可視パディングでタッチターゲットも拡大。
     <button
       type="button"
       onClick={(e) => {
         e.stopPropagation();
-        onTap();
+        onOpen();
       }}
-      className={cn(
-        'flex items-center justify-center rounded-full size-3 transition-all',
-        (status === 'completed' || status === 'rocket_used') && 'bg-success',
-        status === 'failed' && 'bg-danger',
-        status === 'none' && (onImage ? 'border border-skipped bg-transparent dark:border-white/70 dark:bg-white/10' : 'border border-skipped bg-transparent'),
-        status === 'skipped' && (onImage ? 'bg-skipped dark:bg-white/45' : 'bg-skipped'),
-      )}
-    />
+      className="-m-1.5 flex items-center justify-center p-1.5"
+    >
+      {/* 失敗日は inline の failedFillStyle（我慢率に応じた conic-gradient）で塗る。他は v2 トークン。 */}
+      <span
+        className={cn(
+          'flex items-center justify-center rounded-full size-3 transition-all',
+          (status === 'completed' || status === 'rocket_used') && 'bg-success',
+          status === 'none' && (onImage ? 'border border-skipped bg-transparent dark:border-white/70 dark:bg-white/10' : 'border border-skipped bg-transparent'),
+          status === 'skipped' && (onImage ? 'bg-skipped dark:bg-white/45' : 'bg-skipped'),
+        )}
+        style={status === 'failed' ? failedFillStyle(day.resistRate) : undefined}
+      />
+    </button>
   );
 }
 
@@ -100,26 +104,23 @@ function CelebrationEffect() {
 function StatusIndicator({
   habit,
   onTapToday,
-  onTapVs,
+  onLongPressToday,
   onImage = false,
 }: {
   habit: HabitWithStats;
-  onTapToday?: () => void;
-  onTapVs?: () => void;
+  onTapToday: () => void;
+  onLongPressToday: () => void;
   /** 写真バナー上では未達リング/枠を白系にして視認性を保つ */
   onImage?: boolean;
 }) {
-  const isQuit = habit.type === 'quit';
   // v2: 未達リング枠は light=インク（border-skipped）で、dark かつ写真上のみ白系に。
   const idleBorder = onImage ? 'border-skipped dark:border-white/70' : 'border-skipped';
-  // 進捗リング下地は currentColor 経由でテーマ切替（light=track / dark写真上=白）。
-  const trackColorClass = onImage
-    ? 'text-[color:var(--track)] dark:text-white/40'
-    : 'text-[color:var(--track)]';
   const [showCelebration, setShowCelebration] = useState(false);
   const prevStatusRef = useRef<string | null>(null);
+  const pressHandlers = useLongPress(onLongPressToday, onTapToday);
 
-  const todayStatus = habit.recentDays?.[0]?.status ?? 'none';
+  const today = habit.recentDays?.[0];
+  const todayStatus = today?.status ?? 'none';
 
   // 未完了→完了への遷移を検知して祝福演出を一度だけ表示する意図的パターン。
   useEffect(() => {
@@ -137,77 +138,18 @@ function StatusIndicator({
     prevStatusRef.current = todayStatus;
   }, [todayStatus]);
 
-  // Quit habits: show urge progress ring (tappable to open VS modal)
-  if (isQuit) {
-    const current = habit.todayUrgeCount ?? 0;
-    const target = habit.dailyTarget;
-    const progress = target > 0 ? current / target : 0;
-    const radius = 13;
-    const circumference = 2 * Math.PI * radius;
-    const strokeDashoffset = circumference * (1 - Math.min(progress, 1));
-    const isFailed = todayStatus === 'failed';
-    const isCompleted = todayStatus === 'completed' || todayStatus === 'rocket_used';
-    const isDone = progress >= 1;
-
-    return (
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          onTapVs?.();
-        }}
-        className="relative flex size-8 shrink-0 items-center justify-center cursor-pointer active:scale-90 transition-transform"
-      >
-        {isFailed ? (
-          /* Failed: solid red circle, no progress arc */
-          <div className="flex size-8 items-center justify-center rounded-full bg-danger" />
-        ) : (isCompleted || isDone) ? (
-          /* Completed: solid green circle */
-          <div className="flex size-8 items-center justify-center rounded-full bg-success">
-            <span className="text-[9px] font-bold text-success-foreground">
-              {current}/{target}
-            </span>
-          </div>
-        ) : (
-          /* In progress: gray bg ring + green progress arc */
-          <>
-            <svg width="32" height="32" viewBox="0 0 32 32" className={cn('-rotate-90', trackColorClass)}>
-              <circle
-                cx="16" cy="16" r={radius}
-                fill="none" stroke="currentColor" strokeWidth="2.5"
-              />
-              <circle
-                cx="16" cy="16" r={radius}
-                fill="none" stroke="var(--success)" strokeWidth="2.5"
-                strokeDasharray={circumference}
-                strokeDashoffset={strokeDashoffset}
-                strokeLinecap="round"
-                className="transition-all duration-300"
-              />
-            </svg>
-            <span className="absolute text-[9px] font-bold text-success">
-              {current}/{target}
-            </span>
-          </>
-        )}
-      </button>
-    );
-  }
-
+  // #105: やらない系(quit)習慣も達成の二値トグルに統一。旧・我慢カウントの urge リング（VS モーダル）は廃止。
   // Weekly positive habits: status based on weekly target achievement
-  if (!isQuit && habit.frequency === 'weekly') {
+  if (habit.type !== 'quit' && habit.frequency === 'weekly') {
     const weeklyDone = (habit.weeklyCompletedCount ?? 0) >= (habit.weeklyTarget ?? 1);
 
     return (
       <div className="relative flex size-8 shrink-0 items-center justify-center">
         <button
           type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onTapToday?.();
-          }}
+          {...pressHandlers}
           className={cn(
-            'flex size-8 shrink-0 items-center justify-center rounded-full transition-all',
+            'flex size-8 shrink-0 touch-none items-center justify-center rounded-full transition-all',
             weeklyDone ? 'bg-success' : cn('border-2', idleBorder),
           )}
         >
@@ -220,24 +162,31 @@ function StatusIndicator({
     );
   }
 
-  // Positive habits: tappable circle that toggles today's status
+  // Daily habits (positive & quit): tap = 達成の二値トグル、長押し = アクションシート（issue #104）
+  const isFailed = todayStatus === 'failed';
+  const showResistRate = isFailed && today?.resistRate !== undefined && today.resistRate > 0;
+
   return (
     <div className="relative flex size-8 shrink-0 items-center justify-center">
       <button
         type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          onTapToday?.();
-        }}
+        {...pressHandlers}
         className={cn(
-          'flex size-8 shrink-0 items-center justify-center rounded-full transition-all',
+          'flex size-8 shrink-0 touch-none items-center justify-center rounded-full transition-all',
           (todayStatus === 'completed' || todayStatus === 'rocket_used') && 'bg-success',
-          todayStatus === 'failed' && 'bg-danger',
+          // 失敗日は inline の failedFillStyle で塗る（静的 bg-danger は使わない）。none/skipped は v2 トークン。
           todayStatus === 'none' && cn('border-2', idleBorder),
+          todayStatus === 'skipped' && 'bg-skipped',
         )}
+        style={isFailed ? failedFillStyle(today?.resistRate) : undefined}
       >
         {(todayStatus === 'completed' || todayStatus === 'rocket_used') && (
           <Check className="size-4 text-success-foreground" strokeWidth={3} />
+        )}
+        {showResistRate && (
+          <span className="text-[9px] font-bold text-white drop-shadow-sm">
+            {today?.resistRate}%
+          </span>
         )}
       </button>
       {showCelebration && <CelebrationEffect />}
@@ -251,7 +200,7 @@ export function HabitCard({
   onToggleExpand,
   onDayStatusChange,
   onOpenDetail,
-  onOpenVsTemptation,
+  onOpenActionSheet,
   onSkipToday,
   onOpenArticle,
 }: HabitCardProps) {
@@ -344,7 +293,7 @@ export function HabitCard({
         const todayDay = (habit.recentDays ?? [])[0];
         if (todayDay) handleDotTap(todayDay);
       }}
-      onTapVs={() => onOpenVsTemptation(habit.id)}
+      onLongPressToday={() => onOpenActionSheet(habit.id, today)}
     />
   );
 
@@ -376,7 +325,7 @@ export function HabitCard({
         return (
           <div key={day.date} className="flex flex-col items-center gap-0.5">
             <span className={cn('text-[9px] leading-none', onBanner ? 'text-muted-foreground dark:text-white/75 dark:banner-label' : 'text-muted-foreground')}>{dayLabel}</span>
-            <DayStatusDot day={day} onTap={() => handleDotTap(day)} onImage={onBanner} />
+            <DayStatusDot day={day} onOpen={() => onOpenActionSheet(habit.id, day.date)} onImage={onBanner} />
           </div>
         );
       })}

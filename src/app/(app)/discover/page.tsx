@@ -90,10 +90,9 @@ export default function DiscoverPage() {
   const handleFormSubmit = useCallback(
     (
       data: HabitInsertInput,
-      copingSteps?: { title: string; sortOrder: number }[],
       initialEvidences?: { articleId: string; weight: number }[]
     ) => {
-      addHabit(data, copingSteps, initialEvidences);
+      addHabit(data, initialEvidences);
     },
     [addHabit]
   );

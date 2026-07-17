@@ -42,7 +42,6 @@ function makeHabit(overrides: Partial<Habit> & { id: string }): Habit {
     icon: 'target',
     frequency: 'everyday',
     type: 'positive',
-    dailyTarget: 1,
     createdAt: '2026-01-01',
     archived: false,
     evidences: [],
@@ -326,7 +325,6 @@ describe('getHabitsWithStats - multi-evidence', () => {
       icon: 'target',
       type: 'quit',
       frequency: 'everyday',
-      dailyTarget: 1,
       createdAt: today,
       archived: false,
       sortOrder: 0,
@@ -335,7 +333,7 @@ describe('getHabitsWithStats - multi-evidence', () => {
     }];
     const completions = [makeCompletion('h1', today)];
 
-    const result = getHabitsWithStats(habits, completions, [], undefined, getArticle);
+    const result = getHabitsWithStats(habits, completions, getArticle);
     expect(result[0].impactSavings).toBeDefined();
     expect(result[0].impactSavings!.completedDays).toBe(1);
     expect(result[0].impactSavings!.healthMinutes).toBe(30);
@@ -349,7 +347,6 @@ describe('getHabitsWithStats - multi-evidence', () => {
       icon: 'target',
       type: 'quit',
       frequency: 'everyday',
-      dailyTarget: 1,
       createdAt: today,
       archived: false,
       sortOrder: 0,
@@ -359,7 +356,7 @@ describe('getHabitsWithStats - multi-evidence', () => {
     }];
     const completions = [makeCompletion('h1', today)];
 
-    const result = getHabitsWithStats(habits, completions, [], undefined, getArticle);
+    const result = getHabitsWithStats(habits, completions, getArticle);
     expect(result[0].impactSavings).toBeDefined();
     expect(result[0].impactSavings!.completedDays).toBe(1);
   });
@@ -372,7 +369,6 @@ describe('getHabitsWithStats - multi-evidence', () => {
       icon: 'target',
       type: 'positive',
       frequency: 'everyday',
-      dailyTarget: 1,
       createdAt: today,
       archived: false,
       sortOrder: 0,
@@ -380,7 +376,7 @@ describe('getHabitsWithStats - multi-evidence', () => {
       evidences: [],
     }];
 
-    const result = getHabitsWithStats(habits, [], [], undefined, getArticle);
+    const result = getHabitsWithStats(habits, [], getArticle);
     expect(result[0].impactSavings).toBeUndefined();
   });
 });

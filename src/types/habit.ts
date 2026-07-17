@@ -9,7 +9,6 @@ export interface Habit {
   frequency: 'everyday' | 'weekday' | 'custom' | 'weekly';
   customDays?: number[];
   type: 'positive' | 'quit';
-  dailyTarget: number;
   weeklyTarget?: number;
   createdAt: string;
   archived: boolean;
@@ -43,28 +42,17 @@ export type HabitInsertInput = Omit<
   establishedSince?: string;
 };
 
-export interface CopingStep {
-  id: string;
-  habitId: string;
-  title: string;
-  sortOrder: number;
-}
-
-export interface UrgeLog {
-  id: string;
-  habitId: string;
-  date: string;
-  completedSteps: string[];
-  allCompleted: boolean;
-  createdAt: string;
-}
-
 export interface HabitCompletion {
   habitId: string;
   date: string;
   completedAt: string;
   status: 'completed' | 'failed' | 'rocket_used' | 'skipped';
   note?: string;
+  /**
+   * quit 習慣の失敗日に「どれくらい我慢できたか」を 0-100 で記録する（issue #104）。
+   * failed 以外・未入力では undefined。表示上は undefined = 全面赤（無抵抗と同等）。
+   */
+  resistRate?: number;
 }
 
 export interface DailyReflection {
@@ -80,6 +68,8 @@ export interface DailyReflection {
 export interface DayStatus {
   date: string;
   status: 'completed' | 'failed' | 'none' | 'rocket_used' | 'skipped';
+  /** failed 日の我慢率（0-100）。表示のグラデーション（赤面積 = 100 − resistRate）に使う。 */
+  resistRate?: number;
 }
 
 export interface HabitWithStats extends Habit {
@@ -93,8 +83,6 @@ export interface HabitWithStats extends Habit {
   rockets: number;
   rocketNextIn: number;
   weeklyCompletedCount?: number;
-  copingSteps?: CopingStep[];
-  todayUrgeCount?: number;
   impactSavings?: LifeImpactSavings;
 }
 

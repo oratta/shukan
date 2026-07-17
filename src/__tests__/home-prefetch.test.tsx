@@ -54,7 +54,6 @@ const habitRow = {
   frequency: 'everyday',
   custom_days: null,
   type: 'positive',
-  daily_target: 1,
   weekly_target: null,
   created_at: '2026-01-01T00:00:00Z',
   archived: false,

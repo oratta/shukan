@@ -365,7 +365,6 @@ export function buildHabitFromPreset(presetId: string): HabitInsertInput | null 
     frequency: 'everyday',
     customDays: undefined,
     type: preset.defaultHabitType,
-    dailyTarget: preset.defaultHabitType === 'quit' ? 3 : 1,
     weeklyTarget: undefined,
     impactArticleId: undefined,
     evidences: [],
