@@ -10,8 +10,9 @@ import { getArticle, getArticleList } from '@/data/impact-articles';
 //
 // 4軸目「前向きな気持ちの時間」(positive_mood) を UI 9箇所に4軸目として表示し、
 // impact.* ラベル（ja/en）を正準名で追加する。記事データは kpi-data-foundation で
-// 代表12本に値と算出根拠が入っている。0値記事は二重計上回避のため意図的に 0 のままとし、
-// 理由コメントを記事ファイルに残す（受け入れ条件 #9）。
+// 代表12本に値が入り、その後の4KPI化アップデートで全記事に値と算出根拠が入った。
+// 万一 0 値記事を作る場合は理由コメント（marker "positiveMood 0:"）を必須とする
+// （Scenario 3-3 の後段テストが将来の記事追加へのガードとして残っている）。
 
 type Json = string | number | boolean | null | { [k: string]: Json } | Json[];
 const impactJa = (ja as unknown as { impact: Record<string, Json> }).impact;

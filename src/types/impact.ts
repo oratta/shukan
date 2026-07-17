@@ -36,8 +36,8 @@ export interface LifeImpactArticle {
 
   // 固定レイヤー: 普遍的な研究結果（全ユーザー共通）
   article: {
-    // 研究紹介テキスト。{{health_inference}}, {{cost_inference}},
-    // {{income_inference}}, {{cumulative}} をブロックプレースホルダーとして含む。
+    // 研究紹介テキスト。{{health_inference}}, {{cost_inference}}, {{income_inference}},
+    // {{positive_mood_inference}}, {{cumulative}} をブロックプレースホルダーとして含む。
     researchBody: string;
     sources: {
       id: number;
@@ -53,8 +53,9 @@ export interface LifeImpactArticle {
     health: string;
     cost: string;
     income: string;
-    // 「前向きな気持ちの時間」KPIの推論段落。renderArticle では使用しない
-    // 計算・将来表示用のデータとして持つのみ（代表記事のみ設定）
+    // 「前向きな気持ちの時間」KPIの推論段落。renderArticle が
+    // {{positive_mood_inference}} プレースホルダーの置換に使う（全記事が設定する）。
+    // 型上 optional なのはテスト用フィクスチャ等の後方互換のため。
     positiveMood?: string;
     cumulative: string;
   };
@@ -64,7 +65,8 @@ export interface LifeImpactArticle {
     dailyHealthMinutes: number;
     dailyCostSaving: number;
     dailyIncomeGain: number;
-    // 「前向きな気持ちの時間」KPI（分/日）。0 = 未設定（UI 非表示判定に使える）
+    // 「前向きな気持ちの時間」KPI（分/日）。0 = 未設定（UI 非表示判定に使える）。
+    // 現行コーパスは全記事 > 0（固定前提 480分ベースライン × x% で算出）
     dailyPositiveMoodMinutes: number;
   };
 

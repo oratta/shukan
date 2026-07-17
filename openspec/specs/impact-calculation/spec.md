@@ -44,36 +44,38 @@ TBD - normalized from archived change evidence-marketplace (delta format had lea
 - **THEN** impactArticleIdを使用してインパクトが計算される（weight=100相当）
 
 ### Requirement: 記事の positiveMood 計算パラメータ
-`src/data/impact-articles/index.ts` に登録された全35記事は `calculationParams.dailyPositiveMoodMinutes`（number）を持たなければならない（MUST）。値 0 は「未設定」を意味し、UI側で positiveMood を非表示にできる状態として扱う。
+`src/data/impact-articles/index.ts` に登録された全記事は `calculationParams.dailyPositiveMoodMinutes`（number）を持たなければならない（MUST）。値 0 は「未設定」を意味し、UI側で positiveMood を非表示にできる状態として扱う（計算上の後方互換。現行コーパスは全記事 > 0）。
 
-#### Scenario: 全35記事の型適合
+#### Scenario: 全記事の型適合
 - **WHEN** 開発者が型チェック＋ビルド（`npm run build`）を実行する
-- **THEN** 全35記事が dailyPositiveMoodMinutes を持ち、型エラーなしで成功する
-- **THEN** 値を設定しない記事には dailyPositiveMoodMinutes: 0 が明示されている
+- **THEN** 全記事が dailyPositiveMoodMinutes を持ち、型エラーなしで成功する
 
 #### Scenario: 0 を未設定として扱う
 - **WHEN** dailyPositiveMoodMinutes が 0 の記事を含むエビデンスでデイリーインパクトを計算する
 - **THEN** その記事の positiveMoodMinutes への寄与は 0 となり、エラーは発生しない
 
-### Requirement: 代表記事の positiveMood 値と算出根拠
-代表記事（10記事程度）は研究ベースの dailyPositiveMoodMinutes（> 0）と `calculationLogic.positiveMood`（CalcStep[]）を持たなければならない（MUST）。値は固定前提（起きている時間16時間・ベースラインの前向き割合50%）から機械的に算出し、健康寿命（dailyHealthMinutes）との二重計上を避けなければならない（MUST）。機械的に算出できず判断が割れる記事は 0（未設定）のまま残す。
+### Requirement: 全記事の positiveMood 値と算出根拠
+登録された全記事は研究ベースの dailyPositiveMoodMinutes（> 0）・`inferences.positiveMood`（推論段落）・`calculationLogic.positiveMood`（CalcStep[]）を持たなければならない（MUST）。値は固定前提（起きている時間16時間・ベースラインの前向き割合50% = 480分/日）に対する相対増分 x% から機械的に算出し、健康寿命（dailyHealthMinutes）との二重計上を避けなければならない（MUST）。x% の根拠は前向き感情（positive affect / mood / well-being）に関する実在の研究であり、出典（sources）に対応する文献を含めなければならない（MUST）。
 
-#### Scenario: 代表記事の値と算出根拠の設定
-- **WHEN** 開発者がユニットテストで代表記事の calculationParams と calculationLogic を検証する
-- **THEN** 10記事程度で dailyPositiveMoodMinutes > 0 である
-- **THEN** dailyPositiveMoodMinutes > 0 の全記事に calculationLogic.positiveMood（CalcStep[]）が設定されている
+#### Scenario: 全記事の値と算出根拠の設定
+- **WHEN** 開発者がユニットテストで全記事の calculationParams と calculationLogic を検証する
+- **THEN** 全記事で dailyPositiveMoodMinutes > 0 かつ 480 以下の整数である
+- **THEN** 全記事に calculationLogic.positiveMood（CalcStep[]）と inferences.positiveMood が設定されている
 - **THEN** CalcStep に固定前提（起床16h・前向き50%）に基づく算出根拠（label / formula / result）が記録されている
 
-#### Scenario: 判断が割れる記事は未設定のまま
-- **WHEN** 研究記述から固定前提で機械的に算出できない記事を確認する
-- **THEN** その記事の dailyPositiveMoodMinutes は 0（未設定）のままである
-- **THEN** calculationLogic.positiveMood は設定されていない
+#### Scenario: 二重計上の回避
+- **WHEN** 開発者が記事の health と positiveMood の算出根拠を確認する
+- **THEN** dailyHealthMinutes は「寿命延伸の残存余命按分」、dailyPositiveMoodMinutes は「その日のうち前向きでいられる時間の増分」であり、同一の研究効果が両軸に計上されていない
 
-### Requirement: 記事本文プレースホルダーの不変
-`renderArticle` の置換プレースホルダー（health_inference / cost_inference / income_inference / cumulative）に positiveMood を追加してはならない（MUST NOT）。`inferences.positiveMood` は計算・将来表示用のデータとして保持するのみとする。
+### Requirement: 記事本文の positiveMood 推論段落
+`renderArticle` は置換プレースホルダーとして health_inference / cost_inference / income_inference / positive_mood_inference / cumulative の5つを扱わなければならない（MUST）。`{{positive_mood_inference}}` は `inferences.positiveMood` で置換する。inferences.positiveMood が未設定の記事ではプレースホルダーを置換せずそのまま残す（未知キーと同じ挙動）ことで、設定漏れに気付ける状態とする。
 
-#### Scenario: renderArticle の出力不変
-- **WHEN** 開発者が positiveMood 値を設定した代表記事に対して renderArticle を実行する
-- **THEN** 出力は従来の4プレースホルダーの置換のみで構成され、positiveMood の段落は挿入されない
-- **THEN** 既存記事の renderArticle 出力は変更前と同一である
+#### Scenario: renderArticle の positiveMood 段落挿入
+- **WHEN** 開発者が inferences.positiveMood を設定した記事に対して renderArticle を実行する
+- **THEN** 出力の `{{positive_mood_inference}}` 位置に positiveMood の推論段落が挿入される
+- **THEN** 既存4プレースホルダーの置換動作は変わらない
+
+#### Scenario: 未設定記事ではプレースホルダーが残る
+- **WHEN** inferences.positiveMood 未設定の記事（テスト用フィクスチャ等）に `{{positive_mood_inference}}` を含む researchBody で renderArticle を実行する
+- **THEN** プレースホルダーは置換されずそのまま残る
 
