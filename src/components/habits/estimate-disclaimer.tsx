@@ -32,8 +32,9 @@ export function EstimateDisclaimer({
   return (
     <p
       className={cn(
+        // v2: onImage は写真ガラス面。light テーマではベール上のインク、dark では白系。
         'flex items-start gap-1 text-[10px] leading-relaxed',
-        light ? 'text-white/70' : 'text-muted-foreground',
+        light ? 'text-muted-foreground dark:text-white/70' : 'text-muted-foreground',
         className
       )}
     >

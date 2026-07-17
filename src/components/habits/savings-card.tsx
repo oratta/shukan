@@ -29,16 +29,20 @@ export function SavingsCard({ savings, surface = 'default' }: SavingsCardProps) 
     : onImage
       ? 'rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm px-3.5 py-2.5'
       : 'rounded-xl border border-success/20 bg-success/10 px-3.5 py-2.5';
+  // v2: bare（ホーム展開のガラスボックス内）は light=インク / dark=白。PiggyBank ラベルは
+  // 「累積＝積み上げ」の意味なので success(緑) を維持し、内訳の数値だけ中立にする。
+  const labelColor = bare ? 'text-success' : light ? 'text-white' : 'text-success';
+  const valuesColor = bare ? 'text-muted-foreground dark:text-white/80' : light ? 'text-white/80' : 'text-[#6D6C6A]';
 
   return (
     <div className={cn('flex items-center justify-between', chrome)}>
       <div className="flex items-center gap-1.5">
-        <PiggyBank className={cn('size-4', light ? 'text-white' : 'text-success')} />
-        <span className={cn('text-[11px] font-semibold', light ? 'text-white' : 'text-success')}>
+        <PiggyBank className={cn('size-4', labelColor)} />
+        <span className={cn('text-[11px] font-semibold', labelColor)}>
           {t('cumulative')}
         </span>
       </div>
-      <div className={cn('flex items-center gap-2.5 text-[11px] font-medium', light ? 'text-white/80' : 'text-[#6D6C6A]')}>
+      <div className={cn('flex items-center gap-2.5 text-[11px] font-medium', valuesColor)}>
         <span className="flex items-center gap-0.5"><HeartPulse className="size-3" /> {formatHealthMinutes(savings.healthMinutes, timeUnits)}</span>
         <span className="flex items-center gap-0.5"><Wallet className="size-3" /> {formatCurrency(savings.costSaving)}</span>
         <span className="flex items-center gap-0.5"><TrendingUp className="size-3" /> {formatCurrency(savings.incomeGain)}</span>
