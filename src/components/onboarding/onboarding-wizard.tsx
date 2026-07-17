@@ -242,7 +242,7 @@ export function OnboardingWizard() {
                       aria-pressed={selected}
                       onClick={() => updateProfile({ gender: g as OnboardingGender })}
                       className={cn(
-                        "rounded-xl border px-3 py-3 text-sm font-medium transition-colors",
+                        "rounded-lg border px-3 py-3 text-sm font-medium transition-colors",
                         selected
                           ? "border-primary bg-primary/5 text-primary ring-2 ring-primary/30"
                           : "border-border bg-card text-foreground hover:border-primary/40"
@@ -308,7 +308,7 @@ export function OnboardingWizard() {
         <section className="space-y-5">
           <div className="flex items-center gap-3">
             <BackLink label={t("back")} onClick={goBackInHabits} />
-            <span className="ml-auto text-xs font-medium text-muted-foreground tabular-nums">
+            <span className="ml-auto font-mono text-xs font-medium text-muted-foreground tabular-nums">
               {t("habits.countLabel", {
                 current: state.habitIndex + 1,
                 total: TOTAL_HABITS,
@@ -317,11 +317,13 @@ export function OnboardingWizard() {
           </div>
 
           {/* 上部: 4KPIライブ累計（固定表示） */}
-          <div className="rounded-2xl border border-border bg-card p-4">
+          <div className="rounded-xl border border-border bg-card p-4">
             <p className="mb-3 text-xs text-muted-foreground">{t("habits.liveLead")}</p>
             <ul className="grid grid-cols-2 gap-x-4 gap-y-3">
               {KPI_CATALOG.map((def) => {
                 const v = liveShown[def.key];
+                // 累計インパクトは「積み上げ（ポジティブ）」の意味 → 値が立ったら success 緑で光らせる。
+                const accrued = liveResult.byKpi[def.key].raw > 0;
                 return (
                   <li
                     key={`${def.key}-${bumpTick}`}
@@ -331,14 +333,22 @@ export function OnboardingWizard() {
                     )}
                   >
                     <span className="flex min-w-0 items-center gap-1.5">
-                      <KpiIcon name={def.icon} className="size-3.5 shrink-0 text-primary" />
+                      <KpiIcon
+                        name={def.icon}
+                        className={cn("size-3.5 shrink-0", accrued ? "text-success" : "text-muted-foreground")}
+                      />
                       <span className="truncate text-[11px] text-muted-foreground">
                         {t(`kpi.${def.key}.name`)}
                       </span>
                     </span>
-                    <span className="shrink-0 text-sm font-bold tabular-nums">
+                    <span
+                      className={cn(
+                        "shrink-0 font-mono text-sm font-semibold tabular-nums",
+                        accrued ? "text-success" : "text-muted-foreground"
+                      )}
+                    >
                       {v.display}
-                      <span className="ml-0.5 text-[10px] font-semibold text-muted-foreground">
+                      <span className="ml-0.5 text-[10px] font-medium text-muted-foreground">
                         {v.unit}
                       </span>
                     </span>
@@ -395,7 +405,7 @@ export function OnboardingWizard() {
                   disabled={state.advancing}
                   onClick={() => chooseRate(currentPreset.id, rate)}
                   className={cn(
-                    "flex flex-col items-start gap-1 rounded-2xl border p-3.5 text-left transition-all active:scale-[0.98]",
+                    "flex flex-col items-start gap-1 rounded-xl border p-3.5 text-left transition active:scale-[0.98]",
                     selected
                       ? "border-primary bg-primary/5 ring-2 ring-primary/30"
                       : "border-border bg-card hover:border-primary/40"
@@ -405,7 +415,7 @@ export function OnboardingWizard() {
                     <span className="text-sm font-bold leading-tight">
                       {t(`habits.levels.${levelKey}.label`)}
                     </span>
-                    <span className="text-xs font-bold text-muted-foreground tabular-nums">
+                    <span className="font-mono text-xs font-semibold text-muted-foreground tabular-nums">
                       {Math.round(rate * 100)}%
                     </span>
                   </span>
@@ -452,7 +462,7 @@ export function OnboardingWizard() {
               return (
                 <section
                   key={def.key}
-                  className="onb-slide-enter space-y-3 rounded-2xl border border-border bg-card p-5"
+                  className="onb-slide-enter space-y-3 rounded-xl border border-border bg-card p-5"
                 >
                   <div className="flex items-center gap-2.5">
                     <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -471,17 +481,17 @@ export function OnboardingWizard() {
                       <p className="whitespace-nowrap text-[11px] text-muted-foreground">
                         {t("result.currentLabel")}
                       </p>
-                      <p className="mt-0.5 whitespace-nowrap text-base font-bold tabular-nums text-foreground">
+                      <p className="mt-0.5 whitespace-nowrap font-mono text-base font-semibold tabular-nums text-foreground">
                         {cur.raw > 0
                           ? t("result.value", { value: cur.display, unit: cur.unit })
                           : "—"}
                       </p>
                     </div>
-                    <div className="rounded-xl bg-primary/5 p-3 ring-1 ring-primary/15">
-                      <p className="whitespace-nowrap text-[11px] font-medium text-primary">
+                    <div className="rounded-xl bg-success/5 p-3 ring-1 ring-success/20">
+                      <p className="whitespace-nowrap text-[11px] font-medium text-success">
                         {t("result.fullLabel")}
                       </p>
-                      <p className="mt-0.5 whitespace-nowrap text-lg font-bold tabular-nums text-primary">
+                      <p className="mt-0.5 whitespace-nowrap font-mono text-lg font-semibold tabular-nums text-success">
                         {full.raw > 0
                           ? t("result.value", { value: full.display, unit: full.unit })
                           : "—"}
@@ -494,7 +504,7 @@ export function OnboardingWizard() {
           </div>
 
           {/* F1: 4KPIまとめ（縮約版・列見出しの折り返しを起こさない対比） */}
-          <div className="rounded-2xl border border-border bg-card p-5">
+          <div className="rounded-xl border border-border bg-card p-5">
             <p className="mb-1 text-sm font-bold">{t("result.summaryLabel")}</p>
             <p className="mb-3 text-[11px] text-muted-foreground">
               {t("result.currentLabel")} ／ {t("result.fullLabel")}
@@ -511,12 +521,12 @@ export function OnboardingWizard() {
                     <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
                       {t(`kpi.${def.key}.name`)}
                     </span>
-                    <span className="shrink-0 whitespace-nowrap text-xs tabular-nums text-muted-foreground">
+                    <span className="shrink-0 whitespace-nowrap font-mono text-xs tabular-nums text-muted-foreground">
                       {cur.raw > 0
                         ? t("result.value", { value: cur.display, unit: cur.unit })
                         : "—"}
                     </span>
-                    <span className="shrink-0 whitespace-nowrap text-sm font-bold tabular-nums text-primary">
+                    <span className="shrink-0 whitespace-nowrap font-mono text-sm font-semibold tabular-nums text-success">
                       {full.raw > 0
                         ? t("result.value", { value: full.display, unit: full.unit })
                         : "—"}
@@ -543,7 +553,7 @@ export function OnboardingWizard() {
                       type="button"
                       disabled={!articleId}
                       onClick={() => articleId && setArticleSheetId(articleId)}
-                      className="flex w-full items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 text-left transition-all hover:border-primary/40 active:scale-[0.99] disabled:pointer-events-none"
+                      className="flex w-full items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 text-left transition hover:border-primary/40 active:scale-[0.99] disabled:pointer-events-none"
                     >
                       <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                         <KpiIcon name={icon} className="size-5" />
@@ -553,7 +563,7 @@ export function OnboardingWizard() {
                           <span className="min-w-0 flex-1 truncate text-sm font-medium">
                             {t(`preset.${presetId}`)}
                           </span>
-                          <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+                          <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
                             {Math.round(rate * 100)}%
                           </span>
                         </span>
@@ -561,11 +571,13 @@ export function OnboardingWizard() {
                         {effects.length > 0 && (
                           <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
                             {effects.map((e) => (
+                              // 密なリスト行は home の「◯日間のインパクト」に倣い、値は foreground・
+                              // アクセントはアイコンの success 緑に載せる（緑の意味を薄めない）。
                               <span
                                 key={e.key}
-                                className="flex items-center gap-0.5 whitespace-nowrap text-xs font-semibold tabular-nums text-primary"
+                                className="flex items-center gap-0.5 whitespace-nowrap font-mono text-xs font-semibold tabular-nums text-foreground"
                               >
-                                <KpiIcon name={e.icon} className="size-3.5 shrink-0" />
+                                <KpiIcon name={e.icon} className="size-3.5 shrink-0 text-success" />
                                 +{e.display}
                                 <span className="text-[10px] font-medium text-muted-foreground">
                                   {e.unit}
@@ -602,7 +614,7 @@ export function OnboardingWizard() {
                 <button
                   type="button"
                   onClick={() => setState((s) => chooseFocusKpi(s, def.key))}
-                  className="flex w-full items-start gap-3 rounded-2xl border border-border bg-card p-4 text-left transition-all hover:border-primary/40 active:scale-[0.99]"
+                  className="flex w-full items-start gap-3 rounded-xl border border-border bg-card p-4 text-left transition hover:border-primary/40 active:scale-[0.99]"
                 >
                   <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <KpiIcon name={def.icon} className="size-5" />
@@ -642,7 +654,7 @@ export function OnboardingWizard() {
                       aria-pressed={chosen}
                       onClick={() => setState((s) => toggleChosenPreset(s, presetId))}
                       className={cn(
-                        "flex w-full items-center gap-3 rounded-2xl border p-4 text-left transition-all active:scale-[0.99]",
+                        "flex w-full items-center gap-3 rounded-xl border p-4 text-left transition active:scale-[0.99]",
                         chosen
                           ? "border-primary bg-primary/5 ring-2 ring-primary/30"
                           : "border-border bg-card hover:border-primary/40"
@@ -667,9 +679,9 @@ export function OnboardingWizard() {
                           {t("habitSelect.current", { percent: Math.round(rate * 100) })}
                         </span>
                       </span>
-                      <span className="shrink-0 text-sm font-bold tabular-nums text-primary">
+                      <span className="shrink-0 font-mono text-sm font-semibold tabular-nums text-success">
                         +{growth.display}
-                        <span className="ml-0.5 text-[10px] font-semibold text-muted-foreground">
+                        <span className="ml-0.5 text-[10px] font-medium text-muted-foreground">
                           {growth.unit}
                         </span>
                       </span>
@@ -789,17 +801,17 @@ function HabitImpactBox({
             <div key={def.key} className="flex flex-col items-center gap-1 text-center">
               <KpiIcon
                 name={def.icon}
-                className={cn("size-4", dim ? "text-muted-foreground/50" : "text-primary")}
+                className={cn("size-4", dim ? "text-muted-foreground/50" : "text-success")}
               />
               <span
                 className={cn(
-                  "text-[13px] font-bold leading-none tabular-nums",
-                  dim ? "text-muted-foreground" : "text-foreground"
+                  "font-mono text-[13px] font-semibold leading-none tabular-nums",
+                  dim ? "text-muted-foreground" : "text-success"
                 )}
               >
                 {dim ? "—" : `+${v.display}`}
                 {!dim && (
-                  <span className="ml-0.5 text-[9px] font-semibold text-muted-foreground">
+                  <span className="ml-0.5 text-[9px] font-medium text-muted-foreground">
                     {v.unit}
                   </span>
                 )}
@@ -896,7 +908,7 @@ function PrimaryButton({
       type="button"
       disabled={disabled}
       onClick={onClick}
-      className="w-full rounded-xl bg-primary px-4 py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+      className="w-full rounded-lg bg-primary px-4 py-3.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
     >
       {children}
     </button>
@@ -905,7 +917,7 @@ function PrimaryButton({
 
 function inputClass(error: boolean): string {
   return cn(
-    "w-full rounded-xl border bg-card px-4 py-3 text-sm shadow-sm outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20",
+    "w-full rounded-lg border bg-card px-4 py-3 text-sm outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20",
     error ? "border-destructive" : "border-border"
   );
 }

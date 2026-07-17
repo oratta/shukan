@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/components/auth-provider';
+import { SmitchLogo } from '@/components/ui/smitch-logo';
 import Link from 'next/link';
 
 function LoginContent() {
@@ -35,11 +36,13 @@ function LoginContent() {
   return (
     <div className="flex min-h-dvh items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm space-y-8 text-center">
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight">
-            {t('app.name')}
+        <div className="space-y-4">
+          <h1 className="flex justify-center">
+            {/* 単色ロゴ（DESIGN §8）: light=インク黒 / dark=白。ブランド原色は新システムでは使わない。 */}
+            <SmitchLogo height={38} className="brightness-0 dark:invert" />
+            <span className="sr-only">{t('app.name')}</span>
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             {t('auth.loginTagline')}
           </p>
         </div>
@@ -53,7 +56,7 @@ function LoginContent() {
         <button
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="inline-flex w-full items-center justify-center gap-3 rounded-lg border border-border bg-card px-4 py-3 text-sm font-medium shadow-sm transition-colors hover:bg-accent disabled:opacity-50"
+          className="inline-flex w-full items-center justify-center gap-3 rounded-lg border border-border bg-card px-4 py-3 text-sm font-medium transition-colors hover:bg-accent disabled:opacity-50"
         >
           <svg className="size-5" viewBox="0 0 24 24">
             <path
