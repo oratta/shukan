@@ -79,6 +79,11 @@ export interface HabitWithStats extends Habit {
   skippedToday: boolean;
   completionRate: number;
   recentDays: DayStatus[];
+  /**
+   * 編集可能枠（今日を除く過去 EDITABLE_PAST_DAYS 日）の対象日。新しい順。
+   * 週ドット表示と一括編集シートの行はどちらもこれを描画し、常に1:1で一致する（issue #107）。
+   */
+  editablePastDays: DayStatus[];
   allDays: DayStatus[];
   rockets: number;
   rocketNextIn: number;

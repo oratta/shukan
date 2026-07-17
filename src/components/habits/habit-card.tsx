@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Check, ChevronDown, ChevronUp, Maximize2, GripVertical, SkipForward, Undo2, History } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -182,7 +182,6 @@ export function HabitCard({
   const t = useTranslations('habits');
   const tDays = useTranslations('days');
   const tStats = useTranslations('stats');
-  const locale = useLocale();
   const isQuit = habit.type === 'quit';
   const isSkipped = habit.skippedToday;
   const today = getTodayString();
@@ -334,8 +333,10 @@ export function HabitCard({
             )}
           </div>
           {/* 週ドット領域全体が一括編集シートの起動ボタン（issue #107 案1）。
-              ドットは表示専用で、どこを押しても同じ。-m/p の不可視パディングでタッチ高さを確保。 */}
-          {(habit.recentDays ?? []).length > 1 && (
+              ドットは表示専用で、どこを押しても同じ。-m/p の不可視パディングでタッチ高さを確保。
+              表示する日は一括編集シートの行と常に1:1（editablePastDays）。曜日ラベルは置かず、
+              日付・曜日の確認はタップ先のシートに任せる。left=昨日, right=7日前 */}
+          {(habit.editablePastDays ?? []).length > 0 && (
             <button
               type="button"
               onClick={(e) => {
@@ -343,18 +344,11 @@ export function HabitCard({
                 onOpenBulkEdit(habit.id);
               }}
               aria-label={t('bulkEdit.open')}
-              className="-mx-2 -my-2.5 flex items-center gap-1.5 self-start px-2 py-2.5"
+              className="-mx-2 -my-3 flex items-center gap-1.5 self-start px-2 py-3"
             >
-              {/* Past days only (skip index 0 = today), left=yesterday, right=oldest */}
-              {(habit.recentDays ?? []).slice(1).map((day) => {
-                const dayLabel = new Date(day.date + 'T00:00:00').toLocaleDateString(locale, { weekday: 'narrow' });
-                return (
-                  <div key={day.date} className="flex flex-col items-center gap-0.5">
-                    <span className={cn('text-[9px] leading-none', hasEvidenceBg ? 'text-white/70' : 'text-muted-foreground')}>{dayLabel}</span>
-                    <DayStatusDot day={day} />
-                  </div>
-                );
-              })}
+              {(habit.editablePastDays ?? []).map((day) => (
+                <DayStatusDot key={day.date} day={day} />
+              ))}
             </button>
           )}
         </div>

@@ -614,6 +614,7 @@ export function getHabitsWithStats(
         habit
       ),
       recentDays,
+      editablePastDays: getEditablePastDays(habit, completions),
       allDays: getAllDayStatuses(habit.id, completions, habit.createdAt),
       rockets,
       rocketNextIn: nextIn,

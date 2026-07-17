@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { MoreHorizontal } from 'lucide-react';
 import {
@@ -11,18 +11,16 @@ import {
   SheetDescription,
 } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import { getEditablePastDays } from '@/lib/habits';
 import { RESIST_CHOICES } from '@/components/habits/resist-choices';
-import type { DayStatus, HabitCompletion, HabitWithStats } from '@/types/habit';
+import type { DayStatus, HabitWithStats } from '@/types/habit';
 
 type SelectableStatus = 'completed' | 'failed' | 'skipped';
 
 interface HabitBulkEditSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** 行は habit.editablePastDays を描画する（週ドットと同一データで常に1:1。楽観更新にも追従） */
   habit: HabitWithStats | null;
-  /** 行のステータス表示を楽観更新に追従させるため、completion 一覧から都度導出する */
-  completions: HabitCompletion[];
   onSetDayStatus: (
     habitId: string,
     date: string,
@@ -44,7 +42,6 @@ export function HabitBulkEditSheet({
   open,
   onOpenChange,
   habit,
-  completions,
   onSetDayStatus,
   onOpenDayActions,
 }: HabitBulkEditSheetProps) {
@@ -61,10 +58,7 @@ export function HabitBulkEditSheet({
     }
   }, [open]);
 
-  const rows = useMemo(
-    () => (habit ? getEditablePastDays(habit, completions) : []),
-    [habit, completions]
-  );
+  const rows = habit?.editablePastDays ?? [];
 
   if (!habit) return null;
 

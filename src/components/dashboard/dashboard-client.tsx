@@ -381,7 +381,6 @@ export function DashboardClient({
         open={!!bulkEditTarget}
         onOpenChange={(open) => !open && setBulkEditTarget(null)}
         habit={bulkEditHabit}
-        completions={completions}
         onSetDayStatus={setDayStatus}
         onOpenDayActions={handleOpenDayActions}
       />

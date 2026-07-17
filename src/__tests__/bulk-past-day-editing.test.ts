@@ -134,6 +134,24 @@ describe('getEditablePastDays: 対象日の決定', () => {
   });
 });
 
+describe('editablePastDays: 週ドットと一括編集シートの行の1:1一致', () => {
+  it('getHabitsWithStats が editablePastDays を返し、getEditablePastDays と一致する', () => {
+    const habit = makeHabit({ id: 'h1', type: 'quit' });
+    const completions = [makeCompletion('h1', daysAgo(2), 'failed', 25)];
+    const [stats] = getHabitsWithStats([habit], completions);
+    expect(stats.editablePastDays).toEqual(getEditablePastDays(habit, completions));
+    expect(stats.editablePastDays).toHaveLength(EDITABLE_PAST_DAYS);
+  });
+
+  it('曜日指定習慣でも editablePastDays は過去7日の対象曜日のみ（シート行と同じ）', () => {
+    const targetDow = dayOfWeekOf(daysAgo(3));
+    const habit = makeHabit({ id: 'h1', frequency: 'custom', customDays: [targetDow] });
+    const [stats] = getHabitsWithStats([habit], []);
+    expect(stats.editablePastDays).toHaveLength(1);
+    expect(stats.editablePastDays[0].date).toBe(daysAgo(3));
+  });
+});
+
 describe('自動失敗表示の境界統一（getAllDayStatuses 経由の allDays）', () => {
   it('編集可能枠内（7日前まで）の未記録日は none、8日以上前は failed', () => {
     const habit = makeHabit({ id: 'h1', createdAt: daysAgo(10) });
