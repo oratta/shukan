@@ -53,44 +53,59 @@
   --color-impact-cost: var(--impact-cost);
   --color-impact-income: var(--impact-income);
   --color-impact-bg: var(--impact-bg);
-  --color-streak: var(--streak);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-skipped: var(--skipped);
+  --color-track: var(--track);
 }
 
 :root {
   --radius: 0.625rem;
-  /* Smitch brand: Deep Indigo + Slate */
-  --background: oklch(0.98 0.002 250);
-  --foreground: oklch(0.35 0.05 250);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.35 0.05 250);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.35 0.05 250);
-  --primary: oklch(0.35 0.05 250);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.96 0.01 250);
-  --secondary-foreground: oklch(0.35 0.05 250);
-  --muted: oklch(0.96 0.01 250);
-  --muted-foreground: oklch(0.55 0.015 260);
-  --accent: oklch(0.96 0.01 250);
-  --accent-foreground: oklch(0.35 0.05 250);
+  /* v2 ベーストーン: エレクトリック緑（hue≈140）が「よそ者」に見えないよう、ライトの無彩色を
+     従来の青寄り(hue 250)から「紙っぽい暖色オフホワイト」(hue≈95, 極小 chroma)へ振る。
+     暖色紙 × 高彩度ライムで、緑を画面唯一の色＝達成の記号として際立たせる（Fitness+ 方向）。 */
+  --background: oklch(0.985 0.006 95);
+  --foreground: oklch(0.34 0.014 100);
+  --card: oklch(0.997 0.004 95);
+  --card-foreground: oklch(0.34 0.014 100);
+  --popover: oklch(0.997 0.004 95);
+  --popover-foreground: oklch(0.34 0.014 100);
+  /* エッセンス③「意味だけが色を持つ」: FAB・CTA・アクティブ状態の青/インディゴを抜き、
+     ライトは高コントラストの無彩色インク（暖色寄り濃色）にする。 */
+  --primary: oklch(0.30 0.012 100);
+  --primary-foreground: oklch(0.99 0.004 95);
+  --secondary: oklch(0.955 0.008 95);
+  --secondary-foreground: oklch(0.34 0.014 100);
+  --muted: oklch(0.955 0.008 95);
+  --muted-foreground: oklch(0.52 0.014 100);
+  --accent: oklch(0.955 0.008 95);
+  --accent-foreground: oklch(0.34 0.014 100);
   --destructive: oklch(0.65 0.12 30);
-  --border: oklch(0.86 0.01 250);
-  --input: oklch(0.86 0.01 250);
-  --ring: oklch(0.65 0.15 250);
+  --border: oklch(0.88 0.01 95);
+  --input: oklch(0.88 0.01 95);
+  /* v2: フォーカスリングは無彩色（旧: 青 oklch(0.65 0.15 250)）。UI chrome から青を排除。 */
+  --ring: oklch(0.55 0.02 100);
+  /* --chart-* はデータビジュアライゼーション専用パレット（緑=達成の予約色を避けた多色系）。
+     UI chrome の無彩色ルールの対象外。統計画面の刷新（後続フェーズ）で個別に見直す。 */
   --chart-1: oklch(0.65 0.15 250);
   --chart-2: oklch(0.55 0.12 155);
   --chart-3: oklch(0.75 0.12 85);
   --chart-4: oklch(0.65 0.12 30);
   --chart-5: oklch(0.7 0.015 260);
-  --sidebar: oklch(0.98 0.002 250);
-  --sidebar-foreground: oklch(0.35 0.05 250);
-  --sidebar-primary: oklch(0.35 0.05 250);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.96 0.01 250);
-  --sidebar-accent-foreground: oklch(0.35 0.05 250);
-  --sidebar-border: oklch(0.86 0.01 250);
-  --sidebar-ring: oklch(0.65 0.15 250);
-  --success: oklch(0.55 0.15 155);
+  --sidebar: oklch(0.985 0.006 95);
+  --sidebar-foreground: oklch(0.34 0.014 100);
+  --sidebar-primary: oklch(0.30 0.012 100);
+  --sidebar-primary-foreground: oklch(0.99 0.004 95);
+  --sidebar-accent: oklch(0.955 0.008 95);
+  --sidebar-accent-foreground: oklch(0.34 0.014 100);
+  --sidebar-border: oklch(0.88 0.01 95);
+  --sidebar-ring: oklch(0.55 0.02 100);
+  /* ─── アクセント緑（エッセンス③ WHOOP律「意味だけが色を持つ」）──────────────
+     達成・積み上げ専用（数値/チェック/進捗バー/完了ドット）。
+     v2 の確定: ライト = エレクトリック（高彩度ライム, hue≈140, 暖色紙上 3.4:1）を維持、
+     ダーク = 深め（落ち着いたエメラルド, .dark ブロック参照）。
+     白地でネオンは沈むため light は一段深い明度に落として 3:1 以上を確保している。 */
+  --success: oklch(0.60 0.19 140);
   --success-foreground: oklch(1 0 0);
   --warning: oklch(0.7 0.12 85);
   --warning-foreground: oklch(0.3 0.05 85);
@@ -98,7 +113,14 @@
   --impact-cost: oklch(0.65 0.12 85);
   --impact-income: oklch(0.55 0.12 250);
   --impact-bg: oklch(0.97 0.01 85);
-  --streak: oklch(0.65 0.12 30);
+  /* Danger = Coral / Skipped = 暖色グレー / Track = 進捗リング下地 */
+  --danger: oklch(0.66 0.1 40);
+  --danger-foreground: oklch(1 0 0);
+  --skipped: oklch(0.70 0.014 100);
+  --track: oklch(0.9 0.008 95);
+  /* 写真バナー（ダークの「暗い島」）専用: mix-blend-color で色相だけをインディゴへ寄せ、
+     複数写真のトーンのばらつきを揃える（.banner-tint / dark でのみ使用）。 */
+  --photo-tint: oklch(0.55 0.12 262 / 0.20);
 }
 
 .dark {
@@ -108,8 +130,10 @@
   --card-foreground: oklch(0.87 0.01 250);
   --popover: oklch(0.24 0.035 250);
   --popover-foreground: oklch(0.87 0.01 250);
-  --primary: oklch(0.65 0.15 250);
-  --primary-foreground: oklch(0.18 0.025 250);
+  /* エッセンス③: ダークは FAB・CTA・アクティブを白系インクにして高コントラスト化。
+     （旧値 oklch(0.65 0.15 250) の青インディゴを排除） */
+  --primary: oklch(0.93 0.004 260);
+  --primary-foreground: oklch(0.20 0.008 260);
   --secondary: oklch(0.24 0.035 250);
   --secondary-foreground: oklch(0.87 0.01 250);
   --muted: oklch(0.24 0.035 250);
@@ -119,7 +143,7 @@
   --destructive: oklch(0.65 0.12 30);
   --border: oklch(0.35 0.05 250 / 40%);
   --input: oklch(0.35 0.05 250 / 50%);
-  --ring: oklch(0.65 0.15 250);
+  --ring: oklch(0.65 0.02 260);
   --chart-1: oklch(0.65 0.15 250);
   --chart-2: oklch(0.55 0.12 155);
   --chart-3: oklch(0.75 0.12 85);
@@ -127,21 +151,26 @@
   --chart-5: oklch(0.7 0.015 260);
   --sidebar: oklch(0.24 0.035 250);
   --sidebar-foreground: oklch(0.87 0.01 250);
-  --sidebar-primary: oklch(0.65 0.15 250);
-  --sidebar-primary-foreground: oklch(0.18 0.025 250);
+  --sidebar-primary: oklch(0.93 0.004 260);
+  --sidebar-primary-foreground: oklch(0.20 0.008 260);
   --sidebar-accent: oklch(0.24 0.035 250);
   --sidebar-accent-foreground: oklch(0.87 0.01 250);
   --sidebar-border: oklch(0.35 0.05 250 / 40%);
-  --sidebar-ring: oklch(0.65 0.15 250);
-  --success: oklch(0.65 0.15 155);
-  --success-foreground: oklch(0.15 0.02 155);
+  --sidebar-ring: oklch(0.65 0.02 260);
+  /* v2: ダークは「深め版」を採用（落ち着いたエメラルド, 暗地 8:1）。ライトのみエレクトリック維持。 */
+  --success: oklch(0.72 0.15 148);
+  --success-foreground: oklch(0.20 0.04 148);
   --warning: oklch(0.75 0.12 85);
   --warning-foreground: oklch(0.2 0.05 85);
   --impact-health: oklch(0.65 0.15 155);
   --impact-cost: oklch(0.75 0.12 85);
   --impact-income: oklch(0.65 0.12 250);
   --impact-bg: oklch(0.25 0.02 85);
-  --streak: oklch(0.7 0.12 30);
+  --danger: oklch(0.68 0.11 40);
+  --danger-foreground: oklch(0.16 0.02 40);
+  --skipped: oklch(0.6 0.02 260);
+  --track: oklch(0.42 0.02 260);
+  --photo-tint: oklch(0.55 0.13 262 / 0.26);
 }
 
 @layer base {
@@ -157,6 +186,23 @@
   0% { transform: scale(1); }
   50% { transform: scale(1.02); }
   100% { transform: scale(1); }
+}
+
+/* B案由来「静かな精密さ」: インパクトサマリーが下から静かに立ち上がる入場。
+   派手なバウンドを避け、余韻のある ease でデータ面のように整列させる。 */
+@keyframes quietRise {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.quiet-rise {
+  animation: quietRise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes fadeSlideIn {
@@ -234,4 +280,94 @@
 
 .onb-kpi-bump {
   animation: onbKpiBump 0.6s ease;
+}
+
+/* ───────── シネマティック・バナー（A案: 習慣カードの写真バナー） ───────── */
+
+/* v2: 写真上の文字は、ダーク=白文字（影で可読性）／ライト=インク文字（明るいベールで可読性）。
+   影はダークの白文字にのみ効かせる（ライトのインク文字に黒影が乗ると濁るため .dark 限定）。 */
+.dark .banner-title {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55), 0 2px 14px rgba(0, 0, 0, 0.45);
+}
+
+.dark .banner-label {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+/* 写真の色相統一（C案の思想を控えめに）: mix-blend-color で輝度は保ったまま色相を寄せる。
+   ダークの「暗い島」でのみ使用（JSX で dark: 限定表示）。 */
+.banner-tint {
+  background: var(--photo-tint);
+  mix-blend-mode: color;
+}
+
+/* v2 ライト専用「明るいベール」: 黒スクリムの代わりに背景色系の半透明ウォッシュ＋ぼかしを
+   重ね、写真をライト UI に馴染む frosted な脇役にする。下端ほど濃く（インク文字の可読性を確保）、
+   上端は写真を残す。可読性はベール濃度で担保するので文字は foreground(インク)を使う。 */
+.banner-veil {
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--background) 90%, transparent) 0%,
+    color-mix(in srgb, var(--background) 74%, transparent) 44%,
+    color-mix(in srgb, var(--background) 52%, transparent) 100%
+  );
+  backdrop-filter: blur(2.5px) saturate(1.03);
+  -webkit-backdrop-filter: blur(2.5px) saturate(1.03);
+}
+
+.banner-veil-expanded {
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--background) 88%, transparent) 0%,
+    color-mix(in srgb, var(--background) 78%, transparent) 60%,
+    color-mix(in srgb, var(--background) 58%, transparent) 100%
+  );
+  backdrop-filter: blur(3.5px) saturate(1.03);
+  -webkit-backdrop-filter: blur(3.5px) saturate(1.03);
+}
+
+/* v2 入口画面（発見）用の軽ベール: .banner-veil は全面フロスト（blur＋均一ウォッシュ）で、
+   写真が主役の入口では全カードが washed out に見え「押せないグレー板」に読める。browse では
+   全面ぼかしをやめ、テキストが乗る下部だけ背景色ウォッシュ、上部は写真を素通しにして彩度を残す。
+   これで light でも「タップできる写真タイル」に見える。文字は foreground(インク)で、下端の
+   濃いウォッシュで可読性を確保する。dark は従来どおり .banner-scrim（黒スクリム）を使う。 */
+.banner-veil-browse {
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--background) 90%, transparent) 0%,
+    color-mix(in srgb, var(--background) 62%, transparent) 28%,
+    color-mix(in srgb, var(--background) 16%, transparent) 54%,
+    transparent 74%
+  );
+}
+
+/* 下→上の映画的スクリム。下部は濃く（テキスト面）、上部は写真をほぼ素通し。
+   左からもわずかに敷いて左下のタイトル面をさらに持ち上げる。 */
+/* エッセンス④: バナーを「常時ダークの島」として規格化し、②の大数字・③の緑が常に視覚の
+   勝者になるよう、ハイブリッドより一段スクリムを強める（写真は潰さず一回り静かに）。 */
+.banner-scrim {
+  background:
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.88) 0%,
+      rgba(0, 0, 0, 0.58) 34%,
+      rgba(0, 0, 0, 0.24) 64%,
+      rgba(0, 0, 0, 0.06) 100%
+    ),
+    linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.46) 0%,
+      rgba(0, 0, 0, 0.14) 48%,
+      rgba(0, 0, 0, 0) 74%
+    );
+}
+
+/* 展開時の下半分。写真を写真として残しつつ、ガラスパネルの背後を落ち着かせる。 */
+.banner-scrim-expanded {
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.72) 0%,
+    rgba(0, 0, 0, 0.6) 55%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
 }

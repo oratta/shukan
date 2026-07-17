@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { Rocket, X, Pencil, ChevronRight, ChevronLeft, Settings, Crown } from 'lucide-react';
+import { Rocket, X, Pencil, ChevronRight, ChevronLeft, Settings, Crown, HeartPulse, Wallet, TrendingUp, Smile } from 'lucide-react';
 import { HabitIcon } from '@/components/ui/habit-icon';
 import {
   Dialog,
@@ -21,8 +21,9 @@ import {
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import { getArticle } from '@/data/impact-articles';
-import { ImpactBadge } from '@/components/habits/impact-badge';
-import { SavingsCard } from '@/components/habits/savings-card';
+import { calculateDailyImpact, formatHealthMinutes, formatCurrency } from '@/lib/impact';
+import { ImpactKpiGrid, type ImpactKpiMetric } from '@/components/habits/impact-kpi-grid';
+import { EstimateDisclaimer } from '@/components/habits/estimate-disclaimer';
 import { EvidenceManagerSheet } from '@/components/habits/evidence-manager-sheet';
 import { HelpButton } from '@/components/ui/help-button';
 import { nextStatus, EDITABLE_PAST_DAYS } from '@/lib/habits';
@@ -117,6 +118,7 @@ export function HabitDetailModal({
   const tHabits = useTranslations('habits');
   const tDays = useTranslations('days');
   const tEvidence = useTranslations('evidence');
+  const tImpact = useTranslations('impact');
   const [rocketConfirmDate, setRocketConfirmDate] = useState<string | null>(null);
   const [evidenceManagerOpen, setEvidenceManagerOpen] = useState(false);
 
@@ -184,6 +186,42 @@ export function HabitDetailModal({
     }
     return set;
   }, [habit]);
+
+  // 詳細ビューの主役は「累計インパクト」（積み上げ）。大きい数値＝累計、その下に「1日あたり +X」を
+  // 小さい muted 文字で従属表示する（ホーム「今日のライフインパクト」と同じ ImpactKpiGrid の言語）。
+  // 累計は habit.impactSavings（旧・累積貯金ピルの値）、1日あたりは evidences から算出。
+  const cumulativeMetrics = useMemo<ImpactKpiMetric[] | null>(() => {
+    if (!habit || !habit.impactSavings) return null;
+    const daily = calculateDailyImpact(habit.evidences, getArticle);
+    const cum = habit.impactSavings;
+    const perDay = (s: string) => `${tImpact('perDayPrefix')} ${s}`;
+    return [
+      {
+        icon: HeartPulse,
+        label: tImpact('dailyHealth'),
+        value: `+${formatHealthMinutes(cum.healthMinutes)}`,
+        sub: perDay(`+${formatHealthMinutes(daily.healthMinutes)}`),
+      },
+      {
+        icon: Wallet,
+        label: tImpact('dailyCost'),
+        value: formatCurrency(cum.costSaving),
+        sub: perDay(formatCurrency(daily.costSaving, false)),
+      },
+      {
+        icon: TrendingUp,
+        label: tImpact('dailyIncome'),
+        value: formatCurrency(cum.incomeGain),
+        sub: perDay(formatCurrency(daily.incomeGain, false)),
+      },
+      {
+        icon: Smile,
+        label: tImpact('dailyPositiveMood'),
+        value: `+${formatHealthMinutes(cum.positiveMoodMinutes)}`,
+        sub: perDay(`+${formatHealthMinutes(daily.positiveMoodMinutes)}`),
+      },
+    ];
+  }, [habit, tImpact]);
 
   // Resolve evidence articles for display
   const evidenceArticles = useMemo(() => {
@@ -253,65 +291,60 @@ export function HabitDetailModal({
           </div>
         )}
 
-        {/* Impact Badge */}
-        {habit.evidences.length > 0 && (
+        {/* 累計インパクト（詳細ビューの主役）: ホーム「今日のライフインパクト」と同じ 2×2 ヘアライン
+            グリッド（ImpactKpiGrid）。大きい数値＝累計の積み上げ（success=積み上げの意味）、その下に
+            「1日あたり +X」を muted で従属表示。キャプションに実行日数を添える（旧・累積貯金ピルの役割を吸収）。 */}
+        {cumulativeMetrics && habit.impactSavings && (
           <div className="px-5">
-            <ImpactBadge
-              evidences={habit.evidences}
-              mode="daily"
-              onTap={
-                onOpenArticle
-                  ? () => onOpenArticle(habit.evidences[0].articleId)
-                  : undefined
-              }
+            <p className="mb-2 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              {tImpact('cumulativeImpact')}・{tImpact('executedDays', { days: habit.impactSavings.completedDays })}
+            </p>
+            {/* 累計は桁が長くなる（+14時間24分 等）ため値は一段小さめの text-[22px] にして溢れを防ぐ。 */}
+            <ImpactKpiGrid
+              metrics={cumulativeMetrics}
+              accent
+              valueClassName="text-[22px]"
+              className="overflow-hidden rounded-xl border"
             />
+            <EstimateDisclaimer className="mt-2" />
           </div>
         )}
 
-        {/* Stats Row */}
-        <div className="flex gap-3 px-5">
-          <div className="flex-1 rounded-xl bg-success/15 p-4">
-            <div className="flex items-baseline gap-1">
-              {habit.currentStreak >= 30 && <Crown className="size-5 text-amber-500" />}
-              <span className="text-3xl font-bold text-success">
+        {/* 連続日数: stats ページと同じ「塗りなし・ヘアライン罫線グリッド＋巨大 mono 数値」。
+            塗りカードをやめ、緑は面でなく数値・アイコン（達成の記号）に載せる（原則①/⑤）。
+            30日到達の Crown も達成の記号＝success。％は 30日ゴールに対する進捗の従属値。 */}
+        <div className="mx-5 grid grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border">
+          <div className="flex flex-col gap-1.5 bg-card px-5 py-4">
+            <span className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              {t('currentStreak')}
+            </span>
+            <div className="flex items-baseline gap-1.5">
+              {habit.currentStreak >= 30 && <Crown className="size-5 self-center text-success" />}
+              <span className="font-mono text-[32px] font-semibold leading-none tabular-nums text-success">
                 {habit.currentStreak}
               </span>
-              <span className="text-sm text-success/80">
-                {t('days')}
-              </span>
+              <span className="text-sm text-muted-foreground">{t('days')}</span>
             </div>
-            <p className="mt-1 text-xs text-success/80">
-              {t('currentStreak')}
-            </p>
-            <p className="text-xs font-medium text-success">
+            <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
               {streakPercent}%
-            </p>
+            </span>
           </div>
-          <div className="flex-1 rounded-xl bg-[#EDECEA] p-4 dark:bg-neutral-800">
-            <div className="flex items-baseline gap-1">
-              {habit.longestStreak >= 30 && <Crown className="size-5 text-amber-500" />}
-              <span className="text-3xl font-bold text-neutral-800 dark:text-neutral-200">
+          <div className="flex flex-col gap-1.5 bg-card px-5 py-4">
+            <span className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              {t('longestStreak')}
+            </span>
+            <div className="flex items-baseline gap-1.5">
+              {habit.longestStreak >= 30 && <Crown className="size-5 self-center text-success" />}
+              <span className="font-mono text-[32px] font-semibold leading-none tabular-nums text-success">
                 {habit.longestStreak}
               </span>
-              <span className="text-sm text-neutral-600 dark:text-neutral-400">
-                {t('days')}
-              </span>
+              <span className="text-sm text-muted-foreground">{t('days')}</span>
             </div>
-            <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
-              {t('longestStreak')}
-            </p>
-            <p className="text-xs font-medium text-neutral-500 dark:text-neutral-500">
+            <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
               {bestPercent}%
-            </p>
+            </span>
           </div>
         </div>
-
-        {/* Savings Card */}
-        {habit.impactSavings && (
-          <div className="px-5">
-            <SavingsCard savings={habit.impactSavings} />
-          </div>
-        )}
 
         {/* Evidence Section */}
         {evidenceArticles.length > 0 && (
@@ -327,7 +360,7 @@ export function HabitDetailModal({
                   key={evidence.id}
                   type="button"
                   onClick={() => onOpenArticle?.(evidence.articleId)}
-                  className="flex w-full items-center gap-3 rounded-xl border border-[#E5E4E1] bg-card px-3.5 py-3 text-left transition-colors hover:bg-accent/50"
+                  className="flex w-full items-center gap-3 rounded-xl border border-border bg-card px-3.5 py-3 text-left transition-colors hover:bg-accent/50"
                 >
                   <HabitIcon name={article.defaultIcon} size={18} />
                   <div className="flex-1 min-w-0">
@@ -347,7 +380,9 @@ export function HabitDetailModal({
               <button
                 type="button"
                 onClick={() => setEvidenceManagerOpen(true)}
-                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-success/30 bg-success/5 px-3.5 py-2.5 text-sm font-medium text-success transition-colors hover:bg-success/10"
+                /* エビデンス管理は中立の UI 操作なので彩色せずインク（原則①: 緑は達成専用）。
+                   discover の「ゼロからつくる」ダッシュ枠と同じ neutral affordance に揃える。 */
+                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-secondary/50 px-3.5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:bg-secondary hover:text-foreground"
               >
                 <Settings className="size-4" />
                 {tEvidence('manage')}
@@ -356,12 +391,13 @@ export function HabitDetailModal({
           </div>
         )}
 
-        {/* Rocket Section */}
-        <div className="mx-5 flex items-center gap-3 rounded-xl border p-4">
-          <Rocket className="size-6 text-[#D89575]" />
+        {/* Rocket Section。ロケットは失敗日を救済する中立の道具（達成でも破壊でもない）なので
+            アイコンは無彩色インク（原則①/⑥: 独自色を付けない）。個数は mono + tabular-nums。 */}
+        <div className="mx-5 flex items-center gap-3 rounded-xl border border-border p-4">
+          <Rocket className="size-6 text-foreground" />
           <div className="flex-1">
             <p className="text-sm font-semibold">
-              {tHabits('rockets')}: {habit.rockets}
+              {tHabits('rockets')}: <span className="font-mono tabular-nums">{habit.rockets}</span>
             </p>
             <p className="text-xs text-muted-foreground">
               {tHabits('rocketNextIn', { days: habit.rocketNextIn })}
@@ -395,7 +431,7 @@ export function HabitDetailModal({
               >
                 <ChevronLeft className="size-4" />
               </button>
-              <span className="min-w-[5.5rem] text-center text-xs font-medium text-muted-foreground">
+              <span className="min-w-[5.5rem] text-center font-mono text-xs font-medium tabular-nums text-muted-foreground">
                 {monthLabel}
               </span>
               <button
@@ -452,17 +488,18 @@ export function HabitDetailModal({
                         }
                       }}
                       className={cn(
-                        'relative flex aspect-square items-center justify-center rounded-lg text-[10px] font-medium transition-all',
-                        // Status colors
+                        'relative flex aspect-square items-center justify-center rounded-lg font-mono text-[10px] font-medium tabular-nums transition-all',
+                        // Status colors（達成=success / 失敗=danger。いずれもトークン。原則①）
                         isCompleted && 'bg-success text-success-foreground',
+                        // 失敗日は inline の failedFillStyle（conic-gradient）で塗る（#105）。静的 bg-danger は使わない。
                         isFailed && !isRocketEligible && 'text-white',
                         !isCompleted && !isFailed && !isFuture && 'text-foreground',
                         isFuture && 'text-muted-foreground/40',
                         // Tappable border (last 5 days)
                         isTappable && !isCompleted && !isFailed && 'ring-1.5 ring-primary/40 ring-inset',
                         isTappable && 'cursor-pointer',
-                        // Rocket eligible
-                        isRocketEligible && 'cursor-pointer ring-2 ring-[#D89575] ring-offset-1',
+                        // Rocket eligible: 失敗日で救済可能。danger 色域に留めつつロケットで「救える」を示す
+                        isRocketEligible && 'cursor-pointer text-danger ring-2 ring-danger ring-offset-1',
                         // Today highlight
                         isToday && !isCompleted && !isFailed && 'font-bold',
                         // Non-interactive
@@ -470,14 +507,14 @@ export function HabitDetailModal({
                       )}
                       style={
                         isFailed && !isRocketEligible
-                          ? failedFillStyle(resistRate, { red: '#D89575' })
+                          ? failedFillStyle(resistRate)
                           : undefined
                       }
                     >
                       {status === 'rocket_used' ? (
-                        <Rocket className="size-3 text-white" />
+                        <Rocket className="size-3 text-success-foreground" />
                       ) : isRocketEligible ? (
-                        <Rocket className="size-3 animate-pulse text-white" />
+                        <Rocket className="size-3 animate-pulse text-danger" />
                       ) : (
                         dayOfMonth
                       )}

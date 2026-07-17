@@ -130,7 +130,7 @@ export function HabitActionSheet({
             <button
               type="button"
               onClick={handleFailed}
-              className="flex items-center gap-3 rounded-xl bg-[#D08068]/10 px-4 py-3.5 text-left text-sm font-medium text-[#B05E48] ring-1 ring-[#D08068]/30 transition-colors hover:bg-[#D08068]/20 dark:text-[#E0A090]"
+              className="flex items-center gap-3 rounded-xl bg-danger/10 px-4 py-3.5 text-left text-sm font-medium text-danger ring-1 ring-danger/30 transition-colors hover:bg-danger/20"
             >
               <XCircle className="size-5 shrink-0" />
               {t('actionSheet.markFailed')}
@@ -141,7 +141,7 @@ export function HabitActionSheet({
               className={cn(
                 'flex items-center gap-3 rounded-xl px-4 py-3.5 text-left text-sm font-medium ring-1 transition-colors',
                 isSkippedDay
-                  ? 'bg-amber-100 text-amber-700 ring-amber-200 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:ring-amber-900/40'
+                  ? 'bg-muted text-muted-foreground ring-border hover:bg-muted/80'
                   : 'bg-primary/10 text-primary ring-primary/20 hover:bg-primary/20'
               )}
             >

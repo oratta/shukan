@@ -7,7 +7,8 @@ import type * as React from 'react';
  */
 export function failedFillStyle(
   resistRate: number | undefined,
-  { red = '#D08068', neutral = '#D1D5DB' }: { red?: string; neutral?: string } = {}
+  // v2: 失敗の赤は --danger、未抵抗ぶんの下地は --track（CSS 変数は inline style で有効）。
+  { red = 'var(--danger)', neutral = 'var(--track)' }: { red?: string; neutral?: string } = {}
 ): React.CSSProperties {
   if (resistRate === undefined || resistRate <= 0) {
     return { backgroundColor: red };

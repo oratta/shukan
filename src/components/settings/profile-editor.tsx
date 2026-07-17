@@ -72,13 +72,13 @@ export function ProfileEditor({ profile, onSave }: ProfileEditorProps) {
 
   const inputClass = (invalid: boolean) =>
     cn(
-      'w-full rounded-xl border bg-card px-4 py-3 text-sm outline-none transition-colors focus:border-primary',
+      'w-full rounded-xl border bg-card px-4 py-3 font-mono text-sm tabular-nums outline-none transition-colors focus:border-primary',
       invalid ? 'border-destructive' : 'border-border'
     );
 
   return (
-    <Card className="p-4">
-      <h3 className="mb-1 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+    <Card className="p-4 shadow-none">
+      <h3 className="mb-1 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
         {t('profile')}
       </h3>
       <p className="mb-4 text-xs text-muted-foreground">{t('profileDescription')}</p>

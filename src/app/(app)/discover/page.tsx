@@ -9,7 +9,7 @@ import { EstimateDisclaimer } from '@/components/habits/estimate-disclaimer';
 import { EvidenceArticleSheet } from '@/components/habits/evidence-article-sheet';
 import { HabitForm } from '@/components/habits/habit-form';
 import { KpiIcon } from '@/components/onboarding/kpi-icon';
-import { EVIDENCE_HERO_IMAGES as HERO_IMAGES, getEvidenceHeroGradient } from '@/data/evidence-hero-images';
+import { EVIDENCE_HERO_IMAGES as HERO_IMAGES } from '@/data/evidence-hero-images';
 import { useHabits } from '@/hooks/useHabits';
 import { cn } from '@/lib/utils';
 import type { KpiKey } from '@/data/kpi/catalog';
@@ -99,20 +99,21 @@ export default function DiscoverPage() {
 
   return (
     <div className="pb-20">
-      {/* Header */}
+      {/* 見出しは控えめに（原則③）。静的タイトルを視覚の勝者にせず、下の「指標フィルタ」
+          （このページ唯一の操作面）を一等地に置く。ページ名は下部ナビ「発見」と重複するため小さく。 */}
       <div className="mb-4">
-        <h2 className="text-2xl font-bold tracking-tight">
+        <h2 className="text-lg font-semibold tracking-tight">
           {t('discover.title')}
         </h2>
       </div>
 
-      {/* F14: ゼロから習慣をつくる（大きな＋ボタン） */}
+      {/* F14: ゼロから習慣をつくる。彩色せずインク（primary）のダッシュ枠＝「追加」の affordance。 */}
       <button
         type="button"
         onClick={handleCreateFromScratch}
-        className="mb-5 flex w-full items-center gap-3 rounded-2xl border border-dashed border-primary/40 bg-primary/5 px-4 py-4 text-left transition-colors hover:border-primary hover:bg-primary/10 active:scale-[0.99]"
+        className="mb-6 flex w-full items-center gap-3 rounded-2xl border border-dashed border-border bg-card px-4 py-4 text-left transition-colors hover:border-primary/50 hover:bg-secondary active:scale-[0.99]"
       >
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
           <Plus className="size-6" />
         </span>
         <span className="min-w-0">
@@ -123,11 +124,12 @@ export default function DiscoverPage() {
         </span>
       </button>
 
-      {/* F11/F13: KPI 選択（4軸）→ その KPI への効果順にソート */}
+      {/* F11/F13: 指標フィルタ＝このページの操作の一等地（原則③）。選択中はインクのソリッド
+          pill で「今どの指標で並べているか」を最も強いコントラストで示す（原則①: 色でなくインク）。 */}
       <div className="mb-4">
         <p className="mb-2 text-xs text-muted-foreground">{t('discover.sortLead')}</p>
         {/* 景表法・打消し表示対応（issue #39）: リストの推定値に対する近接注記 */}
-        <EstimateDisclaimer className="mb-2" />
+        <EstimateDisclaimer className="mb-2.5" />
         <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
           {DISCOVER_KPIS.map((k) => {
             const selected = selectedKpi === k.key;
@@ -138,15 +140,15 @@ export default function DiscoverPage() {
                 aria-pressed={selected}
                 onClick={() => setSelectedKpi(k.key)}
                 className={cn(
-                  'flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-medium transition-colors',
+                  'flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold transition-colors',
                   selected
-                    ? 'border-primary bg-primary/5 text-primary ring-1 ring-primary/30'
-                    : 'border-border bg-card text-foreground hover:border-primary/40'
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'border-border bg-card text-foreground hover:border-primary/50'
                 )}
               >
                 <KpiIcon
                   name={k.icon}
-                  className={cn('size-3.5', selected ? 'text-primary' : 'text-muted-foreground')}
+                  className={cn('size-3.5', selected ? 'text-primary-foreground' : 'text-muted-foreground')}
                 />
                 {t(k.labelKey)}
               </button>
@@ -164,7 +166,6 @@ export default function DiscoverPage() {
             name={article.name}
             calculationParams={article.calculationParams}
             heroImage={HERO_IMAGES[article.id]}
-            gradient={getEvidenceHeroGradient(article.id) ?? 'from-gray-400 to-gray-600'}
             confidenceLabel={t(`discover.confidence.${article.confidenceLevel}`)}
             timeUnits={timeUnits}
             perYear={perYear}
@@ -204,7 +205,6 @@ interface ArticleCardProps {
     dailyPositiveMoodMinutes: number;
   };
   heroImage?: string;
-  gradient: string;
   confidenceLabel: string;
   timeUnits: { min: string; hour: string; day: string };
   perYear: string;
@@ -218,7 +218,6 @@ function ArticleCard({
   name,
   calculationParams,
   heroImage,
-  gradient,
   confidenceLabel,
   timeUnits,
   perYear,
@@ -257,35 +256,48 @@ function ArticleCard({
     return { ...k, value };
   }).filter((c) => c.value !== null);
 
+  const hasImage = !!heroImage;
+
   return (
     <button
       type="button"
       onClick={() => onTap(articleId)}
-      className="group relative flex h-44 w-full flex-col justify-end overflow-hidden rounded-2xl text-left shadow-sm ring-1 ring-border/40 transition-transform active:scale-[0.97]"
+      className="group relative flex h-44 w-full flex-col justify-end overflow-hidden rounded-2xl text-left shadow-sm shadow-black/5 ring-1 ring-border/60 transition-transform active:scale-[0.97] dark:shadow-black/20 dark:ring-white/10"
     >
-      {/* 背景写真（無ければグラデーション） */}
-      {heroImage ? (
+      {/* 背景写真。無い記事は無彩色プレースホルダ（原則①: 恣意的な多色グラデを使わない）。 */}
+      {hasImage ? (
         <img
           src={heroImage}
           alt=""
+          aria-hidden
           loading="lazy"
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
       ) : (
-        <div className={cn('absolute inset-0 bg-gradient-to-br', gradient)} />
+        <div className="absolute inset-0 bg-muted" />
       )}
 
-      {/* 可読性のためのグラデーションオーバーレイ（写真を主役に、テキストを重ねる） */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/5" />
+      {/* v2 写真規格（原則④）: テーマで写真の扱いを分ける。
+          ・dark = 「暗い島」: 色相ティント + 黒スクリムで写真に光を残しつつ白文字を可読に。
+          ・light = 入口用の軽ベール（.banner-veil-browse）: 全面フロストの .banner-veil だと入口で
+            全カードが washed out に見え「押せないグレー板」になるため、下部だけウォッシュし写真の
+            彩度を残す。写真が入口の主役なので上半分は素通し、テキスト面（下部）だけ濃くする。 */}
+      {hasImage && (
+        <>
+          <div aria-hidden className="banner-tint absolute inset-0 hidden dark:block" />
+          <div aria-hidden className="banner-scrim absolute inset-0 hidden dark:block" />
+          <div aria-hidden className="banner-veil-browse absolute inset-0 dark:hidden" />
+        </>
+      )}
 
-      {/* 信頼度バッジ（写真上・半透明） */}
-      <span className="absolute right-2 top-2 rounded-full bg-black/45 px-2 py-0.5 text-[10px] font-medium text-white/90 backdrop-blur-sm">
+      {/* 信頼度バッジ: 無彩色ガラスチップ（原則①: 信頼度＝注意的情報は色でなく濃淡で示す）。 */}
+      <span className="absolute right-2 top-2 rounded-full bg-background/70 px-2 py-0.5 text-[10px] font-medium text-foreground/80 backdrop-blur-sm dark:bg-black/35 dark:text-white/90">
         {confidenceLabel}
       </span>
 
-      {/* テキスト（下部・白） */}
+      {/* テキスト（下部）。v2: light=インク / dark=白（banner-title で dark のみ影）。 */}
       <div className="relative z-10 p-3">
-        <p className="mb-1.5 line-clamp-2 text-sm font-bold leading-snug text-white drop-shadow-sm">
+        <p className="banner-title mb-1.5 line-clamp-2 text-[15px] font-bold leading-snug text-foreground dark:text-white">
           {name}
         </p>
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -296,8 +308,11 @@ function ArticleCard({
                 key={c.key}
                 aria-label={kpiNames[c.key]}
                 className={cn(
-                  'flex items-center gap-0.5 whitespace-nowrap text-[10px] font-semibold tabular-nums',
-                  isSelected ? 'rounded bg-white/20 px-1 text-white' : 'text-white/75'
+                  // 数値は Geist Mono + tabular-nums（原則⑥）。選択中の指標は塗りで強調。
+                  'flex items-center gap-0.5 whitespace-nowrap font-mono text-[10px] font-semibold tabular-nums',
+                  isSelected
+                    ? 'rounded bg-foreground/10 px-1 text-foreground dark:bg-white/20 dark:text-white'
+                    : 'text-foreground/70 dark:text-white/75'
                 )}
               >
                 <KpiIcon name={c.icon} className="size-3" />

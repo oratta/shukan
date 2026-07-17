@@ -95,9 +95,12 @@ describe('推定値 → 算出根拠への 1 タップ導線', () => {
     expect(src).toMatch(/onTap=/);
   });
 
-  it('habit-detail-modal は ImpactBadge に onTap（onOpenArticle 経由）を配線する', () => {
+  // 詳細ビューの KPI 表示はホーム（daily-impact-summary）と同じ非タップの 2×2 グリッドに
+  // 揃えたため、算出根拠への 1 タップ導線はエビデンス一覧の各行（onOpenArticle）が担う。
+  it('habit-detail-modal はエビデンス一覧から算出根拠へ 1 タップで開ける（onOpenArticle 配線）', () => {
     const src = readSource('src/components/habits/habit-detail-modal.tsx');
-    expect(src).toMatch(/onTap=/);
+    expect(src).toContain('onOpenArticle');
+    expect(src).toMatch(/onOpenArticle\?\.\(/);
   });
 
   // ホームのクライアント本体は issue #59 の server prefetch 化で
