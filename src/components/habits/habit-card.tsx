@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Check, ChevronDown, ChevronUp, Maximize2, GripVertical, SkipForward, Undo2 } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp, Maximize2, GripVertical, SkipForward, Undo2, History } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Card } from '@/components/ui/card';
@@ -25,43 +25,30 @@ interface HabitCardProps {
   onToggleExpand: (id: string) => void;
   onDayStatusChange: (habitId: string, date: string, status: 'completed' | 'failed' | 'none' | 'skipped') => void;
   onOpenDetail: (id: string) => void;
-  /** 長押しで対象日のアクションシート（失敗/スキップ/メモ）を開く（issue #104） */
+  /** 長押しで今日のアクションシート（失敗/スキップ/メモ）を開く（issue #104） */
   onOpenActionSheet: (habitId: string, date: string) => void;
+  /** 週ドット領域タップ・展開ビューのボタンで過去日の一括編集シートを開く（issue #107） */
+  onOpenBulkEdit: (habitId: string) => void;
   onSkipToday: (id: string) => void;
   /** 推定値（ImpactBadge）タップで算出根拠（エビデンス記事）へ 1 タップ到達する導線（issue #39） */
   onOpenArticle?: (articleId: string) => void;
 }
 
-function DayStatusDot({
-  day,
-  onOpen,
-}: {
-  day: DayStatus;
-  onOpen: () => void;
-}) {
+// 過去日ドットは表示専用（issue #107）。個別タップは持たず、
+// ドット領域全体のタップで一括編集シートを開く（入力はシート内の大きなボタンで行う）。
+function DayStatusDot({ day }: { day: DayStatus }) {
   const { status } = day;
 
   return (
-    // 過去日は小ターゲットに精密操作を要求しない: タップ一発でアクションシートを開き、
-    // 操作はシート内の大きなボタンで完結させる（案A）。不可視パディングでタッチターゲットも拡大。
-    <button
-      type="button"
-      onClick={(e) => {
-        e.stopPropagation();
-        onOpen();
-      }}
-      className="-m-1.5 flex items-center justify-center p-1.5"
-    >
-      <span
-        className={cn(
-          'flex items-center justify-center rounded-full size-3 transition-all',
-          (status === 'completed' || status === 'rocket_used') && 'bg-success',
-          status === 'none' && 'border border-gray-300 bg-transparent',
-          status === 'skipped' && 'bg-gray-300',
-        )}
-        style={status === 'failed' ? failedFillStyle(day.resistRate) : undefined}
-      />
-    </button>
+    <span
+      className={cn(
+        'flex items-center justify-center rounded-full size-3 transition-all',
+        (status === 'completed' || status === 'rocket_used') && 'bg-success',
+        status === 'none' && 'border border-gray-300 bg-transparent',
+        status === 'skipped' && 'bg-gray-300',
+      )}
+      style={status === 'failed' ? failedFillStyle(day.resistRate) : undefined}
+    />
   );
 }
 
@@ -188,6 +175,7 @@ export function HabitCard({
   onDayStatusChange,
   onOpenDetail,
   onOpenActionSheet,
+  onOpenBulkEdit,
   onSkipToday,
   onOpenArticle,
 }: HabitCardProps) {
@@ -345,21 +333,30 @@ export function HabitCard({
               </span>
             )}
           </div>
-          <div className="flex items-center gap-1.5">
-            {/* Past days only (skip index 0 = today), left=yesterday, right=oldest */}
-            {(habit.recentDays ?? []).slice(1).map((day) => {
-              const dayLabel = new Date(day.date + 'T00:00:00').toLocaleDateString(locale, { weekday: 'narrow' });
-              return (
-                <div key={day.date} className="flex flex-col items-center gap-0.5">
-                  <span className={cn('text-[9px] leading-none', hasEvidenceBg ? 'text-white/70' : 'text-muted-foreground')}>{dayLabel}</span>
-                  <DayStatusDot
-                    day={day}
-                    onOpen={() => onOpenActionSheet(habit.id, day.date)}
-                  />
-                </div>
-              );
-            })}
-          </div>
+          {/* 週ドット領域全体が一括編集シートの起動ボタン（issue #107 案1）。
+              ドットは表示専用で、どこを押しても同じ。-m/p の不可視パディングでタッチ高さを確保。 */}
+          {(habit.recentDays ?? []).length > 1 && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenBulkEdit(habit.id);
+              }}
+              aria-label={t('bulkEdit.open')}
+              className="-mx-2 -my-2.5 flex items-center gap-1.5 self-start px-2 py-2.5"
+            >
+              {/* Past days only (skip index 0 = today), left=yesterday, right=oldest */}
+              {(habit.recentDays ?? []).slice(1).map((day) => {
+                const dayLabel = new Date(day.date + 'T00:00:00').toLocaleDateString(locale, { weekday: 'narrow' });
+                return (
+                  <div key={day.date} className="flex flex-col items-center gap-0.5">
+                    <span className={cn('text-[9px] leading-none', hasEvidenceBg ? 'text-white/70' : 'text-muted-foreground')}>{dayLabel}</span>
+                    <DayStatusDot day={day} />
+                  </div>
+                );
+              })}
+            </button>
+          )}
         </div>
 
         {/* Right: Chevron */}
@@ -461,6 +458,23 @@ export function HabitCard({
               >
                 <Maximize2 className="size-4" />
                 {t('detail')}
+              </button>
+              {/* 過去日の一括編集シートへの第2入口（issue #107）。中立操作なので緑は使わない */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenBulkEdit(habit.id);
+                }}
+                className={cn(
+                  'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors',
+                  hasEvidenceBg
+                    ? 'bg-white/90 text-gray-900 hover:bg-white'
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                )}
+              >
+                <History className="size-4" />
+                {t('bulkEdit.openButton')}
               </button>
               {/* F19: スキップは中立操作。緑以外の中立アクセント（primary=スレート/白ガラス）＋
                   リングで押せる affordance を明示。skipped 中は amber。 */}
