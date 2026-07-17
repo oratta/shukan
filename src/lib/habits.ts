@@ -325,13 +325,48 @@ export function isEstablishedHabit(habit: Habit): boolean {
   return !habit.archived && habit.status === 'established';
 }
 
+/**
+ * 過去日の編集可能枠（今日を除く過去N日）。issue #107 で 4日→7日に拡大。
+ * 「通常編集できる枠」「未記録日を自動失敗として表示する境界」「ロケット救済の対象境界」の
+ * 3つは必ずこの定数を共有する。ずれると「どの手段でも変更できない日」や
+ * 「failed 表示なのにタップが none 削除で空振りする日」が生まれる。
+ */
+export const EDITABLE_PAST_DAYS = 7;
+
 export function getEffectiveStatus(day: DayStatus): DayStatus['status'] {
   if (day.status !== 'none') return day.status;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const dayDate = new Date(day.date + 'T00:00:00');
   const diffDays = Math.round((today.getTime() - dayDate.getTime()) / (1000 * 60 * 60 * 24));
-  return diffDays > 5 ? 'failed' : 'none';
+  return diffDays > EDITABLE_PAST_DAYS ? 'failed' : 'none';
+}
+
+/**
+ * 一括編集シートの対象日（issue #107）: 今日を除く過去 EDITABLE_PAST_DAYS 日のうち
+ * 習慣の対象日だけを新しい順で返す。weekday/custom は対象曜日のみ、everyday/weekly は全日。
+ */
+export function getEditablePastDays(
+  habit: Habit,
+  completions: HabitCompletion[]
+): DayStatus[] {
+  const today = new Date();
+  const result: DayStatus[] = [];
+  for (let i = 1; i <= EDITABLE_PAST_DAYS; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    if (!isTargetDay(habit, d)) continue;
+    const dateStr = getDateString(d);
+    const completion = completions.find(
+      (c) => c.habitId === habit.id && c.date === dateStr
+    );
+    result.push({
+      date: dateStr,
+      status: completion ? (completion.status as DayStatus['status']) : 'none',
+      ...(completion?.resistRate !== undefined ? { resistRate: completion.resistRate } : {}),
+    });
+  }
+  return result;
 }
 
 export function getYesterdayUnreviewedHabits(
@@ -473,13 +508,13 @@ export function getAllDayStatuses(
         ...(completion.resistRate !== undefined ? { resistRate: completion.resistRate } : {}),
       });
     } else {
-      // Check if it's been more than 5 days ago (auto-fail)
+      // 編集可能枠より古い未記録日は自動失敗として表示する（境界は EDITABLE_PAST_DAYS に統一）
       const daysDiff = Math.round(
         (today.getTime() - d.getTime()) / (1000 * 60 * 60 * 24)
       );
       result.push({
         date: dateStr,
-        status: daysDiff >= 5 ? 'failed' : 'none',
+        status: daysDiff > EDITABLE_PAST_DAYS ? 'failed' : 'none',
       });
     }
     d.setDate(d.getDate() + 1);

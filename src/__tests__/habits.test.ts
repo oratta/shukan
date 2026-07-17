@@ -287,19 +287,19 @@ describe('getAllDayStatuses', () => {
     expect(result[0].status).toBe('completed');
   });
 
-  it('5日以上前の未完了日はfailedになる', () => {
+  it('8日以上前の未完了日はfailedになる（境界は EDITABLE_PAST_DAYS=7。issue #107）', () => {
     const today = new Date();
     const tenDaysAgo = new Date(today);
     tenDaysAgo.setDate(tenDaysAgo.getDate() - 10);
     const result = getAllDayStatuses('h1', [], getDateString(tenDaysAgo));
     // 10日前〜今日 = 11日分
     expect(result).toHaveLength(11);
-    // 5日以上前はfailed
+    // 編集可能枠（7日）より古い日はfailed
     const failedDays = result.filter(d => d.status === 'failed');
-    expect(failedDays.length).toBe(6); // 10,9,8,7,6,5日前
-    // 4日以内はnone
+    expect(failedDays.length).toBe(3); // 10,9,8日前
+    // 7日以内はnone
     const noneDays = result.filter(d => d.status === 'none');
-    expect(noneDays.length).toBe(5); // 4,3,2,1,0日前
+    expect(noneDays.length).toBe(8); // 7,6,5,4,3,2,1,0日前
   });
 });
 
