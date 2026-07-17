@@ -14,6 +14,7 @@ import { Check, Minus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Habit, HabitCompletion, DayStatus } from '@/types/habit';
 import { MOOD_ICONS } from '@/lib/mood-icons';
+import { HelpButton } from '@/components/help/help-button';
 
 interface YesterdayReviewSheetProps {
   open: boolean;
@@ -201,7 +202,10 @@ export function YesterdayReviewSheet({
 
         {/* Mood + Comment section */}
         <div className="px-4 pt-4 pb-2 flex flex-col gap-3 border-t border-border mt-2">
-          <p className="text-sm font-medium text-muted-foreground">{t('reviewMoodLabel')}</p>
+          <div className="flex items-center gap-1">
+            <p className="text-sm font-medium text-muted-foreground">{t('reviewMoodLabel')}</p>
+            <HelpButton topic="reviewMood" />
+          </div>
           <div className="flex gap-2 justify-center">
             {MOOD_ICONS.map(({ Icon, colorClass, value }) => (
               <button

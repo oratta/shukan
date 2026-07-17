@@ -13,6 +13,7 @@ import { DailyImpactSummary } from '@/components/habits/daily-impact-summary';
 import { EstablishedSection } from '@/components/habits/established-section';
 import { YesterdayReviewBanner } from '@/components/habits/yesterday-review-banner';
 import { YesterdayReviewSheet } from '@/components/habits/yesterday-review-sheet';
+import { HelpButton } from '@/components/help/help-button';
 import { useHabits, type InitialHabitData } from '@/hooks/useHabits';
 import { useProfile } from '@/hooks/useProfile';
 import { getHabitsWithStats, getTodayString, getYesterdayUnreviewedHabits, isDailyTrackedHabit, isEstablishedHabit } from '@/lib/habits';
@@ -283,9 +284,12 @@ export function DashboardClient({
         <header>
           <div className="flex items-end justify-between gap-4">
             <div className="min-w-0">
-              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
-                {t('habits.todayProgress')}
-              </p>
+              <div className="flex items-center gap-1">
+                <p className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+                  {t('habits.todayProgress')}
+                </p>
+                <HelpButton topic="todayProgress" className="size-4" iconClassName="size-3.5" />
+              </div>
               <div className="mt-0.5 flex items-baseline leading-none">
                 <span className="font-mono text-[72px] font-semibold leading-[0.85] tracking-tighter tabular-nums text-success">
                   {completedCount}
@@ -303,9 +307,12 @@ export function DashboardClient({
                   </span>
                   <span className="text-sm text-muted-foreground">{t('habits.daysStreakUnit')}</span>
                 </div>
-                <p className="mt-1 text-[11px] leading-none text-muted-foreground">
-                  {t('habits.longestStreakCaption')}
-                </p>
+                <div className="mt-1 flex items-center justify-end gap-1">
+                  <p className="text-[11px] leading-none text-muted-foreground">
+                    {t('habits.longestStreakCaption')}
+                  </p>
+                  <HelpButton topic="streak" className="size-4" iconClassName="size-3.5" />
+                </div>
               </div>
             )}
           </div>
