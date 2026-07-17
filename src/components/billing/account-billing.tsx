@@ -92,6 +92,23 @@ function interpolate(template: string, vars: Record<string, string>): string {
   );
 }
 
+// Same interpolation, but each substituted value is rendered in Geist Mono +
+// tabular-nums so amounts and seat counts line up as digits (DESIGN §6 / ⑥).
+// Surrounding label text stays in the UI sans font.
+function interpolateMono(template: string, vars: Record<string, string>) {
+  return template.split(/(\{\w+\})/).map((part, i) => {
+    const key = part.match(/^\{(\w+)\}$/)?.[1];
+    if (key && key in vars) {
+      return (
+        <span key={i} className="font-mono tabular-nums">
+          {vars[key]}
+        </span>
+      );
+    }
+    return part;
+  });
+}
+
 /**
  * Predict the tier the next claim would land in, from the PUBLIC counter `slots`
  * (Feedback D14). Reuses `decideTier` (src/lib/founding/allocation.ts), the same
@@ -116,11 +133,11 @@ function planLabel(plan: Plan, m: AccountMessages): string {
   return m.planLifetime;
 }
 
-function planPriceLine(plan: Plan, m: AccountMessages, locale: Locale): string {
+function planPriceLine(plan: Plan, m: AccountMessages, locale: Locale) {
   const price = formatTaxInclusivePrice(plan, locale);
-  if (plan === 'monthly') return interpolate(m.perMonth, { price });
-  if (plan === 'annual') return interpolate(m.perYear, { price });
-  return interpolate(m.oneTime, { price });
+  if (plan === 'monthly') return interpolateMono(m.perMonth, { price });
+  if (plan === 'annual') return interpolateMono(m.perYear, { price });
+  return interpolateMono(m.oneTime, { price });
 }
 
 export function AccountBilling({
@@ -217,15 +234,15 @@ export function AccountBilling({
   ];
 
   return (
-    <div className="mx-auto w-full max-w-md space-y-6 p-4">
-      <h1 className="text-xl font-bold tracking-tight">{m.title}</h1>
+    <div className="mx-auto w-full max-w-md space-y-6">
+      <h1 className="text-[28px] font-bold leading-tight tracking-tight">{m.title}</h1>
 
       {/* Current plan / trial remaining */}
       <section
         data-account-current-plan
-        className="rounded-lg border border-border p-4"
+        className="rounded-xl border border-border p-4"
       >
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+        <h2 className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
           {m.currentPlanHeading}
         </h2>
         <p className="mt-2 text-sm text-foreground">{statusLine}</p>
@@ -234,9 +251,9 @@ export function AccountBilling({
       {/* Founding seats — transparent real numbers, or nothing */}
       <section
         data-account-founding
-        className="rounded-lg border border-border p-4 space-y-2"
+        className="rounded-xl border border-border p-4 space-y-2"
       >
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+        <h2 className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
           {m.foundingHeading}
         </h2>
         <p className="text-xs leading-relaxed text-muted-foreground">
@@ -266,7 +283,7 @@ export function AccountBilling({
                   </span>
                   {row.count ? (
                     <span className="whitespace-nowrap font-medium text-foreground">
-                      {interpolate(m.foundingRemaining, {
+                      {interpolateMono(m.foundingRemaining, {
                         remaining: String(row.count.remaining),
                         cap: String(row.count.cap),
                       })}
@@ -282,7 +299,7 @@ export function AccountBilling({
 
         {yourTierLine ? (
           <div data-account-your-tier-line className="pt-1">
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <p className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
               {m.yourTierHeading}
             </p>
             <p className="mt-1 text-sm text-foreground">{yourTierLine}</p>
@@ -294,9 +311,9 @@ export function AccountBilling({
       {offerEarlySwitch ? (
         <section
           data-early-switch
-          className="rounded-lg border border-border p-4 space-y-2"
+          className="rounded-xl border border-border p-4 space-y-2"
         >
-          <h2 className="text-sm font-semibold">{m.earlySwitchHeading}</h2>
+          <h2 className="text-sm font-semibold text-foreground">{m.earlySwitchHeading}</h2>
           <button
             type="button"
             onClick={onEarlySwitch}
@@ -309,7 +326,7 @@ export function AccountBilling({
 
       {/* Plan selection — each leads to the confirmation step, never to Checkout */}
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+        <h2 className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
           {m.choosePlanHeading}
         </h2>
         <div className="space-y-2">
