@@ -100,12 +100,12 @@
       "clearStatus": "未入力に戻す"
     },
     "bulkEdit": {
-      "subtitle": "過去7日をまとめて入力",
+      "subtitle": "直近1週間の記録をまとめて入力",
       "done": "達成",
       "doneQuit": "守れた",
       "failed": "失敗",
       "dayActions": "その他の操作",
-      "noDays": "この7日間に対象日はありません",
+      "noDays": "この1週間に対象日はありません",
       "open": "過去日をまとめて入力",
       "openButton": "まとめて入力"
     }

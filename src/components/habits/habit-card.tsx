@@ -335,7 +335,8 @@ export function HabitCard({
           {/* 週ドット領域全体が一括編集シートの起動ボタン（issue #107 案1）。
               ドットは表示専用で、どこを押しても同じ。-m/p の不可視パディングでタッチ高さを確保。
               表示する日は一括編集シートの行と常に1:1（editablePastDays）。曜日ラベルは置かず、
-              日付・曜日の確認はタップ先のシートに任せる。left=昨日, right=7日前 */}
+              日付・曜日の確認はタップ先のシートに任せる。left=昨日, right=6日前
+              （今日の丸と合わせて計7日間＝1週間の窓） */}
           {(habit.editablePastDays ?? []).length > 0 && (
             <button
               type="button"

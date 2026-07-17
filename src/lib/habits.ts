@@ -326,12 +326,13 @@ export function isEstablishedHabit(habit: Habit): boolean {
 }
 
 /**
- * 過去日の編集可能枠（今日を除く過去N日）。issue #107 で 4日→7日に拡大。
+ * 過去日の編集可能枠（今日を除く過去N日）。issue #107 で 4日→6日に拡大。
+ * 今日を含めて計7日間＝1週間となり、週次習慣（週N回）の時間単位と揃う。
  * 「通常編集できる枠」「未記録日を自動失敗として表示する境界」「ロケット救済の対象境界」の
  * 3つは必ずこの定数を共有する。ずれると「どの手段でも変更できない日」や
  * 「failed 表示なのにタップが none 削除で空振りする日」が生まれる。
  */
-export const EDITABLE_PAST_DAYS = 7;
+export const EDITABLE_PAST_DAYS = 6;
 
 export function getEffectiveStatus(day: DayStatus): DayStatus['status'] {
   if (day.status !== 'none') return day.status;

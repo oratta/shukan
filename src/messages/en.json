@@ -100,12 +100,12 @@
       "clearStatus": "Clear entry"
     },
     "bulkEdit": {
-      "subtitle": "Fill in the past 7 days",
+      "subtitle": "Fill in the past week",
       "done": "Done",
       "doneQuit": "Kept it",
       "failed": "Failed",
       "dayActions": "More actions",
-      "noDays": "No target days in the past 7 days",
+      "noDays": "No target days in the past week",
       "open": "Fill in past days",
       "openButton": "Fill past days"
     }
