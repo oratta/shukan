@@ -7,6 +7,7 @@ import { HabitForm } from '@/components/habits/habit-form';
 import { HabitActions } from '@/components/habits/habit-actions';
 import { HabitDetailModal } from '@/components/habits/habit-detail-modal';
 import { HabitActionSheet } from '@/components/habits/habit-action-sheet';
+import { HabitBulkEditSheet } from '@/components/habits/habit-bulk-edit-sheet';
 import { EvidenceArticleSheet } from '@/components/habits/evidence-article-sheet';
 import { DailyImpactSummary } from '@/components/habits/daily-impact-summary';
 import { EstablishedSection } from '@/components/habits/established-section';
@@ -62,6 +63,8 @@ export function DashboardClient({
   const [detailHabitId, setDetailHabitId] = useState<string | null>(null);
   // 長押しアクションシートの対象（issue #104）。habitId + 対象日（過去日も来る）
   const [actionSheetTarget, setActionSheetTarget] = useState<{ habitId: string; date: string } | null>(null);
+  // 過去日の一括編集シートの対象習慣（issue #107）。週ドット領域タップ・展開ビューのボタンで開く
+  const [bulkEditTarget, setBulkEditTarget] = useState<string | null>(null);
   const [openArticleId, setOpenArticleId] = useState<string | null>(null);
 
   // 3場面構造: デイリーチェックリスト・積み上げ表示は active（デイリー追跡）習慣のみ。
@@ -157,6 +160,11 @@ export function DashboardClient({
     [todayHabits, actionSheetTarget]
   );
 
+  const bulkEditHabit = useMemo(
+    () => todayHabits.find((h) => h.id === bulkEditTarget) ?? null,
+    [todayHabits, bulkEditTarget]
+  );
+
   const actionSheetCompletion = useMemo(
     () =>
       actionSheetTarget
@@ -210,6 +218,16 @@ export function DashboardClient({
   }, []);
 
   const handleOpenActionSheet = useCallback((habitId: string, date: string) => {
+    setActionSheetTarget({ habitId, date });
+  }, []);
+
+  const handleOpenBulkEdit = useCallback((habitId: string) => {
+    setBulkEditTarget(habitId);
+  }, []);
+
+  // 一括編集シートの行末「…」→ 一括を閉じてその日1日分のアクションシートへ（一方向遷移）
+  const handleOpenDayActions = useCallback((habitId: string, date: string) => {
+    setBulkEditTarget(null);
     setActionSheetTarget({ habitId, date });
   }, []);
 
@@ -294,6 +312,7 @@ export function DashboardClient({
         onAdd={handleAdd}
         onOpenDetail={handleOpenDetail}
         onOpenActionSheet={handleOpenActionSheet}
+        onOpenBulkEdit={handleOpenBulkEdit}
         onReorder={reorderHabits}
         onSkipToday={handleSkipToday}
         onOpenArticle={(articleId) => setOpenArticleId(articleId)}
@@ -356,6 +375,14 @@ export function DashboardClient({
             updateNote(actionSheetTarget.habitId, actionSheetTarget.date, note);
           }
         }}
+      />
+
+      <HabitBulkEditSheet
+        open={!!bulkEditTarget}
+        onOpenChange={(open) => !open && setBulkEditTarget(null)}
+        habit={bulkEditHabit}
+        onSetDayStatus={setDayStatus}
+        onOpenDayActions={handleOpenDayActions}
       />
 
       <EvidenceArticleSheet
