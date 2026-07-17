@@ -104,7 +104,9 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
   return (
     <section
       className={cn(
-        'quiet-rise overflow-hidden rounded-xl border bg-card shadow-[var(--elev-2)]',
+        // エッセンス⑤: 影で写真に対抗しない。--elev-2 を外し、罫線＋余白＋タイポ差だけで
+        // 階層を作る（Airbnb 方式）。写真バナーの島より一段「静か」な面にする。
+        'quiet-rise overflow-hidden rounded-xl border bg-card',
         isPerfect && 'border-success/40 animate-[perfectPulse_600ms_ease-out]'
       )}
     >
@@ -138,7 +140,7 @@ export function DailyImpactSummary({ habits }: DailyImpactSummaryProps) {
             <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
               <span
                 className={cn(
-                  'whitespace-nowrap font-mono text-[24px] font-semibold leading-none tracking-tight tabular-nums',
+                  'whitespace-nowrap font-mono text-[26px] font-semibold leading-none tracking-tight tabular-nums',
                   isPerfect ? 'text-success' : 'text-foreground'
                 )}
               >

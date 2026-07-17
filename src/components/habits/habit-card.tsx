@@ -418,7 +418,7 @@ export function HabitCard({
         {hasEvidenceBg ? (
           /* シネマティック・バナー: 高さのある写真バナー。上段にドラッグ/枚数/開閉、
              下段にステータス丸＋大きく太い白タイトル＋曜日ドットを重ねる。 */
-          <div className="relative flex min-h-[118px] flex-col justify-end">
+          <div className="relative flex min-h-[96px] flex-col justify-end">
             <div className="absolute inset-x-0 top-0 flex items-center justify-between px-3 pt-2.5">
               {dragHandle}
               <div className="flex items-center gap-2">
@@ -432,11 +432,11 @@ export function HabitCard({
               </div>
             </div>
 
-            <div className="flex items-end gap-3 px-3 pb-3 pt-10">
+            <div className="flex items-end gap-3 px-3 pb-2.5 pt-8">
               {statusIndicator}
               <div className="min-w-0 flex-1">
                 <div className="flex items-baseline gap-2 min-w-0">
-                  <span className={cn('banner-title truncate text-[21px] font-bold leading-tight tracking-tight text-white', isSkipped && 'text-white/50')}>
+                  <span className={cn('banner-title truncate text-[19px] font-bold leading-tight tracking-tight text-white', isSkipped && 'text-white/50')}>
                     {habit.name}
                   </span>
                   {frequencyLabel(true)}

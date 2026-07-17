@@ -103,7 +103,10 @@
     "establishedSectionTitle": "Established habits",
     "establishedSectionDesc": "Habits that are already part of your life. Their effect on the rest of your life is shown here.",
     "lifetimeEffectHeading": "What this habit brings you for the rest of your life",
-    "trackedKpisTitle": "What matters to you"
+    "trackedKpisTitle": "What matters to you",
+    "todayProgress": "Today",
+    "daysStreakUnit": "day streak",
+    "longestStreakCaption": "Longest active"
   },
   "stats": {
     "title": "Statistics",

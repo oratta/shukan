@@ -69,7 +69,9 @@
   --card-foreground: oklch(0.35 0.05 250);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.35 0.05 250);
-  --primary: oklch(0.35 0.05 250);
+  /* エッセンス③「意味だけが色を持つ」: FAB・CTA・アクティブ状態の青/インディゴを抜き、
+     ライトは高コントラストの無彩色インク（濃色）にする。彩度をほぼ 0 まで落とす。 */
+  --primary: oklch(0.30 0.008 260);
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.96 0.01 250);
   --secondary-foreground: oklch(0.35 0.05 250);
@@ -94,7 +96,14 @@
   --sidebar-accent-foreground: oklch(0.35 0.05 250);
   --sidebar-border: oklch(0.86 0.01 250);
   --sidebar-ring: oklch(0.65 0.15 250);
-  --success: oklch(0.55 0.15 155);
+  /* ─── アクセント緑（エッセンス③ WHOOP律「意味だけが色を持つ」）──────────────
+     達成・積み上げ専用（数値/チェック/進捗バー/完了ドット）。白地でネオンは沈むため
+     light は同色相で一段深い明度に落として 3:1 以上を確保する（下記は白地 3.48:1）。
+     ▼ いま有効な値 = エレクトリック版（Fitness+ 的な高彩度ボルト/ライム, hue≈140）
+     ▽ 深め版（「静かな知性」寄り）に替えるには light/dark の --success 2 行を差し替える:
+        light: --success: oklch(0.52 0.13 150);  --success-foreground: oklch(1 0 0);   (白地 4.90:1)
+        dark : --success: oklch(0.72 0.15 148);  --success-foreground: oklch(0.20 0.04 148); (暗地 8:1) */
+  --success: oklch(0.60 0.19 140);
   --success-foreground: oklch(1 0 0);
   --warning: oklch(0.7 0.12 85);
   --warning-foreground: oklch(0.3 0.05 85);
@@ -125,8 +134,10 @@
   --card-foreground: oklch(0.87 0.01 250);
   --popover: oklch(0.24 0.035 250);
   --popover-foreground: oklch(0.87 0.01 250);
-  --primary: oklch(0.65 0.15 250);
-  --primary-foreground: oklch(0.18 0.025 250);
+  /* エッセンス③: ダークは FAB・CTA・アクティブを白系インクにして高コントラスト化。
+     （旧値 oklch(0.65 0.15 250) の青インディゴを排除） */
+  --primary: oklch(0.93 0.004 260);
+  --primary-foreground: oklch(0.20 0.008 260);
   --secondary: oklch(0.24 0.035 250);
   --secondary-foreground: oklch(0.87 0.01 250);
   --muted: oklch(0.24 0.035 250);
@@ -150,8 +161,9 @@
   --sidebar-accent-foreground: oklch(0.87 0.01 250);
   --sidebar-border: oklch(0.35 0.05 250 / 40%);
   --sidebar-ring: oklch(0.65 0.15 250);
-  --success: oklch(0.65 0.15 155);
-  --success-foreground: oklch(0.15 0.02 155);
+  /* エレクトリック版（暗地でボルト緑, 暗地 11:1）。深め版は :root のコメント参照。 */
+  --success: oklch(0.82 0.21 138);
+  --success-foreground: oklch(0.24 0.06 140);
   --warning: oklch(0.75 0.12 85);
   --warning-foreground: oklch(0.2 0.05 85);
   --impact-health: oklch(0.65 0.15 155);
@@ -300,20 +312,22 @@
 
 /* 下→上の映画的スクリム。下部は濃く（テキスト面）、上部は写真をほぼ素通し。
    左からもわずかに敷いて左下のタイトル面をさらに持ち上げる。 */
+/* エッセンス④: バナーを「常時ダークの島」として規格化し、②の大数字・③の緑が常に視覚の
+   勝者になるよう、ハイブリッドより一段スクリムを強める（写真は潰さず一回り静かに）。 */
 .banner-scrim {
   background:
     linear-gradient(
       to top,
-      rgba(0, 0, 0, 0.82) 0%,
-      rgba(0, 0, 0, 0.5) 32%,
-      rgba(0, 0, 0, 0.18) 62%,
-      rgba(0, 0, 0, 0.02) 100%
+      rgba(0, 0, 0, 0.88) 0%,
+      rgba(0, 0, 0, 0.58) 34%,
+      rgba(0, 0, 0, 0.24) 64%,
+      rgba(0, 0, 0, 0.06) 100%
     ),
     linear-gradient(
       to right,
-      rgba(0, 0, 0, 0.42) 0%,
-      rgba(0, 0, 0, 0.12) 46%,
-      rgba(0, 0, 0, 0) 72%
+      rgba(0, 0, 0, 0.46) 0%,
+      rgba(0, 0, 0, 0.14) 48%,
+      rgba(0, 0, 0, 0) 74%
     );
 }
 

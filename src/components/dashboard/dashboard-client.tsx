@@ -144,6 +144,10 @@ export function DashboardClient({
   const activeHabits = todayHabits.filter((h) => !h.skippedToday);
   const completedCount = activeHabits.filter((h) => h.completedToday).length;
   const totalCount = activeHabits.length;
+  const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+  // エッセンス②: ステータスヘッダーの連続日数要素。継続中の習慣のうち最長の currentStreak を
+  // 導出して「◯日連続（継続中の最長）」として一等地の脇に添える（造語・ストリーク不使用）。
+  const maxStreak = activeHabits.reduce((m, h) => Math.max(m, h.currentStreak ?? 0), 0);
 
   const actionsHabit = useMemo(
     () => todayHabits.find((h) => h.id === actionsHabitId),
@@ -248,27 +252,52 @@ export function DashboardClient({
 
   return (
     <div className="space-y-6">
-      <div>
+      {/* エッセンス②: 静的タイトル「今日の習慣」を廃し、動的ステータスヘッダーへ。
+          一等地に画面最大タイポの達成数（Geist Mono / tabular-nums）を置き、視線の勝者を
+          「今日の状態（数値）」にする。緑は達成＝意味にだけ載せ、分母・ラベルは無彩色。 */}
+      {totalCount > 0 ? (
+        <header>
+          <div className="flex items-end justify-between gap-4">
+            <div className="min-w-0">
+              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+                {t('habits.todayProgress')}
+              </p>
+              <div className="mt-0.5 flex items-baseline leading-none">
+                <span className="font-mono text-[72px] font-semibold leading-[0.85] tracking-tighter tabular-nums text-success">
+                  {completedCount}
+                </span>
+                <span className="font-mono text-[40px] font-medium leading-none tracking-tight tabular-nums text-muted-foreground">
+                  /{totalCount}
+                </span>
+              </div>
+            </div>
+            {maxStreak > 0 && (
+              <div className="shrink-0 pb-1.5 text-right">
+                <div className="flex items-baseline justify-end gap-0.5">
+                  <span className="font-mono text-[26px] font-semibold leading-none tabular-nums text-success">
+                    {maxStreak}
+                  </span>
+                  <span className="text-sm text-muted-foreground">{t('habits.daysStreakUnit')}</span>
+                </div>
+                <p className="mt-1 text-[11px] leading-none text-muted-foreground">
+                  {t('habits.longestStreakCaption')}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* 進捗バー: 緑＝積み上げ（ポジティブ）の意味で使用 */}
+          <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-success transition-all duration-500 ease-out"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+        </header>
+      ) : (
         <h2 className="text-[28px] font-bold leading-tight tracking-tight">
           {t('habits.title')}
         </h2>
-        {totalCount > 0 && (
-          <p className="mt-1.5 text-sm text-muted-foreground">
-            <span className="font-semibold tabular-nums text-foreground">{completedCount}</span>
-            <span className="tabular-nums">/{totalCount}</span> {t('habits.completed').toLowerCase()}
-          </p>
-        )}
-      </div>
-
-      {totalCount > 0 && (
-        <div className="h-2 overflow-hidden rounded-full bg-muted">
-          <div
-            className="h-full rounded-full bg-success transition-all duration-500 ease-out"
-            style={{
-              width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%`,
-            }}
-          />
-        </div>
       )}
 
       <DailyImpactSummary habits={todayHabits} />

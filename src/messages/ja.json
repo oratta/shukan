@@ -103,7 +103,10 @@
     "establishedSectionTitle": "身についた習慣",
     "establishedSectionDesc": "もう身についた習慣。残りの人生にもたらす効果を表示しています。",
     "lifetimeEffectHeading": "この習慣が残りの人生であなたにもたらすこと",
-    "trackedKpisTitle": "あなたが大切にしていること"
+    "trackedKpisTitle": "あなたが大切にしていること",
+    "todayProgress": "今日の達成",
+    "daysStreakUnit": "日連続",
+    "longestStreakCaption": "継続中の最長"
   },
   "stats": {
     "title": "統計",
