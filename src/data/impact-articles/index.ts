@@ -36,6 +36,14 @@ import { movementBreaks } from './movement-breaks';
 import { socialConnection } from './social-connection';
 import { morningLight } from './morning-light';
 import { fermentedFood } from './fermented-food';
+import { hotBath } from './hot-bath';
+import { dentalCare } from './dental-care';
+import { expenseTracking } from './expense-tracking';
+import { limitCaffeine } from './limit-caffeine';
+import { breathingExercise } from './breathing-exercise';
+import { saunaBathing } from './sauna-bathing';
+import { proteinIntake } from './protein-intake';
+import { powerNap } from './power-nap';
 import type { LifeImpactArticle } from '@/types/impact';
 
 /**
@@ -98,6 +106,14 @@ const impactArticles = {
   social_connection: socialConnection,
   morning_light: morningLight,
   fermented_food: fermentedFood,
+  hot_bath: hotBath,
+  dental_care: dentalCare,
+  expense_tracking: expenseTracking,
+  limit_caffeine: limitCaffeine,
+  breathing_exercise: breathingExercise,
+  sauna_bathing: saunaBathing,
+  protein_intake: proteinIntake,
+  power_nap: powerNap,
 } satisfies Record<string, LifeImpactArticle>;
 
 /** 有効な記事ID。マップのキーから導出（手動メンテ不要）。 */
