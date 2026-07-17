@@ -13,15 +13,8 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { getTodayString } from '@/lib/habits';
+import { RESIST_CHOICES } from '@/components/habits/resist-choices';
 import type { HabitWithStats } from '@/types/habit';
-
-/** 我慢率4択チップ（issue #104）。0-100 の int で保存し、刻みは表示側の都合でしかない。 */
-const RESIST_CHOICES = [
-  { rate: 0, key: 'resist0' },
-  { rate: 25, key: 'resist25' },
-  { rate: 50, key: 'resist50' },
-  { rate: 75, key: 'resist75' },
-] as const;
 
 interface HabitActionSheetProps {
   open: boolean;

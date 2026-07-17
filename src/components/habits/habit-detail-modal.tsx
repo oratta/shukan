@@ -26,7 +26,7 @@ import { ImpactKpiGrid, type ImpactKpiMetric } from '@/components/habits/impact-
 import { EstimateDisclaimer } from '@/components/habits/estimate-disclaimer';
 import { EvidenceManagerSheet } from '@/components/habits/evidence-manager-sheet';
 import { HelpButton } from '@/components/ui/help-button';
-import { nextStatus } from '@/lib/habits';
+import { nextStatus, EDITABLE_PAST_DAYS } from '@/lib/habits';
 import { failedFillStyle } from '@/components/habits/failed-fill';
 import type { HabitWithStats, DayStatus } from '@/types/habit';
 
@@ -158,11 +158,11 @@ export function HabitDetailModal({
     return buildCalendarGrid(historyPeriod.year, historyPeriod.month, habit.allDays);
   }, [habit, historyPeriod.year, historyPeriod.month]);
 
-  // Tappable dates: last 5 days (today + 4 previous)
+  // Tappable dates: today + EDITABLE_PAST_DAYS previous
   const tappableDates = useMemo(() => {
     const set = new Set<string>();
     const today = new Date();
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i <= EDITABLE_PAST_DAYS; i++) {
       const d = new Date(today);
       d.setDate(d.getDate() - i);
       set.add(getDateString(d));
@@ -170,7 +170,7 @@ export function HabitDetailModal({
     return set;
   }, []);
 
-  // Rocket-eligible: failed days > 5 days old
+  // Rocket-eligible: failed days older than the editable window
   const rocketEligibleDates = useMemo(() => {
     if (!habit || habit.rockets <= 0) return new Set<string>();
     const set = new Set<string>();
@@ -181,7 +181,7 @@ export function HabitDetailModal({
         const d = new Date(day.date);
         d.setHours(0, 0, 0, 0);
         const diff = Math.round((today.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
-        if (diff > 5) set.add(day.date);
+        if (diff > EDITABLE_PAST_DAYS) set.add(day.date);
       }
     }
     return set;

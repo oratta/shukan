@@ -27,6 +27,8 @@ interface HabitListProps {
   onOpenDetail: (id: string) => void;
   /** 長押しで対象日のアクションシートを開く（issue #104） */
   onOpenActionSheet: (habitId: string, date: string) => void;
+  /** 週ドット領域タップ等で過去日の一括編集シートを開く（issue #107） */
+  onOpenBulkEdit: (habitId: string) => void;
   onReorder: (orderedIds: string[]) => void;
   onSkipToday: (id: string) => void;
   /** 推定値タップで算出根拠（エビデンス記事）を開く導線（issue #39） */
@@ -39,6 +41,7 @@ export function HabitList({
   onAdd,
   onOpenDetail,
   onOpenActionSheet,
+  onOpenBulkEdit,
   onReorder,
   onSkipToday,
   onOpenArticle,
@@ -128,6 +131,7 @@ export function HabitList({
                       onDayStatusChange={onDayStatusChange}
                       onOpenDetail={onOpenDetail}
                       onOpenActionSheet={onOpenActionSheet}
+                      onOpenBulkEdit={onOpenBulkEdit}
                       onSkipToday={onSkipToday}
                       onOpenArticle={onOpenArticle}
                     />
@@ -157,6 +161,7 @@ export function HabitList({
                       onDayStatusChange={onDayStatusChange}
                       onOpenDetail={onOpenDetail}
                       onOpenActionSheet={onOpenActionSheet}
+                      onOpenBulkEdit={onOpenBulkEdit}
                       onSkipToday={onSkipToday}
                       onOpenArticle={onOpenArticle}
                     />

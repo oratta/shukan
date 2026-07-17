@@ -10,7 +10,7 @@ import type { Habit, HabitCompletion } from '@/types/habit';
 // redesign-quit-habit-input (issue #104):
 // - quit の completedToday は completion レコードのみで判定（urge_logs 依存の撤去）
 // - nextStatus は達成の二値トグル（3値サイクル不在）
-// - getEffectiveStatus（6日放置→failed）は現行維持
+// - getEffectiveStatus の自動失敗境界は issue #107 で EDITABLE_PAST_DAYS(=6) に統一（7日放置→failed。今日含め1週間が編集枠）
 
 function makeHabit(overrides: Partial<Habit> & { id: string }): Habit {
   return {
@@ -100,7 +100,7 @@ describe('nextStatus binary toggle', () => {
   });
 });
 
-describe('getEffectiveStatus (現行維持)', () => {
+describe('getEffectiveStatus (境界は EDITABLE_PAST_DAYS=6 に統一。issue #107)', () => {
   function daysAgo(n: number): string {
     const d = new Date();
     d.setDate(d.getDate() - n);
@@ -110,12 +110,12 @@ describe('getEffectiveStatus (現行維持)', () => {
     return `${y}-${m}-${day}`;
   }
 
-  it('6日以上前の none は failed 扱いになる', () => {
-    expect(getEffectiveStatus({ date: daysAgo(6), status: 'none' })).toBe('failed');
+  it('7日以上前の none は failed 扱いになる', () => {
+    expect(getEffectiveStatus({ date: daysAgo(7), status: 'none' })).toBe('failed');
   });
 
-  it('5日前までの none は none のまま', () => {
-    expect(getEffectiveStatus({ date: daysAgo(5), status: 'none' })).toBe('none');
+  it('6日前までの none は none のまま', () => {
+    expect(getEffectiveStatus({ date: daysAgo(6), status: 'none' })).toBe('none');
     expect(getEffectiveStatus({ date: daysAgo(0), status: 'none' })).toBe('none');
   });
 

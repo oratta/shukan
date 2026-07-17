@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Check, ChevronDown, ChevronUp, Maximize2, GripVertical, SkipForward, Undo2, Images } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp, Maximize2, GripVertical, SkipForward, Undo2, Images, History } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Card } from '@/components/ui/card';
@@ -25,47 +25,38 @@ interface HabitCardProps {
   onToggleExpand: (id: string) => void;
   onDayStatusChange: (habitId: string, date: string, status: 'completed' | 'failed' | 'none' | 'skipped') => void;
   onOpenDetail: (id: string) => void;
-  /** 長押しで対象日のアクションシート（失敗/スキップ/メモ）を開く（issue #104） */
+  /** 長押しで今日のアクションシート（失敗/スキップ/メモ）を開く（issue #104） */
   onOpenActionSheet: (habitId: string, date: string) => void;
+  /** 週ドット領域タップ・展開ビューのボタンで過去日の一括編集シートを開く（issue #107） */
+  onOpenBulkEdit: (habitId: string) => void;
   onSkipToday: (id: string) => void;
   /** 推定値（ImpactBadge）タップで算出根拠（エビデンス記事）へ 1 タップ到達する導線（issue #39） */
   onOpenArticle?: (articleId: string) => void;
 }
 
+// 過去日ドットは表示専用（issue #107）。個別タップは持たず、
+// ドット領域全体のタップで一括編集シートを開く（入力はシート内の大きなボタンで行う）。
 function DayStatusDot({
   day,
-  onOpen,
   onImage = false,
 }: {
   day: DayStatus;
-  onOpen: () => void;
   /** 写真バナー上に載る場合の扱い。v2: light=インク（明るいベール上）/ dark=白（暗い島上）。 */
   onImage?: boolean;
 }) {
   const { status } = day;
 
   return (
-    // 過去日は小ターゲットに精密操作を要求しない: タップ一発でアクションシートを開き、
-    // 操作はシート内の大きなボタンで完結させる（案A）。不可視パディングでタッチターゲットも拡大。
-    <button
-      type="button"
-      onClick={(e) => {
-        e.stopPropagation();
-        onOpen();
-      }}
-      className="-m-1.5 flex items-center justify-center p-1.5"
-    >
-      {/* 失敗日は inline の failedFillStyle（我慢率に応じた conic-gradient）で塗る。他は v2 トークン。 */}
-      <span
-        className={cn(
-          'flex items-center justify-center rounded-full size-3 transition-all',
-          (status === 'completed' || status === 'rocket_used') && 'bg-success',
-          status === 'none' && (onImage ? 'border border-skipped bg-transparent dark:border-white/70 dark:bg-white/10' : 'border border-skipped bg-transparent'),
-          status === 'skipped' && (onImage ? 'bg-skipped dark:bg-white/45' : 'bg-skipped'),
-        )}
-        style={status === 'failed' ? failedFillStyle(day.resistRate) : undefined}
-      />
-    </button>
+    // 失敗日は inline の failedFillStyle（我慢率に応じた conic-gradient）で塗る。他は v2 トークン。
+    <span
+      className={cn(
+        'flex items-center justify-center rounded-full size-3 transition-all',
+        (status === 'completed' || status === 'rocket_used') && 'bg-success',
+        status === 'none' && (onImage ? 'border border-skipped bg-transparent dark:border-white/70 dark:bg-white/10' : 'border border-skipped bg-transparent'),
+        status === 'skipped' && (onImage ? 'bg-skipped dark:bg-white/45' : 'bg-skipped'),
+      )}
+      style={status === 'failed' ? failedFillStyle(day.resistRate) : undefined}
+    />
   );
 }
 
@@ -201,6 +192,7 @@ export function HabitCard({
   onDayStatusChange,
   onOpenDetail,
   onOpenActionSheet,
+  onOpenBulkEdit,
   onSkipToday,
   onOpenArticle,
 }: HabitCardProps) {
@@ -317,20 +309,26 @@ export function HabitCard({
     return null;
   };
 
-  const dayDotsRow = (onBanner: boolean) => (
-    <div className="flex items-center gap-1.5">
-      {/* Past days only (skip index 0 = today), left=yesterday, right=oldest */}
-      {(habit.recentDays ?? []).slice(1).map((day) => {
-        const dayLabel = new Date(day.date + 'T00:00:00').toLocaleDateString(locale, { weekday: 'narrow' });
-        return (
-          <div key={day.date} className="flex flex-col items-center gap-0.5">
-            <span className={cn('text-[9px] leading-none', onBanner ? 'text-muted-foreground dark:text-white/75 dark:banner-label' : 'text-muted-foreground')}>{dayLabel}</span>
-            <DayStatusDot day={day} onOpen={() => onOpenActionSheet(habit.id, day.date)} onImage={onBanner} />
-          </div>
-        );
-      })}
-    </div>
-  );
+  // 週ドット領域全体が一括編集シートの起動ボタン（issue #107 案1）。
+  // ドットは表示専用で、どこを押しても同じ。-m/p の不可視パディングでタッチ高さを確保。
+  // 表示する日は一括編集シートの行と常に1:1（editablePastDays）。left=昨日, right=6日前
+  // （今日の丸と合わせて計7日間＝1週間の窓）
+  const dayDotsRow = (onBanner: boolean) =>
+    (habit.editablePastDays ?? []).length > 0 ? (
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onOpenBulkEdit(habit.id);
+        }}
+        aria-label={t('bulkEdit.open')}
+        className="-mx-2 -my-2 flex items-center gap-1.5 self-start px-2 py-2"
+      >
+        {(habit.editablePastDays ?? []).map((day) => (
+          <DayStatusDot key={day.date} day={day} onImage={onBanner} />
+        ))}
+      </button>
+    ) : null;
 
   return (
     <div ref={setNodeRef} style={style} className={cn(isDragging && 'z-50 opacity-80')}>
@@ -513,6 +511,23 @@ export function HabitCard({
               >
                 <Maximize2 className="size-4" />
                 {t('detail')}
+              </button>
+              {/* 過去日の一括編集シートへの第2入口（issue #107）。中立操作なので緑は使わない */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenBulkEdit(habit.id);
+                }}
+                className={cn(
+                  'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors',
+                  hasEvidenceBg
+                    ? 'bg-secondary text-secondary-foreground hover:bg-secondary/80 dark:bg-white/90 dark:text-gray-900 dark:hover:bg-white'
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                )}
+              >
+                <History className="size-4" />
+                {t('bulkEdit.openButton')}
               </button>
               {/* スキップは中立操作。緑以外の中立アクセント（primary=インク/白ガラス）＋リングで
                   affordance を明示。v2: skipped 中の状態も琥珀をやめ無彩色（muted）に。休止＝注意は
