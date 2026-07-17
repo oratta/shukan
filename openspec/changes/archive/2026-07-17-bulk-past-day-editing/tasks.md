@@ -24,6 +24,6 @@
 
 ## 5. 既存テスト・仕上げ
 
-- [ ] 5.1 過去日ドット個別タップ前提の既存テスト・spec 参照箇所を洗い出して更新（`habit-input-actions.test.ts` ほか）
-- [ ] 5.2 `npm run test:run` / lint / `npx tsc --noEmit` / build を実行し、exit code を確認
-- [ ] 5.3 dev サーバーでブラウザ動作確認: ドット領域タップ→シート→連続入力→ドット反映、quit チップ、「…」→メモ、展開ビューの導線、詳細モーダルの7日編集
+- [x] 5.1 過去日ドット個別タップ前提の既存テスト・spec 参照箇所を洗い出して更新（`habit-input-actions.test.ts` ほか）
+- [x] 5.2 `npm run test:run` / lint / `npx tsc --noEmit` / build を実行し、exit code を確認
+- [x] 5.3 dev サーバーでブラウザ動作確認: ドット領域タップ→シート→連続入力→ドット反映、quit チップ、「…」→メモ、展開ビューの導線、詳細モーダルの7日編集
