@@ -138,6 +138,7 @@ function StatusIndicator({
       <div className="relative flex size-8 shrink-0 items-center justify-center">
         <button
           type="button"
+          data-tutorial="habit-status"
           {...pressHandlers}
           className={cn(
             'flex size-8 shrink-0 touch-none items-center justify-center rounded-full transition-all',
@@ -161,6 +162,7 @@ function StatusIndicator({
     <div className="relative flex size-8 shrink-0 items-center justify-center">
       <button
         type="button"
+        data-tutorial="habit-status"
         {...pressHandlers}
         className={cn(
           'flex size-8 shrink-0 touch-none items-center justify-center rounded-full transition-all',

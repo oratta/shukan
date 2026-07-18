@@ -853,5 +853,49 @@
         "body": "Rate how yesterday felt on a five-point scale — further left means a harder day, further right a better one.\nSaved together with a comment, it appears in the review calendar on the Stats page, helping you notice how your mood and habits relate."
       }
     }
+  },
+  "tutorial": {
+    "caption": "Quick guide",
+    "captionDone": "Guide complete",
+    "progress": "Guide {current}/{total}",
+    "skip": "Skip",
+    "start": "Start",
+    "next": "Next",
+    "done": "Done",
+    "goHome": "Go home",
+    "steps": {
+      "welcome": {
+        "title": "Welcome to Smitch",
+        "body": "Take one minute to learn the basics — hands-on, right on the real screen."
+      },
+      "complete": {
+        "title": "Tap to complete",
+        "body": "When you finish a habit today, tap this circle. That's all it takes to log it."
+      },
+      "undo": {
+        "title": "Tap again to undo",
+        "body": "Tapped by mistake? No problem — tap once more to undo."
+      },
+      "longpress": {
+        "title": "Long-press for more",
+        "body": "Now try long-pressing the circle. You can log a missed day or skip a day from here. Close the menu when you're done."
+      },
+      "discover": {
+        "title": "Add more habits",
+        "body": "Tap the Discover tab."
+      },
+      "articles": {
+        "title": "Add evidence-backed habits",
+        "body": "These habits come with evidence for their impact. Tap any card to see the details and an \"Add this habit\" button."
+      },
+      "create": {
+        "title": "Create your own habit",
+        "body": "Build your own habit from here. For example, bundle several actions into one habit like a \"morning routine\", attach multiple pieces of evidence, and tune each one's share (%) to adjust the impact."
+      },
+      "finished": {
+        "title": "You're all set!",
+        "body": "Head back home and complete your first habit of the day."
+      }
+    }
   }
 }

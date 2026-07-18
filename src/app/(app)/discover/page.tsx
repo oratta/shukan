@@ -111,6 +111,7 @@ export default function DiscoverPage() {
       {/* F14: ゼロから習慣をつくる。彩色せずインク（primary）のダッシュ枠＝「追加」の affordance。 */}
       <button
         type="button"
+        data-tutorial="discover-create"
         onClick={handleCreateFromScratch}
         className="mb-6 flex w-full items-center gap-3 rounded-2xl border border-dashed border-border bg-card px-4 py-4 text-left transition-colors hover:border-primary/50 hover:bg-secondary active:scale-[0.99]"
       >
@@ -162,7 +163,7 @@ export default function DiscoverPage() {
       </div>
 
       {/* F12: 写真主役のコンパクトカード（2カラム）・選んだ KPI 効果順 */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3" data-tutorial="discover-articles">
         {sortedArticles.map((article) => (
           <ArticleCard
             key={article.id}
