@@ -13,6 +13,8 @@ export const noScreensBeforeBed: LifeImpactArticle = {
       '{{cost_inference}}\n\n' +
       '睡眠の質が上がれば、翌日のパフォーマンスは確実に上がる。\n\n' +
       '{{income_inference}}\n\n' +
+      '就寝前のスマホを手放す効果は、睡眠だけにとどまらない。He et al.（2020）のランダム化試験では、寝る前のスマホ使用を制限した群で睡眠が改善しただけでなく、日中のポジティブ感情が有意に高まった。\n\n' +
+      '{{positive_mood_inference}}\n\n' +
       '{{cumulative}}',
 
     sources: [
@@ -30,6 +32,11 @@ export const noScreensBeforeBed: LifeImpactArticle = {
         id: 3,
         text: 'Exelmans L & Van den Bulck J (2016). "Bedtime mobile phone use and sleep in adults." Social Science & Medicine, 148, 93-101.',
       },
+      {
+        id: 4,
+        text: 'He JW, et al. (2020). "Effect of restricting bedtime mobile phone use on sleep, arousal, mood, and working memory: A randomized pilot trial." PLoS ONE, 15(2), e0228756.',
+        url: 'https://doi.org/10.1371/journal.pone.0228756',
+      },
     ],
   },
 
@@ -40,10 +47,12 @@ export const noScreensBeforeBed: LifeImpactArticle = {
       '就寝前のスマホ使用は衝動的なオンラインショッピングの温床です（深夜ECサイト購入の平均単価は日中の1.3倍）。この衝動消費の抑制と、睡眠改善による医療費削減を含め、1日あたり¥200のコスト削減と推定されます。',
     income:
       '年収1,500万円（日給¥62,500）に対して、睡眠の質向上による翌日の生産性改善を控えめに1.5%と見積もると年間¥22.5万。加えて覚醒度向上による判断ミスの減少を含め、1日あたり¥850の収入ポテンシャルと推定されます。',
+    positiveMood:
+      '就寝前のスマホ使用を制限すると、睡眠の質が高まると同時に日中のポジティブ感情が向上することが、ランダム化試験で報告されています（He et al., 2020）。効果は主に睡眠改善を経由するため、睡眠そのものを7時間確保する習慣（15%）より控えめに見積もる必要があります。何もしないときに前向きでいられる時間（起床16時間×前向き50%＝480分/日）を基準に、気分改善を保守的に8%とみなすと、1日あたり約38分（480分×8%）、前向きな気持ちで過ごせる時間が増えると推定されます。',
     cumulative:
-      '**1ヶ月続けると**：健康寿命+3時間、¥6,000節約、¥25,500の収入増。\n' +
-      '**1年続けると**：健康寿命+1.8日、¥7.3万節約、¥31万の収入増。\n' +
-      '**10年続けると**：健康寿命+18日、¥73万節約、¥310万の収入増。\n' +
+      '**1ヶ月続けると**：健康寿命+3時間、¥6,000節約、¥25,500の収入増、前向きな気持ちの時間+19時間。\n' +
+      '**1年続けると**：健康寿命+1.8日、¥7.3万節約、¥31万の収入増、前向きな気持ちの時間+9.6日。\n' +
+      '**10年続けると**：健康寿命+18日、¥73万節約、¥310万の収入増、前向きな気持ちの時間+96.3日。\n' +
       '画面を閉じた瞬間から、質の高い明日が始まります。',
   },
 
@@ -51,8 +60,7 @@ export const noScreensBeforeBed: LifeImpactArticle = {
     dailyHealthMinutes: 6,
     dailyCostSaving: 200,
     dailyIncomeGain: 850,
-    // positiveMood 0: 依存・衝動の抑制による便益は健康寿命/出費削減で計上済み。前向きな気持ちの時間への独立した一次エビデンスが確立していないため、二重計上を避けて 0 のままとする。
-    dailyPositiveMoodMinutes: 0,
+    dailyPositiveMoodMinutes: 38,
   },
 
   confidenceLevel: 'medium',
@@ -70,6 +78,11 @@ export const noScreensBeforeBed: LifeImpactArticle = {
       { label: '翌日の生産性改善', value: '覚醒度向上・判断ミス減少' },
       { label: '生産性1.5%', formula: '62500 × 1.5%', result: '938円/日' },
       { label: '保守的に調整', result: '850円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: '就寝前スマホ制限でポジティブ感情が有意に向上（He et al., 2020）。睡眠経由のため気分改善を保守的に8%' },
+      { label: '日割り計算', formula: '480分 × 8%', result: '38分/日' },
     ],
   },
 

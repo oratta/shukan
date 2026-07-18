@@ -32,6 +32,8 @@ export const movementBreaks: LifeImpactArticle = {
       '{{cost_inference}}\n\n' +
       '認知パフォーマンスにも効く。体を動かす休憩は、座ったままの休憩より遥かに効果的だ。\n\n' +
       '{{income_inference}}\n\n' +
+      '体を動かすことは、その場の気分そのものを持ち上げる。Reed & Ones（2006）のメタ分析では、1回の有酸素運動が「活性化されたポジティブ感情」（活力・エネルギー）を中程度の効果量で高めることが示されている。しかも低〜中強度の運動でこの効果は最も大きく、30分ごとの5分間の運動は、この気分の底上げを1日に何度も繰り返すことになる。\n\n' +
+      '{{positive_mood_inference}}\n\n' +
       '{{cumulative}}',
     sources: [
       {
@@ -54,6 +56,11 @@ export const movementBreaks: LifeImpactArticle = {
         text: 'Albulescu P, Macsinga I, Rusu A, et al. (2022). "Give me a break! A systematic review and meta-analysis on the efficacy of micro-breaks for increasing well-being and performance." PLoS ONE, 17(8), e0272460.',
         url: 'https://doi.org/10.1371/journal.pone.0272460',
       },
+      {
+        id: 5,
+        text: 'Reed J, Ones DS (2006). "The effect of acute aerobic exercise on positive activated affect: A meta-analysis." Psychology of Sport and Exercise, 7(5), 477-514.',
+        url: 'https://doi.org/10.1016/j.psychsport.2005.11.003',
+      },
     ],
   },
 
@@ -64,10 +71,12 @@ export const movementBreaks: LifeImpactArticle = {
       'Andersen et al.（2022）が示す職場マイクロエクササイズによる病欠14%減少は、直接的なコスト削減を意味します。年収1,500万円の場合、1日の欠勤コストは¥62,500です。年間平均5日の体調不良日のうち14%（0.7日）を防げると、年間¥43,750の価値があります。これに加え、血糖値・血圧の改善による将来の医療費削減（メタボ関連の治療は年間数十万円）、デスクワークによる肩こり・腰痛の軽減による整体費の削減を含め、保守的に1日あたり¥350と推定します。',
     income:
       '年収1,500万円（日給¥62,500）に対して、Albulescu et al.のメタ分析が示すマイクロブレイクの効果（活力d=0.36、疲労軽減d=0.35）は、身体を動かす休憩でさらに増幅されます。運動による脳血流の増加は認知機能を直接的に改善し、午後の生産性低下（いわゆる「ポストランチ・ディップ」）を大幅に緩和します。デスクワーク中心の仕事において、30分ごとの運動休憩による集中力維持効果を保守的に約2%の生産性向上と推定し、¥62,500 × 2% ≒ ¥1,250/日の収入ポテンシャルに相当します。',
+    positiveMood:
+      '1回の有酸素運動には、その直後の活性化されたポジティブ感情（活力・エネルギー）を中程度の効果量で高める作用があります（Reed & Ones, 2006）。低〜中強度でこの効果は特に大きく、5分間の軽い運動を30分ごとに挟む習慣は、日中のポジティブな気分を繰り返し呼び戻します。何もしないときに前向きでいられる時間（起床16時間のうち約50%＝480分）を基準に、気分改善を保守的に8%とみなすと、1日あたり約38分（480分×8%）、前向きな気持ちで過ごせる時間が増えると推定されます。',
     cumulative:
-      '**1ヶ月続けると**：健康寿命+4時間、¥10,500節約、¥37,500の収入増。\n' +
-      '**1年続けると**：健康寿命+2日、¥12.8万節約、¥45.6万の収入増。\n' +
-      '**10年続けると**：健康寿命+20.3日、¥128万節約、¥456万の収入増。\n' +
+      '**1ヶ月続けると**：健康寿命+4時間、¥10,500節約、¥37,500の収入増、前向きな気持ちの時間+19時間。\n' +
+      '**1年続けると**：健康寿命+2日、¥12.8万節約、¥45.6万の収入増、前向きな気持ちの時間+9.6日。\n' +
+      '**10年続けると**：健康寿命+20.3日、¥128万節約、¥456万の収入増、前向きな気持ちの時間+96.3日。\n' +
       '30分に1回、たった5分立ち上がるだけ。10年で健康寿命が約3週間延び、584万円の経済効果。座りっぱなしの危険を「タダ」で回避できます。',
   },
 
@@ -75,8 +84,7 @@ export const movementBreaks: LifeImpactArticle = {
     dailyHealthMinutes: 8,
     dailyCostSaving: 350,
     dailyIncomeGain: 1250,
-    // positiveMood 0: 身体・健康面の効果は健康寿命で計上済み。気分改善の独立した定量エビデンスに乏しく、二重計上回避のため 0 のままとする。
-    dailyPositiveMoodMinutes: 0,
+    dailyPositiveMoodMinutes: 38,
   },
 
   confidenceLevel: 'high',
@@ -96,6 +104,11 @@ export const movementBreaks: LifeImpactArticle = {
       { label: '基準日給', value: '年収1500万円', formula: '15000000 ÷ 240日', result: '62500円/日' },
       { label: '研究結果', value: 'マイクロブレイク→活力d=0.36、疲労軽減d=0.35（Albulescu, 2022）' },
       { label: '生産性向上', value: '運動休憩による認知回復+午後の集中力維持', formula: '62500 × 2%', result: '1250円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: '1回の有酸素運動が活性化されたポジティブ感情を中程度の効果量で高める（Reed & Ones, 2006）。低〜中強度で効果大。気分改善を保守的に8%' },
+      { label: '日割り計算', formula: '480分 × 8%', result: '38分/日' },
     ],
   },
 

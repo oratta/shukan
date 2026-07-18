@@ -18,6 +18,8 @@ export const intermittentFasting: LifeImpactArticle = {
       '{{cost_inference}}\n\n' +
       '空腹状態は脳のBDNF（脳由来神経栄養因子）を増加させ、認知機能を向上させることが動物実験で示されている。\n\n' +
       '{{income_inference}}\n\n' +
+      '断食の効果は代謝や認知だけにとどまらない。断食介入をまとめたメタ分析（Berthelot et al., 2021）では、不安や抑うつのスコアが対照群より低く、しかも疲労感の増加は見られなかったと報告されている。\n\n' +
+      '{{positive_mood_inference}}\n\n' +
       '{{cumulative}}',
 
     sources: [
@@ -35,6 +37,11 @@ export const intermittentFasting: LifeImpactArticle = {
         id: 3,
         text: 'Mattson MP, et al. (2018). "Intermittent metabolic switching, neuroplasticity and brain health." Nature Reviews Neuroscience, 19, 81-94.',
       },
+      {
+        id: 4,
+        text: 'Berthelot E, et al. (2021). "Fasting Interventions for Stress, Anxiety and Depressive Symptoms: A Systematic Review and Meta-Analysis." Nutrients, 13(11), 3947.',
+        url: 'https://doi.org/10.3390/nu13113947',
+      },
     ],
   },
 
@@ -45,10 +52,12 @@ export const intermittentFasting: LifeImpactArticle = {
       '朝食を抜く（または遅らせる）ことで、1食分のコスト（約300-500円）が節約できます。さらにインスリン関連の医療費リスク低減を含め、1日あたり¥350のコスト削減と推定されます。',
     income:
       '年収1,500万円（日給¥62,500）に対して、血糖値安定による午前中の集中力向上と、BDNF増加による認知機能改善を控えめに1.5%と見積もると年間¥22.5万。1日あたり¥800の収入ポテンシャルと推定されます。',
+    positiveMood:
+      '断食介入のメタ分析では、不安・抑うつスコアの低下が疲労の増加を伴わずに報告されています（Berthelot et al., 2021）。何もしないときに前向きでいられる時間（起床16時間＝960分のうち約50%＝480分/日）を基準に、この気分への効果を保守的に3%とみなすと、1日あたり約14分（480分×3%）、前向きな気持ちで過ごせる時間が増えると推定されます。研究間のばらつきが大きく、効果がカロリー制限由来か断食固有かの切り分けも未確定で、断食初期は空腹による不快感も生じうるため、最も控えめな水準にとどめています。',
     cumulative:
-      '**1ヶ月続けると**：健康寿命+3.5時間、¥10,500節約、¥24,000の収入増。\n' +
-      '**1年続けると**：健康寿命+2.1日、¥12.8万節約、¥29.2万の収入増。\n' +
-      '**10年続けると**：健康寿命+21日、¥128万節約、¥292万の収入増。\n' +
+      '**1ヶ月続けると**：健康寿命+3.5時間、¥10,500節約、¥24,000の収入増、前向きな気持ちの時間+7時間。\n' +
+      '**1年続けると**：健康寿命+2.1日、¥12.8万節約、¥29.2万の収入増、前向きな気持ちの時間+3.5日。\n' +
+      '**10年続けると**：健康寿命+21日、¥128万節約、¥292万の収入増、前向きな気持ちの時間+35.5日。\n' +
       '食べない時間が、あなたの体を内側から若返らせます。',
   },
 
@@ -56,8 +65,7 @@ export const intermittentFasting: LifeImpactArticle = {
     dailyHealthMinutes: 7,
     dailyCostSaving: 350,
     dailyIncomeGain: 800,
-    // positiveMood 0: 栄養・代謝面の効果は健康寿命/出費削減で計上済み。前向きな気持ちの時間への独立効果を定量化できないため 0 のままとする。
-    dailyPositiveMoodMinutes: 0,
+    dailyPositiveMoodMinutes: 14,
   },
 
   confidenceLevel: 'medium',
@@ -77,6 +85,11 @@ export const intermittentFasting: LifeImpactArticle = {
       { label: '基準日給', value: '年収1,500万円', formula: '15000000 ÷ 240日', result: '62500円/日' },
       { label: '集中力・認知機能向上', value: '血糖値安定+BDNF増加を控えめに1.5%', formula: '62500 × 1.5%', result: '938円/日' },
       { label: '保守的調整', value: '長期効果の不確実性を考慮し下方調整', result: '800円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: '断食介入で不安・抑うつスコアが低下、疲労増加なし（Berthelot et al., 2021、11研究1,436人のメタ分析）。異質性大・カロリー制限との交絡ありのため最も保守的に3%' },
+      { label: '日割り計算', formula: '480分 × 3%', result: '14分/日' },
     ],
   },
 

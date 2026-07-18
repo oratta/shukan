@@ -13,6 +13,8 @@ export const dailyStretching: LifeImpactArticle = {
       '{{cost_inference}}\n\n' +
       '体が柔軟になると、精神も柔軟になる。ストレッチはコルチゾール（ストレスホルモン）を低下させ、仕事のパフォーマンスを向上させる。\n\n' +
       '{{income_inference}}\n\n' +
+      '柔軟になるのは体だけではない。ロジスティクス企業の労働者を対象にした無作為化比較試験（Montero-Marín et al., 2013）では、1日10分・3ヶ月のストレッチで不安が中程度に低下し、活力や心の健康度が高まった。\n\n' +
+      '{{positive_mood_inference}}\n\n' +
       '{{cumulative}}',
 
     sources: [
@@ -31,6 +33,11 @@ export const dailyStretching: LifeImpactArticle = {
         text: 'Harvard Health Publishing (2022). "The importance of stretching." Harvard Medical School.',
         url: 'https://www.health.harvard.edu/staying-healthy/the-importance-of-stretching',
       },
+      {
+        id: 4,
+        text: 'Montero-Marín J, et al. (2013). "Effectiveness of a stretching program on anxiety levels of workers in a logistic platform: a randomized controlled study." Atención Primaria, 45(7), 376-383.',
+        url: 'https://pubmed.ncbi.nlm.nih.gov/23764394/',
+      },
     ],
   },
 
@@ -41,10 +48,12 @@ export const dailyStretching: LifeImpactArticle = {
       'ストレッチ自体は無料ですが、腰痛・肩こりの整体通院費（月平均4,000-8,000円）の削減が見込めます。さらに柔軟性低下による怪我の治療費リスク低減を加味すると、1日あたり¥200のコスト削減と推定されます。',
     income:
       '年収1,500万円（日給¥62,500）に対して、ストレッチによるストレス低減と集中力向上を控えめに1%と見積もると年間¥15万。デスクワーク中の体の不調による生産性低下の解消効果を含め、1日あたり¥600の収入ポテンシャルと推定されます。',
+    positiveMood:
+      'ストレッチには不安を和らげる効果が確認されています（Montero-Marín et al., 2013：1日10分・3ヶ月のストレッチで不安が中程度に低下、η²=0.06）。何もしないときに前向きでいられる時間（起床16時間のうち約50%＝480分）を基準に、気分改善効果を保守的に5%とみなすと、1日あたり約24分（480分×5%）、前向きな気持ちで過ごせる時間が増えると推定されます。',
     cumulative:
-      '**1ヶ月続けると**：健康寿命+2.5時間、¥6,000節約、¥18,000の収入増。\n' +
-      '**1年続けると**：健康寿命+1.5日、¥7.3万節約、¥21.9万の収入増。\n' +
-      '**10年続けると**：健康寿命+15日、¥73万節約、¥219万の収入増。\n' +
+      '**1ヶ月続けると**：健康寿命+2.5時間、¥6,000節約、¥18,000の収入増、前向きな気持ちの時間+12時間。\n' +
+      '**1年続けると**：健康寿命+1.5日、¥7.3万節約、¥21.9万の収入増、前向きな気持ちの時間+6.1日。\n' +
+      '**10年続けると**：健康寿命+15日、¥73万節約、¥219万の収入増、前向きな気持ちの時間+61日。\n' +
       '体をほぐす10分が、人生の可動域を広げます。',
   },
 
@@ -52,8 +61,7 @@ export const dailyStretching: LifeImpactArticle = {
     dailyHealthMinutes: 5,
     dailyCostSaving: 200,
     dailyIncomeGain: 600,
-    // positiveMood 0: 身体・健康面の効果は健康寿命で計上済み。気分改善の独立した定量エビデンスに乏しく、二重計上回避のため 0 のままとする。
-    dailyPositiveMoodMinutes: 0,
+    dailyPositiveMoodMinutes: 24,
   },
 
   confidenceLevel: 'medium',
@@ -72,6 +80,11 @@ export const dailyStretching: LifeImpactArticle = {
       { label: '生産性向上', value: 'ストレス低減と集中力向上を控えめに1%と見積もり', formula: '15000000 × 1% ÷ 365', result: '411円/日' },
       { label: '体調不良による生産性低下の解消', value: 'デスクワーク中の肩こり・腰痛解消', result: '189円/日' },
       { label: '合計', formula: '411 + 189', result: '600円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: '1日10分・3ヶ月のストレッチで不安が中程度に低下（Montero-Marín et al., 2013：η²=0.06）。気分改善を保守的に5%' },
+      { label: '日割り計算', formula: '480分 × 5%', result: '24分/日' },
     ],
   },
 

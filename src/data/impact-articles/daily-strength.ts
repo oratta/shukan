@@ -28,6 +28,8 @@ export const dailyStrength: LifeImpactArticle = {
       '{{cost_inference}}\n\n' +
       'さらに、脳機能への好影響も科学的に実証されている。Liu-Ambrose et al.（2010）のランダム化比較試験では、12ヶ月間のレジスタンストレーニングにより実行機能（注意力・意思決定）が有意に向上した。また、レジスタンストレーニングは安静時代謝率を約5〜7%向上させ、エネルギーレベルの底上げにもつながる。\n\n' +
       '{{income_inference}}\n\n' +
+      '死亡リスクや医療費だけの話ではない。筋トレは日々の気分そのものも押し上げる。レジスタンストレーニングはうつ症状を有意に改善し、そのメタアナリシス（Gordon et al., 2018）が示した効果量は有酸素運動に匹敵する。\n\n' +
+      '{{positive_mood_inference}}\n\n' +
       '{{cumulative}}',
     sources: [
       {
@@ -49,6 +51,11 @@ export const dailyStrength: LifeImpactArticle = {
         id: 4,
         text: '厚生労働省 (2024). 「令和4年度 国民医療費の概況」— 糖尿病医療費 約1兆1,997億円、循環器系疾患 約6兆2,834億円',
       },
+      {
+        id: 5,
+        text: 'Gordon BR, et al. (2018). "Association of Efficacy of Resistance Exercise Training With Depressive Symptoms: Meta-analysis and Meta-regression Analysis of Randomized Clinical Trials." JAMA Psychiatry, 75(6), 566-576.',
+        url: 'https://doi.org/10.1001/jamapsychiatry.2018.0572',
+      },
     ],
   },
 
@@ -59,10 +66,12 @@ export const dailyStrength: LifeImpactArticle = {
       '日本の国民医療費データ（1人あたり年間約37万円）から、筋力トレーニングによる生活習慣病リスク低減（糖尿病34%・心血管疾患19%・メタボリックシンドローム予防）を保守的に算出すると、年間約5万円の医療費削減が見込まれます。さらに、加齢に伴う骨粗鬆症・転倒骨折の予防効果（日本の大腿骨骨折の年間医療費は約3,292億円）と、代謝率向上（5〜7%）による体組成改善効果を加味すると、1日あたり¥200のコスト削減になります。',
     income:
       '年収1,500万円（日給換算¥62,500）に対して、レジスタンストレーニングによる実行機能の向上（Liu-Ambrose研究：注意力・意思決定力の有意な改善）と、基礎代謝向上によるエネルギーレベルの底上げから、約1.5%の生産性改善を推定します。さらに、身体活動による病欠日数の減少（年間約2日分）を加味すると、1日あたり¥960の収入ポテンシャルに相当すると推定されます。',
+    positiveMood:
+      'レジスタンストレーニングはうつ症状を中程度に改善します（Gordon et al., 2018：無作為化比較試験のメタアナリシス、効果量 Hedges d=0.66で有酸素運動と同等）。何もしないときに前向きでいられる時間（起床16時間のうち約50%＝480分）を基準に、気分改善効果を保守的に12.5%とみなすと、1日あたり約60分（480分×12.5%）、前向きな気持ちで過ごせる時間が増えると推定されます。',
     cumulative:
-      '**1ヶ月続けると**：健康寿命+4時間、¥6,000節約、¥28,800の収入増。\n' +
-      '**1年続けると**：健康寿命+2日、¥7.3万節約、¥35万の収入増。\n' +
-      '**10年続けると**：健康寿命+20日、¥73万節約、¥350万の収入増。\n' +
+      '**1ヶ月続けると**：健康寿命+4時間、¥6,000節約、¥28,800の収入増、前向きな気持ちの時間+30時間。\n' +
+      '**1年続けると**：健康寿命+2日、¥7.3万節約、¥35万の収入増、前向きな気持ちの時間+15.2日。\n' +
+      '**10年続けると**：健康寿命+20日、¥73万節約、¥350万の収入増、前向きな気持ちの時間+152日。\n' +
       '筋トレは「未来の自分」への最も確実な投資です。1日30分の積み重ねが、健康・経済・キャリアのすべてを底上げします。',
   },
 
@@ -70,8 +79,7 @@ export const dailyStrength: LifeImpactArticle = {
     dailyHealthMinutes: 8,
     dailyCostSaving: 200,
     dailyIncomeGain: 960,
-    // positiveMood 0: 身体・健康面の効果は健康寿命で計上済み。気分改善の独立した定量エビデンスに乏しく、二重計上回避のため 0 のままとする。
-    dailyPositiveMoodMinutes: 0,
+    dailyPositiveMoodMinutes: 60,
   },
 
   confidenceLevel: 'high',
@@ -90,6 +98,11 @@ export const dailyStrength: LifeImpactArticle = {
       { label: '生産性1.5%', formula: '62500 × 1.5%', result: '625円/日' },
       { label: '病欠減少', value: '年間約2日分の回復', formula: '62500 × 2 ÷ 365', result: '335円/日' },
       { label: '合計', formula: '625 + 335', result: '960円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: 'レジスタンストレーニングでうつ症状が有意に改善（Gordon et al., 2018：Hedges d=0.66、有酸素運動と同等）。気分改善を保守的に12.5%' },
+      { label: '日割り計算', formula: '480分 × 12.5%', result: '60分/日' },
     ],
   },
 

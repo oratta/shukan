@@ -18,6 +18,8 @@ export const deepWork: LifeImpactArticle = {
       '{{cost_inference}}\n\n' +
       '「集中する能力が希少になるほど、その価値は高まる」とNewport教授は述べている。\n\n' +
       '{{income_inference}}\n\n' +
+      '集中がもたらすのは成果だけではない。その瞬間の心の質も変わる。78人の労働者を1週間追跡した経験サンプリング研究（Csikszentmihalyi & LeFevre, 1989）では、挑戦と技能が高く釣り合うフロー状態にあるとき、人は最も強い前向きな感情を報告した。\n\n' +
+      '{{positive_mood_inference}}\n\n' +
       '{{cumulative}}',
 
     sources: [
@@ -34,6 +36,10 @@ export const deepWork: LifeImpactArticle = {
         id: 3,
         text: 'McKinsey Global Institute (2012). "The social economy: Unlocking value and productivity through social technologies."',
       },
+      {
+        id: 4,
+        text: 'Csikszentmihalyi M, LeFevre J (1989). "Optimal Experience in Work and Leisure." Journal of Personality and Social Psychology, 56(5), 815-822.',
+      },
     ],
   },
 
@@ -44,10 +50,12 @@ export const deepWork: LifeImpactArticle = {
       'ディープワーク自体は無料です。しかし、集中力の向上により衝動的なオンラインショッピングやSNS消費が減少します。さらに効率的な仕事完了による残業削減（通勤費・食費の節約）を含め、1日あたり¥200のコスト削減と推定されます。',
     income:
       '年収1,500万円（日給¥62,500）に対して、ディープワーク実践による生産性向上は最も直接的な収入効果を持ちます。Newportの研究では、ディープワークを実践するトップパフォーマーは平均の2-3倍のアウトプットを出すとされています。控えめに5%の生産性向上と見積もっても年間¥75万。1日あたり¥2,500の収入ポテンシャルと推定されます。',
+    positiveMood:
+      'フロー状態にあるとき、人は幸福感・集中・活力を最も強く感じます（Csikszentmihalyi & LeFevre, 1989：経験サンプリング法による78人の追跡）。加えて、絶え間ない中断とマルチタスクによるストレス（Mark et al., 2008）を避けられます。何もしないときに前向きでいられる時間（起床16時間のうち約50%＝480分）を基準に、気分改善効果を保守的に7%とみなすと、1日あたり約34分（480分×7%）、前向きな気持ちで過ごせる時間が増えると推定されます。',
     cumulative:
-      '**1ヶ月続けると**：健康寿命+2時間、¥6,000節約、¥75,000の収入増。\n' +
-      '**1年続けると**：健康寿命+1.2日、¥7.3万節約、¥91.3万の収入増。\n' +
-      '**10年続けると**：健康寿命+12日、¥73万節約、¥913万の収入増。\n' +
+      '**1ヶ月続けると**：健康寿命+2時間、¥6,000節約、¥75,000の収入増、前向きな気持ちの時間+17時間。\n' +
+      '**1年続けると**：健康寿命+1.2日、¥7.3万節約、¥91.3万の収入増、前向きな気持ちの時間+8.6日。\n' +
+      '**10年続けると**：健康寿命+12日、¥73万節約、¥913万の収入増、前向きな気持ちの時間+86日。\n' +
       '深く集中する時間が、あなたのキャリアを次のレベルに引き上げます。',
   },
 
@@ -55,8 +63,7 @@ export const deepWork: LifeImpactArticle = {
     dailyHealthMinutes: 4,
     dailyCostSaving: 200,
     dailyIncomeGain: 2500,
-    // positiveMood 0: 生産性・時間創出の効果は増える収入/健康寿命で計上済み。前向きな気持ちの時間への独立した一次エビデンスに乏しく、二重計上回避のため 0 のままとする。
-    dailyPositiveMoodMinutes: 0,
+    dailyPositiveMoodMinutes: 34,
   },
 
   confidenceLevel: 'medium',
@@ -74,6 +81,11 @@ export const deepWork: LifeImpactArticle = {
     income: [
       { label: '基準日給', value: '年収1,500万円', formula: '15000000 ÷ 240日', result: '62500円/日' },
       { label: '生産性向上', value: 'トップパフォーマーは2-3倍のアウトプット（Newport）、控えめに5%', formula: '62500 × 5% ÷ 1.25', result: '2500円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: 'フロー状態で前向きな感情が最も高い（Csikszentmihalyi & LeFevre, 1989）＋中断ストレスの回避（Mark et al., 2008）。気分改善を保守的に7%' },
+      { label: '日割り計算', formula: '480分 × 7%', result: '34分/日' },
     ],
   },
 
