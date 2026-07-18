@@ -10,6 +10,7 @@ import { calculateTotalSavings, formatHealthMinutes, formatCurrency } from '@/li
 import { EstimateDisclaimer } from '@/components/habits/estimate-disclaimer';
 import { useReviewHistory } from '@/hooks/useReviewHistory';
 import { ReviewCalendar } from '@/components/review/ReviewCalendar';
+import { HelpButton } from '@/components/help/help-button';
 
 export default function StatsPage() {
   const t = useTranslations();
@@ -108,9 +109,12 @@ export default function StatsPage() {
           統計はデータ画面なので、今月の達成率を画面最大タイポ（Geist Mono / tabular-nums）で出す。
           緑は達成＝意味にだけ載せ、単位・ラベルは無彩色。 */}
       <header>
-        <p className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
-          {t('stats.completionRate')}（{t('stats.thisMonth')}）
-        </p>
+        <div className="flex items-center gap-1">
+          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+            {t('stats.completionRate')}（{t('stats.thisMonth')}）
+          </p>
+          <HelpButton topic="completionRate" className="size-4" iconClassName="size-3.5" />
+        </div>
         <div className="mt-0.5 flex items-baseline leading-none">
           <span className="font-mono text-[72px] font-semibold leading-[0.85] tracking-tighter tabular-nums text-success">
             {completionPercent}
@@ -132,8 +136,9 @@ export default function StatsPage() {
           連続＝積み上げの意味なので数値は success。旧・炎/トロフィーのハードコード色は撤去。 */}
       <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border">
         <div className="flex flex-col gap-1.5 bg-card px-5 py-4">
-          <span className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+          <span className="flex items-center gap-1 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
             {t('stats.currentStreak')}
+            <HelpButton topic="streak" className="size-4" iconClassName="size-3.5" />
           </span>
           <div className="flex items-baseline gap-1">
             <span className="font-mono text-[32px] font-semibold leading-none tabular-nums text-success">
@@ -198,8 +203,9 @@ export default function StatsPage() {
           旧・全 amber 塗り（text-impact-cost を全軸に適用）を撤去。 */}
       <section className="overflow-hidden rounded-xl border bg-card">
         <div className="flex items-center justify-between px-5 py-3.5">
-          <span className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+          <span className="flex items-center gap-1 font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
             {t('impact.totalSavings')}
+            <HelpButton topic="impactSavings" className="size-4" iconClassName="size-3.5" />
           </span>
           <span className="flex items-center gap-1 rounded-full bg-success px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-success-foreground">
             {t('impact.cumulative')}
