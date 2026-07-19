@@ -223,6 +223,16 @@ describe('All articles have positiveMood values (A-S7, 4KPI化)', () => {
     }
   });
 
+  it('累積効果の収入表記は「収入ポテンシャル」（断定形「収入増」を使わない）', () => {
+    // 生産性向上が給与に1:1で転化する保証はないため、累積の収入は断定しない（換算規約）
+    const articles = getArticleList();
+    for (const { id } of articles) {
+      const cumulative = getArticle(id)?.inferences.cumulative ?? '';
+      expect(cumulative, `${id}: cumulative`).toContain('の収入ポテンシャル');
+      expect(cumulative, `${id}: cumulative`).not.toContain('の収入増');
+    }
+  });
+
   it('値は固定前提（480分ベースライン）の整数換算で 480 以下に収まる', () => {
     // dailyPositiveMoodMinutes = 480 × x% なので必ず baseline 以下
     const articles = getArticleList();

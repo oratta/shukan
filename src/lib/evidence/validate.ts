@@ -200,6 +200,33 @@ function checkCalculationLogicConsistency(findings: Finding[]): void {
 }
 
 /**
+ * 収入軸の換算規約チェック（ERROR）。
+ * 規約: 収入の日次値は「年額換算 ÷ 365（暦日）」で算出する（例: 15000000 × 2% ÷ 365）。
+ * 営業日日給（62,500円 = 年収1500万 ÷ 240営業日）× x% をそのまま日次値として使うと、
+ * 累積表示（×30 / ×365 / ×3650 の暦日積算）で約1.52倍（365/240）の過大計上になる。
+ * 2026-07 に全記事監査で23記事がこのパターンだった実例があるため、機械検出で再発を防ぐ。
+ * 営業日補正（× 240 ÷ 365）か暦日換算（÷ 365）を含む formula は正しい表記として通す。
+ */
+function checkIncomeDayBasis(findings: Finding[]): void {
+  for (const id of VALID_ARTICLE_IDS) {
+    const a = getArticle(id)!;
+    const steps = a.calculationLogic?.income;
+    if (!steps) continue;
+    for (const s of steps) {
+      const formula = s.formula ?? '';
+      if (/(62,?500|7,?813)(円)?\s*×\s*[\d.]+\s*%/.test(formula) && !/365/.test(formula) && !/240/.test(formula)) {
+        push(findings, {
+          level: 'error',
+          code: 'income-workday-basis',
+          article: id,
+          message: `income の formula "${formula}" が営業日賃金×%の直接日次計上（暦日積算で約1.52倍過大）。規約: 年収×% ÷ 365（暦日）で換算する`,
+        });
+      }
+    }
+  }
+}
+
+/**
  * 習慣プリセット間で同一 article_id を複数プリセットが参照している箇所を検出する（WARNING）。
  * 集計の二重計上そのものは #34（PR #66）で解消済み: ホーム集計・診断集計とも impact.ts の
  * de-dup（同一 article_id は最大ウェイトで1回だけ計上）を通るため、重複参照があっても数値は壊れない。
@@ -249,6 +276,7 @@ export function validateEvidence(): Finding[] {
   checkCalculationParams(findings);
   checkArticleIntegrity(findings);
   checkCalculationLogicConsistency(findings);
+  checkIncomeDayBasis(findings);
   checkPresetArticleReferences(findings);
   return findings;
 }
