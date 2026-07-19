@@ -13,6 +13,8 @@ export const quitJunkFood: LifeImpactArticle = {
       '{{cost_inference}}\n\n' +
       '食事の質は仕事の質に直結する。加工食品を減らすことで、炎症が抑制され脳機能が改善する。\n\n' +
       '{{income_inference}}\n\n' +
+      'ジャンクフードを減らす効果は、体だけでなく心にも及ぶ。中等度〜重度のうつ病患者を対象としたランダム化比較試験（SMILES試験, Jacka et al., 2017）では、加工食品を減らし食事の質を高めた群で、うつ症状が対照群より有意に改善した。腸内環境と炎症の改善が、脳の働きと気分を下支えする。\n\n' +
+      '{{positive_mood_inference}}\n\n' +
       '{{cumulative}}',
 
     sources: [
@@ -31,6 +33,11 @@ export const quitJunkFood: LifeImpactArticle = {
         text: 'Hall KD, et al. (2019). "Ultra-Processed Diets Cause Excess Calorie Intake and Weight Gain." Cell Metabolism, 30(1), 67-77.',
         url: 'https://doi.org/10.1016/j.cmet.2019.05.008',
       },
+      {
+        id: 4,
+        text: 'Jacka FN, et al. (2017). "A randomised controlled trial of dietary improvement for adults with major depression (the \'SMILES\' trial)." BMC Medicine, 15, 23.',
+        url: 'https://doi.org/10.1186/s12916-017-0791-y',
+      },
     ],
   },
 
@@ -41,10 +48,12 @@ export const quitJunkFood: LifeImpactArticle = {
       'コンビニ弁当やファストフードの1食平均は約700円。これを自炊に切り替えると1食約350円で済むため、週3回の置き換えで月約4,200円の節約。さらに肥満・糖尿病関連の医療費リスク低減を加味すると、1日あたり¥500のコスト削減になります。',
     income:
       '年収1,500万円（日給¥62,500）に対して、食事改善による集中力・体調向上を控えめに1.5%と見積もると年間¥22.5万。加えて病欠日数の減少効果を含めると、1日あたり¥800の収入ポテンシャルと推定されます。',
+    positiveMood:
+      '食事の質を上げると、前向きな気持ちも底上げされます。SMILES試験（Jacka et al., 2017）では、加工食品を減らす食事介入によってうつ症状が有意に改善し、寛解に至った人は対照群の約4倍でした。何もしないときに前向きでいられる時間（起床16時間のうち約50%＝480分）を基準に、この気分改善効果を保守的に10%とみなすと、1日あたり約48分（480分×10%）、前向きな気持ちで過ごせる時間が増えると推定されます。',
     cumulative:
-      '**1ヶ月続けると**：健康寿命+4時間、¥15,000節約、¥24,000の収入増。\n' +
-      '**1年続けると**：健康寿命+2.4日、¥18.3万節約、¥29.2万の収入増。\n' +
-      '**10年続けると**：健康寿命+24日、¥183万節約、¥292万の収入増。\n' +
+      '**1ヶ月続けると**：健康寿命+4時間、¥15,000節約、¥24,000の収入増、前向きな気持ちの時間+24時間。\n' +
+      '**1年続けると**：健康寿命+2.4日、¥18.3万節約、¥29.2万の収入増、前向きな気持ちの時間+12.2日。\n' +
+      '**10年続けると**：健康寿命+24日、¥183万節約、¥292万の収入増、前向きな気持ちの時間+121日。\n' +
       '体に入れるものを変えれば、体から出てくるパフォーマンスも変わります。',
   },
 
@@ -52,8 +61,7 @@ export const quitJunkFood: LifeImpactArticle = {
     dailyHealthMinutes: 8,
     dailyCostSaving: 500,
     dailyIncomeGain: 800,
-    // positiveMood 0: 依存・衝動の抑制による便益は健康寿命/出費削減で計上済み。前向きな気持ちの時間への独立した一次エビデンスが確立していないため、二重計上を避けて 0 のままとする。
-    dailyPositiveMoodMinutes: 0,
+    dailyPositiveMoodMinutes: 48,
   },
 
   confidenceLevel: 'medium',
@@ -74,6 +82,11 @@ export const quitJunkFood: LifeImpactArticle = {
       { label: '控えめに1.5%適用', formula: '15000000 × 1.5% ÷ 365', result: '616円/日' },
       { label: '病欠日数減少', value: '体調改善による欠勤減少', result: '184円/日' },
       { label: '合計', formula: '616 + 184', result: '800円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: '加工食品を減らす食事介入でうつ症状が有意に改善（SMILES試験, Jacka et al., 2017）。気分改善を保守的に10%' },
+      { label: '日割り計算', formula: '480分 × 10%', result: '48分/日' },
     ],
   },
 

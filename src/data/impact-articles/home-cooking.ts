@@ -18,6 +18,8 @@ export const homeCooking: LifeImpactArticle = {
       '{{cost_inference}}\n\n' +
       '健康的な食事は、仕事のパフォーマンスにも直結する。\n\n' +
       '{{income_inference}}\n\n' +
+      '自炊の効用は、食べる中身だけではない。手を動かして一皿を仕上げる行為そのものが、気分や自己効力感を押し上げる。調理を用いた介入研究のシステマティックレビュー（Farmer et al., 2018）は、料理が気分・感情・自尊感情の改善と結びつくことを報告している。\n\n' +
+      '{{positive_mood_inference}}\n\n' +
       '{{cumulative}}',
 
     sources: [
@@ -35,6 +37,11 @@ export const homeCooking: LifeImpactArticle = {
         text: 'AICR (2017). "Cook dinner at home — save money, eat healthier." American Institute for Cancer Research.',
         url: 'https://www.aicr.org/resources/blog/study-healthy-foods-prepared-at-home-save-money-and-boost-diet-quality/',
       },
+      {
+        id: 4,
+        text: 'Farmer N, Touchton-Leonard K, Ross A (2018). "Psychosocial Benefits of Cooking Interventions: A Systematic Review." Health Education & Behavior, 45(2), 167-180.',
+        url: 'https://doi.org/10.1177/1090198117736352',
+      },
     ],
   },
 
@@ -45,10 +52,12 @@ export const homeCooking: LifeImpactArticle = {
       '外食の平均1食は約900円、自炊なら約350円。週5回の夕食を自炊に切り替えると月約11,000円の節約。ランチも含めると月2万円以上の差になります。1日あたり¥800のコスト削減と推定されます。',
     income:
       '年収1,500万円（日給¥62,500）に対して、食事改善による体調安定・集中力向上を控えめに1%と見積もると年間¥15万。さらに料理スキル自体がストレス解消・創造性向上に寄与するとの研究もあり、1日あたり¥500の収入ポテンシャルと推定されます。',
+    positiveMood:
+      '調理という行為は、気分・感情・自尊感情の改善につながることがシステマティックレビューで示されています（Farmer et al., 2018）。何もしないときに前向きでいられる時間（起床16時間＝960分のうち約50%＝480分/日）を基準に、この気分改善効果を保守的に5%とみなすと、1日あたり約24分（480分×5%）、前向きな気持ちで過ごせる時間が増えると推定されます。エビデンスは臨床・地域介入が中心で、自尊感情や社会的つながりへの効果が大きいため、気分単体への寄与は控えめに見積もっています。',
     cumulative:
-      '**1ヶ月続けると**：健康寿命+3時間、¥24,000節約、¥15,000の収入増。\n' +
-      '**1年続けると**：健康寿命+1.8日、¥29.2万節約、¥18.3万の収入増。\n' +
-      '**10年続けると**：健康寿命+18日、¥292万節約、¥183万の収入増。\n' +
+      '**1ヶ月続けると**：健康寿命+3時間、¥24,000節約、¥15,000の収入増、前向きな気持ちの時間+12時間。\n' +
+      '**1年続けると**：健康寿命+1.8日、¥29.2万節約、¥18.3万の収入増、前向きな気持ちの時間+6.1日。\n' +
+      '**10年続けると**：健康寿命+18日、¥292万節約、¥183万の収入増、前向きな気持ちの時間+60.8日。\n' +
       'キッチンに立つ時間が、人生の質を底上げします。',
   },
 
@@ -56,8 +65,7 @@ export const homeCooking: LifeImpactArticle = {
     dailyHealthMinutes: 6,
     dailyCostSaving: 800,
     dailyIncomeGain: 500,
-    // positiveMood 0: 栄養・代謝面の効果は健康寿命/出費削減で計上済み。前向きな気持ちの時間への独立効果を定量化できないため 0 のままとする。
-    dailyPositiveMoodMinutes: 0,
+    dailyPositiveMoodMinutes: 24,
   },
 
   confidenceLevel: 'high',
@@ -77,6 +85,11 @@ export const homeCooking: LifeImpactArticle = {
       { label: '基準日給', value: '年収1,500万円', formula: '15000000 ÷ 240日', result: '62500円/日' },
       { label: '体調安定・集中力向上', value: '食事改善による生産性向上を控えめに1%', formula: '62500 × 1%', result: '625円/日' },
       { label: '保守的調整', value: 'ストレス解消・創造性向上の付加価値を含め下方調整', result: '500円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: '調理介入は気分・感情・自尊感情の改善と関連（Farmer et al., 2018、11研究のシステマティックレビュー）。臨床・地域介入中心のため保守的に5%' },
+      { label: '日割り計算', formula: '480分 × 5%', result: '24分/日' },
     ],
   },
 

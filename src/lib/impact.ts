@@ -180,6 +180,11 @@ export function renderArticle(article: LifeImpactArticle): string {
     income_inference: article.inferences.income,
     cumulative: article.inferences.cumulative,
   };
+  // 4軸目「前向きな気持ちの時間」の推論段落。全記事が設定する前提だが、
+  // 未設定の場合はプレースホルダーを残す（未知キーと同じ扱い）ことで気付けるようにする。
+  if (article.inferences.positiveMood) {
+    replacements.positive_mood_inference = article.inferences.positiveMood;
+  }
 
   return article.article.researchBody.replace(
     /\{\{(\w+)\}\}/g,

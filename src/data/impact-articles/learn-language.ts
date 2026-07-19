@@ -18,6 +18,8 @@ export const learnLanguage: LifeImpactArticle = {
       '{{cost_inference}}\n\n' +
       'グローバル化が進む経済において、外国語能力は直接的な収入プレミアムをもたらす。\n\n' +
       '{{income_inference}}\n\n' +
+      '語学学習がもたらすのは、認知予備力や収入だけではない。新しい表現が通じた瞬間の高揚や達成感——学習中に感じる「楽しさ（enjoyment）」は、学びを支える中核的な感情として繰り返し観察されてきた（Wu & Kabilan, 2025）。\n\n' +
+      '{{positive_mood_inference}}\n\n' +
       '{{cumulative}}',
 
     sources: [
@@ -35,6 +37,11 @@ export const learnLanguage: LifeImpactArticle = {
         id: 3,
         text: 'Eurobarometer (2012). "Europeans and their Languages." European Commission Special Eurobarometer 386.',
       },
+      {
+        id: 4,
+        text: 'Wu W, Kabilan MK (2025). "Foreign language enjoyment in language learning from a positive psychology perspective: a scoping review." Frontiers in Psychology, 16, 1545114.',
+        url: 'https://doi.org/10.3389/fpsyg.2025.1545114',
+      },
     ],
   },
 
@@ -45,10 +52,12 @@ export const learnLanguage: LifeImpactArticle = {
       '語学アプリ（Duolingo等）は無料プランで十分使えます。有料サービスを使っても月1,000-2,000円程度。一方、語学力向上により海外旅行でのぼったくり回避や情報アクセス範囲の拡大で節約が見込まれ、ネットで1日あたり¥200のコスト削減と推定されます。',
     income:
       '年収1,500万円（日給¥62,500）に対して、外国語能力は日本の労働市場で明確な収入プレミアムをもたらします。リクルートの調査では英語力のある人材は年収が10-15%高い傾向。既にある程度の英語力がある場合、第二外国語やビジネス英語の強化による追加プレミアムを控えめに3%と見積もると、1日あたり¥1,800の収入ポテンシャルと推定されます。',
+    positiveMood:
+      '外国語学習では、新しい表現が通じた瞬間の達成感や高揚といった「楽しさ（foreign language enjoyment）」が、学びを支える中核的な positive emotion として繰り返し観察され、学習者の情緒的ウェルビーイングを高めることが報告されています（Wu & Kabilan, 2025）。何もしないときに前向きでいられる時間（起床16時間のうち約50%＝480分）を基準に、学習中の気分改善効果を保守的に5%とみなすと、1日あたり約24分（480分×5%）、前向きな気持ちで過ごせる時間が増えると推定されます。',
     cumulative:
-      '**1ヶ月続けると**：健康寿命+3時間、¥6,000節約、¥54,000の収入増。\n' +
-      '**1年続けると**：健康寿命+1.8日、¥7.3万節約、¥65.7万の収入増。\n' +
-      '**10年続けると**：健康寿命+18日、¥73万節約、¥657万の収入増。\n' +
+      '**1ヶ月続けると**：健康寿命+3時間、¥6,000節約、¥54,000の収入増、前向きな気持ちの時間+12時間。\n' +
+      '**1年続けると**：健康寿命+1.8日、¥7.3万節約、¥65.7万の収入増、前向きな気持ちの時間+6.1日。\n' +
+      '**10年続けると**：健康寿命+18日、¥73万節約、¥657万の収入増、前向きな気持ちの時間+60.8日。\n' +
       '新しい言語は、新しい世界への扉を開きます。',
   },
 
@@ -56,8 +65,7 @@ export const learnLanguage: LifeImpactArticle = {
     dailyHealthMinutes: 6,
     dailyCostSaving: 200,
     dailyIncomeGain: 1800,
-    // positiveMood 0: 生産性・時間創出の効果は増える収入/健康寿命で計上済み。前向きな気持ちの時間への独立した一次エビデンスに乏しく、二重計上回避のため 0 のままとする。
-    dailyPositiveMoodMinutes: 0,
+    dailyPositiveMoodMinutes: 24,
   },
 
   confidenceLevel: 'medium',
@@ -77,6 +85,11 @@ export const learnLanguage: LifeImpactArticle = {
       { label: '基準日給', value: '年収1,500万円', formula: '15000000 ÷ 240日', result: '62500円/日' },
       { label: '語学プレミアム', value: '英語力ある人材は年収10-15%高い（リクルート調査）' },
       { label: '追加プレミアム', value: '既存英語力への上乗せ・第二外国語を控えめに3%', formula: '62500 × 3% ÷ 1.04', result: '1800円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: '外国語学習の「楽しさ（enjoyment）」が中核的な positive emotion として情緒的ウェルビーイングを高める（Wu & Kabilan, 2025）。気分改善を保守的に5%' },
+      { label: '日割り計算', formula: '480分 × 5%', result: '24分/日' },
     ],
   },
 

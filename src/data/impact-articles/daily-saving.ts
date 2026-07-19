@@ -18,6 +18,8 @@ export const dailySaving: LifeImpactArticle = {
       '{{cost_inference}}\n\n' +
       '経済的余裕は、キャリアにおけるリスクテイクを可能にする。\n\n' +
       '{{income_inference}}\n\n' +
+      'そして貯金がもたらすのは、口座残高だけではない。「もしも」に備えがあるという安心が、日々の心を軽くする。手元にすぐ使える貯蓄（cash on hand）が多い人ほど生活満足度が高いことも報告されている（Ruberton et al., 2016）。\n\n' +
+      '{{positive_mood_inference}}\n\n' +
       '{{cumulative}}',
 
     sources: [
@@ -35,6 +37,11 @@ export const dailySaving: LifeImpactArticle = {
         id: 3,
         text: '金融広報中央委員会 (2023). 「家計の金融行動に関する世論調査（単身世帯調査）」',
       },
+      {
+        id: 4,
+        text: 'Ruberton PM, Gladstone J, Lyubomirsky S (2016). "How Your Bank Balance Buys Happiness: The Importance of \'Cash on Hand\' to Life Satisfaction." Emotion, 16(5), 575-580.',
+        url: 'https://doi.org/10.1037/emo0000184',
+      },
     ],
   },
 
@@ -45,10 +52,12 @@ export const dailySaving: LifeImpactArticle = {
       '毎日1,000円の貯金を続けると、年間36.5万円、10年で365万円（利息除く）。少額でも複利効果で長期的には大きな資産になります。貯金習慣自体が節約意識を高め、不必要な支出の抑制にもつながります。1日あたり¥1,000のコスト改善と推定されます。',
     income:
       '年収1,500万円（日給¥62,500）に対して、経済的余裕は「安い仕事を我慢して引き受ける必要がない」状態を作り、より価値の高い仕事の選択を可能にします。さらに投資に回す資金の確保により、不労所得の基盤が構築できます。間接的な収入効果を控えめに見積もると、1日あたり¥800の収入ポテンシャルと推定されます。',
+    positiveMood:
+      '手元にすぐ使える貯蓄（cash on hand）が多い人ほど、金融面の安心感を通じて生活満足度が高いことが報告されています（Ruberton et al., 2016）。経済的ストレスはうつ・不安のリスクを大きく高めますが（Sweet et al., 2013）、日々の貯金はその安全網として働きます。何もしないときに前向きでいられる時間（起床16時間のうち約50%＝480分）を基準に、安心感による気分改善効果を保守的に5%とみなすと、1日あたり約24分（480分×5%）、前向きな気持ちで過ごせる時間が増えると推定されます。',
     cumulative:
-      '**1ヶ月続けると**：健康寿命+1.5時間、¥30,000の貯蓄、¥24,000の収入増。\n' +
-      '**1年続けると**：健康寿命+0.9日、¥36.5万の貯蓄、¥29.2万の収入増。\n' +
-      '**10年続けると**：健康寿命+9日、¥365万の貯蓄、¥292万の収入増。\n' +
+      '**1ヶ月続けると**：健康寿命+1.5時間、¥30,000の貯蓄、¥24,000の収入増、前向きな気持ちの時間+12時間。\n' +
+      '**1年続けると**：健康寿命+0.9日、¥36.5万の貯蓄、¥29.2万の収入増、前向きな気持ちの時間+6.1日。\n' +
+      '**10年続けると**：健康寿命+9日、¥365万の貯蓄、¥292万の収入増、前向きな気持ちの時間+60.8日。\n' +
       '今日の1,000円が、10年後のあなたの自由を作ります。',
   },
 
@@ -56,8 +65,7 @@ export const dailySaving: LifeImpactArticle = {
     dailyHealthMinutes: 3,
     dailyCostSaving: 1000,
     dailyIncomeGain: 800,
-    // positiveMood 0: 生産性・時間創出の効果は増える収入/健康寿命で計上済み。前向きな気持ちの時間への独立した一次エビデンスに乏しく、二重計上回避のため 0 のままとする。
-    dailyPositiveMoodMinutes: 0,
+    dailyPositiveMoodMinutes: 24,
   },
 
   confidenceLevel: 'medium',
@@ -75,6 +83,11 @@ export const dailySaving: LifeImpactArticle = {
       { label: '基準日給', value: '年収1,500万円', formula: '15000000 ÷ 240日', result: '62500円/日' },
       { label: 'キャリア選択力', value: '経済的余裕により価値の高い仕事を選択可能' },
       { label: '不労所得基盤', value: '投資資金確保による間接的収入効果を控えめに見積もり', result: '800円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: '手元の貯蓄（cash on hand）が多いほど生活満足度が高い（Ruberton et al., 2016）／経済的ストレス→うつ・不安リスク増（Sweet et al., 2013）。気分改善を保守的に5%' },
+      { label: '日割り計算', formula: '480分 × 5%', result: '24分/日' },
     ],
   },
 

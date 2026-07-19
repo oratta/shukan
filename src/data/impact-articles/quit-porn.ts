@@ -32,6 +32,8 @@ export const quitPorn: LifeImpactArticle = {
       '{{cost_inference}}\n\n' +
       'さらに、キャリアへの影響も無視できない。Journal of Business Ethics（Mecham, 2021）の実験では、ポルノ視聴者は対照群と比べて仕事のサボりと虚偽報告が163%増加するという衝撃的な結果が出ている。\n\n' +
       '{{income_inference}}\n\n' +
+      'ポルノをやめることは、気分そのものにも作用する。問題的なポルノ利用は不安やうつと結びつき、心理療法でその利用を減らすと不安・うつ症状と生活の質が改善することが、20研究・2,021人を統合したメタ分析（López-Pinar et al., 2025）で示されている。\n\n' +
+      '{{positive_mood_inference}}\n\n' +
       '{{cumulative}}',
     sources: [
       {
@@ -52,6 +54,11 @@ export const quitPorn: LifeImpactArticle = {
         id: 4,
         text: 'Volkow ND, et al. (2001). "Loss of dopamine transporters in methamphetamine abusers recovers with protracted abstinence." Journal of Neuroscience, 21(23), 9414-9418.',
       },
+      {
+        id: 5,
+        text: 'López-Pinar C, Esparza-Reig J, Bőthe B (2025). "Psychotherapy for problematic pornography use: A comprehensive meta-analysis." Journal of Behavioral Addictions, 14(2).',
+        url: 'https://pubmed.ncbi.nlm.nih.gov/40126561/',
+      },
     ],
   },
 
@@ -62,10 +69,12 @@ export const quitPorn: LifeImpactArticle = {
       '日本における平均的なポルノ関連支出（サブスクリプション・課金：推定月¥3,000〜5,000）に加え、視聴に費やす時間の機会費用（1日平均40分 × 時給¥7,813 = ¥5,208）、さらに離婚リスク低減による法的・経済的コスト回避（Perry & Schleifer研究：ポルノ開始で離婚率が約2倍）を保守的に算入すると、直接的なコスト削減として1日あたり¥410と推定されます。',
     income:
       '年収1,500万円（日給換算¥62,500）に対して、集中力・生産性の向上（ドーパミン回復による実行機能改善）と倫理的行動の改善（Mecham研究のサボり163%増加の逆転）を加味すると、生産性向上分として約3%（推定）。さらに睡眠改善による欠勤減少を含めると、1日あたり¥2,740の収入ポテンシャルに相当すると推定されます。',
+    positiveMood:
+      '問題的なポルノ利用は不安やうつと結びついており、その利用を減らすと不安・うつ症状と生活の質が改善することが、20研究・2,021人を統合したメタ分析で示されています（López-Pinar et al., 2025）。何もしないときに前向きでいられる時間（起床16時間のうち約50%＝480分）を基準に、気分改善効果を保守的に8%とみなすと、1日あたり約38分（480分×8%）、前向きな気持ちで過ごせる時間が増えると推定されます。',
     cumulative:
-      '**1ヶ月続けると**：健康寿命+3.5時間、¥12,300節約、¥82,200の収入増。\n' +
-      '**1年続けると**：健康寿命+1.8日、¥15万節約、¥100万の収入増。\n' +
-      '**10年続けると**：健康寿命+18日、¥150万節約、¥1,000万の収入増。\n' +
+      '**1ヶ月続けると**：健康寿命+3.5時間、¥12,300節約、¥82,200の収入増、前向きな気持ちの時間+19時間。\n' +
+      '**1年続けると**：健康寿命+1.8日、¥15万節約、¥100万の収入増、前向きな気持ちの時間+9.6日。\n' +
+      '**10年続けると**：健康寿命+18日、¥150万節約、¥1,000万の収入増、前向きな気持ちの時間+96.3日。\n' +
       'ポルノをやめることは、脳の回復と人生の質の向上への確実な投資です。',
   },
 
@@ -73,8 +82,7 @@ export const quitPorn: LifeImpactArticle = {
     dailyHealthMinutes: 7,
     dailyCostSaving: 410,
     dailyIncomeGain: 2740,
-    // positiveMood 0: 依存・衝動の抑制による便益は健康寿命/出費削減で計上済み。前向きな気持ちの時間への独立した一次エビデンスが確立していないため、二重計上を避けて 0 のままとする。
-    dailyPositiveMoodMinutes: 0,
+    dailyPositiveMoodMinutes: 38,
   },
 
   confidenceLevel: 'medium',
@@ -97,6 +105,11 @@ export const quitPorn: LifeImpactArticle = {
       { label: '控えめに3%適用', formula: '15000000 × 3% ÷ 365', result: '1233円/日' },
       { label: '欠勤減少・倫理行動改善', value: 'Mecham 2021: サボり163%増加の逆転 + 睡眠改善', result: '1507円/日' },
       { label: '合計', formula: '1233 + 1507', result: '2740円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: '問題的ポルノ利用の低減で不安・うつ・QOLが改善（López-Pinar, 2025、20研究メタ分析）。気分改善を保守的に8%' },
+      { label: '日割り計算', formula: '480分 × 8%', result: '38分/日' },
     ],
   },
 

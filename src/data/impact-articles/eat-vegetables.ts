@@ -18,6 +18,8 @@ export const eatVegetables: LifeImpactArticle = {
       '{{cost_inference}}\n\n' +
       '栄養状態の改善は、脳機能と仕事のパフォーマンスに直結する。\n\n' +
       '{{income_inference}}\n\n' +
+      '野菜や果物を増やした人は、健康診断の数値だけでなく、日々の幸福感や生活満足度そのものが上向く。オーストラリアの大規模パネル調査（Mujcic & Oswald, 2016）は、摂取量を増やしてから24か月以内に幸福度が高まることを示している。\n\n' +
+      '{{positive_mood_inference}}\n\n' +
       '{{cumulative}}',
 
     sources: [
@@ -35,6 +37,11 @@ export const eatVegetables: LifeImpactArticle = {
         id: 3,
         text: '厚生労働省 (2024). 「健康日本21（第三次）」— 野菜摂取目標350g/日',
       },
+      {
+        id: 4,
+        text: 'Mujcic R & Oswald AJ (2016). "Evolution of Well-Being and Happiness After Increases in Consumption of Fruit and Vegetables." American Journal of Public Health, 106(8), 1504-1510.',
+        url: 'https://doi.org/10.2105/AJPH.2016.303260',
+      },
     ],
   },
 
@@ -45,10 +52,12 @@ export const eatVegetables: LifeImpactArticle = {
       '野菜の追加コストは1日約100-200円ですが、長期的な医療費削減効果がこれを大きく上回ります。がんや心血管疾患の治療費（数百万円規模）のリスク低減を加味すると、ネットで1日あたり¥300のコスト削減と推定されます。',
     income:
       '年収1,500万円（日給¥62,500）に対して、栄養改善による体調安定と集中力向上を控えめに1%と見積もると年間¥15万。さらに病欠減少効果を加え、1日あたり¥600の収入ポテンシャルと推定されます。',
+    positiveMood:
+      '野菜・果物の摂取増加は、主観的幸福感や生活満足度を高めることが大規模パネル調査で示されています（Mujcic & Oswald, 2016）。何もしないときに前向きでいられる時間（起床16時間＝960分のうち約50%＝480分/日）を基準に、この気分改善効果を保守的に8%とみなすと、1日あたり約38分（480分×8%）、前向きな気持ちで過ごせる時間が増えると推定されます。効果は観察研究に基づき、現実的な増量幅は研究で最大効果が見られた8皿より小さいため、控えめに見積もっています。',
     cumulative:
-      '**1ヶ月続けると**：健康寿命+5時間、¥9,000節約、¥18,000の収入増。\n' +
-      '**1年続けると**：健康寿命+3日、¥11万節約、¥21.9万の収入増。\n' +
-      '**10年続けると**：健康寿命+30日、¥110万節約、¥219万の収入増。\n' +
+      '**1ヶ月続けると**：健康寿命+5時間、¥9,000節約、¥18,000の収入増、前向きな気持ちの時間+19時間。\n' +
+      '**1年続けると**：健康寿命+3日、¥11万節約、¥21.9万の収入増、前向きな気持ちの時間+9.6日。\n' +
+      '**10年続けると**：健康寿命+30日、¥110万節約、¥219万の収入増、前向きな気持ちの時間+96.3日。\n' +
       '毎食に野菜を一皿追加するだけで、人生が変わります。',
   },
 
@@ -56,8 +65,7 @@ export const eatVegetables: LifeImpactArticle = {
     dailyHealthMinutes: 10,
     dailyCostSaving: 300,
     dailyIncomeGain: 600,
-    // positiveMood 0: 栄養・代謝面の効果は健康寿命/出費削減で計上済み。前向きな気持ちの時間への独立効果を定量化できないため 0 のままとする。
-    dailyPositiveMoodMinutes: 0,
+    dailyPositiveMoodMinutes: 38,
   },
 
   confidenceLevel: 'high',
@@ -77,6 +85,11 @@ export const eatVegetables: LifeImpactArticle = {
       { label: '基準日給', value: '年収1,500万円', formula: '15000000 ÷ 240日', result: '62500円/日' },
       { label: '栄養改善効果', value: '体調安定・集中力向上を控えめに1%', formula: '62500 × 1%', result: '625円/日' },
       { label: '病欠減少効果', value: '免疫力向上による欠勤減少の経済価値を加算調整', result: '600円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: '野菜・果物の摂取増加で幸福度・生活満足度が向上（Mujcic & Oswald, 2016、N=12,385の縦断パネル）。気分改善を保守的に8%' },
+      { label: '日割り計算', formula: '480分 × 8%', result: '38分/日' },
     ],
   },
 

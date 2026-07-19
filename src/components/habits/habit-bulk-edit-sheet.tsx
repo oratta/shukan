@@ -105,14 +105,14 @@ export function HabitBulkEditSheet({
         day.status === 'failed' && day.resistRate !== undefined && day.resistRate > 0
           ? `${t('bulkEdit.failed')} ${day.resistRate}%`
           : t('bulkEdit.failed'),
-      activeClass:
-        'border-[#D08068] bg-[#D08068]/10 text-[#B05E48] dark:text-[#E0A090]',
+      // v2: 失敗＝danger トークン（completed の success と対称）。hex 直書きを排除。
+      activeClass: 'border-danger bg-danger/10 text-danger',
     },
     {
       status: 'skipped',
       label: () => t('skip'),
-      activeClass:
-        'border-gray-400 bg-gray-200 text-gray-600 dark:border-gray-500 dark:bg-gray-700 dark:text-gray-300',
+      // v2: スキップ＝無彩色（--skipped）。gray-* パレット直書きを排除。
+      activeClass: 'border-skipped bg-skipped/15 text-muted-foreground',
     },
   ];
 

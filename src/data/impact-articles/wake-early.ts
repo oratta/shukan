@@ -7,12 +7,14 @@ export const wakeEarly: LifeImpactArticle = {
   article: {
     researchBody:
       '早起きの習慣が、人生のあらゆる面にポジティブな連鎖を生む。\n\n' +
-      'BMJに掲載された84万人のゲノム研究（Vetter et al., 2018）では、朝型の人は夜型に比べてうつ病リスクが23%低いことが示された。ハイデルベルク大学のRandler教授（2009）の研究では、朝型の人はより主体的・目標志向的であり、キャリアで成功しやすい傾向があると報告されている。\n\n' +
+      '84万人のゲノムデータを用いた研究（Daghlas et al., 2021, JAMA Psychiatry）では、睡眠の中間点が1時間早い朝型ほど、うつ病リスクが23%低いことが示された。ハイデルベルク大学のRandler教授（2009）の研究では、朝型の人はより主体的・目標志向的であり、キャリアで成功しやすい傾向があると報告されている。\n\n' +
       '{{health_inference}}\n\n' +
       '早朝の時間は「自分だけの時間」として最も価値が高い。\n\n' +
       '{{cost_inference}}\n\n' +
       '朝の静かな時間にディープワークを行うことで、1日の生産性が飛躍的に向上する。\n\n' +
       '{{income_inference}}\n\n' +
+      '早起きの恩恵は、生産性だけにとどまらない。84万人超の遺伝データを用いた研究では、睡眠の中間点が1時間早いほどうつ病の発症リスクが23%低いことが示されている（Daghlas et al., 2021）。起床時刻を前倒しする習慣は、日々の気分の土台を整える。\n\n' +
+      '{{positive_mood_inference}}\n\n' +
       '{{cumulative}}',
 
     sources: [
@@ -29,6 +31,11 @@ export const wakeEarly: LifeImpactArticle = {
         id: 3,
         text: 'Facer-Childs ER, et al. (2019). "Circadian phenotype impacts the brain\'s resting-state functional connectivity." Sleep Medicine Reviews, 15(1), 245-254.',
       },
+      {
+        id: 4,
+        text: 'Daghlas I, Lane JM, Saxena R, Vetter C (2021). "Genetically Proxied Diurnal Preference, Sleep Timing, and Risk of Major Depressive Disorder." JAMA Psychiatry, 78(8), 903-910.',
+        url: 'https://doi.org/10.1001/jamapsychiatry.2021.0959',
+      },
     ],
   },
 
@@ -39,10 +46,12 @@ export const wakeEarly: LifeImpactArticle = {
       '早起きにより自炊朝食が可能になり、外食朝食との差額（月約5,000円）が節約できます。さらに通勤ラッシュを避けることで精神的ストレスとそれに伴う消費行動が減少します。1日あたり¥200のコスト削減と推定されます。',
     income:
       '年収1,500万円（日給¥62,500）に対して、朝の集中時間確保による生産性向上を控えめに2%と見積もると年間¥30万。ネバダ大学の研究では認知パフォーマンスのピークは8-14時とされ、早起きでこの時間帯をフル活用できます。1日あたり¥1,000の収入ポテンシャルと推定されます。',
+    positiveMood:
+      'メンデルランダム化を用いた84万人規模の研究では、睡眠の中間点が1時間早い朝型ほどうつ病の発症リスクが23%低いと報告されています（Daghlas et al., 2021）。ただし遺伝的要因も関与するため、早起きだけで同じ効果が得られるとは限りません。何もしないときに前向きでいられる時間（起床16時間のうち約50%＝480分）を基準に、気分への効果を保守的に7%とみなすと、1日あたり約34分（480分×7%）、前向きな気持ちで過ごせる時間が増えると推定されます。',
     cumulative:
-      '**1ヶ月続けると**：健康寿命+2.5時間、¥6,000節約、¥30,000の収入増。\n' +
-      '**1年続けると**：健康寿命+1.5日、¥7.3万節約、¥36.5万の収入増。\n' +
-      '**10年続けると**：健康寿命+15日、¥73万節約、¥365万の収入増。\n' +
+      '**1ヶ月続けると**：健康寿命+2.5時間、¥6,000節約、¥30,000の収入増、前向きな気持ちの時間+17時間。\n' +
+      '**1年続けると**：健康寿命+1.5日、¥7.3万節約、¥36.5万の収入増、前向きな気持ちの時間+8.6日。\n' +
+      '**10年続けると**：健康寿命+15日、¥73万節約、¥365万の収入増、前向きな気持ちの時間+86.2日。\n' +
       '朝を制する者は、人生を制する。',
   },
 
@@ -50,15 +59,14 @@ export const wakeEarly: LifeImpactArticle = {
     dailyHealthMinutes: 5,
     dailyCostSaving: 200,
     dailyIncomeGain: 1000,
-    // positiveMood 0: 生産性・時間創出の効果は増える収入/健康寿命で計上済み。前向きな気持ちの時間への独立した一次エビデンスに乏しく、二重計上回避のため 0 のままとする。
-    dailyPositiveMoodMinutes: 0,
+    dailyPositiveMoodMinutes: 34,
   },
 
   confidenceLevel: 'medium',
 
   calculationLogic: {
     health: [
-      { label: '研究結果', value: '朝型はうつ病リスク23%低い（Vetter, 2018）' },
+      { label: '研究結果', value: '朝型はうつ病リスク23%低い（Daghlas, 2021）' },
       { label: '概日リズム安定化', value: '睡眠の質改善を含め保守的に', result: '5分/日' },
     ],
     cost: [
@@ -69,6 +77,11 @@ export const wakeEarly: LifeImpactArticle = {
     income: [
       { label: '朝のDeep Work', value: '認知ピーク8-14時をフル活用' },
       { label: '生産性2%向上', formula: '62500 × 2% ≈ 1250 → 保守的に', result: '1000円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: '睡眠中間点が1時間早いほどうつ発症リスク23%低い（Daghlas, 2021）。遺伝要因も関与するため気分改善を保守的に7%' },
+      { label: '日割り計算', formula: '480分 × 7%', result: '34分/日' },
     ],
   },
 

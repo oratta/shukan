@@ -310,13 +310,13 @@ describe('renderArticle', () => {
     expect(result).toContain('{{unknown_key}}');
   });
 
-  // A-S8: positiveMood を設定しても renderArticle の出力は不変（4プレースホルダーのみ）
-  it('positiveMood を設定しても出力は従来の4プレースホルダー置換のみ（A-S8）', () => {
+  // 4KPI化: inferences.positiveMood 設定時は {{positive_mood_inference}} が置換される
+  it('positiveMood 設定時は positive_mood_inference プレースホルダーが置換される', () => {
     const articleWithMood: LifeImpactArticle = {
       ...mockArticleQuitSmoking,
       inferences: {
         ...mockArticleQuitSmoking.inferences,
-        positiveMood: 'これは前向きな気持ちの推論段落（renderArticle には出ない）',
+        positiveMood: 'これは前向きな気持ちの推論段落',
       },
       calculationParams: {
         ...mockArticleQuitSmoking.calculationParams,
@@ -324,20 +324,32 @@ describe('renderArticle', () => {
       },
       article: {
         ...mockArticleQuitSmoking.article,
-        // positiveMood 用のプレースホルダーがあっても置換されず残る
         researchBody:
           '{{health_inference}}/{{cost_inference}}/{{income_inference}}/{{cumulative}}/{{positive_mood_inference}}',
       },
     };
     const result = renderArticle(articleWithMood);
-    // 既存4プレースホルダーは置換される
+    // 既存4プレースホルダーは従来どおり置換される
     expect(result).toContain('寿命が10年延びる');
     expect(result).toContain('年間20万円の節約');
     expect(result).toContain('生産性が向上する');
     expect(result).toContain('10年で200万円');
-    // positiveMood の推論段落は挿入されない
-    expect(result).not.toContain('これは前向きな気持ちの推論段落');
-    // positive_mood プレースホルダーは未知キーとしてそのまま残る（出力不変の証拠）
+    // positiveMood の推論段落が挿入される
+    expect(result).toContain('これは前向きな気持ちの推論段落');
+    expect(result).not.toContain('{{positive_mood_inference}}');
+  });
+
+  // inferences.positiveMood 未設定（フィクスチャ等）ではプレースホルダーが残り、設定漏れに気付ける
+  it('positiveMood 未設定時は positive_mood_inference プレースホルダーが残る', () => {
+    const article: LifeImpactArticle = {
+      ...mockArticleQuitSmoking,
+      article: {
+        ...mockArticleQuitSmoking.article,
+        researchBody: '{{health_inference}}/{{positive_mood_inference}}',
+      },
+    };
+    const result = renderArticle(article);
+    expect(result).toContain('寿命が10年延びる');
     expect(result).toContain('{{positive_mood_inference}}');
   });
 });

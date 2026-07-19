@@ -13,6 +13,8 @@ export const dailyWalking: LifeImpactArticle = {
       '{{cost_inference}}\n\n' +
       '歩くことは体だけでなく、脳にも効く。スタンフォード大学の研究では、歩行中の創造的思考が60%向上することが示されている。\n\n' +
       '{{income_inference}}\n\n' +
+      '歩くことは、体と脳だけでなく心にも効く。定期的なウォーキングはうつ病にかかるリスクを下げ、日々の気分を前向きに保つことが報告されている（Schuch, 2018）。\n\n' +
+      '{{positive_mood_inference}}\n\n' +
       '{{cumulative}}',
 
     sources: [
@@ -30,6 +32,11 @@ export const dailyWalking: LifeImpactArticle = {
         text: 'Oppezzo M & Schwartz DL (2014). "Give Your Ideas Some Legs: The Positive Effect of Walking on Creative Thinking." Journal of Experimental Psychology, 40(4), 1142-1152.',
         url: 'https://doi.org/10.1037/a0036577',
       },
+      {
+        id: 4,
+        text: 'Schuch FB, et al. (2018). "Physical Activity and Incident Depression: A Meta-Analysis of Prospective Cohort Studies." American Journal of Psychiatry, 175(7), 631-648.',
+        url: 'https://doi.org/10.1176/appi.ajp.2018.17111194',
+      },
     ],
   },
 
@@ -43,9 +50,9 @@ export const dailyWalking: LifeImpactArticle = {
     positiveMood:
       'ウォーキングはうつ病リスクを26%低減します（Schuch, 2018）。何もしないときに前向きでいられる時間（480分/日）を基準に、気分改善を保守的に10%とみなすと、1日あたり約48分（480分×10%）、前向きな気持ちで過ごせる時間が増えると推定されます。',
     cumulative:
-      '**1ヶ月続けると**：健康寿命+5.5時間、¥10,500節約、¥33,000の収入増。\n' +
-      '**1年続けると**：健康寿命+3.3日、¥12.8万節約、¥40.2万の収入増。\n' +
-      '**10年続けると**：健康寿命+34日、¥128万節約、¥402万の収入増。\n' +
+      '**1ヶ月続けると**：健康寿命+5.5時間、¥10,500節約、¥33,000の収入増、前向きな気持ちの時間+24時間。\n' +
+      '**1年続けると**：健康寿命+3.3日、¥12.8万節約、¥40.2万の収入増、前向きな気持ちの時間+12.2日。\n' +
+      '**10年続けると**：健康寿命+34日、¥128万節約、¥402万の収入増、前向きな気持ちの時間+121.7日。\n' +
       '一歩一歩が、あなたの人生を確実に前に進めます。',
   },
 

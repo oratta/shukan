@@ -183,45 +183,47 @@ describe('All 38 articles have dailyPositiveMoodMinutes (A-S6)', () => {
 });
 
 /**
- * A-S7: 代表記事の positiveMood 値と算出根拠
- * - dailyPositiveMoodMinutes > 0 の記事が「10記事程度」（>= 9）存在する
- * - > 0 の全記事に calculationLogic.positiveMood（固定前提16h/50%の根拠付き）が設定されている
+ * A-S7（4KPI化で全記事へ拡張）: 全記事の positiveMood 値と算出根拠
+ * - 全記事が dailyPositiveMoodMinutes > 0 を持つ
+ * - 全記事に calculationLogic.positiveMood（固定前提16h/50%の根拠付き）と
+ *   inferences.positiveMood（推論段落）が設定されている
  * - 固定前提（480分ベースライン）から x% で機械的に算出されている（CalcStep に明記）
  */
-describe('Representative positiveMood articles (A-S7)', () => {
+describe('All articles have positiveMood values (A-S7, 4KPI化)', () => {
   const POSITIVE_BASELINE_MINUTES = 480; // 起床16h=960分 × 前向き割合50%
 
-  it('dailyPositiveMoodMinutes > 0 の記事が 10 記事程度（>= 9）ある', () => {
+  it('全記事が dailyPositiveMoodMinutes > 0 を持つ', () => {
     const articles = getArticleList();
     const withMood = articles.filter(
       ({ id }) => (getArticle(id)?.calculationParams.dailyPositiveMoodMinutes ?? 0) > 0
     );
-    expect(withMood.length).toBeGreaterThanOrEqual(9);
-    expect(withMood.length).toBeLessThanOrEqual(12); // 「10記事程度」の上限ガード
+    expect(withMood.length).toBe(articles.length);
   });
 
-  it('dailyPositiveMoodMinutes > 0 の全記事に calculationLogic.positiveMood と inferences.positiveMood がある', () => {
+  it('全記事に calculationLogic.positiveMood と inferences.positiveMood がある', () => {
     const articles = getArticleList();
     for (const { id } of articles) {
       const article = getArticle(id);
       if (!article) continue;
-      if (article.calculationParams.dailyPositiveMoodMinutes > 0) {
-        expect(Array.isArray(article.calculationLogic?.positiveMood)).toBe(true);
-        expect(article.calculationLogic!.positiveMood!.length).toBeGreaterThan(0);
-        expect(typeof article.inferences.positiveMood).toBe('string');
-        expect(article.inferences.positiveMood!.length).toBeGreaterThan(0);
-      }
+      expect(Array.isArray(article.calculationLogic?.positiveMood), `${id}: calculationLogic.positiveMood`).toBe(true);
+      expect(article.calculationLogic!.positiveMood!.length, `${id}: calculationLogic.positiveMood steps`).toBeGreaterThan(0);
+      expect(typeof article.inferences.positiveMood, `${id}: inferences.positiveMood`).toBe('string');
+      expect(article.inferences.positiveMood!.length, `${id}: inferences.positiveMood length`).toBeGreaterThan(0);
     }
   });
 
-  it('dailyPositiveMoodMinutes = 0 の記事には positiveMood の calculationLogic を強制しない', () => {
-    // 0=未設定。calculationLogic.positiveMood は optional のまま許容される
-    const article = getArticle('quit_smoking' as ArticleId);
-    expect(article!.calculationParams.dailyPositiveMoodMinutes).toBe(0);
-    expect(article!.calculationLogic?.positiveMood).toBeUndefined();
+  it('全記事の本文に {{positive_mood_inference}} プレースホルダーがある', () => {
+    const articles = getArticleList();
+    for (const { id } of articles) {
+      const article = getArticle(id);
+      if (!article) continue;
+      expect(article.article.researchBody, `${id}: positive_mood_inference placeholder`).toContain(
+        '{{positive_mood_inference}}'
+      );
+    }
   });
 
-  it('代表記事の値は固定前提（480分ベースライン）の整数換算で 480 以下に収まる', () => {
+  it('値は固定前提（480分ベースライン）の整数換算で 480 以下に収まる', () => {
     // dailyPositiveMoodMinutes = 480 × x% なので必ず baseline 以下
     const articles = getArticleList();
     for (const { id } of articles) {

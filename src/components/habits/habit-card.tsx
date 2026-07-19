@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Check, ChevronDown, ChevronUp, Maximize2, GripVertical, SkipForward, Undo2, Images, History } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -138,6 +138,7 @@ function StatusIndicator({
       <div className="relative flex size-8 shrink-0 items-center justify-center">
         <button
           type="button"
+          data-tutorial="habit-status"
           {...pressHandlers}
           className={cn(
             'flex size-8 shrink-0 touch-none items-center justify-center rounded-full transition-all',
@@ -161,6 +162,7 @@ function StatusIndicator({
     <div className="relative flex size-8 shrink-0 items-center justify-center">
       <button
         type="button"
+        data-tutorial="habit-status"
         {...pressHandlers}
         className={cn(
           'flex size-8 shrink-0 touch-none items-center justify-center rounded-full transition-all',
@@ -199,7 +201,6 @@ export function HabitCard({
   const t = useTranslations('habits');
   const tDays = useTranslations('days');
   const tStats = useTranslations('stats');
-  const locale = useLocale();
   const isQuit = habit.type === 'quit';
   const isSkipped = habit.skippedToday;
   const today = getTodayString();

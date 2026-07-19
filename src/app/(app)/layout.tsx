@@ -1,5 +1,6 @@
 import { Header } from "@/components/layout/header";
 import { BottomNav } from "@/components/layout/bottom-nav";
+import { TutorialOverlay } from "@/components/tutorial/tutorial-overlay";
 import { resolveAppRedirect } from "@/lib/onboarding-guard";
 
 export default async function AppLayout({
@@ -17,6 +18,8 @@ export default async function AppLayout({
         {children}
       </main>
       <BottomNav />
+      {/* 初回チュートリアル（コーチマーク）。ルート横断（ホーム→発見）で状態を保つためページでなくレイアウトに置く */}
+      <TutorialOverlay />
     </div>
   );
 }

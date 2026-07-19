@@ -71,6 +71,8 @@ export const ${camel}: LifeImpactArticle = {
       '{{cost_inference}}\\n\\n' +
       'TODO: 収入面への橋渡し。\\n\\n' +
       '{{income_inference}}\\n\\n' +
+      'TODO: 前向きな気持ちへの橋渡し。\\n\\n' +
+      '{{positive_mood_inference}}\\n\\n' +
       '{{cumulative}}',
 
     // 最低1件、可能なら3件以上。author/year/journal を含める。
@@ -88,8 +90,10 @@ export const ${camel}: LifeImpactArticle = {
     health: 'TODO: 健康寿命の推論段落（42歳日本人男性プロフィール）。',
     cost: 'TODO: 出費削減の推論段落。',
     income: 'TODO: 収入増加の推論段落。',
+    positiveMood:
+      'TODO: 前向きな気持ちの時間の推論段落（ベースライン480分 × x% の根拠と結論）。',
     cumulative:
-      'TODO: **1ヶ月続けると** … / **1年続けると** … / **10年続けると** … の累積効果。',
+      'TODO: **1ヶ月続けると** … / **1年続けると** … / **10年続けると** … の累積効果（4KPIぶん）。',
   },
 
   // 効果値（分/日・円/日）。daily × 365 が cumulative と整合すること。
@@ -97,9 +101,10 @@ export const ${camel}: LifeImpactArticle = {
     dailyHealthMinutes: 0, // TODO
     dailyCostSaving: 0, // TODO
     dailyIncomeGain: 0, // TODO
-    // 気分改善の独立した定量エビデンスがある代表記事のみ > 0（480分ベースライン × x%）。
-    // 二重計上を避けるため、健康寿命で計上済みの効果は 0 のままにする。
-    dailyPositiveMoodMinutes: 0,
+    // 480分ベースライン（起床16h × 前向き割合50%） × x% で算出（整数・480以下）。
+    // x% は前向き感情（positive affect / mood / well-being）研究の相対増分。
+    // 健康寿命（寿命延伸の按分）との二重計上を避けること。
+    dailyPositiveMoodMinutes: 0, // TODO
   },
 
   confidenceLevel: 'medium', // high | medium | low（low は人間レビュー必須）
@@ -118,6 +123,11 @@ export const ${camel}: LifeImpactArticle = {
     income: [
       { label: 'TODO', value: 'TODO' },
       { label: 'TODO: 合計', formula: 'TODO', result: 'TODO円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: 'TODO: 研究結果', value: 'TODO: 気分改善 x% の根拠' },
+      { label: '日割り計算', formula: '480分 × TODO%', result: 'TODO分/日' },
     ],
   },
 

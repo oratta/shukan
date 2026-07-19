@@ -24,6 +24,8 @@ export const quitSmoking: LifeImpactArticle = {
       '{{cost_inference}}\n\n' +
       'さらに、収入面でも大きな影響がある。米国の職場調査（Halpern, 2001）によると、非喫煙者は欠勤率・生産性の両面で優位とされ、収入格差は約10-20%と報告されている。\n\n' +
       '{{income_inference}}\n\n' +
+      '禁煙が変えるのは寿命や家計だけではない。英国の40試験を統合した大規模メタ分析（Taylor et al., 2014）では、禁煙した人は喫煙を続けた人に比べて不安・うつ・ストレスが減り、前向きな気分と生活の質がむしろ向上することが示されている。ニコチンが気分を安定させるという通説とは逆の結果だ。\n\n' +
+      '{{positive_mood_inference}}\n\n' +
       '{{cumulative}}',
     sources: [
       {
@@ -44,6 +46,11 @@ export const quitSmoking: LifeImpactArticle = {
         id: 4,
         text: '国税庁 (2023). 「民間給与実態統計調査」',
       },
+      {
+        id: 5,
+        text: 'Taylor G, McNeill A, Girling A, Farley A, Lindson-Hawley N, Aveyard P (2014). "Change in mental health after smoking cessation: systematic review and meta-analysis." BMJ, 348, g1151.',
+        url: 'https://doi.org/10.1136/bmj.g1151',
+      },
     ],
   },
 
@@ -54,10 +61,12 @@ export const quitSmoking: LifeImpactArticle = {
       '日本のタバコ価格（1箱約580円、JT 2024年データ）に加え、厚生労働省の医療費データから喫煙関連の追加医療費（年間約16万円）、歯科・クリーニング費用を含めると、1日あたり¥1,240のコスト削減になります。',
     income:
       '年収1,500万円（日給換算¥62,500）に対して、非喫煙者の10%収入プレミアムを控えめに適用すると年間¥150万の収入増。さらに欠勤減少と生産性向上を加味すると、1日あたり¥5,690の収入ポテンシャルに相当すると推定されます。',
+    positiveMood:
+      '禁煙は前向きな気分を直接押し上げます。Taylor et al.（2014）のメタ分析では、禁煙後に不安・うつ・ストレスが低下し、ポジティブな感情が改善する効果量は抗うつ薬にも匹敵すると報告されています。何もしないときに前向きでいられる時間（起床16時間のうち約50%＝480分）を基準に、この気分改善効果を保守的に15%とみなすと、1日あたり約72分（480分×15%）、前向きな気持ちで過ごせる時間が増えると推定されます。',
     cumulative:
-      '**1ヶ月続けると**：健康寿命+6日、¥37,200節約、¥170,700の収入増。\n' +
-      '**1年続けると**：健康寿命+73日、¥45万節約、¥208万の収入増。\n' +
-      '**10年続けると**：健康寿命+2年、¥452万節約、¥2,077万の収入増。\n' +
+      '**1ヶ月続けると**：健康寿命+6日、¥37,200節約、¥170,700の収入増、前向きな気持ちの時間+1.5日。\n' +
+      '**1年続けると**：健康寿命+73日、¥45万節約、¥208万の収入増、前向きな気持ちの時間+18.3日。\n' +
+      '**10年続けると**：健康寿命+2年、¥452万節約、¥2,077万の収入増、前向きな気持ちの時間+182.5日。\n' +
       'この小さな一歩の積み重ねが、あなたの人生を大きく変える力を持っています。',
   },
 
@@ -65,8 +74,7 @@ export const quitSmoking: LifeImpactArticle = {
     dailyHealthMinutes: 288,
     dailyCostSaving: 1240,
     dailyIncomeGain: 5690,
-    // positiveMood 0: 依存・衝動の抑制による便益は健康寿命/出費削減で計上済み。前向きな気持ちの時間への独立した一次エビデンスが確立していないため、二重計上を避けて 0 のままとする。
-    dailyPositiveMoodMinutes: 0,
+    dailyPositiveMoodMinutes: 72,
   },
 
   confidenceLevel: 'high',
@@ -88,6 +96,11 @@ export const quitSmoking: LifeImpactArticle = {
       { label: '控えめに10%適用', formula: '15000000 × 10% ÷ 365', result: '4110円/日' },
       { label: '欠勤減少・生産性向上', value: '病欠減少と集中力改善の経済価値', result: '1580円/日' },
       { label: '合計', formula: '4110 + 1580', result: '5690円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: '禁煙で不安・うつ・ストレスが低下し前向きな感情が向上（Taylor et al., 2014）。気分改善を保守的に15%' },
+      { label: '日割り計算', formula: '480分 × 15%', result: '72分/日' },
     ],
   },
 
