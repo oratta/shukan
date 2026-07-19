@@ -24,6 +24,8 @@ export const powerNap: LifeImpactArticle = {
       '{{health_inference}}\n\n' +
       '短い仮眠がいちばん効くのは、午後のパフォーマンスだ。\n\n' +
       '{{income_inference}}\n\n' +
+      '回復するのは集中力だけではない。午後の気分と活力も一緒に戻ってくる。\n\n' +
+      '{{positive_mood_inference}}\n\n' +
       '{{cumulative}}',
 
     sources: [

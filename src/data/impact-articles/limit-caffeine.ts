@@ -25,6 +25,8 @@ export const limitCaffeine: LifeImpactArticle = {
       '{{cost_inference}}\n\n' +
       '削られた睡眠は、翌日のパフォーマンスに跳ね返る。5か国を比較したRANDの分析では、睡眠不足が認知パフォーマンスと労働生産性を低下させ、日本はその経済損失の対GDP比率が対象国中で最も大きいと報告されている（RAND, 2017）。\n\n' +
       '{{income_inference}}\n\n' +
+      'よく眠れた翌日は気分が安定しやすいことが実験研究の積み重ねで示されており、午後のカフェインを控えることはその土台を守る行動だ。\n\n' +
+      '{{positive_mood_inference}}\n\n' +
       '{{cumulative}}',
 
     sources: [
@@ -48,6 +50,11 @@ export const limitCaffeine: LifeImpactArticle = {
         text: 'Hafner M, Stepanek M, Taylor J, et al. (2017). "Why Sleep Matters — The Economic Costs of Insufficient Sleep: A Cross-Country Comparative Analysis." RAND Corporation, RR-1791. 睡眠不足の経済損失は日本が対GDP比で対象5か国中最大。',
         url: 'https://www.rand.org/pubs/research_reports/RR1791.html',
       },
+      {
+        id: 5,
+        text: 'Palmer CA, Bower JL, Cho KW, et al. (2024). "Sleep loss and emotion: A systematic review and meta-analysis of over 50 years of experimental research." Psychological Bulletin, 150(4), 440-463. 154研究・N=5,717、睡眠不足はあらゆる形態でポジティブ感情を低下（SMD -0.27〜-1.14）。',
+        url: 'https://doi.org/10.1037/bul0000410',
+      },
     ],
   },
 
@@ -58,18 +65,20 @@ export const limitCaffeine: LifeImpactArticle = {
       '午後に習慣的に買っている缶コーヒーやエナジードリンクを1本（約¥130）控えると仮定します。ただし、無料の職場コーヒーや水・デカフェへの置き換えも含まれるため、実際に購入を控える日を約30%と保守的に見積もると、1日あたり¥40のコスト削減と推定します。個人の購入習慣に依存する軟らかい値です。',
     income:
       '年収1,500万円（日給換算¥62,500）に対して、睡眠の質改善による翌日の集中力向上を見込みます。睡眠時間の確保そのもの（7時間睡眠は生産性+¥2,500/日相当）を基準に、本習慣は「質」の一部改善かつ午後カフェインを飲む日に限られるため、その約20%として1日あたり¥500の収入ポテンシャルと推定します。日給の約0.8%にあたる控えめな値です。',
+    positiveMood:
+      'あなたは42歳の日本人男性です。起きている16時間のうち前向きな気持ちで過ごせる時間を仮に50%（480分）とします。154研究・5,717人を統合したメタ解析（Palmer et al., 2024, Psychological Bulletin）では、睡眠が不足したり分断されたりした日はポジティブ感情が明確に低下する（SMD -0.27〜-1.14）ことが示されています。午後のカフェインを控えて睡眠の質を守ることは、この低下を防ぐ方向に働きます。ただし、睡眠そのものの効果は「7時間睡眠」の習慣で既に計上しているため、ここではカフェインを控えたことによる上乗せ分だけを、メタ解析の最小効果量からさらに割り引いた保守的な2.5%で見積もります。前向きな気持ちの時間の増加は、1日あたり約12分（480分×2.5%）です。',
     cumulative:
-      '**1ヶ月続けると**：健康寿命+2時間、¥1,200節約、¥15,000の収入増。\n' +
-      '**1年続けると**：健康寿命+1日、¥1.5万節約、¥18.3万の収入増。\n' +
-      '**10年続けると**：健康寿命+10日、¥15万節約、¥183万の収入増。\n' +
-      '午後の一杯を手放すことが、その夜の眠りと翌日の集中力を守ります。',
+      '**1ヶ月続けると**：健康寿命+2時間、¥1,200節約、¥15,000の収入増、前向きな気持ちの時間+6時間。\n' +
+      '**1年続けると**：健康寿命+1日、¥1.5万節約、¥18.3万の収入増、前向きな気持ちの時間+3日。\n' +
+      '**10年続けると**：健康寿命+10日、¥15万節約、¥183万の収入増、前向きな気持ちの時間+30日。\n' +
+      '午後の一杯を手放すことが、その夜の眠りと翌日の集中力と気分を守ります。',
   },
 
   calculationParams: {
     dailyHealthMinutes: 4,
     dailyCostSaving: 40,
     dailyIncomeGain: 500,
-    dailyPositiveMoodMinutes: 0,
+    dailyPositiveMoodMinutes: 12,
   },
 
   confidenceLevel: 'medium',
@@ -87,6 +96,11 @@ export const limitCaffeine: LifeImpactArticle = {
     income: [
       { label: '睡眠の質改善→翌日の生産性', value: '7時間睡眠の income アンカー ¥2,500/日を基準' },
       { label: '質の一部・該当日限定で20%', formula: '2500 × 20%', result: '500円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: '睡眠不足はあらゆる形態でポジティブ感情を低下（Palmer 2024, SMD -0.27〜-1.14）。7時間睡眠(mood72)との二重計上を避け、カフェイン除去分のみ保守的に2.5%' },
+      { label: '日割り計算', formula: '480分 × 2.5%', result: '12分/日' },
     ],
   },
 

@@ -25,6 +25,8 @@ export const dentalCare: LifeImpactArticle = {
       '{{health_inference}}\n\n' +
       '歯を守ることは、将来の治療費を守ることでもある。とくに日本では、失った歯を補うインプラントが保険のきかない自由診療で、1本あたり30〜50万円かかる。毎日のケアで虫歯・歯周病を防ぐことは、そのまま大きな出費の回避になる。\n\n' +
       '{{cost_inference}}\n\n' +
+      'さらに、歯の健康は体や財布だけでなく、笑顔を見せることへの自信や自尊感情を通じて、日々の気分にも静かに効いてくる。\n\n' +
+      '{{positive_mood_inference}}\n\n' +
       '{{cumulative}}',
 
     sources: [
@@ -53,6 +55,16 @@ export const dentalCare: LifeImpactArticle = {
         text: 'Worthington HV, et al. (2019). "Home use of interdental cleaning devices, in addition to toothbrushing, for preventing and controlling periodontal diseases and dental caries." Cochrane Database of Systematic Reviews, 4, CD012018. 歯間清掃の付加で歯肉炎が減少（低〜中確度）。',
         url: 'https://doi.org/10.1002/14651858.CD012018.pub2',
       },
+      {
+        id: 6,
+        text: 'Alimoradi Z, Jafari E, Roshandel Z, et al. (2024). "Meta-analysis with systematic review to synthesize associations between oral health related quality of life and anxiety and depression." BDJ Open, 10, 9. 15研究・14,419名、口腔健康関連QOLの低下と抑うつが有意に関連（Fisher\'s z=0.26、弱い関連）。',
+        url: 'https://doi.org/10.1038/s41405-024-00191-x',
+      },
+      {
+        id: 7,
+        text: 'Gerritsen AE, Allen PF, Witter DJ, et al. (2010). "Tooth loss and oral health-related quality of life: a systematic review and meta-analysis." Health and Quality of Life Outcomes, 8, 126. 35研究、歯の喪失（特に前歯）が生活の質の低下と一貫して関連。',
+        url: 'https://doi.org/10.1186/1477-7525-8-126',
+      },
     ],
   },
 
@@ -63,18 +75,20 @@ export const dentalCare: LifeImpactArticle = {
       '日本の歯科治療は3割の自己負担ですが、失った歯を補うインプラントは自由診療で1本30〜50万円かかります。予防によって回避できる生涯の歯科費用を、将来のインプラント2本分（約80万円）と、歯周病・虫歯治療の自己負担分の40年累計（約90万円）を合わせて約170万円と保守的に見積もると、残り余命40年で日割りして1日あたり¥110のコスト削減と推定します。',
     income:
       '毎日の歯磨き・歯間ケアが所得を直接増やすとする信頼できる定量エビデンスは無いため、収入への効果は0としています。',
+    positiveMood:
+      'あなたは42歳の日本人男性です。1日の起床時間16時間のうち前向きな気持ちで過ごせる時間を約50%（480分）と仮定します。15件の研究・14,419名を統合したメタ分析（Alimoradi et al., 2024, BDJ Open）では、口腔の健康状態から見た生活の質が低い人ほど抑うつ傾向が有意に高く、また35研究のシステマティックレビュー（Gerritsen et al., 2010）では、歯を失うことが生活の質の低下と一貫して関連し、特に人目に触れる前歯の喪失の影響が最大でした。毎日の歯磨きとフロスで歯を守ることは、笑顔や会話への自信、自尊感情という経路で前向きな時間を支えます。この記事では健康効果（9分/日）と治療費の回避（110円/日）は既に別枠で計上しているため、ここでは重複を避け、自尊感情・生活の質という気分の軸だけを、関連の強さが「弱い」と報告されていることを踏まえて保守的に4%と見積もります。歯を大切にする習慣がもたらす前向きな気持ちの時間は、1日あたり約19分（480分×4%）です。',
     cumulative:
-      '**1ヶ月続けると**：健康寿命+4.5時間、¥3,300節約。\n' +
-      '**1年続けると**：健康寿命+2.3日、¥4万節約。\n' +
-      '**10年続けると**：健康寿命+23日、¥40万節約。\n' +
-      '毎日の数分の歯磨きが、40年先の心臓・頭・そして治療費を守ります。',
+      '**1ヶ月続けると**：健康寿命+4.5時間、¥3,300節約、前向きな気持ちの時間+9.5時間。\n' +
+      '**1年続けると**：健康寿命+2.3日、¥4万節約、前向きな気持ちの時間+4.8日。\n' +
+      '**10年続けると**：健康寿命+23日、¥40万節約、前向きな気持ちの時間+48日。\n' +
+      '毎日の数分の歯磨きが、40年先の心臓・頭・治療費・そして日々の気分を守ります。',
   },
 
   calculationParams: {
     dailyHealthMinutes: 9,
     dailyCostSaving: 110,
     dailyIncomeGain: 0,
-    dailyPositiveMoodMinutes: 0,
+    dailyPositiveMoodMinutes: 19,
   },
 
   confidenceLevel: 'medium',
@@ -92,6 +106,11 @@ export const dentalCare: LifeImpactArticle = {
     ],
     income: [
       { label: '直接エビデンスなし', value: '歯のケアが所得を直接増やす定量的根拠はない', result: '0円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: '口腔健康関連QOLの低下と抑うつが有意に関連（Alimoradi 2024, z=0.26）・歯の喪失は生活の質低下と一貫（Gerritsen 2010）。自尊感情・対人的自信の別軸のみ保守的に4%' },
+      { label: '日割り計算', formula: '480分 × 4%', result: '19分/日' },
     ],
   },
 

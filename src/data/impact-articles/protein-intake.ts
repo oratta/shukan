@@ -24,6 +24,8 @@ export const proteinIntake: LifeImpactArticle = {
       '{{health_inference}}\n\n' +
       '毎食しっかりタンパク質を摂ることは、日々のだらだら食いを静かに減らすことにもつながる。\n\n' +
       '{{cost_inference}}\n\n' +
+      '毎食タンパク質を意識して摂ることは、体づくりだけでなく食事全体の質を高め、気持ちの安定にもつながる。\n\n' +
+      '{{positive_mood_inference}}\n\n' +
       '{{cumulative}}',
 
     sources: [
@@ -47,6 +49,11 @@ export const proteinIntake: LifeImpactArticle = {
         text: '厚生労働省 (2024). 「日本人の食事摂取基準（2025年版）」策定検討会報告書。たんぱく質不足を高齢期フレイルのリスクとして明示し、高齢期の目標量下限を引き上げ。',
         url: 'https://www.mhlw.go.jp/stf/newpage_44138.html',
       },
+      {
+        id: 5,
+        text: 'Lassale C, Batty GD, Baghdadli A, et al. (2019). "Healthy dietary indices and risk of depressive outcomes: a systematic review and meta-analysis of observational studies." Molecular Psychiatry, 24(7), 965-986. 健康的な食事パターンでうつ発症リスク約33%低下（地中海食 RR 0.67）。',
+        url: 'https://doi.org/10.1038/s41380-018-0237-8',
+      },
     ],
   },
 
@@ -57,18 +64,20 @@ export const proteinIntake: LifeImpactArticle = {
       'タンパク質の満腹感による間食削減を、控えめに見積もります。Weigleらの研究では自発的な摂取カロリーが1日441kcal減りましたが、これは減量目的の食事での結果です。「毎食意識する」レベルではこの効果は大きく弱まるため、満腹感によってコンビニの間食（約¥150）を平均6日に1回控える程度と換算し、1日あたり¥25のコスト削減と推定します。4つのKPIの中で最も軟らかい値で、自炊（home_cooking）の食費効果と重なる場合はさらに小さく見るべきです。',
     income:
       'タンパク質摂取と収入を結ぶ直接的な定量エビデンスは無いため、収入への効果は0としています。',
+    positiveMood:
+      'あなたは42歳の日本人男性です。起床している約16時間のうち、前向きな気持ちで過ごす時間を1日480分（16時間の50%）と保守的に見積もります。食事の質とうつリスクの疫学研究では、健康的な食事パターンを保つ人はうつの発症リスクが3割ほど低いと報告されています（Lassale et al., 2019, Molecular Psychiatry）。タンパク質をしっかり摂ることはこの「食事の質」を底上げする一因子ですが、効果を過大に見積もらないため、また満腹感による間食減や身体面の健康効果とは別軸として二重計上を避けるため、寄与はごく保守的に全体の5%と置きました。結果として、前向きな気持ちの時間は1日あたり約24分（480分×5%）増える計算になります。',
     cumulative:
-      '**1ヶ月続けると**：健康寿命+3時間、¥750節約。\n' +
-      '**1年続けると**：健康寿命+1.5日、¥9,000節約。\n' +
-      '**10年続けると**：健康寿命+15日、¥9万節約。\n' +
-      '毎食のタンパク質が、20年後に自分の足で歩ける体を静かに準備します。',
+      '**1ヶ月続けると**：健康寿命+3時間、¥750節約、前向きな気持ちの時間+12時間。\n' +
+      '**1年続けると**：健康寿命+1.5日、¥9,000節約、前向きな気持ちの時間+6.1日。\n' +
+      '**10年続けると**：健康寿命+15日、¥9万節約、前向きな気持ちの時間+61日。\n' +
+      '毎食のタンパク質が、20年後に自分の足で歩ける体と、日々の気分を静かに準備します。',
   },
 
   calculationParams: {
     dailyHealthMinutes: 6,
     dailyCostSaving: 25,
     dailyIncomeGain: 0,
-    dailyPositiveMoodMinutes: 0,
+    dailyPositiveMoodMinutes: 24,
   },
 
   confidenceLevel: 'medium',
@@ -85,6 +94,11 @@ export const proteinIntake: LifeImpactArticle = {
     ],
     income: [
       { label: '直接エビデンスなし', value: 'タンパク質摂取と所得を結ぶ定量的根拠はない', result: '0円/日' },
+    ],
+    positiveMood: [
+      { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },
+      { label: '研究結果', value: '健康的な食事パターンでうつ発症リスク約33%低下（Lassale 2019, 地中海食 RR 0.67）。タンパク質は食事の質を支える一因子として保守的に5%' },
+      { label: '日割り計算', formula: '480分 × 5%', result: '24分/日' },
     ],
   },
 
