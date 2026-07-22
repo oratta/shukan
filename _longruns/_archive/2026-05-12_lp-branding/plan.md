@@ -4,7 +4,7 @@
 - 作成日: 2026-05-12
 - Brain Dump元: GitHub Issue #1（ブランディングページ（LP）作成）+ docs/context/product-concept.md
 - 質問回数: 5問
-- 関連 Issue: https://github.com/oratta/shukan/issues/1
+- 関連 Issue: https://github.com/genetta-inc/shukan/issues/1
 
 ## ゴール
 
