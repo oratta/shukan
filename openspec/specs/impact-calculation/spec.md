@@ -67,6 +67,17 @@ TBD - normalized from archived change evidence-marketplace (delta format had lea
 - **WHEN** 開発者が記事の health と positiveMood の算出根拠を確認する
 - **THEN** dailyHealthMinutes は「寿命延伸の残存余命按分」、dailyPositiveMoodMinutes は「その日のうち前向きでいられる時間の増分」であり、同一の研究効果が両軸に計上されていない
 
+### Requirement: 収入軸の換算規約（暦日ベース）
+収入（earning）軸の日次値は「年額換算 ÷ 365（暦日）」で算出しなければならない（MUST。例: `15000000 × 2% ÷ 365`）。営業日日給（年収 ÷ 240営業日 = 62,500円）× x% をそのまま日次値として使用してはならない（MUST NOT。暦日積算の累積表示で約1.52倍の過大計上になる）。営業日ベースの効果を使う場合は `× 240 ÷ 365` の補正を formula に明記する。累積効果（cumulative）の収入表記は「収入ポテンシャル」とし、「収入増」と断定してはならない（MUST NOT。生産性向上が給与に1:1で転化する保証はないため）。
+
+#### Scenario: 営業日賃金の直接日次計上の検出
+- **WHEN** calculationLogic.income の formula が `62500 × x%` 形式で、`÷ 365` も `× 240` も含まない記事を validate:evidence にかける
+- **THEN** error（income-workday-basis）が報告される
+
+#### Scenario: 累積表示の収入文言
+- **WHEN** 開発者が全記事の inferences.cumulative を検証する
+- **THEN** 収入の表記は「収入ポテンシャル」であり、「収入増」の断定表記は存在しない
+
 ### Requirement: 記事本文の positiveMood 推論段落
 `renderArticle` は置換プレースホルダーとして health_inference / cost_inference / income_inference / positive_mood_inference / cumulative の5つを扱わなければならない（MUST）。`{{positive_mood_inference}}` は `inferences.positiveMood` で置換する。inferences.positiveMood が未設定の記事ではプレースホルダーを置換せずそのまま残す（未知キーと同じ挙動）ことで、設定漏れに気付ける状態とする。
 

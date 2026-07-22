@@ -16,7 +16,8 @@ import type { LifeImpactArticle } from '@/types/impact';
  *   APA — task switching reduces productivity up to 40%;
  *   Cal Newport — deep work / social media quitting;
  *   42 min/day recovered + focus improvement → ~1 hour effective work
- *   → ¥4,690/day
+ *   (workday value converted to calendar-day basis: × 240 ÷ 365)
+ *   → ¥3,100/day
  */
 export const noYoutube: LifeImpactArticle = {
   habitCategory: 'no_youtube',
@@ -68,20 +69,20 @@ export const noYoutube: LifeImpactArticle = {
     cost:
       'YouTube Premium（月額¥1,280 = 1日約¥43）の解約に加え、YouTube広告経由の衝動買い抑制（保守的に1日¥100程度）を算入すると、直接的なコスト削減として1日あたり¥150と推定されます。なお、42分の時間回復による機会費用は収入推定に含めています。',
     income:
-      '年収1,500万円（日給換算¥62,500、時給¥7,813）に対して、1日42分のYouTube視聴をやめることで得られる効果は単純な時間回復だけではありません。Gloria Markの研究による「注意残余」効果（1回の中断で23分のロス）を考慮すると、YouTube視聴2〜3回で実質1時間以上の生産的時間が失われています。この回復時間と、Deep Work能力の段階的な向上（Cal Newport: 断片的メディア消費をやめると数週間で深い集中力が戻る）を総合し、保守的に1日あたり約1時間分の実効的な生産性向上（時給の60%で割引）と推定すると、¥4,690の収入ポテンシャルに相当します。',
+      '年収1,500万円（時給換算¥7,813）に対して、1日42分のYouTube視聴をやめることで得られる効果は単純な時間回復だけではありません。Gloria Markの研究による「注意残余」効果（1回の中断で23分のロス）を考慮すると、YouTube視聴2〜3回で実質1時間以上の生産的時間が失われています。この回復時間と、Deep Work能力の段階的な向上（Cal Newport: 断片的メディア消費をやめると数週間で深い集中力が戻る）を総合し、保守的に1日あたり約1時間分の実効的な生産性向上（時給の60%で割引）と見積もり、就労日にしか賃金価値化されない効果を暦日換算（× 240 ÷ 365）すると、¥3,100の収入ポテンシャルに相当します。',
     positiveMood:
       'スマートフォンのスクリーン時間を減らすと、3週間でうつ症状・ストレス・睡眠の質が改善することがランダム化比較試験で示されています（Brailovskaia et al., 2025）。何もしないときに前向きでいられる時間（起床16時間のうち約50%＝480分）を基準に、YouTube視聴という一つのスクリーン習慣を手放す効果を保守的に10%とみなすと、1日あたり約48分（480分×10%）、前向きな気持ちで過ごせる時間が増えると推定されます。',
     cumulative:
-      '**1ヶ月続けると**：健康寿命+2.5時間、¥4,500節約、¥140,700の収入増、前向きな気持ちの時間+24時間。\n' +
-      '**1年続けると**：健康寿命+1.3日、¥5.5万節約、¥171万の収入増、前向きな気持ちの時間+12.2日。\n' +
-      '**10年続けると**：健康寿命+13日、¥55万節約、¥1,712万の収入増、前向きな気持ちの時間+121.7日。\n' +
+      '**1ヶ月続けると**：健康寿命+2.5時間、¥4,500節約、¥93,000の収入ポテンシャル、前向きな気持ちの時間+24時間。\n' +
+      '**1年続けると**：健康寿命+1.3日、¥5.5万節約、¥113万の収入ポテンシャル、前向きな気持ちの時間+12.2日。\n' +
+      '**10年続けると**：健康寿命+13日、¥55万節約、¥1,132万の収入ポテンシャル、前向きな気持ちの時間+121.7日。\n' +
       'YouTubeをやめることは、散漫になった注意力を取り戻し、深い集中と健康を手に入れるための最も手軽な一歩です。',
   },
 
   calculationParams: {
     dailyHealthMinutes: 5,
     dailyCostSaving: 150,
-    dailyIncomeGain: 4690,
+    dailyIncomeGain: 3100,
     dailyPositiveMoodMinutes: 48,
   },
 
@@ -100,7 +101,7 @@ export const noYoutube: LifeImpactArticle = {
     income: [
       { label: '注意残余の回復', value: '中断1回あたり23分のロス（Mark, 2008）' },
       { label: '実効1時間の回復', value: '42分 + Deep Work能力向上' },
-      { label: '時給60%割引', formula: '7813 × 60%', result: '4690円/日' },
+      { label: '時給60%割引（暦日換算）', formula: '7813 × 60% × 240 ÷ 365', result: '3100円/日' },
     ],
     positiveMood: [
       { label: '前提', value: '起床16時間=960分 × 前向き割合50% = ベースライン480分/日' },

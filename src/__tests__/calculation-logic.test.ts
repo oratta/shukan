@@ -152,9 +152,9 @@ describe('Missing calculationLogic handling', () => {
  * All articles consistency check
  */
 describe('All articles have valid calculationParams', () => {
-  it('all 38 articles should have positive calculationParams', () => {
+  it('all articles should have positive calculationParams', () => {
     const articles = getArticleList();
-    expect(articles.length).toBe(38);
+    expect(articles.length).toBe(46);
 
     for (const { id } of articles) {
       const article = getArticle(id);
@@ -167,12 +167,12 @@ describe('All articles have valid calculationParams', () => {
 });
 
 /**
- * A-S6: 全38記事が dailyPositiveMoodMinutes を持つ（未設定は 0）
+ * A-S6: 全記事が dailyPositiveMoodMinutes を持つ（未設定は 0）
  */
-describe('All 38 articles have dailyPositiveMoodMinutes (A-S6)', () => {
+describe('All articles have dailyPositiveMoodMinutes (A-S6)', () => {
   it('全記事が number の dailyPositiveMoodMinutes を持ち 0 以上である', () => {
     const articles = getArticleList();
-    expect(articles.length).toBe(38);
+    expect(articles.length).toBe(46);
     for (const { id } of articles) {
       const article = getArticle(id);
       expect(article).toBeDefined();
@@ -220,6 +220,19 @@ describe('All articles have positiveMood values (A-S7, 4KPI化)', () => {
       expect(article.article.researchBody, `${id}: positive_mood_inference placeholder`).toContain(
         '{{positive_mood_inference}}'
       );
+    }
+  });
+
+  it('累積効果の収入表記は「収入ポテンシャル」（断定形「収入増」を使わない）', () => {
+    // 生産性向上が給与に1:1で転化する保証はないため、累積の収入は断定しない（換算規約）
+    // dailyIncomeGain: 0 の記事（費用軸のみ）は収入への言及自体がないため対象外
+    const articles = getArticleList();
+    for (const { id } of articles) {
+      const article = getArticle(id);
+      if (!article || article.calculationParams.dailyIncomeGain === 0) continue;
+      const cumulative = article.inferences.cumulative ?? '';
+      expect(cumulative, `${id}: cumulative`).toContain('の収入ポテンシャル');
+      expect(cumulative, `${id}: cumulative`).not.toContain('の収入増');
     }
   });
 
