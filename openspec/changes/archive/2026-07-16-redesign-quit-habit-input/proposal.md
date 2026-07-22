@@ -1,6 +1,6 @@
 # Proposal: redesign-quit-habit-input
 
-GitHub issue: [#104 やらない系習慣の入力UI再設計](https://github.com/oratta/shukan/issues/104)（Refs #2）
+GitHub issue: [#104 やらない系習慣の入力UI再設計](https://github.com/genetta-inc/shukan/issues/104)（Refs #2）
 
 ## Why
 

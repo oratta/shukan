@@ -4,7 +4,7 @@
 - 開始: 2026-05-12 16:35 JST（session_start at HEAD 040ebbe）
 - Build 完了: 2026-05-12 17:26 JST
 - Verify 完了: 2026-05-12 17:34 JST（推定）
-- 関連 Issue: [#1 ブランディングページ（LP）作成](https://github.com/oratta/shukan/issues/1)
+- 関連 Issue: [#1 ブランディングページ（LP）作成](https://github.com/genetta-inc/shukan/issues/1)
 
 ## ゴール（達成）
 Smitch のコアメッセージ（"Switch your path." / 「なりたい自分から科学が習慣を導く」）を体現する LP の **routing 基盤・shell・SEO/OGP・deploy 手順** を整備し、`www.s-mitch.com` で公開できる状態にする。LP の本格デザイン（codex + gpt-image-2 担当）の入力資料も同時に確保。

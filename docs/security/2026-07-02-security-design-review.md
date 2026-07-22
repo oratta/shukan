@@ -1,6 +1,6 @@
 # セキュリティ設計レビュー（早期）— 2026-07-02
 
-GitHub issue [#32](https://github.com/oratta/shukan/issues/32) の早期セキュリティ設計レビュー結果。
+GitHub issue [#32](https://github.com/genetta-inc/shukan/issues/32) の早期セキュリティ設計レビュー結果。
 issue のチェック観点を4領域（RLS・データアクセス / 認証・ヘッダー / Stripe課金・シークレット / 入力出力・計測PII)に分けて並列調査し、検出候補には偽陽性フィルタリング（確信度8/10未満は除外）を適用した。
 
 ## 結論
