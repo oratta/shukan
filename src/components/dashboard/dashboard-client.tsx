@@ -13,6 +13,7 @@ import { DailyImpactSummary } from '@/components/habits/daily-impact-summary';
 import { EstablishedSection } from '@/components/habits/established-section';
 import { YesterdayReviewBanner } from '@/components/habits/yesterday-review-banner';
 import { YesterdayReviewSheet } from '@/components/habits/yesterday-review-sheet';
+import { HelpButton } from '@/components/help/help-button';
 import { useHabits, type InitialHabitData } from '@/hooks/useHabits';
 import { useProfile } from '@/hooks/useProfile';
 import { getHabitsWithStats, getTodayString, getYesterdayUnreviewedHabits, isDailyTrackedHabit, isEstablishedHabit } from '@/lib/habits';
@@ -22,6 +23,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { shouldBlockCreateHabit } from '@/lib/billing/create-habit-gate';
 import { upsertDailyReflection } from '@/lib/supabase/habits';
 import { track } from '@/lib/analytics';
+import { emitTutorialEvent } from '@/lib/tutorial';
 import { InstallBanner } from '@/components/pwa/install-banner';
 import { isCompletionTransition, type DayStatus as PwaDayStatus } from '@/lib/pwa/completion';
 import type { Habit, HabitInsertInput } from '@/types/habit';
@@ -223,7 +225,18 @@ export function DashboardClient({
 
   const handleOpenActionSheet = useCallback((habitId: string, date: string) => {
     setActionSheetTarget({ habitId, date });
+    emitTutorialEvent('action-sheet-open');
   }, []);
+
+  // チュートリアル用: メインリストの達成トグルを横取りせず通知だけ添える
+  const handleDayStatusChange = useCallback<typeof setDayStatus>(
+    async (habitId, date, status, opts) => {
+      await setDayStatus(habitId, date, status, opts);
+      if (status === 'completed') emitTutorialEvent('habit-completed');
+      else if (status === 'none') emitTutorialEvent('habit-uncompleted');
+    },
+    [setDayStatus]
+  );
 
   const handleOpenBulkEdit = useCallback((habitId: string) => {
     setBulkEditTarget(habitId);
@@ -283,9 +296,12 @@ export function DashboardClient({
         <header>
           <div className="flex items-end justify-between gap-4">
             <div className="min-w-0">
-              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
-                {t('habits.todayProgress')}
-              </p>
+              <div className="flex items-center gap-1">
+                <p className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+                  {t('habits.todayProgress')}
+                </p>
+                <HelpButton topic="todayProgress" className="size-4" iconClassName="size-3.5" />
+              </div>
               <div className="mt-0.5 flex items-baseline leading-none">
                 <span className="font-mono text-[72px] font-semibold leading-[0.85] tracking-tighter tabular-nums text-success">
                   {completedCount}
@@ -303,9 +319,12 @@ export function DashboardClient({
                   </span>
                   <span className="text-sm text-muted-foreground">{t('habits.daysStreakUnit')}</span>
                 </div>
-                <p className="mt-1 text-[11px] leading-none text-muted-foreground">
-                  {t('habits.longestStreakCaption')}
-                </p>
+                <div className="mt-1 flex items-center justify-end gap-1">
+                  <p className="text-[11px] leading-none text-muted-foreground">
+                    {t('habits.longestStreakCaption')}
+                  </p>
+                  <HelpButton topic="streak" className="size-4" iconClassName="size-3.5" />
+                </div>
               </div>
             )}
           </div>
@@ -338,7 +357,7 @@ export function DashboardClient({
 
       <HabitList
         habits={todayHabits}
-        onDayStatusChange={setDayStatus}
+        onDayStatusChange={handleDayStatusChange}
         onAdd={handleAdd}
         onOpenDetail={handleOpenDetail}
         onOpenActionSheet={handleOpenActionSheet}
@@ -390,7 +409,12 @@ export function DashboardClient({
 
       <HabitActionSheet
         open={!!actionSheetTarget}
-        onOpenChange={(open) => !open && setActionSheetTarget(null)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setActionSheetTarget(null);
+            emitTutorialEvent('action-sheet-closed');
+          }
+        }}
         habit={actionSheetHabit}
         date={actionSheetTarget?.date ?? null}
         currentStatus={(actionSheetCompletion?.status ?? 'none') as 'completed' | 'failed' | 'none' | 'rocket_used' | 'skipped'}

@@ -36,6 +36,7 @@ export function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
+              data-tutorial={item.href === '/discover' ? 'nav-discover' : undefined}
               className={cn(
                 'flex flex-col items-center gap-1 rounded-lg px-3 py-2 text-xs transition-colors',
                 isActive

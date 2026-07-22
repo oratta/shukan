@@ -9,6 +9,7 @@ import { EstimateDisclaimer } from '@/components/habits/estimate-disclaimer';
 import { EvidenceArticleSheet } from '@/components/habits/evidence-article-sheet';
 import { HabitForm } from '@/components/habits/habit-form';
 import { KpiIcon } from '@/components/onboarding/kpi-icon';
+import { HelpButton } from '@/components/help/help-button';
 import { EVIDENCE_HERO_IMAGES as HERO_IMAGES } from '@/data/evidence-hero-images';
 import { useHabits } from '@/hooks/useHabits';
 import { cn } from '@/lib/utils';
@@ -110,6 +111,7 @@ export default function DiscoverPage() {
       {/* F14: ゼロから習慣をつくる。彩色せずインク（primary）のダッシュ枠＝「追加」の affordance。 */}
       <button
         type="button"
+        data-tutorial="discover-create"
         onClick={handleCreateFromScratch}
         className="mb-6 flex w-full items-center gap-3 rounded-2xl border border-dashed border-border bg-card px-4 py-4 text-left transition-colors hover:border-primary/50 hover:bg-secondary active:scale-[0.99]"
       >
@@ -127,7 +129,10 @@ export default function DiscoverPage() {
       {/* F11/F13: 指標フィルタ＝このページの操作の一等地（原則③）。選択中はインクのソリッド
           pill で「今どの指標で並べているか」を最も強いコントラストで示す（原則①: 色でなくインク）。 */}
       <div className="mb-4">
-        <p className="mb-2 text-xs text-muted-foreground">{t('discover.sortLead')}</p>
+        <div className="mb-2 flex items-center gap-1">
+          <p className="text-xs text-muted-foreground">{t('discover.sortLead')}</p>
+          <HelpButton topic="evidenceConfidence" className="size-4" iconClassName="size-3.5" />
+        </div>
         {/* 景表法・打消し表示対応（issue #39）: リストの推定値に対する近接注記 */}
         <EstimateDisclaimer className="mb-2.5" />
         <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
@@ -158,7 +163,7 @@ export default function DiscoverPage() {
       </div>
 
       {/* F12: 写真主役のコンパクトカード（2カラム）・選んだ KPI 効果順 */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3" data-tutorial="discover-articles">
         {sortedArticles.map((article) => (
           <ArticleCard
             key={article.id}

@@ -50,6 +50,11 @@ import {
   Sparkles,
   ListChecks,
   CalendarCheck,
+  Bath,
+  Smile,
+  Wind,
+  Beef,
+  Bed,
 } from 'lucide-react';
 
 /** Lucide kebab-case name → Component mapping */
@@ -104,6 +109,11 @@ export const ICON_REGISTRY: Record<string, LucideIcon> = {
   sparkles: Sparkles,
   'list-checks': ListChecks,
   'calendar-check': CalendarCheck,
+  bath: Bath,
+  smile: Smile,
+  wind: Wind,
+  beef: Beef,
+  bed: Bed,
 };
 
 /** Icons available in the Habit Icon Picker */

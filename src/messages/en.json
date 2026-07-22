@@ -64,11 +64,6 @@
     "rocketConfirmCancel": "Cancel",
     "historyTab": "HISTORY",
     "milestones": "MILESTONES",
-    "historyHelpTitle": "How History Works",
-    "historyHelp1": "The calendar shows your completion status for this habit by month.",
-    "historyHelp2": "Green: completed, Orange: failed, Empty: no record yet.",
-    "historyHelp3": "The last 5 days are shown with a border and can be tapped to toggle status (completed → failed → none).",
-    "historyHelp4": "Complete 10 consecutive days to earn a rocket. Rockets can rescue a past failed day (only days older than 5 days).",
     "skip": "Skip",
     "unskip": "Unskip",
     "skippedSection": "Skipped",
@@ -243,7 +238,6 @@
     "addCount": "Add {count} evidence(s)",
     "noEvidence": "You can create a habit without evidence",
     "weight": "Weight",
-    "weightAbout": "Changing the weight multiplies the evidence impact values. For example, setting 'Quit Smoking' to 50% matches a goal to cut tobacco by half.",
     "totalImpact": "Total Impact",
     "search": "Search by keyword...",
     "noResults": "No matching articles found",
@@ -818,5 +812,90 @@
     "submitting": "Submitting...",
     "success": "Sent. Thank you!",
     "error": "Failed to send. Please try again later."
+  },
+  "help": {
+    "ariaLabel": "Show help for “{title}”",
+    "topics": {
+      "todayProgress": {
+        "title": "Today’s count",
+        "body": "The big number at the top of Home shows habits completed today out of habits scheduled for today.\nMark a habit as done and the left number goes up. The bar below shows today’s progress."
+      },
+      "streak": {
+        "title": "What is a streak?",
+        "body": "The number of consecutive days you have kept a habit going. It resets to 0 when a day is missed.\nHome shows the longest active streak among your habits. On the Stats page, “Current Streak” averages each habit’s active streak, and “Longest Streak” is your best record so far.\nComplete 10 consecutive days to earn a rocket, which can rescue one past failed day."
+      },
+      "completionRate": {
+        "title": "What is Completion Rate?",
+        "body": "The share of scheduled days on which you completed your habits. The big number on the Stats page covers all habits this month; the per-habit list shows each habit’s rate.\nSkipped days are excluded from the calculation, so planned rest days do not lower your rate."
+      },
+      "lifeImpact": {
+        "title": "What is Life Impact?",
+        "body": "An estimate of what your habits give back, converted into four KPIs — healthy lifespan, cost saving, income growth, and time feeling positive — based on the research evidence linked to each habit.\nFor each KPI, the left number is what you have earned today and the right number is what you would earn by completing all of today’s habits.\nFigures are estimates based on population averages from research. They do not guarantee individual results."
+      },
+      "impactSavings": {
+        "title": "What is Life Impact Savings?",
+        "body": "The Life Impact from every day you completed your habits, added up over your whole history. The longer you keep going, the more it grows — like savings.\nFigures are estimates based on population averages from research. They do not guarantee individual results."
+      },
+      "evidenceConfidence": {
+        "title": "Impact figures and confidence",
+        "body": "The figures on each card are estimates of the effect of keeping the habit for one year, based on research evidence. Cards are ordered by their impact on the metric you selected above.\n“Confidence” indicates how solid the underlying research is — higher confidence means stronger research backing.\nFigures are population-average estimates; results vary by person."
+      },
+      "historyCalendar": {
+        "title": "How History Works",
+        "body": "The calendar shows your completion status for this habit by month.\nGreen: completed, Orange: failed, Empty: no record yet.\nThe last 5 days are shown with a border and can be tapped to toggle status (completed → failed → none).\nComplete 10 consecutive days to earn a rocket. Rockets can rescue a past failed day (only days older than 5 days)."
+      },
+      "evidenceWeight": {
+        "title": "What is Weight?",
+        "body": "Changing the weight multiplies the evidence impact values. For example, setting “Quit Smoking” to 50% matches a goal to cut tobacco by half."
+      },
+      "reviewMood": {
+        "title": "Recording yesterday’s mood",
+        "body": "Rate how yesterday felt on a five-point scale — further left means a harder day, further right a better one.\nSaved together with a comment, it appears in the review calendar on the Stats page, helping you notice how your mood and habits relate."
+      }
+    }
+  },
+  "tutorial": {
+    "caption": "Quick guide",
+    "captionDone": "Guide complete",
+    "progress": "Guide {current}/{total}",
+    "skip": "Skip",
+    "start": "Start",
+    "next": "Next",
+    "done": "Done",
+    "goHome": "Go home",
+    "steps": {
+      "welcome": {
+        "title": "Welcome to Smitch",
+        "body": "Take one minute to learn the basics — hands-on, right on the real screen."
+      },
+      "complete": {
+        "title": "Tap to complete",
+        "body": "When you finish a habit today, tap this circle. That's all it takes to log it."
+      },
+      "undo": {
+        "title": "Tap again to undo",
+        "body": "Tapped by mistake? No problem — tap once more to undo."
+      },
+      "longpress": {
+        "title": "Long-press for more",
+        "body": "Now try long-pressing the circle. You can log a missed day or skip a day from here. Close the menu when you're done."
+      },
+      "discover": {
+        "title": "Add more habits",
+        "body": "Tap the Discover tab."
+      },
+      "articles": {
+        "title": "Add evidence-backed habits",
+        "body": "These habits come with evidence for their impact. Tap any card to see the details and an \"Add this habit\" button."
+      },
+      "create": {
+        "title": "Create your own habit",
+        "body": "Build your own habit from here. For example, bundle several actions into one habit like a \"morning routine\", attach multiple pieces of evidence, and tune each one's share (%) to adjust the impact."
+      },
+      "finished": {
+        "title": "You're all set!",
+        "body": "Head back home and complete your first habit of the day."
+      }
+    }
   }
 }

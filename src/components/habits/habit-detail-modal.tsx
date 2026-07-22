@@ -25,7 +25,7 @@ import { calculateDailyImpact, formatHealthMinutes, formatCurrency } from '@/lib
 import { ImpactKpiGrid, type ImpactKpiMetric } from '@/components/habits/impact-kpi-grid';
 import { EstimateDisclaimer } from '@/components/habits/estimate-disclaimer';
 import { EvidenceManagerSheet } from '@/components/habits/evidence-manager-sheet';
-import { HelpButton } from '@/components/ui/help-button';
+import { HelpButton } from '@/components/help/help-button';
 import { nextStatus, EDITABLE_PAST_DAYS } from '@/lib/habits';
 import { failedFillStyle } from '@/components/habits/failed-fill';
 import type { HabitWithStats, DayStatus } from '@/types/habit';
@@ -413,14 +413,7 @@ export function HabitDetailModal({
               <p className="text-sm font-semibold text-foreground">
                 {tHabits('history')}
               </p>
-              <HelpButton title={tHabits('historyHelpTitle')}>
-                <div className="space-y-2">
-                  <p>{tHabits('historyHelp1')}</p>
-                  <p>{tHabits('historyHelp2')}</p>
-                  <p>{tHabits('historyHelp3')}</p>
-                  <p>{tHabits('historyHelp4')}</p>
-                </div>
-              </HelpButton>
+              <HelpButton topic="historyCalendar" />
             </div>
             <div className="flex items-center gap-2">
               <button
